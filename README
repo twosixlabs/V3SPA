@@ -1,4 +1,8 @@
 
- Avispa (spanish for wasp) is a visualization framework. Originally developed
- for V3SPA, it is intended to be a general purpose Javascript library for
- rendering graphs.
+Avispa (spanish for wasp) is a visualization framework. Originally developed
+for V3SPA, it is intended to be a general purpose Javascript library for
+rendering graphs.
+
+Currently compiled with CoffeeScript 1.6.3 (http://coffeescript.org)
+
+Depends on jQuery, Underscore.js, and Backbone.js
