@@ -1,6 +1,8 @@
 
-    Group = Backbone.View.extend
-        className: 'group'
+Base class for "group" objects
 
-        initialize: () ->
+    #Group = Backbone.View.extend
+    #    className: 'group'
+    #
+    #    initialize: () ->
 

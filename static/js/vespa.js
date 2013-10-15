@@ -17,7 +17,10 @@
   vespa = null;
 
   $(document).ready(function() {
-    var flip;
+    var avispa, flip;
+    avispa = new Avispa({
+      surface: $('#surface')
+    });
     flip = true;
     $('#expand').on('click', function() {
       return $('#status_pane').animate({

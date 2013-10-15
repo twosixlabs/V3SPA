@@ -19,6 +19,9 @@
 This is the entry point into the V3SPA framework.
 
     $(document).ready () ->
+        avispa = new Avispa
+            surface: $('#surface')
+
         flip = true
         $('#expand').on 'click', () ->
             $('#status_pane').animate

@@ -5,24 +5,27 @@
         max  : 2.5
 
     window.Avispa = Backbone.View.extend
-        className: 'AvispaView'
+        tagName:   'svg'
+        className: 'avispa'
 
         events:
-            'mousedown.avispa      SVG' : 'OnMouseDown'
-            'mousemove.avispa      SVG' : 'OnMouseMove'
-            'mouseup.avispa        SVG' : 'OnMouseUp'
-            'mousewheel.avispa     SVG' : 'OnMouseWheel'
-            'DOMMouseScroll.avispa SVG' : 'OnMouseWheel'
-            'contextmenu.avispa    SVG' : 'OnContextMenu'
+            'mousedown.avispa      svg' : 'OnMouseDown'
+            'mousemove.avispa      svg' : 'OnMouseMove'
+            'mouseup.avispa        svg' : 'OnMouseUp'
+            'mousewheel.avispa     svg' : 'OnMouseWheel'
+            'DOMMouseScroll.avispa svg' : 'OnMouseWheel'
+            'contextmenu.avispa    svg' : 'OnContextMenu'
 
         # for child class initialization
         secondstage: () ->
 
         initialize: () ->
+            console.log(@)
+
             _.bindAll @, 'render',
                 'OnMouseDown', 'OnMouseMove', 'OnMouseUp', 'OnMouseWheel', 'OnContextMenu'
 
-            window.riskview = @
+            #window.riskview = @
 
             @scale    = 1.0
             @links    = {}
@@ -33,16 +36,16 @@
             @$el.html($('#template_risk').text())
 
             # find the SVG element from the template
-            @$canvas = @$('svg.avispa')
-            @canvasdom = @$canvas.get(0)
-            @$parent = @$canvas.parent()
+            @$surface = @options.element
+            @surfacedom = @$surface.get(0)
+            @$parent = @$surface.parent()
 
-            @$pan    = @$canvas.find('g.pan')
-            @$zoom   = @$canvas.find('g.zoom')
+            @$pan    = @$surface.find('g.pan')
+            @$zoom   = @$surface.find('g.zoom')
 
-            @$links  = @$canvas.find('g.links')
-            @$nodes  = @$canvas.find('g.nodes')
-            @$labels = @$canvas.find('g.labels')
+            @$links  = @$surface.find('g.links')
+            @$nodes  = @$surface.find('g.nodes')
+            @$labels = @$surface.find('g.labels')
 
             @$pan.x = window.innerWidth / 2
             @$pan.y = window.innerHeight / 2
@@ -56,13 +59,13 @@
                     max:   zoom.max
                     step:  zoom.step
                     slide: (event, ui) ->
-                        riskview.Scale(ui.value)
+                        #riskview.Scale(ui.value)
 
                 .on 'mousedown', (event) ->
                     # zoom to normal on non-left click of zoom control
                     #cancelEvent(event)
                     if event.which != 1
-                        riskview.Scale(1.0)
+                        #riskview.Scale(1.0)
                         $(@).slider('value', 1.0)
                     event.stopPropagation()
                     return
@@ -72,7 +75,7 @@
                     d = normalizeWheel(event)
 
                     z = Math.max(0.25, Math.min(3.0, $(@).slider('value') + d * 0.25))
-                    riskview.Scale(z)
+                    #riskview.Scale(z)
                     $(@).slider('value', z)
                     return cancelEvent(event)
 
@@ -102,11 +105,11 @@
             return @
 
         Point: (event) ->
-            # translates the client x,y into the canvas x,y
-            point = @canvasdom.createSVGPoint()
+            # translates the client x,y into the surface x,y
+            point = @surfacedom.createSVGPoint()
             point.x = event.clientX
             point.y = event.clientY
-            point = point.matrixTransform(@canvasdom.getScreenCTM().inverse())
+            point = point.matrixTransform(@surfacedom.getScreenCTM().inverse())
 
             # account for the current pan and scale
             point.x = parseInt((point.x - @$pan.x) / @scale)

@@ -1,6 +1,7 @@
 
-    Link = Backbone.View.extend
-        className: 'link'
+Base class for "link" objects
 
-        initialize: () ->
+    #Link = Backbone.View.extend
+    #    className: 'link'
+    #    initialize: () ->
 

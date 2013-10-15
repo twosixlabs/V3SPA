@@ -1,6 +1,7 @@
 
-    Node = Backbone.View.extend
-        className: 'node'
+Base class for "node" objects
 
-        initialize: () ->
+    #Node = Backbone.View.extend
+    #    className: 'node'
+    #    initialize: () ->
 

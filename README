@@ -9,15 +9,32 @@
 
 Ubuntu 12.04 (Precise)
 
-Compiling (optional):
+  Compiling (optional):
 
     $ sudo apt-get install nodejs npm
     $ sudo npm -g install coffee-script
     $ sudo npm -g install less
+    $ make
 
-Running:
+  Running:
 
     $ sudo apt-get install python-setuptools python-pip
+    $ sudo pip install tornado
+
+OS X (10.8)
+
+  Compiling (optional):
+
+    Downlaod "Macintosh Installer" from http://nodejs.org/download/
+    Install pkg
+
+    $ sudo npm -g install coffee-script
+    $ sudo npm -g install less
+    $ make
+
+  Running:
+
+    $ sudo easy_install pip
     $ sudo pip install tornado
 
 #Building
@@ -26,3 +43,6 @@ Running:
 
 #Usage
 
+$ python vespa.py
+
+Override settings from etc/server.ini by creating etc/server.ini.local
