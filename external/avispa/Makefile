@@ -18,3 +18,6 @@ $(AVISPA_JS_OUT): $(AVISPA_JS_SRC)
 
 $(AVISPA_CSS_OUT): $(AVISPA_CSS_SRC)
 	$(LESS) $< $@
+
+clean:
+	@rm -f $(AVISPA_JS_OUT) $(AVISPA_CSS_OUT)

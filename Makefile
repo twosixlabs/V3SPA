@@ -24,6 +24,7 @@ $(VESPA_CSS_OUT): $(VESPA_CSS_SRC)
 
 clean:
 	@find . -type f -name \*.pyc -exec rm -f {} +
+	@make -C external/avispa clean
 
 distclean: clean
 	@rm -f $(VESPA_JS_OUT) $(VESPA_CSS_OUT)
