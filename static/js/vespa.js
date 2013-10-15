@@ -57,7 +57,6 @@
       this.connectionAttempts += 1;
       try {
         host = "ws://" + location.host + "/ws/" + channel;
-        console.log('Connecting to:', host);
         this.ws = new WebSocket(host);
         this.connectionAttempts = 0;
       } catch (_error) {

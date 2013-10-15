@@ -1,16 +1,22 @@
 {% extends 'base.html' %}
 
 {% block body %}
-    <div id="top_menu">
-     <ol>
-      <li>1</li>
-      <li>2</li>
-     </ol>
+    <div id="top_pane" class="pane">
+      <ol>
+        <li><b>V3SPA</b></li>
+        <li><a href="#editor">Editor</a></li>
+        <li><a href="#">Menu 2</a></li>
+        <li><a href="#">Menu 3</a></li>
+        <li><a href="#">Menu 4</a></li>
+        <li class="floatright"> &copy;2013 <b>Invincea Labs</b> </li>
+      </ol>
     </div>
-    <div id="left_pane"></div>
-    <div id="right_pane"></div>
-    <div id="bottom_pane"></div>
-
-    <textarea id="editor">
-    </textarea>
+    <div id="left_pane" class="pane">
+      <textarea id="editor"></textarea>
+    </div>
+    <div id="right_pane" class="pane">
+      {% include 'svg.html' %}
+    </div>
+    <div id="bottom_pane" class="pane clear">
+    </div>
 {% end %}

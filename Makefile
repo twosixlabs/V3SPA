@@ -18,3 +18,9 @@ $(VESPA_JS_OUT): $(VESPA_JS_SRC)
 
 $(VESPA_CSS_OUT): $(VESPA_CSS_SRC)
 	$(LESS) -x --no-color --include-path=src/less $< $@
+
+clean:
+	@find . -type f -name \*.pyc -exec rm -f {} +
+
+distclean: clean
+	@rm -f $(VESPA_JS_OUT) $(VESPA_CSS_OUT)

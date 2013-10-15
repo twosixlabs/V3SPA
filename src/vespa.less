@@ -1,11 +1,81 @@
 
+@import 'reset.less';
 @import 'elements.less';
+@import 'base.less';
 @import 'common.less';
 @import 'define.less';
 
 HTML {
     color: @fgcolor;
     background: @bgcolor;
-    font-size: 8pt;
 }
 
+/* PANES */
+
+DIV#top_pane
+{
+    background: @menucolor;
+    border-bottom: 1px solid @bordercolor;
+
+    position: absolute;
+    top: 0em;
+    width: 100%;
+    height: @top_height;
+    z-index: 10;
+
+    OL {
+        padding: 0.5em 1em;
+        list-style: none;
+
+        LI {
+            display: inline;
+            padding-right: 1em;
+
+            A {
+                font-weight: normal;
+                text-decoration: none;
+            }
+            A:hover {
+                text-decoration: underline;
+            }
+        }
+        LI:last-child {
+            padding-right: 0em;
+        }
+    }
+}
+
+DIV#left_pane
+{
+    background: #cfc;
+    width: 40%;
+    position: absolute;
+    top: @top_height;
+    left: 0em;
+    bottom: @bottom_height;
+
+    * {
+        width: 100%;
+        height: 100%;
+    }
+}
+DIV#right_pane
+{
+    width: 60%;
+    position: absolute;
+    top: @top_height;
+    right: 0em;
+    bottom: @bottom_height;
+}
+
+DIV#bottom_pane
+{
+    height: @bottom_height;
+    position: absolute;
+    bottom: 0em;
+    width: 100%;
+    border-top: 1px solid @bordercolor;
+
+    padding: 0.5em;
+    text-align: right;
+}

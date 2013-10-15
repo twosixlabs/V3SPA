@@ -1,5 +1,5 @@
 
-Backbone models
+Backbone models that use the CRUD paradigm
 
     Models.Node = Backbone.DeepModel.extend
         idAttribute: '_id'

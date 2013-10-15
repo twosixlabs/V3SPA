@@ -26,6 +26,7 @@ This is the entry point into the V3SPA framework.
             graph_node_contextmenu: $( '#template_graph_node_contextmenu' ).text()
             graph_task_configure:   $( '#template_graph_task_configure'   ).text()
 
+        return
 
 The main class for V3SPA framework.
 
@@ -68,18 +69,21 @@ The main class for V3SPA framework.
             models.positions.reset _data.positions
             models.arcs.reset      _data.arcs
             models.nodes.reset     _data.nodes
-            models.links.reset    _data.links
+            models.links.reset     _data.links
 
-Establish a websocket connection to the server.
+            return
+
+
+Establish a websocket connection to the server.  When a connection closes it
+automatically attempts to reconnect.
 
         ConnectWS: (channel) ->
-            @connectionAttempts += 1
+            @timeout = Math.min(@timeout + 1, 30)
 
             try
                 host = "ws://#{location.host}/ws/#{channel}"
-                console.log('Connecting to:', host)
                 @ws = new WebSocket(host)
-                @connectionAttempts = 0
+                @timeout = 0
 
             catch error
                 console.log('Connection failed')
@@ -91,13 +95,10 @@ Establish a websocket connection to the server.
                 return
 
             @ws.onclose = (event) ->
-                if @connectionAttempts < 10
-                    setTimeout () ->
-                        controller.ConnectWS(channel)
-                      ,
-                        1000 * @connectionAttempts
-                else
-                    console.log('Giving up')
+                setTimeout () ->
+                    controller.ConnectWS(channel)
+                  ,
+                    1000 * @timeout
                 return
 
             return
