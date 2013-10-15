@@ -19,12 +19,20 @@
 This is the entry point into the V3SPA framework.
 
     $(document).ready () ->
-        vespa ?= new Vespa()
+        flip = true
+        $('#expand').on 'click', () ->
+            $('#status_pane').animate
+                height: if flip then "+=8em" else "-=8em"
+              ,
+                200
+              ,
+                () ->
+                    flip = !flip
 
-        # pre-compile the templates
         templates =
-            graph_node_contextmenu: $( '#template_graph_node_contextmenu' ).text()
-            graph_task_configure:   $( '#template_graph_task_configure'   ).text()
+            editor: $( '#tmpl_editor' ).text()
+
+        vespa ?= new Vespa()
 
         return
 
@@ -32,7 +40,6 @@ The main class for V3SPA framework.
 
     class Vespa
         constructor: () ->
-
             # instantiate the models
             models.nodes     = new Models.Nodes
             models.positions = new Models.Positions
@@ -57,19 +64,22 @@ The main class for V3SPA framework.
             @dispatch.on 'UpdateArc',      @OnUpdateArc,      @
 
             @connectionAttempts = 0
-            @WebsocketConnect()
+            #@ConnectWS()
 
-            views.graph = new Views.Graph
+            #views.graph = new Views.Graph
 
             # instantiate views and associate models
             #views.nodes = new Views.Node
             #    collection: models.nodes
 
             # load the boot-strapped model data
-            models.positions.reset _data.positions
-            models.arcs.reset      _data.arcs
-            models.nodes.reset     _data.nodes
-            models.links.reset     _data.links
+            #models.positions.reset _data.positions
+            #models.arcs.reset      _data.arcs
+            #models.nodes.reset     _data.nodes
+            #models.links.reset     _data.links
+
+            new Router()
+            Backbone.history.start()
 
             return
 

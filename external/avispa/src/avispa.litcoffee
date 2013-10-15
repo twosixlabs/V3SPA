@@ -4,7 +4,7 @@
         min  : 0.125
         max  : 2.5
 
-    window.Risk = Backbone.View.extend
+    window.Avispa = Backbone.View.extend
         className: 'AvispaView'
 
         events:

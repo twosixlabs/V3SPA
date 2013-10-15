@@ -8,13 +8,17 @@
 HTML {
     color: @fgcolor;
     background: @bgcolor;
+    overflow: hidden;
 }
 
 /* PANES */
 
-DIV#top_pane
+DIV#menubar
 {
-    background: @menucolor;
+    .user-select();
+    cursor: default;
+
+    background: @bgcolor;
     border-bottom: 1px solid @bordercolor;
 
     position: absolute;
@@ -45,37 +49,89 @@ DIV#top_pane
     }
 }
 
-DIV#left_pane
+DIV#editor
 {
     background: #cfc;
-    width: 40%;
+    min-width: 40%;
     position: absolute;
-    top: @top_height;
-    left: 0em;
-    bottom: @bottom_height;
+    top: 5%;
+    left: 5%;
 
-    * {
+    border: 2px solid #99c;
+    border-radius: @lightradius;
+
+    DIV.title
+    {
+        .user-select();
+        cursor: default;
+
+        background: #ccf;
+        border-bottom: 1px solid #99c;
+        padding: 0.25em 0.5em;
+        font-weight: bold;
+    }
+    DIV.status
+    {
+        background: @bgcolor;
+        border-top: 1px solid #99c;
+    }
+    TEXTAREA {
+        display: block;
         width: 100%;
-        height: 100%;
+        height: 12em;
+        border: 0px;
+        margin: 0em;
+        padding: 0.5em;
+        font-family: "Courier New", serif;
     }
 }
-DIV#right_pane
+
+DIV#surface
 {
-    width: 60%;
+    background: #fff;
+    width: 100%;
+    height: 100%;
     position: absolute;
-    top: @top_height;
+    top: 0em;
+    left: 0em;
     right: 0em;
-    bottom: @bottom_height;
+    bottom: 0em;
+    z-index: 0;
 }
 
-DIV#bottom_pane
+DIV#modal
 {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0em;
+    left: 0em;
+    right: 0em;
+    bottom: 0em;
+    z-index: 1000;
+}
+
+DIV#status_pane
+{
+    background: @bgcolor;
     height: @bottom_height;
     position: absolute;
     bottom: 0em;
-    width: 100%;
-    border-top: 1px solid @bordercolor;
+    width: 90%;
+    border: 2px solid @bordercolor;
+    border-bottom: none;
+    border-top-left-radius: @lightradius;
+    border-top-right-radius: @lightradius;
+    margin: 0em 5%;
 
     padding: 0.5em;
-    text-align: right;
+
+    #expand
+    {
+        float: right;
+    }
+    #contract
+    {
+        float: right;
+    }
 }

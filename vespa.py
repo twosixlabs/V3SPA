@@ -23,10 +23,12 @@ def main():
             cookie_secret = fp.read(44)
     except IOError:
         logging.critical('Could not read cookie.secret')
-        return -1;
+        return -1
 
     patterns = [
-        (r'/', api.handlers.Index)
+        (r'/',       api.handlers.Index  ),
+        (r'/login',  api.handlers.Login  ),
+        (r'/logout', api.handlers.Logout ),
         ]
 
     settings = dict(
