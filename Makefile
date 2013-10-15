@@ -12,6 +12,9 @@ VESPA_CSS_SRC = src/vespa.less \
                 src/less/define.less
 
 all: $(VESPA_JS_OUT) $(VESPA_CSS_OUT)
+	@make -C external/avispa
+	@cp -f external/avispa/out/avispa.js static/js/
+	@cp -f external/avispa/out/avispa.css static/css/
 
 $(VESPA_JS_OUT): $(VESPA_JS_SRC)
 	$(COFFEE) -j $(VESPA_JS_OUT) -c $(VESPA_JS_SRC)

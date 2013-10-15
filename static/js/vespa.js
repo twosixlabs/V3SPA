@@ -20,7 +20,7 @@
     if (vespa == null) {
       vespa = new Vespa();
     }
-    return templates = {
+    templates = {
       graph_node_contextmenu: $('#template_graph_node_contextmenu').text(),
       graph_task_configure: $('#template_graph_task_configure').text()
     };
@@ -50,15 +50,16 @@
       models.arcs.reset(_data.arcs);
       models.nodes.reset(_data.nodes);
       models.links.reset(_data.links);
+      return;
     }
 
     Vespa.prototype.ConnectWS = function(channel) {
       var error, host;
-      this.connectionAttempts += 1;
+      this.timeout = Math.min(this.timeout + 1, 30);
       try {
         host = "ws://" + location.host + "/ws/" + channel;
         this.ws = new WebSocket(host);
-        this.connectionAttempts = 0;
+        this.timeout = 0;
       } catch (_error) {
         error = _error;
         console.log('Connection failed');
@@ -70,13 +71,9 @@
         controller.dispatch.trigger(msg.action, msg);
       };
       this.ws.onclose = function(event) {
-        if (this.connectionAttempts < 10) {
-          setTimeout(function() {
-            return controller.ConnectWS(channel);
-          }, 1000 * this.connectionAttempts);
-        } else {
-          console.log('Giving up');
-        }
+        setTimeout(function() {
+          return controller.ConnectWS(channel);
+        }, 1000 * this.timeout);
       };
     };
 
