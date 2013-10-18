@@ -14,6 +14,7 @@ api.ioloop = tornado.ioloop.IOLoop.instance()
 
 def main():
     api.settings.parse()
+    api.storage.initialize()
 
     addr = api.args.addr or api.config.get('server', 'address')
     port = api.args.port or api.config.getint('server', 'port')

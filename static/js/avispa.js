@@ -203,9 +203,6 @@
       return cancelEvent(event);
     },
     Drag: function(event) {
-      var x, y;
-      x = this.position.get('x');
-      y = this.position.get('y');
       x += (event.clientX / context.scale) - this.old_x - x;
       y += (event.clientY / context.scale) - this.old_y - y;
       this.position.set({

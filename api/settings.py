@@ -19,8 +19,8 @@ def parse():
     api.config.optionxform = str
 
     ini_files = [
-        os.path.join(api.root, 'etc', 'server.ini'),
-        os.path.join(api.root, 'etc', 'server.ini.local')
+        os.path.join(api.root, 'etc', 'vespa.ini'),
+        os.path.join(api.root, 'etc', 'vespa.ini.local')
         ]
 
     if api.args.ini:
@@ -35,7 +35,7 @@ def parse():
         raise api.error('Unable to read config file')
 
     logging.basicConfig(
-        format  = '%(asctime)s %(levelname)-7s %(message)s',
+        format  = '%(asctime)s %(levelname)-8s %(message)s',
         datefmt = '%Y-%m-%d %H:%M:%S',
         level   = logging.INFO
         )
