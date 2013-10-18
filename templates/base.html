@@ -2,14 +2,16 @@
 <html>
 <head>
   <title>V3SPA - {% block title %}Main{% end %}</title>
+  <link type="text/css" rel="stylesheet" href="{{ static_url('css/ui-lightness/jquery-ui-1.10.3.custom.css') }}" />
   <link type="text/css" rel="stylesheet" href="{{ static_url('css/avispa.css') }}" />
   <link type="text/css" rel="stylesheet" href="{{ static_url('css/vespa.css')  }}" />
-  <script type="text/javascript" src="{{ static_url('js/jquery-2.0.3.min.js')      }}"></script>
-  <script type="text/javascript" src="{{ static_url('js/underscore-min.js')        }}"></script>
-  <script type="text/javascript" src="{{ static_url('js/backbone.js')          }}"></script>
-  <script type="text/javascript" src="{{ static_url('js/deep-model-0.10.4.min.js') }}"></script>
-  <script type="text/javascript" src="{{ static_url('js/avispa.js') }}"></script>
-  <script type="text/javascript" src="{{ static_url('js/vespa.js') }}"></script>
+  <script type="text/javascript" src="{{ static_url('js/jquery-2.0.3.min.js')            }}"></script>
+  <script type="text/javascript" src="{{ static_url('js/jquery-ui-1.10.3.custom.min.js') }}"></script>
+  <script type="text/javascript" src="{{ static_url('js/underscore-min.js')              }}"></script>
+  <script type="text/javascript" src="{{ static_url('js/backbone.js')                    }}"></script>
+  <script type="text/javascript" src="{{ static_url('js/deep-model-0.10.4.min.js')       }}"></script>
+  <script type="text/javascript" src="{{ static_url('js/avispa.js')                      }}"></script>
+  <script type="text/javascript" src="{{ static_url('js/vespa.js')                       }}"></script>
   {% block head %}{% end %}
   {% block templates %}{% end %}
 </head>

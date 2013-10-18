@@ -1,3 +1,32 @@
-svg.avispa {
-  background: red;
+g.group rect {
+  cursor: pointer;
+  fill: #fff;
+  stroke: #ccc;
+  stroke-width: 1px;
+}
+g.group rect.hover {
+  stroke: #333;
+  stroke-width: 2px;
+}
+g.group text {
+  cursor: pointer;
+  font: bold 8pt Verdana, Helvetica, sans-serif;
+  fill: #000;
+  text-anchor: middle;
+}
+g.node circle {
+  cursor: pointer;
+  fill: #fff;
+  stroke: #ccc;
+  stroke-width: 1px;
+}
+g.node circle.hover {
+  stroke: #333;
+  stroke-width: 2px;
+}
+g.node text {
+  cursor: pointer;
+  font: bold 8pt Verdana, Helvetica, sans-serif;
+  fill: #000;
+  text-anchor: middle;
 }

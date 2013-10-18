@@ -2,8 +2,8 @@
 # OS X Sublime Text 2 hack
 PATH := $(PATH):/usr/local/bin
 
-COFFEE = coffee
-LESS = lessc
+COFFEE = PATH=$(PATH) coffee
+LESS = PATH=$(PATH) lessc
 
 VESPA_JS_OUT = static/js/vespa.js
 VESPA_JS_SRC = src/vespa.litcoffee  \
@@ -12,7 +12,8 @@ VESPA_JS_SRC = src/vespa.litcoffee  \
                src/editor.litcoffee
 
 VESPA_CSS_OUT = static/css/vespa.css
-VESPA_CSS_SRC = src/vespa.less \
+VESPA_CSS_SRC = src/vespa.less       \
+                src/editor.less      \
                 src/less/common.less \
                 src/less/define.less
 

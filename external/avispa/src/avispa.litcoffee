@@ -1,28 +1,26 @@
 
+    context = null
+
 Expose a global view class so that consumers of the API can instantiate a view.
 
     window.Avispa = Backbone.View.extend
-        tagName:   'svg'
-        className: 'avispa'
 
         events:
-            'mousedown.avispa      svg' : 'OnMouseDown'
-            'mousemove.avispa      svg' : 'OnMouseMove'
-            'mouseup.avispa        svg' : 'OnMouseUp'
-            'mousewheel.avispa     svg' : 'OnMouseWheel'
-            'DOMMouseScroll.avispa svg' : 'OnMouseWheel'
-            'contextmenu.avispa    svg' : 'OnContextMenu'
+            'mousedown.avispa'      : 'OnMouseDown'
+            'mousemove.avispa'      : 'OnMouseMove'
+            'mouseup.avispa'        : 'OnMouseUp'
+            'mousewheel.avispa'     : 'OnMouseWheel'
+            'DOMMouseScroll.avispa' : 'OnMouseWheel'
+            'contextmenu.avispa'    : 'OnContextMenu'
 
         # for child class initialization
         secondstage: () ->
 
         initialize: (options) ->
-            console.log(@)
+            context = @
 
             _.bindAll @, 'render',
                 'OnMouseDown', 'OnMouseMove', 'OnMouseUp', 'OnMouseWheel', 'OnContextMenu'
-
-            #window.riskview = @
 
             @scale    = 1.0
             @links    = {}
@@ -35,21 +33,16 @@ Expose a global view class so that consumers of the API can instantiate a view.
                 min  : 0.125
                 max  : 2.5
 
-            @$el.html(avispa_main)
+            #@$el.text(avispa_main)
 
-            console.log('avispa initialize: ', options)
+            #@$parent = @$surface.parent()
 
-            # find the SVG element from the template
-            @$surface = options.surface
-            @surfacedom = @$surface.get(0)
-            @$parent = @$surface.parent()
+            @$pan    = @$el.find('g.pan')
+            @$zoom   = @$el.find('g.zoom')
 
-            @$pan    = @$surface.find('g.pan')
-            @$zoom   = @$surface.find('g.zoom')
-
-            @$links  = @$surface.find('g.links')
-            @$nodes  = @$surface.find('g.nodes')
-            @$labels = @$surface.find('g.labels')
+            @$links  = @$el.find('g.links')
+            @$nodes  = @$el.find('g.nodes')
+            @$labels = @$el.find('g.labels')
 
             @$pan.x = window.innerWidth / 2
             @$pan.y = window.innerHeight / 2
@@ -65,7 +58,7 @@ Expose a global view class so that consumers of the API can instantiate a view.
             @$pan.y += dy
 
             @$pan.attr('transform', "translate(#{@$pan.x}, #{@$pan.y})")
-            @$parent.css('background-position', "#{@$pan.x}px #{@$pan.y}px")
+            #@$parent.css('background-position', "#{@$pan.x}px #{@$pan.y}px")
             return @
 
         Scale: (@scale) ->
@@ -83,10 +76,10 @@ Expose a global view class so that consumers of the API can instantiate a view.
 
         Point: (event) ->
             # translates the client x,y into the surface x,y
-            point = @surfacedom.createSVGPoint()
+            point = @el.createSVGPoint()
             point.x = event.clientX
             point.y = event.clientY
-            point = point.matrixTransform(@surfacedom.getScreenCTM().inverse())
+            point = point.matrixTransform(@el.getScreenCTM().inverse())
 
             # account for the current pan and scale
             point.x = parseInt((point.x - @$pan.x) / @scale)
@@ -128,7 +121,7 @@ Expose a global view class so that consumers of the API can instantiate a view.
                 @arrow.Drag(event)
 
             else if @dragItem
-                @dragItem.jitter++
+                #@dragItem.jitter++
                 @dragItem.Drag(event) if @dragItem.Drag
 
             return cancelEvent(event)
@@ -162,6 +155,7 @@ Expose a global view class so that consumers of the API can instantiate a view.
             return cancelEvent(event)
 
         OnContextMenu: (event) ->
+            console.log('yeah')
             return cancelEvent(event)
 
 

@@ -17,10 +17,7 @@
   vespa = null;
 
   $(document).ready(function() {
-    var avispa, flip;
-    avispa = new Avispa({
-      surface: $('#surface')
-    });
+    var flip;
     flip = true;
     $('#expand').on('click', function() {
       return $('#status_pane').animate({
@@ -39,6 +36,12 @@
 
   Vespa = (function() {
     function Vespa() {
+      vespa = this;
+      this.avispa = new Avispa({
+        el: $('#surface svg')
+      });
+      console.log(this.avispa.$el);
+      $('#surface').append(this.avispa.$el);
       models.nodes = new Models.Nodes;
       models.positions = new Models.Positions;
       models.links = new Models.Links;
@@ -57,7 +60,7 @@
       this.connectionAttempts = 0;
       new Router();
       Backbone.history.start();
-      return;
+      return this;
     }
 
     Vespa.prototype.ConnectWS = function(channel) {
@@ -155,8 +158,8 @@
 
   Router = Backbone.Router.extend({
     routes: {
-      'plugin/:plugin(/*action)': 'plugin',
       'editor': 'editor',
+      'node': 'node',
       'logout': 'logout',
       '': 'main'
     },
@@ -164,20 +167,22 @@
       this.modal = $('#modal');
       this.editor = null;
     },
-    cleanse: function() {
-      return this.modal.empty();
-    },
+    cleanse: function() {},
     main: function() {
-      console.log('main');
       return this.cleanse();
     },
     editor: function() {
-      console.log('editor');
       this.cleanse();
       if (!this.editor) {
-        this.editor = new Editor;
+        return this.editor = new Editor;
       }
-      return this.modal.append(this.editor.$el);
+    },
+    node: function() {
+      var group, node;
+      node = new Avispa.Node;
+      vespa.avispa.$nodes.append(node.$el);
+      group = new Avispa.Group;
+      return vespa.avispa.$nodes.append(group.$el);
     },
     logout: function() {
       return window.location = '/logout';
@@ -185,9 +190,32 @@
   });
 
   Editor = Backbone.View.extend({
-    id: "editor",
+    id: 'editor',
+    className: 'dialog',
     initialize: function() {
-      this.$el.append($(_.template(templates.editor)()));
+      this.$el.html('<textarea resizable="0"></textarea>');
+      this.$el.attr('title', 'hey');
+      this.$el.dialog({
+        resizable: true,
+        width: 400,
+        minWidth: 400,
+        height: 400,
+        minHeight: 400,
+        modal: false,
+        hide: {
+          effect: 'fade',
+          duration: 200
+        },
+        buttons: {
+          'Update': function() {
+            return $(this).dialog("close");
+          },
+          'Cancel': function() {
+            return $(this).dialog("close");
+          }
+        }
+      });
+      console.log(this.$el);
       return this;
     }
   });

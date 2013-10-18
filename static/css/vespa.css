@@ -53,15 +53,12 @@ textarea:-moz-placeholder{color:#a9a9a9}
 .clear{clear:both}
 .clearleft{clear:left}
 .clearright{clear:right}
+DIV#editor{margin:0;padding:.3em 0;width:100%;min-height:12em;height:12em;overflow:hidden}DIV#editor TEXTAREA{width:100%;height:100%;display:block;border:0;margin:0;padding:.5em;font-family:"Courier New",serif;resize:none;border:1px dotted #ccc}
+DIV#editor TEXTAREA:focus{outline:none;border:1px dotted #999}
 HTML{color:#2e3436;background:#eeeeec;overflow:hidden}
 DIV#menubar{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;cursor:default;background:#eeeeec;border-bottom:1px solid #2e3436;position:absolute;top:0;width:100%;height:2em;z-index:10000}DIV#menubar OL{padding:.5em 1em;list-style:none}DIV#menubar OL LI{display:inline;padding-right:1em}DIV#menubar OL LI A{font-weight:normal;text-decoration:none}
 DIV#menubar OL LI A:hover{text-decoration:underline}
 DIV#menubar OL LI:last-child{padding-right:0}
-DIV#editor{background:#cfc;min-width:40%;position:absolute;top:5%;left:5%;border:2px solid #99c;border-radius:4px}DIV#editor DIV.title{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;cursor:default;background:#ccf;border-bottom:1px solid #99c;padding:.25em .5em;font-weight:bold;border-top-left-radius:2px;border-top-right-radius:2px}
-DIV#editor DIV.status{background:#eeeeec;border-top:1px solid #99c}
-DIV#editor TEXTAREA{display:block;width:100%;height:12em;border:0;margin:0;padding:.5em;font-family:"Courier New",serif}
-DIV#editor TEXTAREA:focus{outline:1px dotted #999}
-DIV#surface{background:#fff;width:100%;height:100%;position:absolute;top:0;left:0;right:0;bottom:0;z-index:0}
-DIV#modal{width:100%;height:100%;position:absolute;top:0;left:0;right:0;bottom:0;z-index:1000}
+DIV#surface{background:#fff;width:100%;height:100%;position:absolute;top:0;left:0;right:0;bottom:0;z-index:0}DIV#surface svg{width:100%;height:100%}
 DIV#status_pane{background:#eeeeec;height:4em;position:absolute;bottom:0;width:90%;border:2px solid #2e3436;border-bottom:none;border-top-left-radius:4px;border-top-right-radius:4px;margin:0 5%;padding:.5em}DIV#status_pane #expand{float:right}
 DIV#status_pane #contract{float:right}

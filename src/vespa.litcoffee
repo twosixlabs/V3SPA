@@ -19,9 +19,6 @@
 This is the entry point into the V3SPA framework.
 
     $(document).ready () ->
-        avispa = new Avispa
-            surface: $('#surface')
-
         flip = true
         $('#expand').on 'click', () ->
             $('#status_pane').animate
@@ -43,6 +40,15 @@ The main class for V3SPA framework.
 
     class Vespa
         constructor: () ->
+            vespa = @
+
+            @avispa = new Avispa
+                el: $('#surface svg')
+                #surface: $('#avispa')
+
+            console.log(@avispa.$el)
+            $('#surface').append @avispa.$el
+
             # instantiate the models
             models.nodes     = new Models.Nodes
             models.positions = new Models.Positions
@@ -84,7 +90,7 @@ The main class for V3SPA framework.
             new Router()
             Backbone.history.start()
 
-            return
+            return @
 
 
 Establish a websocket connection to the server.  When a connection closes it

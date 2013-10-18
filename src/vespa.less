@@ -5,6 +5,8 @@
 @import 'common.less';
 @import 'define.less';
 
+@import 'editor.less';
+
 HTML {
     color: @fgcolor;
     background: @bgcolor;
@@ -49,6 +51,7 @@ DIV#menubar
     }
 }
 
+/*
 DIV#editor
 {
     background: #cfc;
@@ -92,6 +95,7 @@ DIV#editor
         outline: 1px dotted #999;
     }
 }
+*/
 
 DIV#surface
 {
@@ -104,8 +108,15 @@ DIV#surface
     right: 0em;
     bottom: 0em;
     z-index: 0;
+
+    svg
+    {
+        width: 100%;
+        height: 100%;
+    }
 }
 
+/*
 DIV#modal
 {
     width: 100%;
@@ -117,6 +128,7 @@ DIV#modal
     bottom: 0em;
     z-index: 1000;
 }
+*/
 
 DIV#status_pane
 {
