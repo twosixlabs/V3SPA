@@ -28,14 +28,16 @@ Expose a global view class so that consumers of the API can instantiate a view.
             @dragItem = null
             @arrow    = null
 
+            @position = new Models.Position
+                x: 0
+                y: 0
+
             @zoom =
                 step : 0.125
                 min  : 0.125
                 max  : 2.5
 
-            #@$el.text(avispa_main)
-
-            #@$parent = @$surface.parent()
+            @$parent = @$el.parent()
 
             @$pan    = @$el.find('g.pan')
             @$zoom   = @$el.find('g.zoom')
@@ -58,7 +60,7 @@ Expose a global view class so that consumers of the API can instantiate a view.
             @$pan.y += dy
 
             @$pan.attr('transform', "translate(#{@$pan.x}, #{@$pan.y})")
-            #@$parent.css('background-position', "#{@$pan.x}px #{@$pan.y}px")
+            @$parent.css('background-position', "#{@$pan.x}px #{@$pan.y}px")
             return @
 
         Scale: (@scale) ->
@@ -67,9 +69,9 @@ Expose a global view class so that consumers of the API can instantiate a view.
 
         Zoom: (delta) ->
             if delta is 0 then scale = 1.0
-            else scale = @scale + delta * zoom.step
+            else scale = @scale + delta * @zoom.step
 
-            return @ if scale <= zoom.min or scale >= zoom.max
+            return @ if scale <= @zoom.min or scale >= @zoom.max
 
             @Scale(scale)
             return @
@@ -148,8 +150,6 @@ Expose a global view class so that consumers of the API can instantiate a view.
             return cancelEvent(event)
 
         OnMouseWheel: (event) ->
-            #@MouseWheel(event) if @MouseWheel?
-            #if event.shiftKey
             @Zoom(normalizeWheel(event))
             @$('#zoomslider').slider('option', 'value', @scale)
             return cancelEvent(event)

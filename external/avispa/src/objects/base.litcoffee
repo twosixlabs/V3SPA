@@ -1,4 +1,7 @@
 
+The Avispa.BaseObject represents an abstract base class for Group and Node
+elements.  The root is an SVG G element that is translated when dragged.
+
     Avispa.BaseObject = Backbone.View.extend
 
         events:
@@ -7,15 +10,18 @@
             'mouseleave'  : 'OnMouseLeave'
             'contextmenu' : 'OnRightClick'
 
+The "Position" model is defined by the project that is importing Avispa.
+
         initialize: (@options) ->
             _.bindAll @, 'OnMouseDown'
 
-            @parent = @options
+            @parent = @options.parent if @options
+            @parent.$el.append(@$el) if @parent
+
             @position = new Models.Position
                 x: 0
                 y: 0
             @position.bind 'change', @render, @
-            @options?.parent?.$el.append(@$el)
 
             @init()
 
@@ -25,6 +31,8 @@
         OnMouseDown: (event) ->
             @x1 = (event.clientX / context.scale) - @position.get('x')
             @y1 = (event.clientY / context.scale) - @position.get('y')
+
+            # TODO: calculate the bounds of the parent element
 
             context.dragItem = @
 
