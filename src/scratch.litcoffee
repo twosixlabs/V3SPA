@@ -28,3 +28,12 @@ Zoom slider
             $(@).slider('value', z)
             return cancelEvent(event)
 
+
+Sending stuff to a websocket
+
+    msg = _.extend
+        action: 'UpdatePosition'
+      ,
+        @position.toJSON()
+    controller.ws.send(JSON.stringify(msg))
+

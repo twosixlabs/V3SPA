@@ -197,34 +197,60 @@
       'mouseleave': 'OnMouseLeave',
       'contextmenu': 'OnRightClick'
     },
-    OnMouseDown: function() {
+    initialize: function(options) {
+      var _ref, _ref1;
+      this.options = options;
+      _.bindAll(this, 'OnMouseDown');
+      this.parent = this.options;
+      this.position = new Models.Position({
+        x: 0,
+        y: 0
+      });
+      this.position.bind('change', this.render, this);
+      if ((_ref = this.options) != null) {
+        if ((_ref1 = _ref.parent) != null) {
+          _ref1.$el.append(this.$el);
+        }
+      }
+      return this.init();
+    },
+    render: function() {
+      return this.$el.attr('transform', "translate(" + (this.position.get('x')) + ", " + (this.position.get('y')) + ")");
+    },
+    OnMouseDown: function(event) {
+      this.x1 = (event.clientX / context.scale) - this.position.get('x');
+      this.y1 = (event.clientY / context.scale) - this.position.get('y');
       context.dragItem = this;
-      console.log(context.dragItem);
       return cancelEvent(event);
     },
     Drag: function(event) {
-      x += (event.clientX / context.scale) - this.old_x - x;
-      y += (event.clientY / context.scale) - this.old_y - y;
+      var x, y;
+      x = (event.clientX / context.scale) - this.x1;
+      y = (event.clientY / context.scale) - this.y1;
       this.position.set({
         'x': x,
         'y': y
       });
+      return cancelEvent(event);
     }
   });
 
   Avispa.Group = Avispa.BaseObject.extend({
-    el: $SVG('g').attr('class', 'group'),
-    initialize: function() {
-      _.bindAll(this, 'OnMouseDown');
+    el: function() {
+      return $SVG('g').attr('class', 'group');
+    },
+    init: function() {
       this.$el.append($SVG('rect').attr('x', '-30').attr('y', '-30').attr('width', '60').attr('height', '60'));
       return this;
     }
   });
 
   Avispa.Node = Avispa.BaseObject.extend({
-    el: $SVG('g').attr('class', 'node'),
-    initialize: function() {
-      this.$el.append($SVG('circle').attr('r', '30').attr('cx', '0').attr('cy', '0'));
+    el: function() {
+      return $SVG('g').attr('class', 'node');
+    },
+    init: function() {
+      this.$el.append($SVG('circle').attr('r', '20').attr('cx', '0').attr('cy', '0'));
       return this;
     }
   });

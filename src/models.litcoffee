@@ -48,11 +48,3 @@ Backbone models that use the CRUD paradigm
 
     Models.Positions = Backbone.Collection.extend
         model: Models.Position
-
-
-    Models.Arc = Backbone.Model.extend
-        idAttribute: '_id'
-        urlRoot: '/data/arc/'
-
-    Models.Arcs = Backbone.Collection.extend
-        model: Models.Arc

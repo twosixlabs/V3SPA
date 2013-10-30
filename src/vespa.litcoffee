@@ -1,5 +1,6 @@
 
-    Models  = {}
+    window.Models = {}
+
     Views   = {}
     Dialogs = {}
 
@@ -46,14 +47,12 @@ The main class for V3SPA framework.
                 el: $('#surface svg')
                 #surface: $('#avispa')
 
-            console.log(@avispa.$el)
             $('#surface').append @avispa.$el
 
             # instantiate the models
             models.nodes     = new Models.Nodes
             models.positions = new Models.Positions
             models.links     = new Models.Links
-            models.arcs      = new Models.Arcs
             models.tasks     = new Models.Tasks
 
             # setup the dispatcher for websocket messages
@@ -73,7 +72,7 @@ The main class for V3SPA framework.
             @dispatch.on 'UpdateArc',      @OnUpdateArc,      @
 
             @connectionAttempts = 0
-            #@ConnectWS()
+            @ConnectWS('lobster')
 
             #views.graph = new Views.Graph
 
@@ -83,7 +82,6 @@ The main class for V3SPA framework.
 
             # load the boot-strapped model data
             #models.positions.reset _data.positions
-            #models.arcs.reset      _data.arcs
             #models.nodes.reset     _data.nodes
             #models.links.reset     _data.links
 
@@ -108,14 +106,14 @@ automatically attempts to reconnect.
                 console.log('Connection failed')
                 return
 
-            @ws.onmessage = (event) ->
+            @ws.onmessage = (event) =>
                 msg = JSON.parse(event.data)
-                controller.dispatch.trigger(msg.action, msg)
+                @dispatch.trigger(msg.action, msg)
                 return
 
-            @ws.onclose = (event) ->
-                setTimeout () ->
-                    controller.ConnectWS(channel)
+            @ws.onclose = (event) =>
+                setTimeout () =>
+                    @ConnectWS(channel)
                   ,
                     1000 * @timeout
                 return

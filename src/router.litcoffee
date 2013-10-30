@@ -25,11 +25,26 @@
             #@modal.append(@editor.$el)
 
         node: () ->
+            group = new Avispa.Group
+            vespa.avispa.$nodes.append group.$el
+
             node = new Avispa.Node
-            vespa.avispa.$nodes.append node.$el
+                parent: group
+
+            node = new Avispa.Node
+                parent: group
 
             group = new Avispa.Group
             vespa.avispa.$nodes.append group.$el
+
+            node = new Avispa.Node
+                parent: group
+
+            node = new Avispa.Node
+                parent: group
+
+            #vespa.avispa.$nodes.append node.$el
+
             #@cleanse()
             #if not @editor
             #    @editor = new Editor

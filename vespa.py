@@ -27,9 +27,10 @@ def main():
         return -1
 
     patterns = [
-        (r'/',       api.handlers.Index  ),
-        (r'/login',  api.handlers.Login  ),
-        (r'/logout', api.handlers.Logout ),
+        (r'/',             api.handlers.Index     ),
+        ( r'/ws/([a-z]+)', api.handlers.WebSocket ),
+        (r'/login',        api.handlers.Login     ),
+        (r'/logout',       api.handlers.Logout    ),
         ]
 
     settings = dict(
@@ -41,6 +42,7 @@ def main():
         )
 
     api.app = tornado.web.Application(patterns, **settings)
+    api.app.sockets = {}
 
     try:
         api.app.listen(port, addr)

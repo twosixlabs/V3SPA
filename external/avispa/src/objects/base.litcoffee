@@ -7,24 +7,33 @@
             'mouseleave'  : 'OnMouseLeave'
             'contextmenu' : 'OnRightClick'
 
-        OnMouseDown: () ->
+        initialize: (@options) ->
+            _.bindAll @, 'OnMouseDown'
+
+            @parent = @options
+            @position = new Models.Position
+                x: 0
+                y: 0
+            @position.bind 'change', @render, @
+            @options?.parent?.$el.append(@$el)
+
+            @init()
+
+        render: () ->
+            @$el.attr('transform', "translate(#{@position.get('x')}, #{@position.get('y')})")
+
+        OnMouseDown: (event) ->
+            @x1 = (event.clientX / context.scale) - @position.get('x')
+            @y1 = (event.clientY / context.scale) - @position.get('y')
+
             context.dragItem = @
-            console.log(context.dragItem)
+
             return cancelEvent(event)
 
         Drag: (event) ->
-            #x = @position.get('x')
-            #y = @position.get('y')
-
-            x += (event.clientX / context.scale) - @old_x - x
-            y += (event.clientY / context.scale) - @old_y - y
+            x = (event.clientX / context.scale) - @x1
+            y = (event.clientY / context.scale) - @y1
 
             @position.set 'x': x, 'y': y
 
-            #msg = _.extend
-            #    action: 'UpdatePosition'
-            #  ,
-            #    @position.toJSON()
-            #controller.ws.send(JSON.stringify(msg))
-
-            return
+            return cancelEvent(event)

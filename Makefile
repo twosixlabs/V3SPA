@@ -1,6 +1,6 @@
 
-# OS X Sublime Text 2 hack
-PATH := $(PATH):/usr/local/bin
+# OS X 10.8 Sublime Text 2 hack
+#PATH := $(PATH):/usr/local/bin
 
 COFFEE = PATH=$(PATH) coffee
 LESS = PATH=$(PATH) lessc

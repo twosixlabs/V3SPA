@@ -13,4 +13,5 @@ class Index(Base):
     def get(self):
         self.render('index.html')
 
-from .auth import *
+from .auth  import *
+from .ws    import *

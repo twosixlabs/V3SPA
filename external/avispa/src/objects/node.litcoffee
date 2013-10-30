@@ -2,11 +2,11 @@
 Base class for "node" objects
 
     Avispa.Node = Avispa.BaseObject.extend
-        el: $SVG('g').attr('class', 'node')
+        el: () -> $SVG('g').attr('class', 'node')
 
-        initialize: () ->
+        init: () ->
             @$el.append $SVG('circle')
-                .attr('r', '30')
+                .attr('r', '20')
                 .attr('cx', '0')
                 .attr('cy', '0')
 
