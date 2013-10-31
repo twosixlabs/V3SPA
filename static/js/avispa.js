@@ -35,7 +35,7 @@
       this.$pan = this.$el.find('g.pan');
       this.$zoom = this.$el.find('g.zoom');
       this.$links = this.$el.find('g.links');
-      this.$nodes = this.$el.find('g.nodes');
+      this.$objects = this.$el.find('g.objects');
       this.$labels = this.$el.find('g.labels');
       this.$pan.x = window.innerWidth / 2;
       this.$pan.y = window.innerHeight / 2;
@@ -216,20 +216,17 @@
       'contextmenu': 'OnRightClick'
     },
     initialize: function(options) {
+      var position;
       this.options = options;
       _.bindAll(this, 'OnMouseDown');
       if (this.options) {
         this.parent = this.options.parent;
+        position = this.options.position;
       }
-      if (this.parent) {
-        this.parent.$el.append(this.$el);
-      }
-      this.position = new Models.Position({
-        x: 0,
-        y: 0
-      });
+      this.position = new Models.Position(position);
       this.position.bind('change', this.render, this);
-      return this.init();
+      this.init();
+      return this.$el.attr('transform', "translate(" + (this.position.get('x')) + ", " + (this.position.get('y')) + ")");
     },
     render: function() {
       return this.$el.attr('transform', "translate(" + (this.position.get('x')) + ", " + (this.position.get('y')) + ")");
@@ -257,7 +254,7 @@
       return $SVG('g').attr('class', 'group');
     },
     init: function() {
-      this.$el.append($SVG('rect').attr('x', '-30').attr('y', '-30').attr('width', '60').attr('height', '60'));
+      this.$el.append($SVG('rect').attr('width', this.position.get('w')).attr('height', this.position.get('h')).css('fill', this.position.get('fill')));
       return this;
     }
   });
@@ -267,7 +264,8 @@
       return $SVG('g').attr('class', 'node');
     },
     init: function() {
-      this.$el.append($SVG('circle').attr('r', '20').attr('cx', '0').attr('cy', '0'));
+      this.$el.append($SVG('circle').attr('r', this.position.get('radius')).css('fill', this.position.get('fill')));
+      this.$el.append($SVG('text').attr('dy', '0.5em').text(this.options.label));
       return this;
     }
   });

@@ -4,6 +4,8 @@
     Views   = {}
     Dialogs = {}
 
+    objects = {}
+
     models    = {}
     views     = {}
     templates = {}
@@ -58,6 +60,10 @@ The main class for V3SPA framework.
             # setup the dispatcher for websocket messages
             @dispatch = _.clone(Backbone.Events)
 
+            @dispatch.on 'CreateGroup', @OnCreateGroup, @
+            @dispatch.on 'UpdateGroup', @OnUpdateGroup, @
+            @dispatch.on 'DeleteGroup', @OnDeleteGroup, @
+
             @dispatch.on 'CreateNode', @OnCreateNode, @
             @dispatch.on 'UpdateNode', @OnUpdateNode, @
             @dispatch.on 'DeleteNode', @OnDeleteNode, @
@@ -74,7 +80,7 @@ The main class for V3SPA framework.
             @connectionAttempts = 0
             @ConnectWS('lobster')
 
-            #views.graph = new Views.Graph
+            @ParseTestData()
 
             # instantiate views and associate models
             #views.nodes = new Views.Node
@@ -90,6 +96,47 @@ The main class for V3SPA framework.
 
             return @
 
+        ParseTestData: () ->
+            parent = [@avispa.$objects]
+
+            Iterate = (objs) =>
+                for id,obj of objs
+                    if obj.type is 'group'
+                        @dispatch.trigger('CreateGroup', id, parent[0], obj)
+
+                        parent.unshift(objects[id].$el)
+                        if obj.children
+                            Iterate(obj.children)
+                        parent.shift()
+
+                    else if obj.type is 'node'
+                        @dispatch.trigger('CreateNode',  id, parent[0], obj)
+                return
+
+            Iterate(_data)
+            return
+
+        OnCreateGroup: (id, parent, obj) ->
+            group = new Avispa.Group
+                _id: id
+                position: obj.position
+
+            objects[id] = group
+
+            parent.append group.$el
+            return
+
+        OnCreateNode: (id, parent, obj) ->
+            node = new Avispa.Node
+                _id: id
+                parent: parent
+                label: obj.label
+                position: obj.position
+
+            objects[id] = node
+
+            parent.append node.$el
+            return
 
 Establish a websocket connection to the server.  When a connection closes it
 automatically attempts to reconnect.

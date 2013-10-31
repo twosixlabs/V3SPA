@@ -15,15 +15,16 @@ The "Position" model is defined by the project that is importing Avispa.
         initialize: (@options) ->
             _.bindAll @, 'OnMouseDown'
 
-            @parent = @options.parent if @options
-            @parent.$el.append(@$el) if @parent
+            if @options
+                @parent = @options.parent
+                position = @options.position
 
-            @position = new Models.Position
-                x: 0
-                y: 0
+            #@parent.$el.append(@$el) if @parent
+
+            @position = new Models.Position(position)
             @position.bind 'change', @render, @
-
             @init()
+            @$el.attr('transform', "translate(#{@position.get('x')}, #{@position.get('y')})")
 
         render: () ->
             @$el.attr('transform', "translate(#{@position.get('x')}, #{@position.get('y')})")

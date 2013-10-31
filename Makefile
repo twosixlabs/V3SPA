@@ -17,7 +17,10 @@ VESPA_CSS_SRC = src/vespa.less       \
                 src/less/common.less \
                 src/less/define.less
 
-all: $(VESPA_JS_OUT) $(VESPA_CSS_OUT)
+TESTDATA_OUT = static/position.js
+TESTDATA_SRC = src/position.litcoffee
+
+all: $(VESPA_JS_OUT) $(VESPA_CSS_OUT) $(TESTDATA_OUT)
 	@make -C external/avispa
 	@cp -f external/avispa/out/avispa.js static/js/
 	@cp -f external/avispa/out/avispa.css static/css/
@@ -27,6 +30,9 @@ $(VESPA_JS_OUT): $(VESPA_JS_SRC)
 
 $(VESPA_CSS_OUT): $(VESPA_CSS_SRC)
 	$(LESS) -x --no-color --include-path=src/less $< $@
+
+$(TESTDATA_OUT): $(TESTDATA_SRC)
+	$(COFFEE) -b -j $(TESTDATA_OUT) -c $(TESTDATA_SRC)
 
 clean:
 	@find . -type f -name \*.pyc -exec rm -f {} +

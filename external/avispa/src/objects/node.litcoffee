@@ -6,8 +6,11 @@ Base class for "node" objects
 
         init: () ->
             @$el.append $SVG('circle')
-                .attr('r', '20')
-                .attr('cx', '0')
-                .attr('cy', '0')
+                .attr('r', @position.get('radius'))
+                .css('fill', @position.get('fill'))
+
+            @$el.append $SVG('text')
+                .attr('dy', '0.5em')
+                .text(@options.label)
 
             return @

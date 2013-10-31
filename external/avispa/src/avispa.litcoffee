@@ -37,16 +37,16 @@ Expose a global view class so that consumers of the API can instantiate a view.
                 min  : 0.125
                 max  : 2.5
 
-            @$parent = @$el.parent()
+            @$parent  = @$el.parent()
 
-            @$pan    = @$el.find('g.pan')
-            @$zoom   = @$el.find('g.zoom')
+            @$pan     = @$el.find('g.pan')
+            @$zoom    = @$el.find('g.zoom')
 
-            @$links  = @$el.find('g.links')
-            @$nodes  = @$el.find('g.nodes')
-            @$labels = @$el.find('g.labels')
+            @$links   = @$el.find('g.links')
+            @$objects = @$el.find('g.objects')
+            @$labels  = @$el.find('g.labels')
 
-            @$pan.x = window.innerWidth / 2
+            @$pan.x = window.innerWidth  / 2
             @$pan.y = window.innerHeight / 2
 
             @Pan(0,0)

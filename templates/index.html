@@ -1,5 +1,9 @@
 {% extends 'base.html' %}
 
+{% block head %}
+    <script type="text/javascript" src="{{ static_url('position.js') }}"></script>
+{% end %}
+
 {% block body %}
     <div id="menubar">
       <ol>
@@ -27,7 +31,7 @@
         <g class="pan">
          <g class="zoom">
           <g class="links"></g>
-          <g class="nodes"></g>
+          <g class="objects"></g>
           <g class="labels"></g>
          </g>
         </g>
