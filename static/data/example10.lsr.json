@@ -1,0 +1,89 @@
+{
+  "name": "",
+  "class": "System",
+  "args": [],
+  "ports": {},
+  "connections": [
+    {
+      "left": {
+        "domain": 0,
+        "port": "portA"
+      },
+      "right": {
+        "domain": 1,
+        "port": "portB"
+      },
+      "connection": "neutral"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "portA1"
+      },
+      "right": {
+        "domain": 2,
+        "port": "portC1"
+      },
+      "connection": "neutral"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "portA2"
+      },
+      "right": {
+        "domain": 2,
+        "port": "portC2"
+      },
+      "connection": "neutral"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "portA3"
+      },
+      "right": {
+        "domain": 2,
+        "port": "portC3"
+      },
+      "connection": "neutral"
+    }
+  ],
+  "subdomains": {
+    "0": {
+      "name": "a",
+      "class": "A",
+      "args": [],
+      "ports": {
+        "portA": {},
+        "portA1": {},
+        "portA2": {},
+        "portA3": {}
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "1": {
+      "name": "b",
+      "class": "B",
+      "args": [],
+      "ports": {
+        "portB": {}
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "2": {
+      "name": "c",
+      "class": "C",
+      "args": [],
+      "ports": {
+        "portC2": {},
+        "portC3": {},
+        "portC1": {}
+      },
+      "connections": [],
+      "subdomains": {}
+    }
+  }
+}

@@ -1,0 +1,124 @@
+{
+  "name": "",
+  "class": "System",
+  "args": [],
+  "ports": {},
+  "connections": [
+    {
+      "left": {
+        "domain": 0,
+        "port": "port1"
+      },
+      "right": {
+        "domain": 1,
+        "port": "port2"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "port1"
+      },
+      "right": {
+        "domain": 2,
+        "port": "port2"
+      },
+      "connection": "right-to-left"
+    }
+  ],
+  "subdomains": {
+    "0": {
+      "name": "domainA",
+      "class": "A",
+      "args": [],
+      "ports": {
+        "port1": {
+          "position": "subject"
+        }
+      },
+      "connections": [
+        {
+          "left": {
+            "port": "port1"
+          },
+          "right": {
+            "domain": 0,
+            "port": "port3"
+          },
+          "connection": "left-to-right"
+        },
+        {
+          "left": {
+            "domain": 0,
+            "port": "port3"
+          },
+          "right": {
+            "domain": 1,
+            "port": "port4"
+          },
+          "connection": "bidirectional"
+        }
+      ],
+      "subdomains": {
+        "0": {
+          "name": "domainC",
+          "class": "C",
+          "args": [],
+          "ports": {
+            "port3": {
+              "position": "subject"
+            }
+          },
+          "connections": [],
+          "subdomains": {}
+        },
+        "1": {
+          "name": "domainD",
+          "class": "D",
+          "args": [],
+          "ports": {
+            "port4": {
+              "position": "object"
+            }
+          },
+          "connections": [],
+          "subdomains": {
+            "0": {
+              "name": "domainCD",
+              "class": "C",
+              "args": [],
+              "ports": {
+                "port3": {
+                  "position": "subject"
+                }
+              },
+              "connections": [],
+              "subdomains": {}
+            }
+          }
+        }
+      }
+    },
+    "1": {
+      "name": "domainB",
+      "class": "B",
+      "args": [],
+      "ports": {
+        "port2": {}
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "2": {
+      "name": "domainB2",
+      "class": "B",
+      "args": [],
+      "ports": {
+        "port2": {}
+      },
+      "connections": [],
+      "subdomains": {}
+    }
+  }
+}

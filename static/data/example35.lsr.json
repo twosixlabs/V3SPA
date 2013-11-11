@@ -1,0 +1,72 @@
+{
+  "name": "",
+  "class": "System",
+  "args": [],
+  "ports": {},
+  "connections": [
+    {
+      "left": {
+        "domain": 0,
+        "port": "ext"
+      },
+      "right": {
+        "domain": 1,
+        "port": "readwrite"
+      },
+      "connection": "bidirectional"
+    }
+  ],
+  "subdomains": {
+    "0": {
+      "name": "proc",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "active": {
+          "position": "subject"
+        },
+        "ext": {
+          "position": "subject"
+        }
+      },
+      "connections": [
+        {
+          "left": {
+            "port": "active"
+          },
+          "right": {
+            "domain": 0,
+            "port": "readwrite"
+          },
+          "connection": "bidirectional"
+        }
+      ],
+      "subdomains": {
+        "0": {
+          "name": "internet",
+          "class": "Network",
+          "args": [],
+          "ports": {
+            "readwrite": {
+              "position": "object"
+            }
+          },
+          "connections": [],
+          "subdomains": {}
+        }
+      }
+    },
+    "1": {
+      "name": "secret",
+      "class": "Network",
+      "args": [],
+      "ports": {
+        "readwrite": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    }
+  }
+}

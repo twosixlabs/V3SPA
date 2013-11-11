@@ -1,0 +1,85 @@
+{
+  "name": "",
+  "class": "System",
+  "args": [],
+  "ports": {},
+  "connections": [
+    {
+      "left": {
+        "domain": 0,
+        "port": "a"
+      },
+      "right": {
+        "domain": 1,
+        "port": "d"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "b"
+      },
+      "right": {
+        "domain": 2,
+        "port": "e"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "c"
+      },
+      "right": {
+        "domain": 3,
+        "port": "f"
+      },
+      "connection": "left-to-right"
+    }
+  ],
+  "subdomains": {
+    "0": {
+      "name": "w",
+      "class": "W",
+      "args": [],
+      "ports": {
+        "a": {},
+        "b": {},
+        "c": {}
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "1": {
+      "name": "x",
+      "class": "X",
+      "args": [],
+      "ports": {
+        "d": {}
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "2": {
+      "name": "y",
+      "class": "Y",
+      "args": [],
+      "ports": {
+        "e": {}
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "3": {
+      "name": "z",
+      "class": "Z",
+      "args": [],
+      "ports": {
+        "f": {}
+      },
+      "connections": [],
+      "subdomains": {}
+    }
+  }
+}

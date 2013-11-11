@@ -1,0 +1,61 @@
+{
+  "name": "",
+  "class": "System",
+  "args": [],
+  "ports": {},
+  "connections": [],
+  "subdomains": {
+    "0": {
+      "name": "net",
+      "class": "Network",
+      "args": [],
+      "ports": {
+        "read": {
+          "direction": "out"
+        },
+        "write": {
+          "position": "in"
+        }
+      },
+      "connections": [
+        {
+          "left": {
+            "port": "read"
+          },
+          "right": {
+            "domain": 0,
+            "port": "out"
+          },
+          "connection": "right-to-left"
+        },
+        {
+          "left": {
+            "port": "write"
+          },
+          "right": {
+            "domain": 0,
+            "port": "in"
+          },
+          "connection": "left-to-right"
+        }
+      ],
+      "subdomains": {
+        "0": {
+          "name": "subNet",
+          "class": "Network.SubNetwork",
+          "args": [],
+          "ports": {
+            "in": {
+              "direction": "in"
+            },
+            "out": {
+              "direction": "out"
+            }
+          },
+          "connections": [],
+          "subdomains": {}
+        }
+      }
+    }
+  }
+}

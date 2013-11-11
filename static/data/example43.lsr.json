@@ -1,0 +1,40 @@
+{
+  "name": "",
+  "class": "System",
+  "args": [],
+  "ports": {},
+  "connections": [],
+  "subdomains": {
+    "0": {
+      "name": "net",
+      "class": "Network",
+      "args": [],
+      "ports": {
+        "read": {
+          "direction": "out"
+        },
+        "write": {
+          "position": "in"
+        }
+      },
+      "connections": [],
+      "subdomains": {
+        "0": {
+          "name": "subNet",
+          "class": "Network.SubNetwork",
+          "args": [],
+          "ports": {
+            "in": {
+              "direction": "in"
+            },
+            "out": {
+              "direction": "out"
+            }
+          },
+          "connections": [],
+          "subdomains": {}
+        }
+      }
+    }
+  }
+}

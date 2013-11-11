@@ -1,0 +1,59 @@
+{
+  "name": "",
+  "class": "System",
+  "args": [],
+  "ports": {},
+  "connections": [
+    {
+      "left": {
+        "domain": 0,
+        "port": "d"
+      },
+      "right": {
+        "domain": 1,
+        "port": "e"
+      },
+      "connection": "neutral"
+    }
+  ],
+  "subdomains": {
+    "0": {
+      "name": "d",
+      "class": "X",
+      "args": [
+        "Requests"
+      ],
+      "ports": {
+        "d": {
+          "type": "Requests",
+          "position": "subject"
+        },
+        "e": {
+          "type": "Requests",
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "1": {
+      "name": "e",
+      "class": "X",
+      "args": [
+        "Requests"
+      ],
+      "ports": {
+        "d": {
+          "type": "Requests",
+          "position": "subject"
+        },
+        "e": {
+          "type": "Requests",
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    }
+  }
+}

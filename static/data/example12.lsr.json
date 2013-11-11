@@ -1,0 +1,1093 @@
+{
+  "name": "",
+  "class": "System",
+  "args": [],
+  "ports": {},
+  "connections": [
+    {
+      "left": {
+        "domain": 0,
+        "port": "read"
+      },
+      "right": {
+        "domain": 1,
+        "port": "write"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "write"
+      },
+      "right": {
+        "domain": 3,
+        "port": "in"
+      },
+      "connection": "left-to-right"
+    },
+    {
+      "left": {
+        "domain": 1,
+        "port": "read"
+      },
+      "right": {
+        "domain": 2,
+        "port": "write"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 2,
+        "port": "read"
+      },
+      "right": {
+        "domain": 5,
+        "port": "write"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 2,
+        "port": "write"
+      },
+      "right": {
+        "domain": 5,
+        "port": "read"
+      },
+      "connection": "left-to-right"
+    },
+    {
+      "left": {
+        "domain": 3,
+        "port": "out"
+      },
+      "right": {
+        "domain": 4,
+        "port": "in"
+      },
+      "connection": "left-to-right"
+    },
+    {
+      "left": {
+        "domain": 4,
+        "port": "in"
+      },
+      "right": {
+        "domain": 5,
+        "port": "write"
+      },
+      "connection": "neutral"
+    }
+  ],
+  "subdomains": {
+    "0": {
+      "name": "high",
+      "class": "Network",
+      "args": [
+        "Hi"
+      ],
+      "ports": {
+        "read": {
+          "direction": "in",
+          "position": "object"
+        },
+        "write": {
+          "direction": "out",
+          "position": "subject"
+        }
+      },
+      "connections": [
+        {
+          "left": {
+            "port": "read"
+          },
+          "right": {
+            "domain": 1,
+            "port": "in"
+          },
+          "connection": "neutral"
+        },
+        {
+          "left": {
+            "port": "write"
+          },
+          "right": {
+            "domain": 0,
+            "port": "out"
+          },
+          "connection": "neutral"
+        },
+        {
+          "left": {
+            "domain": 0,
+            "port": "in"
+          },
+          "right": {
+            "domain": 4,
+            "port": "write"
+          },
+          "connection": "right-to-left"
+        },
+        {
+          "left": {
+            "domain": 1,
+            "port": "out"
+          },
+          "right": {
+            "domain": 2,
+            "port": "in"
+          },
+          "connection": "left-to-right"
+        },
+        {
+          "left": {
+            "domain": 1,
+            "port": "out"
+          },
+          "right": {
+            "domain": 3,
+            "port": "in"
+          },
+          "connection": "left-to-right"
+        },
+        {
+          "left": {
+            "domain": 1,
+            "port": "out"
+          },
+          "right": {
+            "domain": 4,
+            "port": "read"
+          },
+          "connection": "left-to-right"
+        },
+        {
+          "left": {
+            "domain": 2,
+            "port": "in"
+          },
+          "right": {
+            "domain": 4,
+            "port": "write"
+          },
+          "connection": "right-to-left"
+        },
+        {
+          "left": {
+            "domain": 3,
+            "port": "in"
+          },
+          "right": {
+            "domain": 4,
+            "port": "write"
+          },
+          "connection": "right-to-left"
+        }
+      ],
+      "subdomains": {
+        "0": {
+          "name": "guard",
+          "class": "GuardC",
+          "args": [],
+          "ports": {
+            "in": {
+              "direction": "in",
+              "position": "object"
+            },
+            "out": {
+              "position": "subject"
+            }
+          },
+          "connections": [],
+          "subdomains": {}
+        },
+        "1": {
+          "name": "vscan",
+          "class": "Checker",
+          "args": [],
+          "ports": {
+            "in": {
+              "position": "object"
+            },
+            "out": {
+              "position": "subject"
+            }
+          },
+          "connections": [],
+          "subdomains": {}
+        },
+        "4": {
+          "name": "userD",
+          "class": "Network.User",
+          "args": [
+            "Hi"
+          ],
+          "ports": {
+            "read": {},
+            "write": {}
+          },
+          "connections": [
+            {
+              "left": {
+                "port": "read"
+              },
+              "right": {
+                "domain": 0,
+                "port": "read"
+              },
+              "connection": "neutral"
+            },
+            {
+              "left": {
+                "port": "read"
+              },
+              "right": {
+                "domain": 1,
+                "port": "read"
+              },
+              "connection": "neutral"
+            },
+            {
+              "left": {
+                "port": "write"
+              },
+              "right": {
+                "domain": 0,
+                "port": "write"
+              },
+              "connection": "neutral"
+            },
+            {
+              "left": {
+                "port": "write"
+              },
+              "right": {
+                "domain": 1,
+                "port": "write"
+              },
+              "connection": "neutral"
+            }
+          ],
+          "subdomains": {
+            "0": {
+              "name": "browser",
+              "class": "IOApp",
+              "args": [],
+              "ports": {
+                "read": {
+                  "position": "object"
+                },
+                "write": {
+                  "position": "subject"
+                }
+              },
+              "connections": [
+                {
+                  "left": {
+                    "port": "read"
+                  },
+                  "right": {
+                    "domain": 0,
+                    "port": "in"
+                  },
+                  "connection": "neutral"
+                }
+              ],
+              "subdomains": {
+                "0": {
+                  "name": "r",
+                  "class": "Review",
+                  "args": [],
+                  "ports": {
+                    "in": {
+                      "position": "object"
+                    }
+                  },
+                  "connections": [],
+                  "subdomains": {}
+                }
+              }
+            },
+            "1": {
+              "name": "email",
+              "class": "IOApp",
+              "args": [],
+              "ports": {
+                "read": {
+                  "position": "object"
+                },
+                "write": {
+                  "position": "subject"
+                }
+              },
+              "connections": [
+                {
+                  "left": {
+                    "port": "read"
+                  },
+                  "right": {
+                    "domain": 0,
+                    "port": "in"
+                  },
+                  "connection": "neutral"
+                }
+              ],
+              "subdomains": {
+                "0": {
+                  "name": "r",
+                  "class": "Review",
+                  "args": [],
+                  "ports": {
+                    "in": {
+                      "position": "object"
+                    }
+                  },
+                  "connections": [],
+                  "subdomains": {}
+                }
+              }
+            }
+          }
+        },
+        "2": {
+          "name": "sReview",
+          "class": "Review",
+          "args": [],
+          "ports": {
+            "in": {
+              "position": "object"
+            }
+          },
+          "connections": [],
+          "subdomains": {}
+        },
+        "3": {
+          "name": "logger",
+          "class": "Review",
+          "args": [],
+          "ports": {
+            "in": {
+              "position": "object"
+            }
+          },
+          "connections": [],
+          "subdomains": {}
+        }
+      }
+    },
+    "1": {
+      "name": "secret",
+      "class": "Network",
+      "args": [
+        "Se"
+      ],
+      "ports": {
+        "read": {
+          "direction": "in",
+          "position": "object"
+        },
+        "write": {
+          "direction": "out",
+          "position": "subject"
+        }
+      },
+      "connections": [
+        {
+          "left": {
+            "port": "read"
+          },
+          "right": {
+            "domain": 1,
+            "port": "in"
+          },
+          "connection": "neutral"
+        },
+        {
+          "left": {
+            "port": "write"
+          },
+          "right": {
+            "domain": 0,
+            "port": "out"
+          },
+          "connection": "neutral"
+        },
+        {
+          "left": {
+            "domain": 0,
+            "port": "in"
+          },
+          "right": {
+            "domain": 4,
+            "port": "write"
+          },
+          "connection": "right-to-left"
+        },
+        {
+          "left": {
+            "domain": 1,
+            "port": "out"
+          },
+          "right": {
+            "domain": 2,
+            "port": "in"
+          },
+          "connection": "left-to-right"
+        },
+        {
+          "left": {
+            "domain": 1,
+            "port": "out"
+          },
+          "right": {
+            "domain": 3,
+            "port": "in"
+          },
+          "connection": "left-to-right"
+        },
+        {
+          "left": {
+            "domain": 1,
+            "port": "out"
+          },
+          "right": {
+            "domain": 4,
+            "port": "read"
+          },
+          "connection": "left-to-right"
+        },
+        {
+          "left": {
+            "domain": 2,
+            "port": "in"
+          },
+          "right": {
+            "domain": 4,
+            "port": "write"
+          },
+          "connection": "right-to-left"
+        },
+        {
+          "left": {
+            "domain": 3,
+            "port": "in"
+          },
+          "right": {
+            "domain": 4,
+            "port": "write"
+          },
+          "connection": "right-to-left"
+        }
+      ],
+      "subdomains": {
+        "0": {
+          "name": "guard",
+          "class": "GuardC",
+          "args": [],
+          "ports": {
+            "in": {
+              "direction": "in",
+              "position": "object"
+            },
+            "out": {
+              "position": "subject"
+            }
+          },
+          "connections": [],
+          "subdomains": {}
+        },
+        "1": {
+          "name": "vscan",
+          "class": "Checker",
+          "args": [],
+          "ports": {
+            "in": {
+              "position": "object"
+            },
+            "out": {
+              "position": "subject"
+            }
+          },
+          "connections": [],
+          "subdomains": {}
+        },
+        "4": {
+          "name": "userD",
+          "class": "Network.User",
+          "args": [
+            "Se"
+          ],
+          "ports": {
+            "read": {},
+            "write": {}
+          },
+          "connections": [
+            {
+              "left": {
+                "port": "read"
+              },
+              "right": {
+                "domain": 0,
+                "port": "read"
+              },
+              "connection": "neutral"
+            },
+            {
+              "left": {
+                "port": "read"
+              },
+              "right": {
+                "domain": 1,
+                "port": "read"
+              },
+              "connection": "neutral"
+            },
+            {
+              "left": {
+                "port": "write"
+              },
+              "right": {
+                "domain": 0,
+                "port": "write"
+              },
+              "connection": "neutral"
+            },
+            {
+              "left": {
+                "port": "write"
+              },
+              "right": {
+                "domain": 1,
+                "port": "write"
+              },
+              "connection": "neutral"
+            }
+          ],
+          "subdomains": {
+            "0": {
+              "name": "browser",
+              "class": "IOApp",
+              "args": [],
+              "ports": {
+                "read": {
+                  "position": "object"
+                },
+                "write": {
+                  "position": "subject"
+                }
+              },
+              "connections": [
+                {
+                  "left": {
+                    "port": "read"
+                  },
+                  "right": {
+                    "domain": 0,
+                    "port": "in"
+                  },
+                  "connection": "neutral"
+                }
+              ],
+              "subdomains": {
+                "0": {
+                  "name": "r",
+                  "class": "Review",
+                  "args": [],
+                  "ports": {
+                    "in": {
+                      "position": "object"
+                    }
+                  },
+                  "connections": [],
+                  "subdomains": {}
+                }
+              }
+            },
+            "1": {
+              "name": "email",
+              "class": "IOApp",
+              "args": [],
+              "ports": {
+                "read": {
+                  "position": "object"
+                },
+                "write": {
+                  "position": "subject"
+                }
+              },
+              "connections": [
+                {
+                  "left": {
+                    "port": "read"
+                  },
+                  "right": {
+                    "domain": 0,
+                    "port": "in"
+                  },
+                  "connection": "neutral"
+                }
+              ],
+              "subdomains": {
+                "0": {
+                  "name": "r",
+                  "class": "Review",
+                  "args": [],
+                  "ports": {
+                    "in": {
+                      "position": "object"
+                    }
+                  },
+                  "connections": [],
+                  "subdomains": {}
+                }
+              }
+            }
+          }
+        },
+        "2": {
+          "name": "sReview",
+          "class": "Review",
+          "args": [],
+          "ports": {
+            "in": {
+              "position": "object"
+            }
+          },
+          "connections": [],
+          "subdomains": {}
+        },
+        "3": {
+          "name": "logger",
+          "class": "Review",
+          "args": [],
+          "ports": {
+            "in": {
+              "position": "object"
+            }
+          },
+          "connections": [],
+          "subdomains": {}
+        }
+      }
+    },
+    "4": {
+      "name": "logger",
+      "class": "Review",
+      "args": [],
+      "ports": {
+        "in": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "2": {
+      "name": "low",
+      "class": "Network",
+      "args": [
+        "Lo"
+      ],
+      "ports": {
+        "read": {
+          "direction": "in",
+          "position": "object"
+        },
+        "write": {
+          "direction": "out",
+          "position": "subject"
+        }
+      },
+      "connections": [
+        {
+          "left": {
+            "port": "read"
+          },
+          "right": {
+            "domain": 1,
+            "port": "in"
+          },
+          "connection": "neutral"
+        },
+        {
+          "left": {
+            "port": "write"
+          },
+          "right": {
+            "domain": 0,
+            "port": "out"
+          },
+          "connection": "neutral"
+        },
+        {
+          "left": {
+            "domain": 0,
+            "port": "in"
+          },
+          "right": {
+            "domain": 4,
+            "port": "write"
+          },
+          "connection": "right-to-left"
+        },
+        {
+          "left": {
+            "domain": 1,
+            "port": "out"
+          },
+          "right": {
+            "domain": 2,
+            "port": "in"
+          },
+          "connection": "left-to-right"
+        },
+        {
+          "left": {
+            "domain": 1,
+            "port": "out"
+          },
+          "right": {
+            "domain": 3,
+            "port": "in"
+          },
+          "connection": "left-to-right"
+        },
+        {
+          "left": {
+            "domain": 1,
+            "port": "out"
+          },
+          "right": {
+            "domain": 4,
+            "port": "read"
+          },
+          "connection": "left-to-right"
+        },
+        {
+          "left": {
+            "domain": 2,
+            "port": "in"
+          },
+          "right": {
+            "domain": 4,
+            "port": "write"
+          },
+          "connection": "right-to-left"
+        },
+        {
+          "left": {
+            "domain": 3,
+            "port": "in"
+          },
+          "right": {
+            "domain": 4,
+            "port": "write"
+          },
+          "connection": "right-to-left"
+        }
+      ],
+      "subdomains": {
+        "0": {
+          "name": "guard",
+          "class": "GuardC",
+          "args": [],
+          "ports": {
+            "in": {
+              "direction": "in",
+              "position": "object"
+            },
+            "out": {
+              "position": "subject"
+            }
+          },
+          "connections": [],
+          "subdomains": {}
+        },
+        "1": {
+          "name": "vscan",
+          "class": "Checker",
+          "args": [],
+          "ports": {
+            "in": {
+              "position": "object"
+            },
+            "out": {
+              "position": "subject"
+            }
+          },
+          "connections": [],
+          "subdomains": {}
+        },
+        "4": {
+          "name": "userD",
+          "class": "Network.User",
+          "args": [
+            "Lo"
+          ],
+          "ports": {
+            "read": {},
+            "write": {}
+          },
+          "connections": [
+            {
+              "left": {
+                "port": "read"
+              },
+              "right": {
+                "domain": 0,
+                "port": "read"
+              },
+              "connection": "neutral"
+            },
+            {
+              "left": {
+                "port": "read"
+              },
+              "right": {
+                "domain": 1,
+                "port": "read"
+              },
+              "connection": "neutral"
+            },
+            {
+              "left": {
+                "port": "write"
+              },
+              "right": {
+                "domain": 0,
+                "port": "write"
+              },
+              "connection": "neutral"
+            },
+            {
+              "left": {
+                "port": "write"
+              },
+              "right": {
+                "domain": 1,
+                "port": "write"
+              },
+              "connection": "neutral"
+            }
+          ],
+          "subdomains": {
+            "0": {
+              "name": "browser",
+              "class": "IOApp",
+              "args": [],
+              "ports": {
+                "read": {
+                  "position": "object"
+                },
+                "write": {
+                  "position": "subject"
+                }
+              },
+              "connections": [
+                {
+                  "left": {
+                    "port": "read"
+                  },
+                  "right": {
+                    "domain": 0,
+                    "port": "in"
+                  },
+                  "connection": "neutral"
+                }
+              ],
+              "subdomains": {
+                "0": {
+                  "name": "r",
+                  "class": "Review",
+                  "args": [],
+                  "ports": {
+                    "in": {
+                      "position": "object"
+                    }
+                  },
+                  "connections": [],
+                  "subdomains": {}
+                }
+              }
+            },
+            "1": {
+              "name": "email",
+              "class": "IOApp",
+              "args": [],
+              "ports": {
+                "read": {
+                  "position": "object"
+                },
+                "write": {
+                  "position": "subject"
+                }
+              },
+              "connections": [
+                {
+                  "left": {
+                    "port": "read"
+                  },
+                  "right": {
+                    "domain": 0,
+                    "port": "in"
+                  },
+                  "connection": "neutral"
+                }
+              ],
+              "subdomains": {
+                "0": {
+                  "name": "r",
+                  "class": "Review",
+                  "args": [],
+                  "ports": {
+                    "in": {
+                      "position": "object"
+                    }
+                  },
+                  "connections": [],
+                  "subdomains": {}
+                }
+              }
+            }
+          }
+        },
+        "2": {
+          "name": "sReview",
+          "class": "Review",
+          "args": [],
+          "ports": {
+            "in": {
+              "position": "object"
+            }
+          },
+          "connections": [],
+          "subdomains": {}
+        },
+        "3": {
+          "name": "logger",
+          "class": "Review",
+          "args": [],
+          "ports": {
+            "in": {
+              "position": "object"
+            }
+          },
+          "connections": [],
+          "subdomains": {}
+        }
+      }
+    },
+    "5": {
+      "name": "internet",
+      "class": "InternetC",
+      "args": [],
+      "ports": {
+        "read": {
+          "direction": "in",
+          "position": "object"
+        },
+        "write": {
+          "direction": "out",
+          "position": "subject"
+        },
+        "io": {
+          "position": "object"
+        }
+      },
+      "connections": [
+        {
+          "left": {
+            "port": "io"
+          },
+          "right": {
+            "domain": 0,
+            "port": "in"
+          },
+          "connection": "left-to-right"
+        },
+        {
+          "left": {
+            "port": "read"
+          },
+          "right": {
+            "domain": 1,
+            "port": "intR"
+          },
+          "connection": "neutral"
+        },
+        {
+          "left": {
+            "port": "write"
+          },
+          "right": {
+            "domain": 1,
+            "port": "intW"
+          },
+          "connection": "neutral"
+        },
+        {
+          "left": {
+            "domain": 0,
+            "port": "out"
+          },
+          "right": {
+            "domain": 1,
+            "port": "ext"
+          },
+          "connection": "left-to-right"
+        }
+      ],
+      "subdomains": {
+        "0": {
+          "name": "vscan2",
+          "class": "Checker2",
+          "args": [],
+          "ports": {
+            "in": {
+              "position": "object"
+            },
+            "out": {
+              "position": "subject"
+            }
+          },
+          "connections": [],
+          "subdomains": {}
+        },
+        "1": {
+          "name": "fireWall",
+          "class": "FireWall",
+          "args": [],
+          "ports": {
+            "intW": {
+              "direction": "out",
+              "position": "subject"
+            },
+            "intR": {
+              "direction": "in",
+              "position": "object"
+            },
+            "ext": {
+              "position": "object"
+            }
+          },
+          "connections": [],
+          "subdomains": {}
+        }
+      }
+    },
+    "3": {
+      "name": "encrypt",
+      "class": "Encrypt",
+      "args": [],
+      "ports": {
+        "in": {},
+        "out": {}
+      },
+      "connections": [],
+      "subdomains": {}
+    }
+  }
+}

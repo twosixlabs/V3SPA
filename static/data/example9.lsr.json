@@ -1,0 +1,79 @@
+{
+  "name": "",
+  "class": "System",
+  "args": [],
+  "ports": {},
+  "connections": [
+    {
+      "left": {
+        "domain": 0,
+        "port": "port1"
+      },
+      "right": {
+        "domain": 1,
+        "port": "port2"
+      },
+      "connection": "neutral"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "port1"
+      },
+      "right": {
+        "domain": 2,
+        "port": "port3"
+      },
+      "connection": "neutral"
+    }
+  ],
+  "subdomains": {
+    "0": {
+      "name": "a",
+      "class": "A",
+      "args": [],
+      "ports": {
+        "port1": {
+          "type": "MyType",
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "1": {
+      "name": "b",
+      "class": "B",
+      "args": [],
+      "ports": {
+        "port2": {}
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "2": {
+      "name": "c",
+      "class": "C",
+      "args": [],
+      "ports": {
+        "port3": {
+          "type": "MyType"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "3": {
+      "name": "d",
+      "class": "D",
+      "args": [],
+      "ports": {
+        "port4": {
+          "type": "NotMyType"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    }
+  }
+}

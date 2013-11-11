@@ -1,0 +1,244 @@
+{
+  "name": "",
+  "class": "System",
+  "args": [],
+  "ports": {},
+  "connections": [
+    {
+      "left": {
+        "domain": 0,
+        "port": "o"
+      },
+      "right": {
+        "domain": 8,
+        "port": "s"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "s"
+      },
+      "right": {
+        "domain": 1,
+        "port": "o"
+      },
+      "connection": "left-to-right"
+    },
+    {
+      "left": {
+        "domain": 1,
+        "port": "s"
+      },
+      "right": {
+        "domain": 2,
+        "port": "o"
+      },
+      "connection": "left-to-right"
+    },
+    {
+      "left": {
+        "domain": 2,
+        "port": "s"
+      },
+      "right": {
+        "domain": 3,
+        "port": "o"
+      },
+      "connection": "left-to-right"
+    },
+    {
+      "left": {
+        "domain": 3,
+        "port": "s"
+      },
+      "right": {
+        "domain": 4,
+        "port": "o"
+      },
+      "connection": "left-to-right"
+    },
+    {
+      "left": {
+        "domain": 4,
+        "port": "s"
+      },
+      "right": {
+        "domain": 5,
+        "port": "o"
+      },
+      "connection": "left-to-right"
+    },
+    {
+      "left": {
+        "domain": 5,
+        "port": "s"
+      },
+      "right": {
+        "domain": 6,
+        "port": "o"
+      },
+      "connection": "left-to-right"
+    },
+    {
+      "left": {
+        "domain": 6,
+        "port": "s"
+      },
+      "right": {
+        "domain": 7,
+        "port": "o"
+      },
+      "connection": "left-to-right"
+    },
+    {
+      "left": {
+        "domain": 7,
+        "port": "s"
+      },
+      "right": {
+        "domain": 8,
+        "port": "o"
+      },
+      "connection": "left-to-right"
+    }
+  ],
+  "subdomains": {
+    "7": {
+      "name": "h",
+      "class": "A",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "0": {
+      "name": "a",
+      "class": "A",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "1": {
+      "name": "b",
+      "class": "A",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "4": {
+      "name": "e",
+      "class": "A",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "2": {
+      "name": "c",
+      "class": "A",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "5": {
+      "name": "f",
+      "class": "A",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "8": {
+      "name": "i",
+      "class": "A",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "3": {
+      "name": "d",
+      "class": "A",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "6": {
+      "name": "g",
+      "class": "A",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    }
+  }
+}

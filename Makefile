@@ -9,6 +9,9 @@ VESPA_JS_OUT = static/js/vespa.js
 VESPA_JS_SRC = src/vespa.litcoffee  \
                src/models.litcoffee \
                src/router.litcoffee \
+               src/parser.litcoffee \
+               src/lobster/domain.litcoffee \
+               src/lobster/port.litcoffee   \
                src/editor.litcoffee
 
 VESPA_CSS_OUT = static/css/vespa.css

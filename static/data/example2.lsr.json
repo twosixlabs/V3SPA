@@ -1,0 +1,115 @@
+{
+  "name": "",
+  "class": "System",
+  "args": [],
+  "ports": {},
+  "connections": [
+    {
+      "left": {
+        "domain": 0,
+        "port": "php_script"
+      },
+      "right": {
+        "domain": 4,
+        "port": "inp"
+      },
+      "connection": "left-to-right"
+    },
+    {
+      "left": {
+        "domain": 1,
+        "port": "creator"
+      },
+      "right": {
+        "domain": 4,
+        "port": "create"
+      },
+      "connection": "left-to-right"
+    },
+    {
+      "left": {
+        "domain": 2,
+        "port": "send"
+      },
+      "right": {
+        "domain": 4,
+        "port": "outp"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 3,
+        "port": "log"
+      },
+      "right": {
+        "domain": 4,
+        "port": "log"
+      },
+      "connection": "right-to-left"
+    }
+  ],
+  "subdomains": {
+    "0": {
+      "name": "web_server",
+      "class": "WebServer",
+      "args": [],
+      "ports": {
+        "php_script": {}
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "1": {
+      "name": "init",
+      "class": "Init",
+      "args": [],
+      "ports": {
+        "creator": {}
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "4": {
+      "name": "application",
+      "class": "Application",
+      "args": [],
+      "ports": {
+        "log": {
+          "position": "subject"
+        },
+        "inp": {
+          "position": "subject"
+        },
+        "create": {
+          "position": "object"
+        },
+        "outp": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "2": {
+      "name": "mail_server",
+      "class": "MailServer",
+      "args": [],
+      "ports": {
+        "send": {}
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "3": {
+      "name": "syslog",
+      "class": "Syslog",
+      "args": [],
+      "ports": {
+        "log": {}
+      },
+      "connections": [],
+      "subdomains": {}
+    }
+  }
+}

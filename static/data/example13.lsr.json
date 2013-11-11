@@ -1,0 +1,67 @@
+{
+  "name": "",
+  "class": "System",
+  "args": [],
+  "ports": {},
+  "connections": [
+    {
+      "left": {
+        "domain": 0,
+        "port": "subj1"
+      },
+      "right": {
+        "domain": 1,
+        "port": "obj1"
+      },
+      "connection": "neutral"
+    }
+  ],
+  "subdomains": {
+    "0": {
+      "name": "x",
+      "class": "Subj1",
+      "args": [],
+      "ports": {
+        "subj1": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "1": {
+      "name": "y",
+      "class": "Obj1",
+      "args": [],
+      "ports": {
+        "obj1": {}
+      },
+      "connections": [
+        {
+          "left": {
+            "port": "obj1"
+          },
+          "right": {
+            "domain": 0,
+            "port": "obj0"
+          },
+          "connection": "neutral"
+        }
+      ],
+      "subdomains": {
+        "0": {
+          "name": "d1",
+          "class": "Obj1.Obj0",
+          "args": [],
+          "ports": {
+            "obj0": {
+              "position": "object"
+            }
+          },
+          "connections": [],
+          "subdomains": {}
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,505 @@
+{
+  "name": "",
+  "class": "System",
+  "args": [],
+  "ports": {},
+  "connections": [
+    {
+      "left": {
+        "domain": 0,
+        "port": "a"
+      },
+      "right": {
+        "domain": 1,
+        "port": "b"
+      },
+      "connection": "neutral"
+    }
+  ],
+  "subdomains": {
+    "0": {
+      "name": "a1",
+      "class": "A",
+      "args": [],
+      "ports": {
+        "a": {},
+        "b": {}
+      },
+      "connections": [
+        {
+          "left": {
+            "port": "a"
+          },
+          "right": {
+            "domain": 0,
+            "port": "a"
+          },
+          "connection": "neutral"
+        },
+        {
+          "left": {
+            "port": "b"
+          },
+          "right": {
+            "domain": 0,
+            "port": "b"
+          },
+          "connection": "neutral"
+        }
+      ],
+      "subdomains": {
+        "0": {
+          "name": "b1",
+          "class": "A.B",
+          "args": [],
+          "ports": {
+            "a": {},
+            "b": {}
+          },
+          "connections": [
+            {
+              "left": {
+                "port": "a"
+              },
+              "right": {
+                "domain": 0,
+                "port": "a"
+              },
+              "connection": "neutral"
+            },
+            {
+              "left": {
+                "port": "b"
+              },
+              "right": {
+                "domain": 0,
+                "port": "b"
+              },
+              "connection": "neutral"
+            }
+          ],
+          "subdomains": {
+            "0": {
+              "name": "c1",
+              "class": "A.B.C",
+              "args": [],
+              "ports": {
+                "a": {},
+                "b": {}
+              },
+              "connections": [
+                {
+                  "left": {
+                    "port": "a"
+                  },
+                  "right": {
+                    "domain": 0,
+                    "port": "a"
+                  },
+                  "connection": "neutral"
+                },
+                {
+                  "left": {
+                    "port": "b"
+                  },
+                  "right": {
+                    "domain": 0,
+                    "port": "b"
+                  },
+                  "connection": "neutral"
+                }
+              ],
+              "subdomains": {
+                "0": {
+                  "name": "d1",
+                  "class": "A.B.C.D",
+                  "args": [],
+                  "ports": {
+                    "a": {},
+                    "b": {}
+                  },
+                  "connections": [
+                    {
+                      "left": {
+                        "port": "a"
+                      },
+                      "right": {
+                        "domain": 0,
+                        "port": "a"
+                      },
+                      "connection": "neutral"
+                    },
+                    {
+                      "left": {
+                        "port": "b"
+                      },
+                      "right": {
+                        "domain": 0,
+                        "port": "b"
+                      },
+                      "connection": "neutral"
+                    }
+                  ],
+                  "subdomains": {
+                    "0": {
+                      "name": "e1",
+                      "class": "A.B.C.D.E",
+                      "args": [],
+                      "ports": {
+                        "a": {},
+                        "b": {}
+                      },
+                      "connections": [
+                        {
+                          "left": {
+                            "port": "a"
+                          },
+                          "right": {
+                            "domain": 0,
+                            "port": "a"
+                          },
+                          "connection": "neutral"
+                        },
+                        {
+                          "left": {
+                            "port": "b"
+                          },
+                          "right": {
+                            "domain": 0,
+                            "port": "b"
+                          },
+                          "connection": "neutral"
+                        }
+                      ],
+                      "subdomains": {
+                        "0": {
+                          "name": "f1",
+                          "class": "A.B.C.D.E.F",
+                          "args": [],
+                          "ports": {
+                            "a": {},
+                            "b": {}
+                          },
+                          "connections": [
+                            {
+                              "left": {
+                                "port": "a"
+                              },
+                              "right": {
+                                "domain": 0,
+                                "port": "a"
+                              },
+                              "connection": "neutral"
+                            },
+                            {
+                              "left": {
+                                "port": "b"
+                              },
+                              "right": {
+                                "domain": 0,
+                                "port": "b"
+                              },
+                              "connection": "neutral"
+                            }
+                          ],
+                          "subdomains": {
+                            "0": {
+                              "name": "g1",
+                              "class": "A.B.C.D.E.F.G",
+                              "args": [],
+                              "ports": {
+                                "a": {},
+                                "b": {}
+                              },
+                              "connections": [
+                                {
+                                  "left": {
+                                    "port": "a"
+                                  },
+                                  "right": {
+                                    "domain": 0,
+                                    "port": "a"
+                                  },
+                                  "connection": "neutral"
+                                },
+                                {
+                                  "left": {
+                                    "port": "b"
+                                  },
+                                  "right": {
+                                    "domain": 0,
+                                    "port": "b"
+                                  },
+                                  "connection": "neutral"
+                                }
+                              ],
+                              "subdomains": {
+                                "0": {
+                                  "name": "h1",
+                                  "class": "A.B.C.D.E.F.G.H",
+                                  "args": [],
+                                  "ports": {
+                                    "a": {},
+                                    "b": {}
+                                  },
+                                  "connections": [],
+                                  "subdomains": {}
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "1": {
+      "name": "b1",
+      "class": "A",
+      "args": [],
+      "ports": {
+        "a": {},
+        "b": {}
+      },
+      "connections": [
+        {
+          "left": {
+            "port": "a"
+          },
+          "right": {
+            "domain": 0,
+            "port": "a"
+          },
+          "connection": "neutral"
+        },
+        {
+          "left": {
+            "port": "b"
+          },
+          "right": {
+            "domain": 0,
+            "port": "b"
+          },
+          "connection": "neutral"
+        }
+      ],
+      "subdomains": {
+        "0": {
+          "name": "b1",
+          "class": "A.B",
+          "args": [],
+          "ports": {
+            "a": {},
+            "b": {}
+          },
+          "connections": [
+            {
+              "left": {
+                "port": "a"
+              },
+              "right": {
+                "domain": 0,
+                "port": "a"
+              },
+              "connection": "neutral"
+            },
+            {
+              "left": {
+                "port": "b"
+              },
+              "right": {
+                "domain": 0,
+                "port": "b"
+              },
+              "connection": "neutral"
+            }
+          ],
+          "subdomains": {
+            "0": {
+              "name": "c1",
+              "class": "A.B.C",
+              "args": [],
+              "ports": {
+                "a": {},
+                "b": {}
+              },
+              "connections": [
+                {
+                  "left": {
+                    "port": "a"
+                  },
+                  "right": {
+                    "domain": 0,
+                    "port": "a"
+                  },
+                  "connection": "neutral"
+                },
+                {
+                  "left": {
+                    "port": "b"
+                  },
+                  "right": {
+                    "domain": 0,
+                    "port": "b"
+                  },
+                  "connection": "neutral"
+                }
+              ],
+              "subdomains": {
+                "0": {
+                  "name": "d1",
+                  "class": "A.B.C.D",
+                  "args": [],
+                  "ports": {
+                    "a": {},
+                    "b": {}
+                  },
+                  "connections": [
+                    {
+                      "left": {
+                        "port": "a"
+                      },
+                      "right": {
+                        "domain": 0,
+                        "port": "a"
+                      },
+                      "connection": "neutral"
+                    },
+                    {
+                      "left": {
+                        "port": "b"
+                      },
+                      "right": {
+                        "domain": 0,
+                        "port": "b"
+                      },
+                      "connection": "neutral"
+                    }
+                  ],
+                  "subdomains": {
+                    "0": {
+                      "name": "e1",
+                      "class": "A.B.C.D.E",
+                      "args": [],
+                      "ports": {
+                        "a": {},
+                        "b": {}
+                      },
+                      "connections": [
+                        {
+                          "left": {
+                            "port": "a"
+                          },
+                          "right": {
+                            "domain": 0,
+                            "port": "a"
+                          },
+                          "connection": "neutral"
+                        },
+                        {
+                          "left": {
+                            "port": "b"
+                          },
+                          "right": {
+                            "domain": 0,
+                            "port": "b"
+                          },
+                          "connection": "neutral"
+                        }
+                      ],
+                      "subdomains": {
+                        "0": {
+                          "name": "f1",
+                          "class": "A.B.C.D.E.F",
+                          "args": [],
+                          "ports": {
+                            "a": {},
+                            "b": {}
+                          },
+                          "connections": [
+                            {
+                              "left": {
+                                "port": "a"
+                              },
+                              "right": {
+                                "domain": 0,
+                                "port": "a"
+                              },
+                              "connection": "neutral"
+                            },
+                            {
+                              "left": {
+                                "port": "b"
+                              },
+                              "right": {
+                                "domain": 0,
+                                "port": "b"
+                              },
+                              "connection": "neutral"
+                            }
+                          ],
+                          "subdomains": {
+                            "0": {
+                              "name": "g1",
+                              "class": "A.B.C.D.E.F.G",
+                              "args": [],
+                              "ports": {
+                                "a": {},
+                                "b": {}
+                              },
+                              "connections": [
+                                {
+                                  "left": {
+                                    "port": "a"
+                                  },
+                                  "right": {
+                                    "domain": 0,
+                                    "port": "a"
+                                  },
+                                  "connection": "neutral"
+                                },
+                                {
+                                  "left": {
+                                    "port": "b"
+                                  },
+                                  "right": {
+                                    "domain": 0,
+                                    "port": "b"
+                                  },
+                                  "connection": "neutral"
+                                }
+                              ],
+                              "subdomains": {
+                                "0": {
+                                  "name": "h1",
+                                  "class": "A.B.C.D.E.F.G.H",
+                                  "args": [],
+                                  "ports": {
+                                    "a": {},
+                                    "b": {}
+                                  },
+                                  "connections": [],
+                                  "subdomains": {}
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

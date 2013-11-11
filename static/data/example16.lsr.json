@@ -1,0 +1,128 @@
+{
+  "name": "",
+  "class": "System",
+  "args": [],
+  "ports": {},
+  "connections": [
+    {
+      "left": {
+        "domain": 0,
+        "port": "na"
+      },
+      "right": {
+        "domain": 4,
+        "port": "b"
+      },
+      "connection": "bidirectional"
+    }
+  ],
+  "subdomains": {
+    "0": {
+      "name": "d",
+      "class": "X",
+      "args": [],
+      "ports": {
+        "na": {},
+        "o": {
+          "direction": "out",
+          "position": "subject"
+        },
+        "b": {
+          "direction": "inout",
+          "position": "subject"
+        },
+        "i": {
+          "direction": "in"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "1": {
+      "name": "e",
+      "class": "Y",
+      "args": [],
+      "ports": {
+        "na": {
+          "position": "object"
+        },
+        "o": {
+          "direction": "out",
+          "position": "subject"
+        },
+        "b": {
+          "direction": "inout"
+        },
+        "i": {
+          "direction": "in"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "4": {
+      "name": "h",
+      "class": "X",
+      "args": [],
+      "ports": {
+        "na": {},
+        "o": {
+          "direction": "out",
+          "position": "subject"
+        },
+        "b": {
+          "direction": "inout",
+          "position": "subject"
+        },
+        "i": {
+          "direction": "in"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "2": {
+      "name": "f",
+      "class": "X",
+      "args": [],
+      "ports": {
+        "na": {},
+        "o": {
+          "direction": "out",
+          "position": "subject"
+        },
+        "b": {
+          "direction": "inout",
+          "position": "subject"
+        },
+        "i": {
+          "direction": "in"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "3": {
+      "name": "g",
+      "class": "Y",
+      "args": [],
+      "ports": {
+        "na": {
+          "position": "object"
+        },
+        "o": {
+          "direction": "out",
+          "position": "subject"
+        },
+        "b": {
+          "direction": "inout"
+        },
+        "i": {
+          "direction": "in"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    }
+  }
+}

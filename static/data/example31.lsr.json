@@ -1,0 +1,102 @@
+{
+  "name": "",
+  "class": "System",
+  "args": [],
+  "ports": {},
+  "connections": [
+    {
+      "left": {
+        "domain": 0,
+        "port": "a"
+      },
+      "right": {
+        "domain": 1,
+        "port": "b"
+      },
+      "connection": "neutral"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "a"
+      },
+      "right": {
+        "domain": 2,
+        "port": "b"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "b"
+      },
+      "right": {
+        "domain": 1,
+        "port": "a"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "b"
+      },
+      "right": {
+        "domain": 2,
+        "port": "a"
+      },
+      "connection": "bidirectional"
+    }
+  ],
+  "subdomains": {
+    "0": {
+      "name": "d",
+      "class": "A",
+      "args": [],
+      "ports": {
+        "a": {
+          "position": "subject"
+        },
+        "b": {},
+        "e": {
+          "type": "C"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "1": {
+      "name": "e",
+      "class": "A",
+      "args": [],
+      "ports": {
+        "a": {
+          "position": "subject"
+        },
+        "b": {},
+        "e": {
+          "type": "C"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "2": {
+      "name": "f",
+      "class": "A",
+      "args": [],
+      "ports": {
+        "a": {
+          "position": "subject"
+        },
+        "b": {},
+        "e": {
+          "type": "C"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    }
+  }
+}

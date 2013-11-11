@@ -1,0 +1,125 @@
+{
+  "name": "",
+  "class": "System",
+  "args": [],
+  "ports": {},
+  "connections": [
+    {
+      "left": {
+        "domain": 0,
+        "port": "readwrite"
+      },
+      "right": {
+        "domain": 2,
+        "port": "active"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "readwrite"
+      },
+      "right": {
+        "domain": 4,
+        "port": "active"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 1,
+        "port": "readwrite"
+      },
+      "right": {
+        "domain": 2,
+        "port": "active"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 1,
+        "port": "readwrite"
+      },
+      "right": {
+        "domain": 3,
+        "port": "active"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 1,
+        "port": "readwrite"
+      },
+      "right": {
+        "domain": 4,
+        "port": "active"
+      },
+      "connection": "neutral"
+    }
+  ],
+  "subdomains": {
+    "0": {
+      "name": "internet",
+      "class": "Network",
+      "args": [],
+      "ports": {
+        "readwrite": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "1": {
+      "name": "secret",
+      "class": "Network",
+      "args": [],
+      "ports": {
+        "readwrite": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "4": {
+      "name": "encrypt",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "active": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "2": {
+      "name": "low",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "active": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "3": {
+      "name": "high",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "active": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    }
+  }
+}

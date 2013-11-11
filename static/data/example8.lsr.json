@@ -1,0 +1,1858 @@
+{
+  "name": "",
+  "class": "System",
+  "args": [],
+  "ports": {},
+  "connections": [
+    {
+      "left": {
+        "domain": 0,
+        "port": "create"
+      },
+      "right": {
+        "domain": 2,
+        "port": "a7"
+      },
+      "connection": "neutral"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "gstat"
+      },
+      "right": {
+        "domain": 3,
+        "port": "g3"
+      },
+      "connection": "neutral"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "ping"
+      },
+      "right": {
+        "domain": 2,
+        "port": "a5"
+      },
+      "connection": "neutral"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "read"
+      },
+      "right": {
+        "domain": 4,
+        "port": "x"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "read"
+      },
+      "right": {
+        "domain": 15,
+        "port": "x"
+      },
+      "connection": "neutral"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "write"
+      },
+      "right": {
+        "domain": 1,
+        "port": "lock"
+      },
+      "connection": "neutral"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "write"
+      },
+      "right": {
+        "domain": 5,
+        "port": "x"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "write"
+      },
+      "right": {
+        "domain": 6,
+        "port": "x"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 1,
+        "port": "out2"
+      },
+      "right": {
+        "domain": 14,
+        "port": "x"
+      },
+      "connection": "neutral"
+    },
+    {
+      "left": {
+        "domain": 2,
+        "port": "a1"
+      },
+      "right": {
+        "domain": 28,
+        "port": "x"
+      },
+      "connection": "neutral"
+    },
+    {
+      "left": {
+        "domain": 3,
+        "port": "g2"
+      },
+      "right": {
+        "domain": 12,
+        "port": "x"
+      },
+      "connection": "neutral"
+    },
+    {
+      "left": {
+        "domain": 3,
+        "port": "g2"
+      },
+      "right": {
+        "domain": 13,
+        "port": "x"
+      },
+      "connection": "neutral"
+    },
+    {
+      "left": {
+        "domain": 4,
+        "port": "y"
+      },
+      "right": {
+        "domain": 7,
+        "port": "x"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 4,
+        "port": "y"
+      },
+      "right": {
+        "domain": 9,
+        "port": "x"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 5,
+        "port": "y"
+      },
+      "right": {
+        "domain": 10,
+        "port": "x"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 6,
+        "port": "y"
+      },
+      "right": {
+        "domain": 11,
+        "port": "x"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 7,
+        "port": "y"
+      },
+      "right": {
+        "domain": 8,
+        "port": "x"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 10,
+        "port": "y"
+      },
+      "right": {
+        "domain": 20,
+        "port": "x"
+      },
+      "connection": "neutral"
+    },
+    {
+      "left": {
+        "domain": 11,
+        "port": "y"
+      },
+      "right": {
+        "domain": 21,
+        "port": "x"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 12,
+        "port": "y"
+      },
+      "right": {
+        "domain": 16,
+        "port": "x"
+      },
+      "connection": "neutral"
+    },
+    {
+      "left": {
+        "domain": 12,
+        "port": "y"
+      },
+      "right": {
+        "domain": 22,
+        "port": "x"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 13,
+        "port": "y"
+      },
+      "right": {
+        "domain": 17,
+        "port": "x"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 13,
+        "port": "y"
+      },
+      "right": {
+        "domain": 23,
+        "port": "x"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 13,
+        "port": "y"
+      },
+      "right": {
+        "domain": 56,
+        "port": "g3"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 14,
+        "port": "y"
+      },
+      "right": {
+        "domain": 26,
+        "port": "x"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 16,
+        "port": "y"
+      },
+      "right": {
+        "domain": 25,
+        "port": "x"
+      },
+      "connection": "neutral"
+    },
+    {
+      "left": {
+        "domain": 17,
+        "port": "y"
+      },
+      "right": {
+        "domain": 18,
+        "port": "x"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 18,
+        "port": "y"
+      },
+      "right": {
+        "domain": 19,
+        "port": "x"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 19,
+        "port": "y"
+      },
+      "right": {
+        "domain": 25,
+        "port": "x"
+      },
+      "connection": "neutral"
+    },
+    {
+      "left": {
+        "domain": 20,
+        "port": "y"
+      },
+      "right": {
+        "domain": 26,
+        "port": "x"
+      },
+      "connection": "neutral"
+    },
+    {
+      "left": {
+        "domain": 21,
+        "port": "y"
+      },
+      "right": {
+        "domain": 27,
+        "port": "x"
+      },
+      "connection": "neutral"
+    },
+    {
+      "left": {
+        "domain": 21,
+        "port": "y"
+      },
+      "right": {
+        "domain": 33,
+        "port": "x"
+      },
+      "connection": "neutral"
+    },
+    {
+      "left": {
+        "domain": 21,
+        "port": "y"
+      },
+      "right": {
+        "domain": 34,
+        "port": "x"
+      },
+      "connection": "neutral"
+    },
+    {
+      "left": {
+        "domain": 23,
+        "port": "y"
+      },
+      "right": {
+        "domain": 24,
+        "port": "x"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 24,
+        "port": "y"
+      },
+      "right": {
+        "domain": 30,
+        "port": "x"
+      },
+      "connection": "neutral"
+    },
+    {
+      "left": {
+        "domain": 25,
+        "port": "y"
+      },
+      "right": {
+        "domain": 29,
+        "port": "x"
+      },
+      "connection": "neutral"
+    },
+    {
+      "left": {
+        "domain": 30,
+        "port": "y"
+      },
+      "right": {
+        "domain": 31,
+        "port": "x"
+      },
+      "connection": "neutral"
+    },
+    {
+      "left": {
+        "domain": 31,
+        "port": "y"
+      },
+      "right": {
+        "domain": 32,
+        "port": "x"
+      },
+      "connection": "neutral"
+    },
+    {
+      "left": {
+        "domain": 32,
+        "port": "y"
+      },
+      "right": {
+        "domain": 37,
+        "port": "x"
+      },
+      "connection": "neutral"
+    },
+    {
+      "left": {
+        "domain": 34,
+        "port": "x"
+      },
+      "right": {
+        "domain": 56,
+        "port": "g2"
+      },
+      "connection": "neutral"
+    },
+    {
+      "left": {
+        "domain": 34,
+        "port": "y"
+      },
+      "right": {
+        "domain": 35,
+        "port": "x"
+      },
+      "connection": "neutral"
+    },
+    {
+      "left": {
+        "domain": 35,
+        "port": "y"
+      },
+      "right": {
+        "domain": 36,
+        "port": "x"
+      },
+      "connection": "neutral"
+    },
+    {
+      "left": {
+        "domain": 36,
+        "port": "y"
+      },
+      "right": {
+        "domain": 43,
+        "port": "x"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 37,
+        "port": "y"
+      },
+      "right": {
+        "domain": 38,
+        "port": "x"
+      },
+      "connection": "neutral"
+    },
+    {
+      "left": {
+        "domain": 38,
+        "port": "y"
+      },
+      "right": {
+        "domain": 39,
+        "port": "x"
+      },
+      "connection": "neutral"
+    },
+    {
+      "left": {
+        "domain": 39,
+        "port": "y"
+      },
+      "right": {
+        "domain": 40,
+        "port": "x"
+      },
+      "connection": "neutral"
+    },
+    {
+      "left": {
+        "domain": 40,
+        "port": "y"
+      },
+      "right": {
+        "domain": 41,
+        "port": "x"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 41,
+        "port": "y"
+      },
+      "right": {
+        "domain": 42,
+        "port": "x"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 43,
+        "port": "y"
+      },
+      "right": {
+        "domain": 44,
+        "port": "x"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 44,
+        "port": "y"
+      },
+      "right": {
+        "domain": 45,
+        "port": "x"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 45,
+        "port": "y"
+      },
+      "right": {
+        "domain": 46,
+        "port": "x"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 46,
+        "port": "y"
+      },
+      "right": {
+        "domain": 47,
+        "port": "x"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 47,
+        "port": "y"
+      },
+      "right": {
+        "domain": 48,
+        "port": "x"
+      },
+      "connection": "right-to-left"
+    }
+  ],
+  "subdomains": {
+    "51": {
+      "name": "r45",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "15": {
+      "name": "r9",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "37": {
+      "name": "r31",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "48": {
+      "name": "r42",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "7": {
+      "name": "r1",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "25": {
+      "name": "r19",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "43": {
+      "name": "r37",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "28": {
+      "name": "r22",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "57": {
+      "name": "portage4",
+      "class": "Portage_t",
+      "args": [],
+      "ports": {
+        "a5": {
+          "position": "subject"
+        },
+        "a2": {
+          "position": "object"
+        },
+        "a7": {
+          "position": "subject"
+        },
+        "a1": {
+          "position": "object"
+        }
+      },
+      "connections": [
+        {
+          "left": {
+            "port": "a5"
+          },
+          "right": {
+            "domain": 1,
+            "port": "list"
+          },
+          "connection": "neutral"
+        },
+        {
+          "left": {
+            "port": "a7"
+          },
+          "right": {
+            "domain": 0,
+            "port": "list"
+          },
+          "connection": "neutral"
+        }
+      ],
+      "subdomains": {
+        "0": {
+          "name": "gcc1",
+          "class": "Gcc",
+          "args": [],
+          "ports": {
+            "list": {
+              "position": "subject"
+            }
+          },
+          "connections": [],
+          "subdomains": {}
+        },
+        "1": {
+          "name": "gcc2",
+          "class": "Gcc",
+          "args": [],
+          "ports": {
+            "list": {
+              "position": "subject"
+            }
+          },
+          "connections": [],
+          "subdomains": {}
+        }
+      }
+    },
+    "13": {
+      "name": "r7",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "31": {
+      "name": "r25",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "14": {
+      "name": "r8",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "36": {
+      "name": "r30",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "49": {
+      "name": "r43",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "50": {
+      "name": "r44",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "0": {
+      "name": "con1",
+      "class": "Consoletype",
+      "args": [],
+      "ports": {
+        "read": {
+          "position": "object"
+        },
+        "write": {
+          "position": "object"
+        },
+        "g13": {
+          "direction": "out",
+          "position": "subject"
+        },
+        "ping": {
+          "position": "object"
+        },
+        "create": {
+          "position": "object"
+        },
+        "gstat": {
+          "position": "object"
+        }
+      },
+      "connections": [
+        {
+          "left": {
+            "port": "create"
+          },
+          "right": {
+            "domain": 2,
+            "port": "exe"
+          },
+          "connection": "neutral"
+        },
+        {
+          "left": {
+            "port": "g13"
+          },
+          "right": {
+            "domain": 0,
+            "port": "create"
+          },
+          "connection": "right-to-left"
+        },
+        {
+          "left": {
+            "port": "gstat"
+          },
+          "right": {
+            "domain": 2,
+            "port": "create"
+          },
+          "connection": "neutral"
+        },
+        {
+          "left": {
+            "port": "ping"
+          },
+          "right": {
+            "domain": 2,
+            "port": "list"
+          },
+          "connection": "neutral"
+        },
+        {
+          "left": {
+            "domain": 0,
+            "port": "lock"
+          },
+          "right": {
+            "domain": 1,
+            "port": "rw"
+          },
+          "connection": "right-to-left"
+        },
+        {
+          "left": {
+            "domain": 0,
+            "port": "write"
+          },
+          "right": {
+            "domain": 1,
+            "port": "search"
+          },
+          "connection": "right-to-left"
+        },
+        {
+          "left": {
+            "domain": 1,
+            "port": "lock"
+          },
+          "right": {
+            "domain": 2,
+            "port": "a5"
+          },
+          "connection": "neutral"
+        },
+        {
+          "left": {
+            "domain": 1,
+            "port": "write"
+          },
+          "right": {
+            "domain": 3,
+            "port": "read"
+          },
+          "connection": "neutral"
+        },
+        {
+          "left": {
+            "domain": 2,
+            "port": "a7"
+          },
+          "right": {
+            "domain": 3,
+            "port": "write"
+          },
+          "connection": "neutral"
+        }
+      ],
+      "subdomains": {
+        "0": {
+          "name": "prelink1",
+          "class": "Prelink",
+          "args": [],
+          "ports": {
+            "write": {
+              "position": "object"
+            },
+            "create": {
+              "position": "subject"
+            },
+            "lock": {
+              "position": "object"
+            }
+          },
+          "connections": [
+            {
+              "left": {
+                "port": "create"
+              },
+              "right": {
+                "domain": 0,
+                "port": "s"
+              },
+              "connection": "neutral"
+            },
+            {
+              "left": {
+                "port": "write"
+              },
+              "right": {
+                "domain": 1,
+                "port": "o"
+              },
+              "connection": "neutral"
+            },
+            {
+              "left": {
+                "domain": 0,
+                "port": "o"
+              },
+              "right": {
+                "domain": 1,
+                "port": "s"
+              },
+              "connection": "neutral"
+            }
+          ],
+          "subdomains": {
+            "0": {
+              "name": "d1",
+              "class": "D",
+              "args": [],
+              "ports": {
+                "o": {
+                  "position": "object"
+                },
+                "s": {
+                  "position": "subject"
+                }
+              },
+              "connections": [
+                {
+                  "left": {
+                    "port": "s"
+                  },
+                  "right": {
+                    "domain": 0,
+                    "port": "o"
+                  },
+                  "connection": "left-to-right"
+                }
+              ],
+              "subdomains": {
+                "0": {
+                  "name": "a1",
+                  "class": "A",
+                  "args": [],
+                  "ports": {
+                    "o": {
+                      "position": "object"
+                    },
+                    "s": {
+                      "position": "subject"
+                    }
+                  },
+                  "connections": [],
+                  "subdomains": {
+                    "0": {
+                      "name": "e1",
+                      "class": "E",
+                      "args": [],
+                      "ports": {
+                        "o": {
+                          "position": "object"
+                        }
+                      },
+                      "connections": [],
+                      "subdomains": {}
+                    }
+                  }
+                }
+              }
+            },
+            "1": {
+              "name": "b1",
+              "class": "B",
+              "args": [],
+              "ports": {
+                "o": {
+                  "position": "object"
+                },
+                "s": {
+                  "position": "subject"
+                }
+              },
+              "connections": [],
+              "subdomains": {}
+            }
+          }
+        },
+        "1": {
+          "name": "amtu1",
+          "class": "Amtu",
+          "args": [],
+          "ports": {
+            "write": {
+              "position": "object"
+            },
+            "rw": {
+              "position": "subject"
+            },
+            "lock": {
+              "position": "object"
+            },
+            "search": {
+              "position": "subject"
+            }
+          },
+          "connections": [],
+          "subdomains": {}
+        },
+        "2": {
+          "name": "rx5a",
+          "class": "Rx5",
+          "args": [],
+          "ports": {
+            "a5": {
+              "position": "subject"
+            },
+            "list": {
+              "position": "object"
+            },
+            "a7": {
+              "position": "subject"
+            },
+            "create": {
+              "position": "object"
+            },
+            "exe": {
+              "position": "object"
+            }
+          },
+          "connections": [],
+          "subdomains": {}
+        },
+        "3": {
+          "name": "amanda1",
+          "class": "Amanda",
+          "args": [],
+          "ports": {
+            "read": {
+              "position": "subject"
+            },
+            "write": {
+              "position": "object"
+            }
+          },
+          "connections": [],
+          "subdomains": {}
+        }
+      }
+    },
+    "22": {
+      "name": "r16",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "19": {
+      "name": "r13",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "44": {
+      "name": "r38",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "29": {
+      "name": "r23",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "56": {
+      "name": "portage3",
+      "class": "Portage",
+      "args": [],
+      "ports": {
+        "g3": {
+          "position": "subject"
+        },
+        "g2": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "12": {
+      "name": "r6",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "30": {
+      "name": "r24",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "53": {
+      "name": "r47",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "17": {
+      "name": "r11",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "35": {
+      "name": "r29",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "45": {
+      "name": "r39",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "1": {
+      "name": "rpm1",
+      "class": "Rpm",
+      "args": [],
+      "ports": {
+        "out2": {
+          "position": "object"
+        },
+        "lock": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "23": {
+      "name": "r17",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "18": {
+      "name": "r12",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "40": {
+      "name": "r34",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "4": {
+      "name": "quota1",
+      "class": "Quota",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "26": {
+      "name": "r20",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "52": {
+      "name": "r46",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "16": {
+      "name": "r10",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "34": {
+      "name": "r28",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "2": {
+      "name": "portage1",
+      "class": "Portage_t",
+      "args": [],
+      "ports": {
+        "a5": {
+          "position": "subject"
+        },
+        "a2": {
+          "position": "object"
+        },
+        "a7": {
+          "position": "subject"
+        },
+        "a1": {
+          "position": "object"
+        }
+      },
+      "connections": [
+        {
+          "left": {
+            "port": "a5"
+          },
+          "right": {
+            "domain": 1,
+            "port": "list"
+          },
+          "connection": "neutral"
+        },
+        {
+          "left": {
+            "port": "a7"
+          },
+          "right": {
+            "domain": 0,
+            "port": "list"
+          },
+          "connection": "neutral"
+        }
+      ],
+      "subdomains": {
+        "0": {
+          "name": "gcc1",
+          "class": "Gcc",
+          "args": [],
+          "ports": {
+            "list": {
+              "position": "subject"
+            }
+          },
+          "connections": [],
+          "subdomains": {}
+        },
+        "1": {
+          "name": "gcc2",
+          "class": "Gcc",
+          "args": [],
+          "ports": {
+            "list": {
+              "position": "subject"
+            }
+          },
+          "connections": [],
+          "subdomains": {}
+        }
+      }
+    },
+    "20": {
+      "name": "r14",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "39": {
+      "name": "r33",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "46": {
+      "name": "r40",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "5": {
+      "name": "postlink1",
+      "class": "Postlink",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "27": {
+      "name": "r21",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "41": {
+      "name": "r35",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "8": {
+      "name": "r2",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "55": {
+      "name": "r49",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "11": {
+      "name": "r5",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "33": {
+      "name": "r27",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "38": {
+      "name": "r32",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "47": {
+      "name": "r41",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "3": {
+      "name": "portage2",
+      "class": "Portage",
+      "args": [],
+      "ports": {
+        "g3": {
+          "position": "subject"
+        },
+        "g2": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "21": {
+      "name": "r15",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "24": {
+      "name": "r18",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "42": {
+      "name": "r36",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "6": {
+      "name": "prelinka1",
+      "class": "Prelinka",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "9": {
+      "name": "r3",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "54": {
+      "name": "r48",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "10": {
+      "name": "r4",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "32": {
+      "name": "r26",
+      "class": "Random",
+      "args": [],
+      "ports": {
+        "x": {
+          "position": "subject"
+        },
+        "y": {
+          "position": "object"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    }
+  }
+}

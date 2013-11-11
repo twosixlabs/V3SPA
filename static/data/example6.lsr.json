@@ -1,0 +1,853 @@
+{
+  "name": "",
+  "class": "System",
+  "args": [],
+  "ports": {},
+  "connections": [
+    {
+      "left": {
+        "domain": 0,
+        "port": "inPort1"
+      },
+      "right": {
+        "domain": 6,
+        "port": "outPort1"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "inPort2"
+      },
+      "right": {
+        "domain": 19,
+        "port": "outPort1"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "outPort1"
+      },
+      "right": {
+        "domain": 1,
+        "port": "inPort1"
+      },
+      "connection": "left-to-right"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "outPort2"
+      },
+      "right": {
+        "domain": 13,
+        "port": "inPort2"
+      },
+      "connection": "left-to-right"
+    },
+    {
+      "left": {
+        "domain": 1,
+        "port": "inPort1"
+      },
+      "right": {
+        "domain": 7,
+        "port": "outPort1"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 1,
+        "port": "inPort2"
+      },
+      "right": {
+        "domain": 20,
+        "port": "outPort1"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 1,
+        "port": "outPort1"
+      },
+      "right": {
+        "domain": 2,
+        "port": "inPort1"
+      },
+      "connection": "left-to-right"
+    },
+    {
+      "left": {
+        "domain": 1,
+        "port": "outPort2"
+      },
+      "right": {
+        "domain": 14,
+        "port": "inPort2"
+      },
+      "connection": "left-to-right"
+    },
+    {
+      "left": {
+        "domain": 2,
+        "port": "inPort1"
+      },
+      "right": {
+        "domain": 8,
+        "port": "outPort1"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 2,
+        "port": "inPort2"
+      },
+      "right": {
+        "domain": 21,
+        "port": "outPort1"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 2,
+        "port": "outPort1"
+      },
+      "right": {
+        "domain": 3,
+        "port": "inPort1"
+      },
+      "connection": "left-to-right"
+    },
+    {
+      "left": {
+        "domain": 2,
+        "port": "outPort2"
+      },
+      "right": {
+        "domain": 15,
+        "port": "inPort2"
+      },
+      "connection": "left-to-right"
+    },
+    {
+      "left": {
+        "domain": 3,
+        "port": "inPort1"
+      },
+      "right": {
+        "domain": 9,
+        "port": "outPort1"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 3,
+        "port": "inPort2"
+      },
+      "right": {
+        "domain": 22,
+        "port": "outPort1"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 3,
+        "port": "outPort1"
+      },
+      "right": {
+        "domain": 4,
+        "port": "inPort1"
+      },
+      "connection": "left-to-right"
+    },
+    {
+      "left": {
+        "domain": 3,
+        "port": "outPort2"
+      },
+      "right": {
+        "domain": 16,
+        "port": "inPort2"
+      },
+      "connection": "left-to-right"
+    },
+    {
+      "left": {
+        "domain": 4,
+        "port": "inPort1"
+      },
+      "right": {
+        "domain": 10,
+        "port": "outPort1"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 4,
+        "port": "inPort2"
+      },
+      "right": {
+        "domain": 23,
+        "port": "outPort1"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 4,
+        "port": "outPort1"
+      },
+      "right": {
+        "domain": 5,
+        "port": "inPort1"
+      },
+      "connection": "left-to-right"
+    },
+    {
+      "left": {
+        "domain": 4,
+        "port": "outPort2"
+      },
+      "right": {
+        "domain": 17,
+        "port": "inPort2"
+      },
+      "connection": "left-to-right"
+    },
+    {
+      "left": {
+        "domain": 5,
+        "port": "inPort1"
+      },
+      "right": {
+        "domain": 11,
+        "port": "outPort1"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 5,
+        "port": "inPort2"
+      },
+      "right": {
+        "domain": 24,
+        "port": "outPort1"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 5,
+        "port": "outPort1"
+      },
+      "right": {
+        "domain": 6,
+        "port": "inPort1"
+      },
+      "connection": "left-to-right"
+    },
+    {
+      "left": {
+        "domain": 5,
+        "port": "outPort2"
+      },
+      "right": {
+        "domain": 18,
+        "port": "inPort2"
+      },
+      "connection": "left-to-right"
+    },
+    {
+      "left": {
+        "domain": 6,
+        "port": "inPort1"
+      },
+      "right": {
+        "domain": 12,
+        "port": "outPort1"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 6,
+        "port": "outPort1"
+      },
+      "right": {
+        "domain": 7,
+        "port": "inPort1"
+      },
+      "connection": "left-to-right"
+    },
+    {
+      "left": {
+        "domain": 6,
+        "port": "outPort2"
+      },
+      "right": {
+        "domain": 19,
+        "port": "inPort2"
+      },
+      "connection": "left-to-right"
+    }
+  ],
+  "subdomains": {
+    "15": {
+      "name": "p",
+      "class": "IO",
+      "args": [],
+      "ports": {
+        "inPort1": {
+          "position": "object"
+        },
+        "inPort2": {
+          "position": "object"
+        },
+        "outPort2": {
+          "position": "subject"
+        },
+        "outPort1": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "7": {
+      "name": "h",
+      "class": "IO",
+      "args": [],
+      "ports": {
+        "inPort1": {
+          "position": "object"
+        },
+        "inPort2": {
+          "position": "object"
+        },
+        "outPort2": {
+          "position": "subject"
+        },
+        "outPort1": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "25": {
+      "name": "z",
+      "class": "IO",
+      "args": [],
+      "ports": {
+        "inPort1": {
+          "position": "object"
+        },
+        "inPort2": {
+          "position": "object"
+        },
+        "outPort2": {
+          "position": "subject"
+        },
+        "outPort1": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "13": {
+      "name": "n",
+      "class": "IO",
+      "args": [],
+      "ports": {
+        "inPort1": {
+          "position": "object"
+        },
+        "inPort2": {
+          "position": "object"
+        },
+        "outPort2": {
+          "position": "subject"
+        },
+        "outPort1": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "14": {
+      "name": "o",
+      "class": "IO",
+      "args": [],
+      "ports": {
+        "inPort1": {
+          "position": "object"
+        },
+        "inPort2": {
+          "position": "object"
+        },
+        "outPort2": {
+          "position": "subject"
+        },
+        "outPort1": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "0": {
+      "name": "a",
+      "class": "IO",
+      "args": [],
+      "ports": {
+        "inPort1": {
+          "position": "object"
+        },
+        "inPort2": {
+          "position": "object"
+        },
+        "outPort2": {
+          "position": "subject"
+        },
+        "outPort1": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "22": {
+      "name": "w",
+      "class": "IO",
+      "args": [],
+      "ports": {
+        "inPort1": {
+          "position": "object"
+        },
+        "inPort2": {
+          "position": "object"
+        },
+        "outPort2": {
+          "position": "subject"
+        },
+        "outPort1": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "19": {
+      "name": "t",
+      "class": "IO",
+      "args": [],
+      "ports": {
+        "inPort1": {
+          "position": "object"
+        },
+        "inPort2": {
+          "position": "object"
+        },
+        "outPort2": {
+          "position": "subject"
+        },
+        "outPort1": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "12": {
+      "name": "m",
+      "class": "IO",
+      "args": [],
+      "ports": {
+        "inPort1": {
+          "position": "object"
+        },
+        "inPort2": {
+          "position": "object"
+        },
+        "outPort2": {
+          "position": "subject"
+        },
+        "outPort1": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "17": {
+      "name": "r",
+      "class": "IO",
+      "args": [],
+      "ports": {
+        "inPort1": {
+          "position": "object"
+        },
+        "inPort2": {
+          "position": "object"
+        },
+        "outPort2": {
+          "position": "subject"
+        },
+        "outPort1": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "1": {
+      "name": "b",
+      "class": "IO",
+      "args": [],
+      "ports": {
+        "inPort1": {
+          "position": "object"
+        },
+        "inPort2": {
+          "position": "object"
+        },
+        "outPort2": {
+          "position": "subject"
+        },
+        "outPort1": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "23": {
+      "name": "x",
+      "class": "IO",
+      "args": [],
+      "ports": {
+        "inPort1": {
+          "position": "object"
+        },
+        "inPort2": {
+          "position": "object"
+        },
+        "outPort2": {
+          "position": "subject"
+        },
+        "outPort1": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "18": {
+      "name": "s",
+      "class": "IO",
+      "args": [],
+      "ports": {
+        "inPort1": {
+          "position": "object"
+        },
+        "inPort2": {
+          "position": "object"
+        },
+        "outPort2": {
+          "position": "subject"
+        },
+        "outPort1": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "4": {
+      "name": "e",
+      "class": "IO",
+      "args": [],
+      "ports": {
+        "inPort1": {
+          "position": "object"
+        },
+        "inPort2": {
+          "position": "object"
+        },
+        "outPort2": {
+          "position": "subject"
+        },
+        "outPort1": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "16": {
+      "name": "q",
+      "class": "IO",
+      "args": [],
+      "ports": {
+        "inPort1": {
+          "position": "object"
+        },
+        "inPort2": {
+          "position": "object"
+        },
+        "outPort2": {
+          "position": "subject"
+        },
+        "outPort1": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "2": {
+      "name": "c",
+      "class": "IO",
+      "args": [],
+      "ports": {
+        "inPort1": {
+          "position": "object"
+        },
+        "inPort2": {
+          "position": "object"
+        },
+        "outPort2": {
+          "position": "subject"
+        },
+        "outPort1": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "20": {
+      "name": "u",
+      "class": "IO",
+      "args": [],
+      "ports": {
+        "inPort1": {
+          "position": "object"
+        },
+        "inPort2": {
+          "position": "object"
+        },
+        "outPort2": {
+          "position": "subject"
+        },
+        "outPort1": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "5": {
+      "name": "f",
+      "class": "IO",
+      "args": [],
+      "ports": {
+        "inPort1": {
+          "position": "object"
+        },
+        "inPort2": {
+          "position": "object"
+        },
+        "outPort2": {
+          "position": "subject"
+        },
+        "outPort1": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "8": {
+      "name": "i",
+      "class": "IO",
+      "args": [],
+      "ports": {
+        "inPort1": {
+          "position": "object"
+        },
+        "inPort2": {
+          "position": "object"
+        },
+        "outPort2": {
+          "position": "subject"
+        },
+        "outPort1": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "11": {
+      "name": "l",
+      "class": "IO",
+      "args": [],
+      "ports": {
+        "inPort1": {
+          "position": "object"
+        },
+        "inPort2": {
+          "position": "object"
+        },
+        "outPort2": {
+          "position": "subject"
+        },
+        "outPort1": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "3": {
+      "name": "d",
+      "class": "IO",
+      "args": [],
+      "ports": {
+        "inPort1": {
+          "position": "object"
+        },
+        "inPort2": {
+          "position": "object"
+        },
+        "outPort2": {
+          "position": "subject"
+        },
+        "outPort1": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "21": {
+      "name": "v",
+      "class": "IO",
+      "args": [],
+      "ports": {
+        "inPort1": {
+          "position": "object"
+        },
+        "inPort2": {
+          "position": "object"
+        },
+        "outPort2": {
+          "position": "subject"
+        },
+        "outPort1": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "24": {
+      "name": "y",
+      "class": "IO",
+      "args": [],
+      "ports": {
+        "inPort1": {
+          "position": "object"
+        },
+        "inPort2": {
+          "position": "object"
+        },
+        "outPort2": {
+          "position": "subject"
+        },
+        "outPort1": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "6": {
+      "name": "g",
+      "class": "IO",
+      "args": [],
+      "ports": {
+        "inPort1": {
+          "position": "object"
+        },
+        "inPort2": {
+          "position": "object"
+        },
+        "outPort2": {
+          "position": "subject"
+        },
+        "outPort1": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "9": {
+      "name": "j",
+      "class": "IO",
+      "args": [],
+      "ports": {
+        "inPort1": {
+          "position": "object"
+        },
+        "inPort2": {
+          "position": "object"
+        },
+        "outPort2": {
+          "position": "subject"
+        },
+        "outPort1": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "10": {
+      "name": "k",
+      "class": "IO",
+      "args": [],
+      "ports": {
+        "inPort1": {
+          "position": "object"
+        },
+        "inPort2": {
+          "position": "object"
+        },
+        "outPort2": {
+          "position": "subject"
+        },
+        "outPort1": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    }
+  }
+}

@@ -1,0 +1,119 @@
+{
+  "name": "",
+  "class": "System",
+  "args": [],
+  "ports": {},
+  "connections": [
+    {
+      "left": {
+        "domain": 0,
+        "port": "b"
+      },
+      "right": {
+        "domain": 1,
+        "port": "b"
+      },
+      "connection": "neutral"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "b"
+      },
+      "right": {
+        "domain": 1,
+        "port": "na"
+      },
+      "connection": "neutral"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "i"
+      },
+      "right": {
+        "domain": 1,
+        "port": "na"
+      },
+      "connection": "neutral"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "i"
+      },
+      "right": {
+        "domain": 1,
+        "port": "o"
+      },
+      "connection": "neutral"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "na"
+      },
+      "right": {
+        "domain": 1,
+        "port": "na"
+      },
+      "connection": "neutral"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "o"
+      },
+      "right": {
+        "domain": 1,
+        "port": "na"
+      },
+      "connection": "neutral"
+    }
+  ],
+  "subdomains": {
+    "0": {
+      "name": "d",
+      "class": "X",
+      "args": [],
+      "ports": {
+        "na": {},
+        "o": {
+          "direction": "out"
+        },
+        "b": {
+          "direction": "inout",
+          "position": "subject"
+        },
+        "i": {
+          "direction": "in",
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "1": {
+      "name": "e",
+      "class": "Y",
+      "args": [],
+      "ports": {
+        "na": {
+          "position": "object"
+        },
+        "o": {
+          "direction": "out",
+          "position": "object"
+        },
+        "b": {
+          "direction": "inout"
+        },
+        "i": {
+          "direction": "in"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    }
+  }
+}

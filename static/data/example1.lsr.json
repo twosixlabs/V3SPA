@@ -1,0 +1,72 @@
+{
+  "name": "",
+  "class": "System",
+  "args": [],
+  "ports": {},
+  "connections": [],
+  "subdomains": {
+    "0": {
+      "name": "app",
+      "class": "ExampleApp",
+      "args": [
+        "/tmp/example.*"
+      ],
+      "ports": {},
+      "connections": [
+        {
+          "left": {
+            "domain": 0,
+            "port": "active"
+          },
+          "right": {
+            "domain": 1,
+            "port": "read"
+          },
+          "connection": "right-to-left"
+        },
+        {
+          "left": {
+            "domain": 0,
+            "port": "active"
+          },
+          "right": {
+            "domain": 1,
+            "port": "write"
+          },
+          "connection": "left-to-right"
+        }
+      ],
+      "subdomains": {
+        "0": {
+          "name": "p",
+          "class": "Process",
+          "args": [],
+          "ports": {
+            "active": {
+              "position": "subject"
+            }
+          },
+          "connections": [],
+          "subdomains": {}
+        },
+        "1": {
+          "name": "f",
+          "class": "File",
+          "args": [
+            "/tmp/example.*"
+          ],
+          "ports": {
+            "read": {
+              "position": "object"
+            },
+            "write": {
+              "position": "object"
+            }
+          },
+          "connections": [],
+          "subdomains": {}
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,238 @@
+{
+  "name": "",
+  "class": "System",
+  "args": [],
+  "ports": {},
+  "connections": [
+    {
+      "left": {
+        "domain": 0,
+        "port": "php_script"
+      },
+      "right": {
+        "domain": 4,
+        "port": "inp"
+      },
+      "connection": "left-to-right"
+    },
+    {
+      "left": {
+        "domain": 1,
+        "port": "creator"
+      },
+      "right": {
+        "domain": 4,
+        "port": "create"
+      },
+      "connection": "left-to-right"
+    },
+    {
+      "left": {
+        "domain": 2,
+        "port": "send"
+      },
+      "right": {
+        "domain": 4,
+        "port": "outp"
+      },
+      "connection": "right-to-left"
+    },
+    {
+      "left": {
+        "domain": 3,
+        "port": "log"
+      },
+      "right": {
+        "domain": 4,
+        "port": "log"
+      },
+      "connection": "right-to-left"
+    }
+  ],
+  "subdomains": {
+    "0": {
+      "name": "web_server",
+      "class": "WebServer",
+      "args": [],
+      "ports": {
+        "database": {},
+        "php_script": {}
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "1": {
+      "name": "init",
+      "class": "Init",
+      "args": [],
+      "ports": {
+        "creator": {}
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "4": {
+      "name": "application",
+      "class": "Application",
+      "args": [],
+      "ports": {
+        "log": {},
+        "inp": {},
+        "inp2": {},
+        "create": {},
+        "outp": {}
+      },
+      "connections": [
+        {
+          "left": {
+            "port": "create"
+          },
+          "right": {
+            "domain": 2,
+            "port": "create"
+          },
+          "connection": "left-to-right"
+        },
+        {
+          "left": {
+            "port": "inp"
+          },
+          "right": {
+            "domain": 0,
+            "port": "inp"
+          },
+          "connection": "left-to-right"
+        },
+        {
+          "left": {
+            "port": "log"
+          },
+          "right": {
+            "domain": 2,
+            "port": "log"
+          },
+          "connection": "right-to-left"
+        },
+        {
+          "left": {
+            "port": "outp"
+          },
+          "right": {
+            "domain": 1,
+            "port": "outp"
+          },
+          "connection": "right-to-left"
+        },
+        {
+          "left": {
+            "domain": 0,
+            "port": "create"
+          },
+          "right": {
+            "domain": 2,
+            "port": "creator"
+          },
+          "connection": "right-to-left"
+        },
+        {
+          "left": {
+            "domain": 0,
+            "port": "outp"
+          },
+          "right": {
+            "domain": 1,
+            "port": "inp"
+          },
+          "connection": "left-to-right"
+        },
+        {
+          "left": {
+            "domain": 1,
+            "port": "create"
+          },
+          "right": {
+            "domain": 2,
+            "port": "creator"
+          },
+          "connection": "right-to-left"
+        }
+      ],
+      "subdomains": {
+        "0": {
+          "name": "validator",
+          "class": "Validator",
+          "args": [],
+          "ports": {
+            "inp": {
+              "position": "subject"
+            },
+            "create": {
+              "position": "object"
+            },
+            "outp": {
+              "position": "subject"
+            }
+          },
+          "connections": [],
+          "subdomains": {}
+        },
+        "1": {
+          "name": "processor",
+          "class": "Processor",
+          "args": [],
+          "ports": {
+            "inp": {
+              "position": "object"
+            },
+            "create": {
+              "position": "object"
+            },
+            "outp": {
+              "position": "subject"
+            }
+          },
+          "connections": [],
+          "subdomains": {}
+        },
+        "2": {
+          "name": "controller",
+          "class": "Controller",
+          "args": [],
+          "ports": {
+            "log": {
+              "position": "subject"
+            },
+            "creator": {
+              "position": "subject"
+            },
+            "create": {
+              "position": "object"
+            }
+          },
+          "connections": [],
+          "subdomains": {}
+        }
+      }
+    },
+    "2": {
+      "name": "mail_server",
+      "class": "MailServer",
+      "args": [],
+      "ports": {
+        "send": {}
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "3": {
+      "name": "syslog",
+      "class": "Syslog",
+      "args": [],
+      "ports": {
+        "log": {}
+      },
+      "connections": [],
+      "subdomains": {}
+    }
+  }
+}

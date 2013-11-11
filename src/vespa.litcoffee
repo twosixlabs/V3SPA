@@ -60,9 +60,9 @@ The main class for V3SPA framework.
             # setup the dispatcher for websocket messages
             @dispatch = _.clone(Backbone.Events)
 
-            @dispatch.on 'CreateGroup', @OnCreateGroup, @
-            @dispatch.on 'UpdateGroup', @OnUpdateGroup, @
-            @dispatch.on 'DeleteGroup', @OnDeleteGroup, @
+            @dispatch.on 'CreateDomain', @OnCreateDomain, @
+            @dispatch.on 'UpdateDomain', @OnUpdateDomain, @
+            @dispatch.on 'DeleteDomain', @OnDeleteDomain, @
 
             @dispatch.on 'CreateNode', @OnCreateNode, @
             @dispatch.on 'UpdateNode', @OnUpdateNode, @
@@ -80,8 +80,6 @@ The main class for V3SPA framework.
             @connectionAttempts = 0
             @ConnectWS('lobster')
 
-            @ParseTestData()
-
             # instantiate views and associate models
             #views.nodes = new Views.Node
             #    collection: models.nodes
@@ -96,30 +94,10 @@ The main class for V3SPA framework.
 
             return @
 
-        ParseTestData: () ->
-            parent = [@avispa.$objects]
-
-            Iterate = (objs) =>
-                for id,obj of objs
-                    if obj.type is 'group'
-                        @dispatch.trigger('CreateGroup', id, parent[0], obj)
-
-                        parent.unshift(objects[id].$el)
-                        if obj.children
-                            Iterate(obj.children)
-                        parent.shift()
-
-                    else if obj.type is 'node'
-                        @dispatch.trigger('CreateNode',  id, parent[0], obj)
-                return
-
-            Iterate(_data)
-            return
-
-        OnCreateGroup: (id, parent, obj) ->
-            group = new Avispa.Group
+        OnCreateDomain: (id, parent, obj) ->
+            group = new Domain
                 _id: id
-                position: obj.position
+                position: obj.coords
 
             objects[id] = group
 
@@ -131,7 +109,7 @@ The main class for V3SPA framework.
                 _id: id
                 parent: parent
                 label: obj.label
-                position: obj.position
+                position: obj.coords
 
             objects[id] = node
 

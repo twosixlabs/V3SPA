@@ -1,0 +1,1251 @@
+{
+  "name": "",
+  "class": "System",
+  "args": [],
+  "ports": {},
+  "connections": [
+    {
+      "left": {
+        "domain": 0,
+        "port": "s"
+      },
+      "right": {
+        "domain": 1,
+        "port": "o"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "s"
+      },
+      "right": {
+        "domain": 2,
+        "port": "o"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "s"
+      },
+      "right": {
+        "domain": 3,
+        "port": "o"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "s"
+      },
+      "right": {
+        "domain": 4,
+        "port": "o"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "s"
+      },
+      "right": {
+        "domain": 5,
+        "port": "o"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "s"
+      },
+      "right": {
+        "domain": 6,
+        "port": "o"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "s"
+      },
+      "right": {
+        "domain": 7,
+        "port": "o"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "s"
+      },
+      "right": {
+        "domain": 8,
+        "port": "o"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "s"
+      },
+      "right": {
+        "domain": 9,
+        "port": "o"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "s"
+      },
+      "right": {
+        "domain": 10,
+        "port": "o"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "s"
+      },
+      "right": {
+        "domain": 11,
+        "port": "o"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "s"
+      },
+      "right": {
+        "domain": 12,
+        "port": "o"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "s"
+      },
+      "right": {
+        "domain": 13,
+        "port": "o"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "s"
+      },
+      "right": {
+        "domain": 14,
+        "port": "o"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "s"
+      },
+      "right": {
+        "domain": 15,
+        "port": "o"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "s"
+      },
+      "right": {
+        "domain": 16,
+        "port": "o"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "s"
+      },
+      "right": {
+        "domain": 17,
+        "port": "o"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "s"
+      },
+      "right": {
+        "domain": 18,
+        "port": "o"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "s"
+      },
+      "right": {
+        "domain": 19,
+        "port": "o"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "s"
+      },
+      "right": {
+        "domain": 20,
+        "port": "o"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "s"
+      },
+      "right": {
+        "domain": 21,
+        "port": "o"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "s"
+      },
+      "right": {
+        "domain": 22,
+        "port": "o"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "s"
+      },
+      "right": {
+        "domain": 23,
+        "port": "o"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "s"
+      },
+      "right": {
+        "domain": 24,
+        "port": "o"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "s"
+      },
+      "right": {
+        "domain": 25,
+        "port": "o"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "s"
+      },
+      "right": {
+        "domain": 26,
+        "port": "o"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "s"
+      },
+      "right": {
+        "domain": 27,
+        "port": "o"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 4,
+        "port": "s"
+      },
+      "right": {
+        "domain": 31,
+        "port": "o"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 4,
+        "port": "s"
+      },
+      "right": {
+        "domain": 32,
+        "port": "o"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 4,
+        "port": "s"
+      },
+      "right": {
+        "domain": 33,
+        "port": "o"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 8,
+        "port": "s"
+      },
+      "right": {
+        "domain": 33,
+        "port": "o"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 8,
+        "port": "s"
+      },
+      "right": {
+        "domain": 34,
+        "port": "o"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 8,
+        "port": "s"
+      },
+      "right": {
+        "domain": 35,
+        "port": "o"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 23,
+        "port": "o"
+      },
+      "right": {
+        "domain": 42,
+        "port": "s"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 25,
+        "port": "o"
+      },
+      "right": {
+        "domain": 28,
+        "port": "s"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 28,
+        "port": "s"
+      },
+      "right": {
+        "domain": 29,
+        "port": "o"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 28,
+        "port": "s"
+      },
+      "right": {
+        "domain": 30,
+        "port": "o"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 36,
+        "port": "o"
+      },
+      "right": {
+        "domain": 37,
+        "port": "s"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 38,
+        "port": "o"
+      },
+      "right": {
+        "domain": 39,
+        "port": "s"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 40,
+        "port": "o"
+      },
+      "right": {
+        "domain": 41,
+        "port": "s"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 42,
+        "port": "s"
+      },
+      "right": {
+        "domain": 43,
+        "port": "o"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 42,
+        "port": "s"
+      },
+      "right": {
+        "domain": 44,
+        "port": "o"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 42,
+        "port": "s"
+      },
+      "right": {
+        "domain": 45,
+        "port": "o"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 42,
+        "port": "s"
+      },
+      "right": {
+        "domain": 46,
+        "port": "o"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 45,
+        "port": "o"
+      },
+      "right": {
+        "domain": 47,
+        "port": "s"
+      },
+      "connection": "bidirectional"
+    },
+    {
+      "left": {
+        "domain": 46,
+        "port": "o"
+      },
+      "right": {
+        "domain": 48,
+        "port": "s"
+      },
+      "connection": "bidirectional"
+    }
+  ],
+  "subdomains": {
+    "15": {
+      "name": "rpm",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "37": {
+      "name": "mta",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "48": {
+      "name": "filesystem",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "7": {
+      "name": "sysnetwork",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "25": {
+      "name": "authlogin",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "43": {
+      "name": "clamav",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "28": {
+      "name": "terminal",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "13": {
+      "name": "quota",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "31": {
+      "name": "ppp",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "14": {
+      "name": "readahead",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "36": {
+      "name": "postfix",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "0": {
+      "name": "devices",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "22": {
+      "name": "cups",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "19": {
+      "name": "apcupsd",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "44": {
+      "name": "brctl",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "29": {
+      "name": "zen",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "12": {
+      "name": "dpkg",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "30": {
+      "name": "finger",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "17": {
+      "name": "sdix",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "35": {
+      "name": "miscfiles",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "45": {
+      "name": "corenetwork",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "1": {
+      "name": "pcscd",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "23": {
+      "name": "hal",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "18": {
+      "name": "slocate",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "40": {
+      "name": "entrophy",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "4": {
+      "name": "init",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "26": {
+      "name": "ssh",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "16": {
+      "name": "sxid",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "34": {
+      "name": "modutils",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "2": {
+      "name": "remotelogin",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "20": {
+      "name": "bluetooth",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "39": {
+      "name": "fpd",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "46": {
+      "name": "rpc",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "5": {
+      "name": "locallogin",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "27": {
+      "name": "openct",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "41": {
+      "name": "audioentrophy",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "8": {
+      "name": "userdomain",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "11": {
+      "name": "bootloader",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "33": {
+      "name": "files",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "38": {
+      "name": "tcpd",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "47": {
+      "name": "stunnel",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "3": {
+      "name": "xserver",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "21": {
+      "name": "cron",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "24": {
+      "name": "fstools",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "42": {
+      "name": "kernel",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "6": {
+      "name": "pcmcia",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "9": {
+      "name": "amanda",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "10": {
+      "name": "backup",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "32": {
+      "name": "corecommands",
+      "class": "Process",
+      "args": [],
+      "ports": {
+        "o": {
+          "position": "object"
+        },
+        "s": {
+          "position": "subject"
+        }
+      },
+      "connections": [],
+      "subdomains": {}
+    }
+  }
+}

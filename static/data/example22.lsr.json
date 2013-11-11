@@ -1,0 +1,97 @@
+{
+  "name": "",
+  "class": "System",
+  "args": [],
+  "ports": {},
+  "connections": [
+    {
+      "left": {
+        "domain": 0,
+        "port": "b"
+      },
+      "right": {
+        "domain": 1,
+        "port": "a"
+      },
+      "connection": "neutral"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "c"
+      },
+      "right": {
+        "domain": 1,
+        "port": "a"
+      },
+      "connection": "neutral"
+    },
+    {
+      "left": {
+        "domain": 0,
+        "port": "d"
+      },
+      "right": {
+        "domain": 1,
+        "port": "e"
+      },
+      "connection": "neutral"
+    }
+  ],
+  "subdomains": {
+    "0": {
+      "name": "d",
+      "class": "X",
+      "args": [
+        "Request"
+      ],
+      "ports": {
+        "a": {
+          "type": "Request",
+          "position": "subject"
+        },
+        "d": {
+          "type": "Request",
+          "position": "subject"
+        },
+        "b": {
+          "type": "Request"
+        },
+        "e": {
+          "type": "Request",
+          "position": "object"
+        },
+        "c": {}
+      },
+      "connections": [],
+      "subdomains": {}
+    },
+    "1": {
+      "name": "e",
+      "class": "X",
+      "args": [
+        "Request"
+      ],
+      "ports": {
+        "a": {
+          "type": "Request",
+          "position": "subject"
+        },
+        "d": {
+          "type": "Request",
+          "position": "subject"
+        },
+        "b": {
+          "type": "Request"
+        },
+        "e": {
+          "type": "Request",
+          "position": "object"
+        },
+        "c": {}
+      },
+      "connections": [],
+      "subdomains": {}
+    }
+  }
+}

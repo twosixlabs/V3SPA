@@ -3,6 +3,7 @@
         routes:
             'editor'                   : 'editor'
             'node'                     : 'node'
+            'load/:example'            : 'load'
             'logout'                   : 'logout'
             ''                         : 'main'
 
@@ -23,6 +24,14 @@
             if not @editor
                 @editor = new Editor
             #@modal.append(@editor.$el)
+
+        load: (example) ->
+            $.ajax
+                url: "/static/data/#{example}.lsr.json"
+                success: (lsr) ->
+                    Parser.Load(lsr)
+
+            return
 
         node: () ->
             #vespa.avispa.$nodes.append node.$el
