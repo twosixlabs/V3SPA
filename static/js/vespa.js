@@ -68,13 +68,14 @@
     }
 
     Vespa.prototype.OnCreateDomain = function(id, parent, obj) {
-      var group;
-      group = new Domain({
+      var domain;
+      domain = new Domain({
         _id: id,
+        name: obj.name,
         position: obj.coords
       });
-      objects[id] = group;
-      parent.append(group.$el);
+      objects[id] = domain;
+      parent.append(domain.$el);
     };
 
     Vespa.prototype.OnCreateNode = function(id, parent, obj) {
@@ -82,7 +83,7 @@
       node = new Avispa.Node({
         _id: id,
         parent: parent,
-        label: obj.label,
+        label: id,
         position: obj.coords
       });
       objects[id] = node;
@@ -248,7 +249,7 @@
   Domain = Avispa.Group.extend({
     init: function() {
       this.$el.append($SVG('rect').attr('width', this.position.get('w')).attr('height', this.position.get('h')).css('fill', this.position.get('fill')));
-      this.$el.append($SVG('text').attr('dx', '2em').attr('dy', '1em').text('HELLO'));
+      this.$el.append($SVG('text').attr('dx', '2em').attr('dy', '1em').text(this.options.name));
       return this;
     }
   });

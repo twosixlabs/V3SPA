@@ -95,20 +95,21 @@ The main class for V3SPA framework.
             return @
 
         OnCreateDomain: (id, parent, obj) ->
-            group = new Domain
+            domain = new Domain
                 _id: id
+                name: obj.name
                 position: obj.coords
 
-            objects[id] = group
+            objects[id] = domain
 
-            parent.append group.$el
+            parent.append domain.$el
             return
 
         OnCreateNode: (id, parent, obj) ->
             node = new Avispa.Node
                 _id: id
                 parent: parent
-                label: obj.label
+                label: id
                 position: obj.coords
 
             objects[id] = node

@@ -11,6 +11,6 @@
             @$el.append $SVG('text')
                 .attr('dx', '2em')
                 .attr('dy', '1em')
-                .text('HELLO')
+                .text(@options.name)
 
             return @
