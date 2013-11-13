@@ -1,0 +1,38 @@
+// symbion test cases
+
+class X() {
+  port i : {};
+  port o : {position=subject};
+  port b : {};
+  assert [this.i] -> [this.o] :: never;
+}
+
+class Y() {
+  port i : {};
+  port o : {position=subject};
+  port b : {};
+}
+
+class Z() {
+  class A() {
+    port a;
+    port b;
+  }
+  domain e = A();
+  port c;
+  port d;
+  c -- e.a;
+  d -- e.b;
+}
+
+domain d = X();
+domain e = Y();
+domain f = Y();
+domain g = Z();
+
+d.i -- e.o;
+e.o -- f.b;
+
+assert [d.i] -> [d.o] :: never;
+assert [d.i] -> [f.b] :: exists;
+assert [g.c] -> [d.i] :: never;

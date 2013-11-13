@@ -1,0 +1,7 @@
+// genLobster bug: was generating hierarchical port names
+
+class App() {
+  port inner.active;
+}
+
+domain app = App();

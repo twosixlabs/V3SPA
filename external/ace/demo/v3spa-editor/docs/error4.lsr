@@ -1,0 +1,16 @@
+// fail case
+// problem: classes used as types in information flow properties should be empty
+
+class Request() {
+  port x;  // no longer empty class
+}
+
+class X() {
+  port b : {type=Request};
+  port c;
+}
+
+domain d = X();
+domain e = X();
+
+d.b -- e.c;

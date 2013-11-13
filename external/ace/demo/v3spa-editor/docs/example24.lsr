@@ -1,0 +1,34 @@
+// direction property checking
+// 1) inputs connect to outputs
+// 2) bidirectional connect to bidirectional
+// 3) input to nothing
+// 4) output to nothing
+// 5) bidirectional to nothing
+// 6) no direction both ports
+
+
+class X() {
+  port i : {direction=input, position=subject} ;
+  port o : {direction=output } ;
+  port b : {direction=bidirectional, position=subject };
+  port na ;
+ }
+
+class Y() {
+  port i : {direction=input} ;
+  port o : {direction=output, position=object } ;
+  port b : {direction=bidirectional};
+  port na : {position=object};
+ }
+domain d = X();
+domain e = Y();
+d.i -- e.o; 	// 1
+d.b -- e.b; 	// 2
+d.i -- e.na; 	// 3
+d.o -- e.na; 	// 4
+d.b -- e.na; 	// 5
+d.na -- e.na;	// 6
+
+
+
+

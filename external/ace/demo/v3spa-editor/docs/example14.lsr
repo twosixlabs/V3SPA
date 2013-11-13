@@ -1,0 +1,32 @@
+// test for parser syntax cases:
+
+y = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890-=!@#$%^&*()_+~`<,>.?/:;'{[}]|\"";
+x = 14;
+z_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz123456789001234567890 = y;
+
+class ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890 (ref, gx) { }
+
+class B() {
+  port a : {type=*, direction=*, position=*};
+  port b : {type=*};
+}
+
+class A() {
+  port a :{position=subject} ;
+  port b;
+  port e : {type=C};
+}
+class C() {}
+
+w = A; 
+
+
+domain d = A();
+domain e = A();
+domain f = A();
+d_a = d.b;
+//d_a -- e.b;
+d.a -- e.b;
+e.a --> d.b;
+d.a <-- f.b;
+d.b <--> f.a;

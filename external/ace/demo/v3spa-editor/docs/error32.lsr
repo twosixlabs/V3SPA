@@ -1,0 +1,22 @@
+// two port test
+// show that a connection is automatically assumed through a two ports unless blocked with an assertion
+
+class A () {
+  port x;
+  port y;
+
+}
+
+class B() {
+  port z : {position=subject};
+}
+
+domain a = A();
+domain b = B();
+domain c = B();
+
+b.z -- a.x;
+c.z -- a.y;
+
+assert [b.z] -> [c.z] :: never; // Assertion B - passes when assertion above is commented out
+

@@ -1,0 +1,27 @@
+// position property checking fails
+// a) subject to subject
+// b) object to object
+// c) missing subject/object
+
+class X() {
+  port s : {position=subject} ;
+  port o : {position=object } ;
+  port na ;
+ }
+class Y() {
+  port s : {position=subject} ;
+  port o : {position=object } ;
+  port na ;
+ }
+domain d = X();
+domain e = Y();
+
+//d.s -- e.s; 	// a
+d.o -- e.o;	// b
+//d.na -- e.na;	// c
+
+
+
+
+
+

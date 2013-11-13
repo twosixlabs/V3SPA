@@ -1,0 +1,41 @@
+class Process() {
+  port active : {position = subject};
+}
+
+class Network() {
+  port readwrite : {position = object};
+}
+
+class LogFile() {
+  port readwrite : {position = object};
+}
+
+domain internet = Network();
+domain secret = Network();
+domain low = Process();
+domain high = Process();
+domain encrypt = Process();
+domain logger = Process();
+domain logfile = LogFile();
+domain encryptfile = LogFile();
+
+high.active <--> secret.readwrite ;
+
+low.active <--> internet.readwrite ;
+
+low.active --> secret.readwrite;
+
+logger.active <--> secret.readwrite;
+
+logger.active --> logfile.readwrite;
+
+encrypt.active <-- logfile.readwrite;
+
+encrypt.active --> internet.readwrite;
+
+high.active --> internet.readwrite; // error: can't skip the logging and encryption
+
+assert [internet.*] -> [high.*] :: exists;
+assert [low.*] -> [high.*] :: exists;
+
+assert [high.*] -> [internet.*] :: .* [logger.*] .* [logfile.*] .* [encrypt.*] .*;

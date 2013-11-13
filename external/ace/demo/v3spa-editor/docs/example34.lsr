@@ -1,0 +1,41 @@
+class Process() {
+  port active : {position = subject};
+}
+
+class Network() {
+  port readwrite : {position = object};
+}
+
+class LogFile() {
+  port readwrite : {position = object};
+}
+
+domain internet = Network();
+domain secret = Network();
+domain low = Process();
+domain high = Process();
+domain encrypt = Process();
+domain logger = Process();
+domain logfile = LogFile();
+
+high.active <--> secret.readwrite ;
+
+low.active <--> internet.readwrite ;
+
+low.active --> secret.readwrite;
+
+logger.active <--> secret.readwrite;
+
+logger.active --> logfile.readwrite;
+
+encrypt.active <-- logfile.readwrite;
+
+encrypt.active --> internet.readwrite;
+
+assert [internet.*] -> [high.*] :: exists;
+assert [low.*] -> [high.*] :: exists;
+
+// all paths from high to low must go through the three specified
+// domains in the specified order, but no other aspects of the route are
+// constrained.
+assert [high.*] -> [low.*] :: .* [logger.*] .* [logfile.*] .* [encrypt.*] .*;

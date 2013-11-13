@@ -1,0 +1,6 @@
+// type set to output, with no in-scope variables
+class A() {
+  port out : { type = output };
+}
+
+domain a = A();

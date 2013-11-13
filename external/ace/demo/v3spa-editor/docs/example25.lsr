@@ -1,0 +1,30 @@
+// position property checking passes
+// a) subject to object
+// b) object ot subject
+// c) subject to undefined
+// d) object to undefined 
+
+class X() {
+  port s : {position=subject} ;
+  port o : {position=object } ;
+  port na ;
+ }
+class Y() {
+  port s : {position=subject} ;
+  port o : {position=object } ;
+  port na ;
+ }
+domain d = X();
+domain e = Y();
+
+d.s -- e.o; 	// a
+d.o -- e.s;	//b
+d.s -- e.na;	//c
+d.o -- e.na;	//d
+
+
+
+
+
+
+

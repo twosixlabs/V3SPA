@@ -1,0 +1,28 @@
+class Process() {
+  port active : {position = subject};
+}
+
+class Network() {
+  port readwrite : {position = object};
+}
+
+domain internet = Network();
+domain secret = Network();
+domain low = Process();
+domain high = Process();
+
+high.active <--> secret.readwrite ;
+
+low.active <--> internet.readwrite ;
+
+low.active --> secret.readwrite;
+
+assert [internet.*] -> [high.*] :: exists ;
+
+assert [low.*] -> [high.*] :: exists ;
+
+assert [high.*] -> [internet.*] :: never;
+assert [high.*] -> [low.*] :: never;
+
+assert [secret.*] -> [internet.*] :: never;
+assert [secret.*] -> [low.*] :: never;

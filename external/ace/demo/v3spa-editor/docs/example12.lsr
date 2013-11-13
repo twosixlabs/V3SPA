@@ -1,0 +1,102 @@
+
+class Review() {
+  port in : {position=object} ;
+}
+class Checker() {
+  port in : {position=object} ;
+  port out : {position=subject} ;
+}
+class Checker2() {
+  port in : {position=object} ;
+  port out : {position=subject} ;
+}
+
+class GuardC() {
+  port in : {position=object, direction=input};
+  port out : {position=subject};
+}
+class IOApp() {
+  port write : {position=subject};
+  port read : {position=object};
+  domain r = Review();
+  read -- r.in;
+//  r.in -- write;
+}
+class Encrypt() {
+  port in ;
+  port out ;
+//  assert [this.out] -> [this.in] :: never;
+//  assert [this.in] -> [this.out] :: never;
+}
+
+class FireWall() {
+  port ext : {position=object};
+  port intW : {position=subject, direction=output};
+  port intR : {position=object, direction=input};
+}
+
+class InternetC() {
+  port read: {position=object, direction=input};
+  port write : {position=subject, direction=output};
+  port io : {position=object};
+  domain vscan2 = Checker2();
+  domain fireWall = FireWall();
+  io --> vscan2.in;
+  vscan2.out --> fireWall.ext;
+  fireWall.intR -- read;
+  fireWall.intW -- write;
+}
+
+class Network(level) {
+  port write : {direction=output, position=subject};
+  port read : {direction=input, position=object} ;
+  domain guard = GuardC();
+  domain vscan = Checker();
+  domain sReview = Review();
+  domain logger = Review();
+  class User(level) {
+    port write ;
+    port read  ;
+    domain browser = IOApp();
+    domain email = IOApp();
+    browser.write -- write;
+    browser.read -- read;
+    email.write -- write;
+    email.read -- read;
+  }
+  domain userD = User(level);
+  userD.write --> sReview.in;
+  userD.write --> logger.in;
+  userD.write --> guard.in;
+  vscan.out --> logger.in;
+  vscan.out --> userD.read;
+  vscan.out --> sReview.in;
+  guard.out -- write;
+  read -- vscan.in;
+}
+
+
+class Hi() {} // high type
+class Lo() {} // low type
+class Se() {} // secret type
+
+domain high = Network(Hi);
+domain secret = Network(Se);
+domain low = Network(Lo);
+
+domain encrypt = Encrypt();
+domain logger = Review();
+domain internet = InternetC();
+
+
+secret.write --> high.read;
+high.write --> encrypt.in;
+encrypt.out --> logger.in;
+internet.write -- logger.in;
+low.write --> secret.read;
+low.write --> internet.read;
+low.read <-- internet.write;
+
+
+assert [high.write] -> [internet.read] :: .* [encrypt.*] .*;
+

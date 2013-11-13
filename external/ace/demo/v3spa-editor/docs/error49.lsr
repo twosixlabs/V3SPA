@@ -1,0 +1,7 @@
+// genLobster bug: was generating "Class" keywords
+
+Class App() {
+  port active;
+}
+
+domain app = App();

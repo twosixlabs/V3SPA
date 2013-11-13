@@ -1,0 +1,21 @@
+class Network() {
+  port write : {position = input};
+  port read : { direction = output };
+
+  class SubNetwork() {
+    port in : {direction = input };
+    port out : {direction = output };
+
+    assert [this.in] -> [this.out] :: never;
+  }
+
+  domain subNet = SubNetwork();
+
+  write --> subNet.in;
+  read <-- subNet.out;
+
+  assert [this.write] -> [this.read] :: never;
+}
+
+domain net = Network();
+

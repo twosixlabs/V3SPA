@@ -1,0 +1,14 @@
+// input connected (as though it were an output) to erroniously defined output.
+
+class A() {
+  port in : { direction = input };
+}
+
+class B() {
+  port out : { type = output };
+}
+
+domain a = A();
+domain b = B();
+
+a.in --> b.out;

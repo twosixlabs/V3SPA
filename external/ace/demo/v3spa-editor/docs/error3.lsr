@@ -1,0 +1,16 @@
+// type fail case
+// type definitions with different type values cannot be connected
+// define type classes inside another class
+
+class A() {
+  class Request() { }
+  class NoRequest() { }
+  port a : {type=Request, position=subject} ;
+  port b : {type=NoRequest};
+ }
+
+domain d = A();
+domain e = A();
+
+d.a -- e.b;
+

@@ -1,0 +1,22 @@
+// one port test
+// show that a connection is automatically assumed through a single port unless blocked with an assertion
+
+class A () {
+  port x;
+  assert [this.x] -> [this.x] :: never;  // assertion A
+}
+
+class B() {
+  port y : {position=subject};
+}
+
+domain a = A();
+domain b = B();
+domain c = B();
+
+b.y -- a.x;
+c.y -- a.x;
+
+assert [b.y] -> [c.y] :: exists; // connection doesn't exist
+
+

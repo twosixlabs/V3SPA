@@ -1,0 +1,241 @@
+class A() { 
+  port s: {position = subject }  ;  
+  port o: {position = object }  ;  
+  domain e1 = E() ;
+}
+
+class B() { 
+  port s: {position = subject }  ;  
+  port o: {position = object }  ;  
+}
+class C() { 
+  port o: {position = object }  ;  
+}
+
+class E() { 
+  port o: {position = object }  ;  
+}
+
+class D() { 
+  port s: {position = subject }  ;  
+  port o: {position = object }  ;  
+  domain a1 = A() ;
+
+    s --> a1.o ;
+   // a1.s --> o ;  // this is incompatible
+}
+
+class Rpm() { 
+  port lock: {position = subject }  ;  
+  port out2: {position = object }  ;  
+}
+
+class Portage() { 
+  port g2: {position = object }  ;  
+  port g3: {position = subject }  ;  
+}
+
+class Gcc() { 
+  port list: {position = subject }  ;  
+}
+
+class Portage_t() { 
+  port a1: {position = object }  ;  
+  port a7: {position = subject }  ;  
+  port a2: {position = object }  ;  
+  port a5: {position = subject }  ;  
+  domain gcc1 = Gcc() ;
+  domain gcc2 = Gcc() ;
+    gcc1.list -- a7 ;
+    gcc2.list -- a5 ;
+}
+
+class Prelink() { 
+  port write: {position = object }  ;  
+  port lock: {position = object }  ;  
+  port create: {position = subject }  ;  
+  domain d1 = D() ;
+  d1.s -- create ;
+  domain b1 = B() ;
+  b1.s -- d1.o ;
+  write -- b1.o ;
+}
+
+class Amtu() { 
+  port write: {position = object }  ;  
+  port lock: {position = object }  ;  
+  port search: {position = subject }  ;  
+  port rw: {position = subject }  ;  
+}
+
+class Amanda() { 
+  port read: {position = subject }  ;  
+  port write: {position = object }  ;  
+}
+
+class Rx5() { 
+  port a7: {position = subject }  ;  
+  port a5: {position = subject }  ;  
+  port create: {position = object }  ;  
+  port exe: {position = object }  ;  
+  port list: {position = object }  ;  
+}
+
+class Quota() { 
+  port x: {position = subject }  ;  
+  port y: {position = object }  ;  
+}
+
+class Postlink() { 
+  port x: {position = subject }  ;  
+  port y: {position = object }  ;  
+}
+
+class Random() { 
+  port x: {position = subject }  ;  
+  port y: {position = object }  ;  
+}
+
+
+class Prelinka() { 
+  port x: {position = subject }  ;  
+  port y: {position = object }  ;  
+}
+
+class Consoletype() { 
+  port gstat: {position = object }  ;  
+  port create: {position = object }  ;  
+  port ping: {position = object }  ;  
+  port read: {position = object }  ;  
+  port write: {position = object }  ;  
+  port g13: {position = subject, direction = output }  ;  
+  domain prelink1 = Prelink() ;
+  domain amtu1 = Amtu() ;
+  domain rx5a = Rx5() ;
+  domain amanda1 = Amanda() ;
+    prelink1.create --> g13 ;
+    amtu1.search --> prelink1.write ;
+    amtu1.rw --> prelink1.lock ;
+    amanda1.write -- rx5a.a7 ;
+    amanda1.read -- amtu1.write ;
+
+    rx5a.a5 -- amtu1.lock ;
+    gstat -- rx5a.create ;
+    create -- rx5a.exe ;
+    ping -- rx5a.list ;
+}
+
+domain con1 = Consoletype() ;
+//domain con2 = Consoletype() ;
+domain rpm1 = Rpm() ;
+domain portage1 = Portage_t() ;
+domain portage2 = Portage() ;
+domain quota1 = Quota() ;
+domain postlink1 = Postlink() ;
+domain prelinka1 = Prelinka() ;
+
+portage1.a7 -- con1.create  ;
+portage1.a5 -- con1.ping  ;
+portage2.g3 -- con1.gstat  ;
+quota1.x --> con1.read  ;
+postlink1.x --> con1.write  ;
+prelinka1.x --> con1.write  ;
+
+domain r1 = Random() ;
+domain r2 = Random() ;
+domain r3 = Random() ;
+domain r4 = Random() ;
+domain r5 = Random() ;
+domain r6 = Random() ;
+domain r7 = Random() ;
+domain r8 = Random() ;
+domain r9 = Random() ;
+domain r10 = Random() ;
+domain r11 = Random() ;
+domain r12 = Random() ;
+domain r13 = Random() ;
+domain r14 = Random() ;
+domain r15 = Random() ;
+domain r16 = Random() ;
+domain r17 = Random() ;
+domain r18 = Random() ;
+domain r19 = Random() ;
+domain r20 = Random() ;
+domain r21 = Random() ;
+domain r22 = Random() ;
+domain r23 = Random() ;
+domain r24 = Random() ;
+domain r25 = Random() ;
+domain r26 = Random() ;
+domain r27 = Random() ;
+domain r28 = Random() ;
+domain r29 = Random() ;
+domain r30 = Random() ;
+domain r31 = Random() ;
+domain r32 = Random() ;
+domain r33 = Random() ;
+domain r34 = Random() ;
+domain r35 = Random() ;
+domain r36 = Random() ;
+domain r37 = Random() ;
+domain r38 = Random() ;
+domain r39 = Random() ;
+domain r40 = Random() ;
+domain r41 = Random() ;
+domain r42 = Random() ;
+domain r43 = Random() ;
+domain r44 = Random() ;
+domain r45 = Random() ;
+domain r46 = Random() ;
+domain r47 = Random() ;
+domain r48 = Random() ;
+domain r49 = Random() ;
+r1.x --> quota1.y  ;
+r2.x --> r1.y  ;
+r3.x --> quota1.y  ;
+r4.x --> postlink1.y  ;
+r5.x --> prelinka1.y  ;
+r6.x -- portage2.g2  ;
+r7.x -- portage2.g2  ;
+rpm1.lock -- con1.write ;
+r8.x -- rpm1.out2;
+r9.x -- con1.read;
+r10.x -- r6.y ;
+r11.x --> r7.y ;
+r12.x --> r11.y ;
+r13.x --> r12.y ;
+r14.x -- r4.y ;
+r15.x --> r5.y ;
+r16.x --> r6.y ;
+r17.x --> r7.y ;
+r18.x --> r17.y ;
+r19.x -- r10.y;
+r19.x -- r13.y ;
+r20.x -- r14.y ;
+r20.x --> r8.y ;
+r21.x --r15.y ;
+r22.x -- portage1.a1 ;
+r23.x -- r19.y ;
+r24.x -- r18.y ;
+r25.x -- r24.y ;
+r26.x -- r25.y; 
+r27.x -- r15.y ;
+r28.x -- r15.y ;
+r29.x -- r28.y ;
+r30.x -- r29.y ;
+r31.x -- r26.y ;
+r32.x -- r31.y ;
+r33.x -- r32.y ;
+r34.x -- r33.y;
+r35.x --> r34.y ;
+r36.x --> r35.y;
+r37.x --> r30.y;
+r38.x --> r37.y;
+r39.x --> r38.y;
+r40.x --> r39.y;
+r41.x --> r40.y;
+r42.x --> r41.y;
+domain portage3 = Portage();
+portage3.g2 -- r28.x;
+portage3.g3 --> r7.y;
+domain portage4 = Portage_t() ;

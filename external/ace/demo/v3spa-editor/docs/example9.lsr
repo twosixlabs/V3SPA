@@ -1,0 +1,27 @@
+class MyType(){}
+class NotMyType(){}
+
+class A() {
+    port port1 : { position = subject, type = MyType };
+}
+
+class B() {
+    port port2;
+}
+
+class C() {
+    port port3 : { type = MyType };
+}
+
+class D() {
+    port port4 : { type = NotMyType };
+}
+
+domain a = A();
+domain b = B();
+domain c = C();
+domain d = D();
+
+a.port1 -- b.port2;
+a.port1 -- c.port3;
+// a.port1 -- d.port4; // this would cause an error because the "type" fields are incompatible
