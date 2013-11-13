@@ -17,24 +17,38 @@
     </div>
 
 
-    <div id="editor">
-class Process() {
-  port active : {position = subject};
+    <div id="editor-container">
+      <button id="expand">+</button>
+      <b style="color: red;">0 errors</b> &nbsp; <b style="color: orange;">1 warnings</b>
+      <div id="editor">class A () {
+    port s : { position = subject } ;
+    port o : { position = object } ;
 }
 
-class Network() {
-  port readwrite : {position = object};
-}
+domain a = A();
+domain b = A();
+domain c = A();
+domain d = A();
+domain e = A();
+domain f = A();
+domain g = A();
+domain h = A();
+domain i = A();
 
-class LogFile() {
-  port readwrite : {position = object};
-}
-    </div>
+a.s --> b.o;
+b.s --> c.o;
+c.s --> d.o;
+d.s --> e.o;
+e.s --> f.o;
+f.s --> g.o;
+g.s --> h.o;
+h.s --> i.o;
+i.s --> a.o;</div></div>
 
 <script>
     var editor = ace.edit("editor");
-    editor.setTheme("ace/theme/ambiance");
-    editor.getSession().setMode("ace/mode/javascript");
+    editor.setTheme("ace/theme/idleFiners");
+    editor.getSession().setMode("ace/mode/lobster");
 </script>
 
 

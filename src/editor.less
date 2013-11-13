@@ -1,13 +1,25 @@
+
+    DIV#editor-container { 
+    	background: @bgcolor;
+    	height: 90%;
+	left: 0;
+	top: @top_height;
+    	position: absolute;
+    	bottom: 0;
+    	border: 2px solid @bordercolor;
+   	border-bottom: @lightradius;
+    	border-top-right-radius: @lightradius;
+	border-top: none;
+    	width: 30%;
+	z-index:5000;
+}
     #editor { 
         position: absolute;
-        top: @top_height;
+        top: 0;
         right: 0;
         bottom: 0;
         left: 0;
-	width: 30%;
-	height: 90%;
-
-    	background: #CCCCCC;
-    	border: 2px solid @bordercolor;
-    	border-right: none;
     }
+
+
+
