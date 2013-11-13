@@ -16,6 +16,10 @@ window.console.trace = window.console;
 window.window = window;
 window.ace = window;
 
+window.onerror = function(message, file, line, col, err) {
+    console.error("Worker " + err.stack);
+};
+
 window.normalizeModule = function(parentId, moduleName) {
     if (moduleName.indexOf("!") !== -1) {
         var chunks = moduleName.split("!");
@@ -951,7 +955,9 @@ var Mirror = exports.Mirror = function(sender) {
     var _self = this;
     sender.on("change", function(e) {
         doc.applyDeltas(e.data);
-        deferredUpdate.schedule(_self.$timeout);
+        if (_self.$timeout)
+            return deferredUpdate.schedule(_self.$timeout);
+        _self.onUpdate();
     });
 };
 
@@ -973,6 +979,10 @@ var Mirror = exports.Mirror = function(sender) {
     };
     
     this.onUpdate = function() {
+    };
+    
+    this.isPending = function() {
+        return this.deferredUpdate.isPending();
     };
     
 }).call(Mirror.prototype);
@@ -1897,14 +1907,16 @@ exports.copyArray = function(array){
 };
 
 exports.deepCopy = function (obj) {
-    if (typeof obj != "object") {
+    if (typeof obj !== "object" || !obj)
         return obj;
-    }
+    var cons = obj.constructor;
+    if (cons === RegExp)
+        return obj;
     
-    var copy = obj.constructor();
+    var copy = cons();
     for (var key in obj) {
-        if (typeof obj[key] == "object") {
-            copy[key] = this.deepCopy(obj[key]);
+        if (typeof obj[key] === "object") {
+            copy[key] = exports.deepCopy(obj[key]);
         } else {
             copy[key] = obj[key];
         }
@@ -1983,6 +1995,10 @@ exports.deferredCall = function(fcn) {
         timer = null;
         return deferred;
     };
+    
+    deferred.isPending = function() {
+        return timer;
+    };
 
     return deferred;
 };
@@ -1996,15 +2012,15 @@ exports.delayedCall = function(fcn, defaultTimeout) {
     };
 
     var _self = function(timeout) {
+        if (timer == null)
+            timer = setTimeout(callback, timeout || defaultTimeout);
+    };
+
+    _self.delay = function(timeout) {
         timer && clearTimeout(timer);
         timer = setTimeout(callback, timeout || defaultTimeout);
     };
-
-    _self.delay = _self;
-    _self.schedule = function(timeout) {
-        if (timer == null)
-            timer = setTimeout(callback, timeout || 0);
-    };
+    _self.schedule = _self;
 
     _self.call = function() {
         this.cancel();

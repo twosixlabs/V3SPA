@@ -869,13 +869,12 @@ var toObject = function (o) {
 };
 
 });
-
-define('ace/mode/javascript_worker', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/worker/mirror', 'ace/mode/javascript/jshint'], function(require, exports, module) {
+define('ace/mode/lobster_worker', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/worker/mirror', 'ace/mode/lobster/lshint'], function(require, exports, module) {
 
 
 var oop = require("../lib/oop");
 var Mirror = require("../worker/mirror").Mirror;
-var lint = require("./javascript/jshint").JSHINT;
+var lint = require("./lobster/lshint").JSHINT;
 
 function startRegex(arr) {
     return RegExp("^(" + arr.join("|") + ")");
@@ -908,13 +907,13 @@ var infoRe = startRegex([
     "'{a}' used out of scope"
 ]);
 
-var JavaScriptWorker = exports.JavaScriptWorker = function(sender) {
+var LobsterWorker = exports.LobsterWorker = function(sender) {
     Mirror.call(this, sender);
     this.setTimeout(500);
     this.setOptions();
 };
 
-oop.inherits(JavaScriptWorker, Mirror);
+oop.inherits(LobsterWorker, Mirror);
 
 (function() {
     this.setOptions = function(options) {
@@ -1014,7 +1013,7 @@ oop.inherits(JavaScriptWorker, Mirror);
         this.sender.emit("jslint", errors);
     };
 
-}).call(JavaScriptWorker.prototype);
+}).call(LobsterWorker.prototype);
 
 });
 
@@ -2142,7 +2141,7 @@ exports.delayedCall = function(fcn, defaultTimeout) {
     return _self;
 };
 });
-define('ace/mode/javascript/jshint', ['require', 'exports', 'module' ], function(require, exports, module) {
+define('ace/mode/lobster/lshint', ['require', 'exports', 'module' ], function(require, exports, module) {
 require = null;
 require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({
 9:[function (req,module,exports){

@@ -82,7 +82,6 @@ var supportedModes = {
     Liquid:      ["liquid"],
     Lisp:        ["lisp"],
     LiveScript:  ["ls"],
-    Lobster:     ["lsr"],
     LogiQL:      ["logic|lql"],
     LSL:         ["lsl"],
     Lua:         ["lua"],

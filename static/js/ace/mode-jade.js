@@ -320,7 +320,7 @@ var MarkdownHighlightRules = function() {
         regex : "^```\\s*[a-zA-Z]*(?:{.*?\\})?\\s*$",
         next  : "githubblock"
     }, { // block quote
-        token : "string",
+        token : "string.blockquote",
         regex : "^>[ ].+$",
         next  : "blockquote"
     }, { // HR * - _
@@ -357,10 +357,10 @@ var MarkdownHighlightRules = function() {
                     '(\\s*"' +  escaped('"') + '"\\s*)?' +            // "title"
                     "(\\))"                                           // )
         }, { // strong ** __
-            token : "string",
+            token : "string.strong",
             regex : "([*]{2}|[_]{2}(?=\\S))(.*?\\S[*_]*)(\\1)"
         }, { // emphasis * _
-            token : "string",
+            token : "string.emphasis",
             regex : "([*]|[_](?=\\S))(.*?\\S[*_]*)(\\1)"
         }, { //
             token : ["text", "url", "text"],
@@ -1798,7 +1798,7 @@ define('ace/mode/coffee_highlight_rules', ['require', 'exports', 'module' , 'ace
 
         var keywords = (
             "this|throw|then|try|typeof|super|switch|return|break|by|continue|" +
-            "catch|class|in|instanceof|is|isnt|if|else|extends|for|forown|" +
+            "catch|class|in|instanceof|is|isnt|if|else|extends|for|own|" +
             "finally|function|while|when|new|no|not|delete|debugger|do|loop|of|off|" +
             "or|on|unless|until|and|yes"
         );
