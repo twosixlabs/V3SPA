@@ -1,29 +1,13 @@
+    #editor { 
+        position: absolute;
+        top: @top_height;
+        right: 0;
+        bottom: 0;
+        left: 0;
+	width: 30%;
+	height: 90%;
 
-DIV#editor
-{
-    margin: 0em;
-    padding: 0.3em 0em;
-    width: 100%;
-    min-height: 12em;
-    height: 12em;
-    overflow: hidden;
-
-    TEXTAREA
-    {
-        width: 100%;
-        height: 100%;
-        display: block;
-        border: 0px;
-        margin: 0em;
-        padding: 0.5em;
-        font-family: "Courier New", serif;
-        resize: none;
-        border: 1px dotted #ccc;
+    	background: #CCCCCC;
+    	border: 2px solid @bordercolor;
+    	border-right: none;
     }
-
-    TEXTAREA:focus
-    {
-        outline: none;
-        border: 1px dotted #999;
-    }
-}

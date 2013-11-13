@@ -16,6 +16,28 @@
       </ol>
     </div>
 
+
+    <div id="editor">
+class Process() {
+  port active : {position = subject};
+}
+
+class Network() {
+  port readwrite : {position = object};
+}
+
+class LogFile() {
+  port readwrite : {position = object};
+}
+    </div>
+
+<script>
+    var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/ambiance");
+    editor.getSession().setMode("ace/mode/javascript");
+</script>
+
+
     <div id="surface">
       <svg xmlns="http://www.w3.org/2000/svg" class="avispa">
         <defs>
@@ -47,11 +69,5 @@
 {% end %}
 
 {% block templates %}
-
-<script type="text/template" id="tmpl_editor">
-    <div class="title">Editor</div>
-    <textarea>yep</textarea>
-    <div class="status">&nbsp;</div>
-</script>
 
 {% end %}
