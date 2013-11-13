@@ -18,8 +18,6 @@
 
 
     <div id="editor-container">
-      <button id="expand">+</button>
-      <b style="color: red;">0 errors</b> &nbsp; <b style="color: orange;">1 warnings</b>
       <div id="editor">class A () {
     port s : { position = subject } ;
     port o : { position = object } ;
@@ -50,6 +48,8 @@ i.s --> a.o;</div></div>
     //editor.setTheme("ace/theme/idle_fingers");
     editor.setTheme("ace/theme/chaos");
     editor.getSession().setMode("ace/mode/lobster");
+    //$("#editor-container").width(500);
+    //editor.resize();
 </script>
 
 

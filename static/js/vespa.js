@@ -192,10 +192,7 @@
       return this.cleanse();
     },
     editor: function() {
-      this.cleanse();
-      if (!this.editor) {
-        return this.editor = new Editor;
-      }
+      return $('#editor-container').toggle();
     },
     load: function(example) {
       $.ajax({

@@ -20,10 +20,7 @@
             @cleanse()
 
         editor: () ->
-            @cleanse()
-            if not @editor
-                @editor = new Editor
-            #@modal.append(@editor.$el)
+            $('#editor-container').toggle()
 
         load: (example) ->
             $.ajax
