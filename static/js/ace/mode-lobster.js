@@ -40,98 +40,282 @@ var Range = require("../range").Range;
 var CstyleBehaviour = require("./behaviour/cstyle").CstyleBehaviour;
 var CStyleFoldMode = require("./folding/cstyle").FoldMode;
 
-
-
-
 var Mode = function() {
     this.HighlightRules = LobsterHighlightRules;
 
     this.$outdent = new MatchingBraceOutdent();
     this.$behaviour = new CstyleBehaviour();
+
     this.foldingRules = new CStyleFoldMode();
 };
-
-
 oop.inherits(Mode, TextMode);
 
 (function() {
 
-    this.lineCommentStart = "%";
-    this.blockComment = {start: "%{", end: "%}"};
+    this.lineCommentStart = "//";
+    this.blockComment = {start: "/*", end: "*/"};
+
+    this.getNextLineIndent = function(state, line, tab) {
+        var indent = this.$getIndent(line);
+
+        var tokenizedLine = this.getTokenizer().getLineTokens(line, state);
+        var tokens = tokenizedLine.tokens;
+        var endState = tokenizedLine.state;
+
+        if (tokens.length && tokens[tokens.length-1].type == "comment") {
+            return indent;
+        }
+
+        if (state == "start") {
+            var match = line.match(/^.*(?:\bcase\b.*\:|[\{\(\[])\s*$/);
+            if (match) {
+                indent += tab;
+            }
+        } else if (state == "doc-start") {
+            if (endState == "start") {
+                return "";
+            }
+            var match = line.match(/^\s*(\/?)\*/);
+            if (match) {
+                if (match[1]) {
+                    indent += " ";
+                }
+                indent += "* ";
+            }
+        }
+
+        return indent;
+    };
+
+    this.checkOutdent = function(state, line, input) {
+        return this.$outdent.checkOutdent(line, input);
+    };
+
+    this.autoOutdent = function(state, doc, row) {
+        this.$outdent.autoOutdent(doc, row);
+    };
 
 }).call(Mode.prototype);
 
 exports.Mode = Mode;
-
 });
-
-define('ace/mode/lobster_highlight_rules', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/text_highlight_rules'], function(require, exports, module) {
+define('ace/mode/lobster_highlight_rules', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/doc_comment_highlight_rules', 'ace/mode/text_highlight_rules'], function(require, exports, module) {
 
 
 var oop = require("../lib/oop");
+var DocCommentHighlightRules = require("./doc_comment_highlight_rules").DocCommentHighlightRules;
 var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
+var cFunctions = exports.cFunctions = "\\s*\\bhypot(?:f|l)?"
 
 var LobsterHighlightRules = function() {
 
-var keywords = (
-        "class|domain|port|position|direction|type|assert"
+    var keywordControls = (
+        "class|domain|direction|type|assert"
+    );
+    
+    var storageType = (
+        "position" 
+ 
+    );
+
+    var storageModifiers = (
+        "" 
+    );
+
+    var keywordOperators = (
+        "port" 
+ 
     );
 
     var builtinConstants = (
-        "true|false"
+        "subject|object"
     );
 
-    var builtinFunctions = (
-        "abs"
-    );
-    var storageType = (
-        "cell"
-    );
-    var keywordMapper = this.createKeywordMapper({
-        "storage.type": storageType,
-        "support.function": builtinFunctions,
-        "keyword": keywords,
+    var keywordMapper = this.$keywords = this.createKeywordMapper({
+        "keyword.control" : keywordControls,
+        "storage.type" : storageType,
+        "storage.modifier" : storageModifiers,
+        "keyword.operator" : keywordOperators,
+        "variable.language": "this",
         "constant.language": builtinConstants
-    }, "identifier", true);
+    }, "identifier");
+
+    var identifierRe = "[a-zA-Z\\$_\u00a1-\uffff][a-zA-Z\d\\$_\u00a1-\uffff]*\\b";
 
     this.$rules = {
-        "start" : [ {
-            token : "comment",
-            regex : "^\\/\\/[^\r\n]*"
-        }, {
-             token : "string",           // " string
-            regex : '".*?"'
-        }, {
-            token : "string",           // ' string
-            regex : "'.*?'"
-        }, {
-            token : "constant.numeric", // float
-            regex : "[+-]?\\d+(?:(?:\\.\\d*)?(?:[eE][+-]?\\d+)?)?\\b"
-        }, {
-            token : keywordMapper,
-            regex : "[a-zA-Z_$][a-zA-Z0-9_$]*\\b"
-        }, {
-            token : "keyword.operator",
-            regex : "\\+|\\-|\\/|\\/\\/|%|<@>|@>|<@|&|\\^|~|<|>|<=|=>|==|!=|<>|="
-        }, {
-             token : "punctuation.operator",
-             regex : "\\?|\\:|\\,|\\;|\\."
-        }, {
-            token : "paren.lparen",
-            regex : "[\\(]"
-        }, {
-            token : "paren.rparen",
-            regex : "[\\)]"
-        }, {
-            token : "text",
-            regex : "\\s+"
-        } ]
+        "start" : [
+            {
+                token : "comment",
+                regex : "\\/\\/.*$"
+            },
+            DocCommentHighlightRules.getStartRule("doc-start"),
+            {
+                token : "comment", // multi line comment
+                regex : "\\/\\*",
+                next : "comment"
+            }, {
+                token : "string", // single line
+                regex : '["](?:(?:\\\\.)|(?:[^"\\\\]))*?["]'
+            }, {
+                token : "string", // multi line string start
+                regex : '["].*\\\\$',
+                next : "qqstring"
+            }, {
+                token : "string", // single line
+                regex : "['](?:(?:\\\\.)|(?:[^'\\\\]))*?[']"
+            }, {
+                token : "string", // multi line string start
+                regex : "['].*\\\\$",
+                next : "qstring"
+            }, {
+                token : "constant.numeric", // hex
+                regex : "0[xX][0-9a-fA-F]+(L|l|UL|ul|u|U|F|f|ll|LL|ull|ULL)?\\b"
+            }, {
+                token : "constant.numeric", // float
+                regex : "[+-]?\\d+(?:(?:\\.\\d*)?(?:[eE][+-]?\\d+)?)?(L|l|UL|ul|u|U|F|f|ll|LL|ull|ULL)?\\b"
+            }, {
+                token : "keyword", // pre-compiler directives
+                regex : "#\\s*(?:include|import|pragma|line|define|undef|if|ifdef|else|elif|ifndef)\\b",
+                next  : "directive"
+            }, {
+                token : "keyword", // special case pre-compiler directive
+                regex : "(?:#\\s*endif)\\b"
+            }, {
+                token : "support.function.C99.c",
+                regex : cFunctions
+            }, {
+                token : keywordMapper,
+                regex : "[a-zA-Z_$][a-zA-Z0-9_$]*\\b"
+            }, {
+                token : "keyword.operator",
+                regex : "!|\\$|%|&|\\*|\\-\\-|\\-|\\+\\+|\\+|~|==|=|!=|<=|>=|<<=|>>=|>>>=|<>|<|>|!|&&|\\|\\||\\?\\:|\\*=|%=|\\+=|\\-=|&=|\\^=|\\b(?:in|new|delete|typeof|void)"
+            }, {
+              token : "punctuation.operator",
+              regex : "\\?|\\:|\\,|\\;|\\."
+            }, {
+                token : "paren.lparen",
+                regex : "[[({]"
+            }, {
+                token : "paren.rparen",
+                regex : "[\\])}]"
+            }, {
+                token : "text",
+                regex : "\\s+"
+            }
+        ],
+        "comment" : [
+            {
+                token : "comment", // closing comment
+                regex : ".*?\\*\\/",
+                next : "start"
+            }, {
+                token : "comment", // comment spanning whole line
+                regex : ".+"
+            }
+        ],
+        "qqstring" : [
+            {
+                token : "string",
+                regex : '(?:(?:\\\\.)|(?:[^"\\\\]))*?"',
+                next : "start"
+            }, {
+                token : "string",
+                regex : '.+'
+            }
+        ],
+        "qstring" : [
+            {
+                token : "string",
+                regex : "(?:(?:\\\\.)|(?:[^'\\\\]))*?'",
+                next : "start"
+            }, {
+                token : "string",
+                regex : '.+'
+            }
+        ],
+        "directive" : [
+            {
+                token : "constant.other.multiline",
+                regex : /\\/
+            },
+            {
+                token : "constant.other.multiline",
+                regex : /.*\\/
+            },
+            {
+                token : "constant.other",
+                regex : "\\s*<.+?>",
+                next : "start"
+            },
+            {
+                token : "constant.other", // single line
+                regex : '\\s*["](?:(?:\\\\.)|(?:[^"\\\\]))*?["]',
+                next : "start"
+            }, 
+            {
+                token : "constant.other", // single line
+                regex : "\\s*['](?:(?:\\\\.)|(?:[^'\\\\]))*?[']",
+                next : "start"
+            },
+            {
+                token : "constant.other",
+                regex : /[^\\\/]+/,
+                next : "start"
+            }
+        ]
     };
+
+    this.embedRules(DocCommentHighlightRules, "doc-",
+        [ DocCommentHighlightRules.getEndRule("start") ]);
 };
 
 oop.inherits(LobsterHighlightRules, TextHighlightRules);
 
 exports.LobsterHighlightRules = LobsterHighlightRules;
+});
+
+define('ace/mode/doc_comment_highlight_rules', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/text_highlight_rules'], function(require, exports, module) {
+
+
+var oop = require("../lib/oop");
+var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
+
+var DocCommentHighlightRules = function() {
+
+    this.$rules = {
+        "start" : [ {
+            token : "comment.doc.tag",
+            regex : "@[\\w\\d_]+" // TODO: fix email addresses
+        }, {
+            token : "comment.doc.tag",
+            regex : "\\bTODO\\b"
+        }, {
+            defaultToken : "comment.doc"
+        }]
+    };
+};
+
+oop.inherits(DocCommentHighlightRules, TextHighlightRules);
+
+DocCommentHighlightRules.getStartRule = function(start) {
+    return {
+        token : "comment.doc", // doc comment
+        regex : "\\/\\*(?=\\*)",
+        next  : start
+    };
+};
+
+DocCommentHighlightRules.getEndRule = function (start) {
+    return {
+        token : "comment.doc", // closing comment
+        regex : "\\*\\/",
+        next  : start
+    };
+};
+
+
+exports.DocCommentHighlightRules = DocCommentHighlightRules;
+
 });
 
 define('ace/mode/matching_brace_outdent', ['require', 'exports', 'module' , 'ace/range'], function(require, exports, module) {
