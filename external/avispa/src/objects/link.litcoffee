@@ -134,13 +134,8 @@ Bind to the position of the left and right sides of the connection
             return
 
         LeftClick: (event) ->
-            #new Dialogs.ClientRoute node: @ if Dialogs.Node?
             @arc.set('arc', 0) if event.shiftKey
             return
 
         OnRightClick: (event) ->
-            new Dialogs.GraphRoute
-                model: @model
-                position: context.Point(event)
-
             return cancelEvent(event)

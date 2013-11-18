@@ -19,3 +19,14 @@ Base class for "group" objects
                 .attr('x', @position.get('x'))
                 .attr('y', @position.get('y'))
             return @
+
+        OnMouseEnter: (event) ->
+            if not context.dragItem?
+                @$rect.attr('class', 'hover')
+            return cancelEvent(event)
+
+        OnMouseLeave: (event) ->
+            if not context.dragItem?
+                @$rect.removeAttr('class')
+            return cancelEvent(event)
+

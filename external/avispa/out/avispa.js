@@ -272,9 +272,7 @@
         'y': y
       });
       return cancelEvent(event);
-    },
-    OnMouseEnter: function(event) {},
-    OnMouseLeave: function(event) {}
+    }
   });
 
   Avispa.Group = Avispa.BaseObject.extend({
@@ -287,6 +285,18 @@
     render: function() {
       this.$rect.attr('x', this.position.get('x')).attr('y', this.position.get('y'));
       return this;
+    },
+    OnMouseEnter: function(event) {
+      if (context.dragItem == null) {
+        this.$rect.attr('class', 'hover');
+      }
+      return cancelEvent(event);
+    },
+    OnMouseLeave: function(event) {
+      if (context.dragItem == null) {
+        this.$rect.removeAttr('class');
+      }
+      return cancelEvent(event);
     }
   });
 
@@ -302,6 +312,18 @@
       this.$circle.attr('cx', this.position.get('x')).attr('cy', this.position.get('y'));
       this.$label.attr('x', this.position.get('x')).attr('y', this.position.get('y'));
       return this;
+    },
+    OnMouseEnter: function(event) {
+      if (context.dragItem == null) {
+        this.$circle.attr('class', 'hover');
+      }
+      return cancelEvent(event);
+    },
+    OnMouseLeave: function(event) {
+      if (context.dragItem == null) {
+        this.$circle.removeAttr('class');
+      }
+      return cancelEvent(event);
     }
   });
 
@@ -404,10 +426,6 @@
       }
     },
     OnRightClick: function(event) {
-      new Dialogs.GraphRoute({
-        model: this.model,
-        position: context.Point(event)
-      });
       return cancelEvent(event);
     }
   });

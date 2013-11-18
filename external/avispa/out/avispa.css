@@ -4,9 +4,8 @@ g.group rect {
   opacity: 0.75;
   stroke: #999;
   stroke-width: 1px;
-  z-index: 100;
 }
-g.group rect:hover {
+g.group rect.hover {
   stroke: #333;
   stroke-width: 2px;
 }
@@ -21,7 +20,6 @@ g.node circle {
   fill: #fff;
   stroke: #999;
   stroke-width: 1px;
-  z-index: 300;
 }
 g.node circle:hover {
   stroke: #333;
@@ -46,7 +44,6 @@ g.link path {
   stroke-linecap: round;
   cursor: pointer;
   stroke-dasharray: 8,4;
-  z-index: 200;
 }
 g.link text {
   font: bold 6pt Verdana, Helvetica, sans-serif;

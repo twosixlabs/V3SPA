@@ -74,9 +74,3 @@ The init method allows classes to extend the BaseObject without re-implementing 
             @position.set 'x': x, 'y': y
 
             return cancelEvent(event)
-
-        OnMouseEnter: (event) ->
-            return
-
-        OnMouseLeave: (event) ->
-            return

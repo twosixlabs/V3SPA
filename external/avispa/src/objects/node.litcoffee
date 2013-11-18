@@ -27,3 +27,14 @@ Base class for "node" objects
                 .attr('y', @position.get('y'))
 
             return @
+
+        OnMouseEnter: (event) ->
+            if not context.dragItem?
+                @$circle.attr('class', 'hover')
+            return cancelEvent(event)
+
+        OnMouseLeave: (event) ->
+            if not context.dragItem?
+                @$circle.removeAttr('class')
+            return cancelEvent(event)
+
