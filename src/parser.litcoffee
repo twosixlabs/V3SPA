@@ -8,15 +8,15 @@
             return
 
         Domain: (domain) ->
-            domains = x: 0
+            domains = x: 10
             bounds = x: 40, y: 40
 
             for id,subdomain of domain.subdomains
                 subdomain.coords =
                     x: domains.x
                     y: 100
-                    w: 200
-                    h: 200
+                    w: 220 * Object.keys(subdomain.subdomains).length || 200
+                    h: 220 * Object.keys(subdomain.subdomains).length || 200
 
                 vespa.dispatch.trigger('CreateDomain', subdomain.name, @parent[0], subdomain)
 

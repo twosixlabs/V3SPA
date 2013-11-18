@@ -263,10 +263,6 @@
       var x, y;
       x = (event.clientX / context.scale) - this.x1;
       y = (event.clientY / context.scale) - this.y1;
-      if (this.offset) {
-        this.offset.x = this.ox1 + x;
-        this.offset.y = this.oy1 + y;
-      }
       this.position.set({
         'x': x,
         'y': y
@@ -297,6 +293,36 @@
         this.$rect.removeAttr('class');
       }
       return cancelEvent(event);
+    },
+    Drag: function(event) {
+      var boundsx, boundsy, x, y;
+      x = (event.clientX / context.scale) - this.x1;
+      y = (event.clientY / context.scale) - this.y1;
+      if (this.offset) {
+        this.offset.x = this.ox1 + x;
+        this.offset.y = this.oy1 + y;
+        boundsx = this.parent.position.get('w') - this.position.get('w') - 10;
+        boundsy = this.parent.position.get('h') - this.position.get('h') - 10;
+        if (this.offset.x < 10) {
+          this.offset.x = 10;
+          x = this.parent.position.get('x') + 10;
+        } else if (this.offset.x > boundsx) {
+          this.offset.x = boundsx;
+          x = this.parent.position.get('x') + boundsx;
+        }
+        if (this.offset.y < 10) {
+          this.offset.y = 10;
+          y = this.parent.position.get('y') + 10;
+        } else if (this.offset.y > boundsy) {
+          this.offset.y = boundsy;
+          y = this.parent.position.get('y') + boundsy;
+        }
+      }
+      this.position.set({
+        'x': x,
+        'y': y
+      });
+      return cancelEvent(event);
     }
   });
 
@@ -323,6 +349,34 @@
       if (context.dragItem == null) {
         this.$circle.removeAttr('class');
       }
+      return cancelEvent(event);
+    },
+    Drag: function(event) {
+      var x, y;
+      x = (event.clientX / context.scale) - this.x1;
+      y = (event.clientY / context.scale) - this.y1;
+      if (this.offset) {
+        this.offset.x = this.ox1 + x;
+        this.offset.y = this.oy1 + y;
+        if (this.offset.x < 0) {
+          this.offset.x = 0;
+          x = this.parent.position.get('x');
+        } else if (this.offset.x > this.parent.position.get('w')) {
+          this.offset.x = this.parent.position.get('w');
+          x = this.parent.position.get('x') + this.parent.position.get('w');
+        }
+        if (this.offset.y < 0) {
+          this.offset.y = 0;
+          y = this.parent.position.get('y');
+        } else if (this.offset.y > this.parent.position.get('h')) {
+          this.offset.y = this.parent.position.get('h');
+          y = this.parent.position.get('y') + this.parent.position.get('h');
+        }
+      }
+      this.position.set({
+        'x': x,
+        'y': y
+      });
       return cancelEvent(event);
     }
   });

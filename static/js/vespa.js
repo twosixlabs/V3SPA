@@ -230,7 +230,7 @@
     Domain: function(domain) {
       var bounds, connection, domains, id, idx, port, subdomain, _ref, _ref1, _ref2;
       domains = {
-        x: 0
+        x: 10
       };
       bounds = {
         x: 40,
@@ -242,8 +242,8 @@
         subdomain.coords = {
           x: domains.x,
           y: 100,
-          w: 200,
-          h: 200
+          w: 220 * Object.keys(subdomain.subdomains).length || 200,
+          h: 220 * Object.keys(subdomain.subdomains).length || 200
         };
         vespa.dispatch.trigger('CreateDomain', subdomain.name, this.parent[0], subdomain);
         this.parent.unshift(objects[subdomain.name]);

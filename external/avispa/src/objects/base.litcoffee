@@ -67,10 +67,6 @@ The init method allows classes to extend the BaseObject without re-implementing 
             x = (event.clientX / context.scale) - @x1
             y = (event.clientY / context.scale) - @y1
 
-            if @offset
-                @offset.x = @ox1 + x
-                @offset.y = @oy1 + y
-
             @position.set 'x': x, 'y': y
 
             return cancelEvent(event)
