@@ -42,6 +42,7 @@ Expose a global view class so that consumers of the API can instantiate a view.
             @$pan     = @$el.find('g.pan')
             @$zoom    = @$el.find('g.zoom')
 
+            @$groups  = @$el.find('g.groups')
             @$links   = @$el.find('g.links')
             @$objects = @$el.find('g.objects')
             @$labels  = @$el.find('g.labels')

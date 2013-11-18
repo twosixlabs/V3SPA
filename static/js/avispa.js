@@ -34,6 +34,7 @@
       this.$parent = this.$el.parent();
       this.$pan = this.$el.find('g.pan');
       this.$zoom = this.$el.find('g.zoom');
+      this.$groups = this.$el.find('g.groups');
       this.$links = this.$el.find('g.links');
       this.$objects = this.$el.find('g.objects');
       this.$labels = this.$el.find('g.labels');

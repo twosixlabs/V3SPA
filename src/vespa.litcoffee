@@ -100,9 +100,10 @@ The main class for V3SPA framework.
 
             objects[id] = domain
 
-            if parent
-            then parent.$el.append domain.$el
-            else vespa.avispa.$objects.append domain.$el
+            #if parent
+            #then parent.$el.append domain.$el
+            #else vespa.avispa.$objects.append domain.$el
+            vespa.avispa.$groups.append domain.$el
 
             return
 
@@ -115,7 +116,8 @@ The main class for V3SPA framework.
 
             objects[id] = port
 
-            parent.$el.append port.$el
+            #parent.$el.append port.$el
+            vespa.avispa.$objects.append port.$el
 
             return
 
@@ -125,7 +127,7 @@ The main class for V3SPA framework.
                 left: left
                 right: right
 
-            vespa.avispa.$objects.append link.$el
+            vespa.avispa.$links.append link.$el
             return
 
 Establish a websocket connection to the server.  When a connection closes it

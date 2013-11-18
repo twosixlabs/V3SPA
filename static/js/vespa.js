@@ -75,11 +75,7 @@
         position: obj.coords
       });
       objects[id] = domain;
-      if (parent) {
-        parent.$el.append(domain.$el);
-      } else {
-        vespa.avispa.$objects.append(domain.$el);
-      }
+      vespa.avispa.$groups.append(domain.$el);
     };
 
     Vespa.prototype.OnCreatePort = function(id, parent, obj) {
@@ -91,7 +87,7 @@
         position: obj.coords
       });
       objects[id] = port;
-      parent.$el.append(port.$el);
+      vespa.avispa.$objects.append(port.$el);
     };
 
     Vespa.prototype.OnCreateLink = function(dir, left, right) {
@@ -101,7 +97,7 @@
         left: left,
         right: right
       });
-      vespa.avispa.$objects.append(link.$el);
+      vespa.avispa.$links.append(link.$el);
     };
 
     Vespa.prototype.ConnectWS = function(channel) {
