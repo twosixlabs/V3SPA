@@ -51,10 +51,9 @@
       this.dispatch.on('CreateDomain', this.OnCreateDomain, this);
       this.dispatch.on('UpdateDomain', this.OnUpdateDomain, this);
       this.dispatch.on('DeleteDomain', this.OnDeleteDomain, this);
-      this.dispatch.on('CreateNode', this.OnCreateNode, this);
-      this.dispatch.on('UpdateNode', this.OnUpdateNode, this);
-      this.dispatch.on('DeleteNode', this.OnDeleteNode, this);
-      this.dispatch.on('UpdateNodeText', this.OnUpdateNodeText, this);
+      this.dispatch.on('CreatePort', this.OnCreatePort, this);
+      this.dispatch.on('UpdatePort', this.OnUpdatePort, this);
+      this.dispatch.on('DeletePort', this.OnDeletePort, this);
       this.dispatch.on('CreateLink', this.OnCreateLink, this);
       this.dispatch.on('UpdateLink', this.OnUpdateLink, this);
       this.dispatch.on('DeleteLink', this.OnDeleteLink, this);
@@ -71,23 +70,38 @@
       var domain;
       domain = new Domain({
         _id: id,
+        parent: parent,
         name: obj.name,
         position: obj.coords
       });
       objects[id] = domain;
-      parent.append(domain.$el);
+      if (parent) {
+        parent.$el.append(domain.$el);
+      } else {
+        vespa.avispa.$objects.append(domain.$el);
+      }
     };
 
-    Vespa.prototype.OnCreateNode = function(id, parent, obj) {
-      var node;
-      node = new Avispa.Node({
+    Vespa.prototype.OnCreatePort = function(id, parent, obj) {
+      var port;
+      port = new Port({
         _id: id,
         parent: parent,
         label: id,
         position: obj.coords
       });
-      objects[id] = node;
-      parent.append(node.$el);
+      objects[id] = port;
+      parent.$el.append(port.$el);
+    };
+
+    Vespa.prototype.OnCreateLink = function(dir, left, right) {
+      var link;
+      link = new Avispa.Link({
+        direction: dir,
+        left: left,
+        right: right
+      });
+      vespa.avispa.$objects.append(link.$el);
     };
 
     Vespa.prototype.ConnectWS = function(channel) {
@@ -210,48 +224,66 @@
 
   Parser = {
     Load: function(lsr) {
-      this.parent = [vespa.avispa.$objects];
+      this.parent = [null];
       this.Domain(lsr);
     },
     Domain: function(domain) {
-      var id, port, subdomain, _ref, _ref1;
+      var bounds, connection, domains, id, idx, port, subdomain, _ref, _ref1, _ref2;
+      domains = {
+        x: 0
+      };
+      bounds = {
+        x: 40,
+        y: 40
+      };
       _ref = domain.subdomains;
       for (id in _ref) {
         subdomain = _ref[id];
         subdomain.coords = {
-          x: 70,
-          y: 60,
+          x: domains.x,
+          y: 100,
           w: 200,
           h: 200
         };
-        vespa.dispatch.trigger('CreateDomain', id, this.parent[0], subdomain);
-        this.parent.unshift(objects[id].$el);
+        vespa.dispatch.trigger('CreateDomain', subdomain.name, this.parent[0], subdomain);
+        this.parent.unshift(objects[subdomain.name]);
         this.Domain(subdomain);
         this.parent.shift();
+        domains.x += 210;
       }
       _ref1 = domain.ports;
       for (id in _ref1) {
         port = _ref1[id];
         port.coords = {
-          x: 40,
-          y: 40,
+          x: bounds.x,
+          y: bounds.y,
           radius: 30,
           fill: '#eeeeec'
         };
-        vespa.dispatch.trigger('CreateNode', id, this.parent[0], port);
+        vespa.dispatch.trigger('CreatePort', id, this.parent[0], port);
+        bounds.x += 70;
+      }
+      _ref2 = domain.connections;
+      for (idx in _ref2) {
+        connection = _ref2[idx];
+        vespa.dispatch.trigger('CreateLink', connection.connection, objects[connection.left.port], objects[connection.right.port]);
       }
     }
   };
 
   Domain = Avispa.Group.extend({
     init: function() {
-      this.$el.append($SVG('rect').attr('width', this.position.get('w')).attr('height', this.position.get('h')).css('fill', this.position.get('fill')));
-      this.$el.append($SVG('text').attr('dx', '2em').attr('dy', '1em').text(this.options.name));
+      this.$label = $SVG('text').attr('dx', '0.5em').attr('dy', '1.5em').text(this.options.name).appendTo(this.$el);
+      return this;
+    },
+    render: function() {
+      this.$rect.attr('x', this.position.get('x')).attr('y', this.position.get('y'));
+      this.$label.attr('x', this.position.get('x')).attr('y', this.position.get('y'));
       return this;
     }
   });
 
-  Port = Avispa.Node.extend;
+  Port = Avispa.Node;
 
   Editor = Backbone.View.extend({
     id: 'editor',

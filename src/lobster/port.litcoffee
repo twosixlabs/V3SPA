@@ -1,2 +1,5 @@
 
-    Port = Avispa.Node.extend
+    Port = Avispa.Node #.extend
+
+        #init: () ->
+        #    return

@@ -47,7 +47,6 @@ The main class for V3SPA framework.
 
             @avispa = new Avispa
                 el: $('#surface svg')
-                #surface: $('#avispa')
 
             $('#surface').append @avispa.$el
 
@@ -64,11 +63,9 @@ The main class for V3SPA framework.
             @dispatch.on 'UpdateDomain', @OnUpdateDomain, @
             @dispatch.on 'DeleteDomain', @OnDeleteDomain, @
 
-            @dispatch.on 'CreateNode', @OnCreateNode, @
-            @dispatch.on 'UpdateNode', @OnUpdateNode, @
-            @dispatch.on 'DeleteNode', @OnDeleteNode, @
-
-            @dispatch.on 'UpdateNodeText', @OnUpdateNodeText, @
+            @dispatch.on 'CreatePort', @OnCreatePort, @
+            @dispatch.on 'UpdatePort', @OnUpdatePort, @
+            @dispatch.on 'DeletePort', @OnDeletePort, @
 
             @dispatch.on 'CreateLink', @OnCreateLink, @
             @dispatch.on 'UpdateLink', @OnUpdateLink, @
@@ -97,24 +94,38 @@ The main class for V3SPA framework.
         OnCreateDomain: (id, parent, obj) ->
             domain = new Domain
                 _id: id
+                parent: parent
                 name: obj.name
                 position: obj.coords
 
             objects[id] = domain
 
-            parent.append domain.$el
+            if parent
+            then parent.$el.append domain.$el
+            else vespa.avispa.$objects.append domain.$el
+
             return
 
-        OnCreateNode: (id, parent, obj) ->
-            node = new Avispa.Node
+        OnCreatePort: (id, parent, obj) ->
+            port = new Port
                 _id: id
                 parent: parent
                 label: id
                 position: obj.coords
 
-            objects[id] = node
+            objects[id] = port
 
-            parent.append node.$el
+            parent.$el.append port.$el
+
+            return
+
+        OnCreateLink: (dir, left, right) ->
+            link = new Avispa.Link
+                direction: dir
+                left: left
+                right: right
+
+            vespa.avispa.$objects.append link.$el
             return
 
 Establish a websocket connection to the server.  When a connection closes it

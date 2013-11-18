@@ -3,14 +3,20 @@
     Domain = Avispa.Group.extend
 
         init: () ->
-            @$el.append $SVG('rect')
-                .attr('width',  @position.get('w'))
-                .attr('height', @position.get('h'))
-                .css('fill', @position.get('fill'))
-
-            @$el.append $SVG('text')
-                .attr('dx', '2em')
-                .attr('dy', '1em')
+            @$label = $SVG('text')
+                .attr('dx', '0.5em')
+                .attr('dy', '1.5em')
                 .text(@options.name)
+                .appendTo(@$el)
 
             return @
+
+        render: () ->
+            @$rect
+                .attr('x', @position.get('x'))
+                .attr('y', @position.get('y'))
+            @$label
+                .attr('x', @position.get('x'))
+                .attr('y', @position.get('y'))
+            return @
+

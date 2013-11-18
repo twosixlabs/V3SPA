@@ -19,3 +19,7 @@ Standardize the way scrolling the mousewheel is handled across browsers
         return event.wheelDelta / 120 if event.wheelDelta
         return event.detail     /  -3 if event.detail
         return 0
+
+Constants
+
+    RAD = 180.0 / Math.PI

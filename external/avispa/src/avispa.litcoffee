@@ -123,7 +123,7 @@ Expose a global view class so that consumers of the API can instantiate a view.
                 @arrow.Drag(event)
 
             else if @dragItem
-                #@dragItem.jitter++
+                @dragItem.jitter++
                 @dragItem.Drag(event) if @dragItem.Drag
 
             return cancelEvent(event)

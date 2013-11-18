@@ -1,8 +1,6 @@
 {% extends 'base.html' %}
 
-{% block head %}
-    <script type="text/javascript" src="{{ static_url('position.js') }}"></script>
-{% end %}
+{% block head %}{% end %}
 
 {% block body %}
     <div id="menubar">
@@ -10,7 +8,7 @@
         <li><b>V3SPA</b></li>
         <li><a href="#editor">Editor</a></li>
         <li><a href="#node">Node</a></li>
-        <li><a href="#">Menu 3</a></li>
+        <li><a href="#load/example2">Menu 3</a></li>
         <li><a href="#logout">Logout</a></li>
         <li class="floatright"> &copy;2013 <b>Invincea Labs</b> </li>
       </ol>
@@ -48,8 +46,8 @@ i.s --> a.o;</div></div>
     var editor = ace.edit("editor");
     editor.setTheme("ace/theme/chaos");
     editor.getSession().setMode("ace/mode/lobster");
-    editor.setKeyboardHandler("vim"); 
-    editor.setBehavioursEnabled(true);    
+    editor.setKeyboardHandler("vim");
+    editor.setBehavioursEnabled(true);
     editor.setSelectionStyle('line');
     editor.setHighlightActiveLine(true);
     editor.setShowInvisibles(false);
@@ -77,6 +75,7 @@ i.s --> a.o;</div></div>
         </defs>
         <g class="pan">
          <g class="zoom">
+          <g class="domains"></g>
           <g class="links"></g>
           <g class="objects"></g>
           <g class="labels"></g>
