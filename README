@@ -6,6 +6,29 @@
 
 
 #Prerequistes
+Fedora 18
+
+  Compiling (optional):
+
+    $ sudo yum install git nodejs npm
+    $ sudo npm -g install coffee-script
+    $ sudo npm -g install less
+    $ cd ide
+    $ make
+
+  Running:
+    #Ensure port 8080 is allowed through the firewall
+    $ sudo yum install python-setuptools python-pip
+    $ sudo pip install tornado
+
+OS X (10.8)
+
+  Compiling (optional):
+
+    Downlaod "Macintosh Installer" from http://nodejs.org/download/
+    Install pkg
+
+    $ sudo npm -g install coffee-script
 
 Ubuntu 12.04 (Precise)
 
