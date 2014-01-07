@@ -6,6 +6,7 @@ module.exports = function(grunt) {
       style: {
         files: {
           "public/css/vespa.css": "src/vespa.less",
+          "public/css/avispa.css": "external/avispa/src/avispa.less",
         }
       }
     },
@@ -13,16 +14,26 @@ module.exports = function(grunt) {
       compileJoined: {
         options:{
         join: true,
+        bare: true,
         literate: true
         },
         files: {
           'static/js/vespa.js': [
+            'src/vespa.litcoffee',
+            'src/models.litcoffee',
+            'src/router.litcoffee',
+            'src/parser.litcoffee',
             'src/lobster/*.litcoffee',
-            'src/*.litcoffee',
+            'src/editor.litcoffee',
           ],
           'static/js/avispa.js': [
-            'external/avispa/src/objects/*.litcoffee',
-            'external/avispa/src/*.litcoffee',
+            'external/avispa/src/avispa.litcoffee',
+            'external/avispa/src/templates.litcoffee',
+            'external/avispa/src/util.litcoffee',
+            'external/avispa/src/objects/base.litcoffee',
+            'external/avispa/src/objects/group.litcoffee',
+            'external/avispa/src/objects/node.litcoffee',
+            'external/avispa/src/objects/link.litcoffee',
           ]
         }
       }
