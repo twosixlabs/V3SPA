@@ -37,6 +37,27 @@ This is the entry point into the V3SPA framework.
 
         vespa ?= new Vespa()
 
+        editor = ace.edit("editor");
+        editor.setTheme("ace/theme/chaos");
+        editor.getSession().setMode("ace/mode/lobster");
+        editor.setKeyboardHandler("vim");
+        editor.setBehavioursEnabled(true);
+        editor.setSelectionStyle('line');
+        editor.setHighlightActiveLine(true);
+        editor.setShowInvisibles(false);
+        editor.setDisplayIndentGuides(false);
+        editor.renderer.setHScrollBarAlwaysVisible(false);
+        editor.setAnimatedScroll(false);
+        editor.renderer.setShowGutter(true);
+        editor.renderer.setShowPrintMargin(false);
+        editor.getSession().setUseSoftTabs(true);
+        editor.setHighlightSelectedWord(true);
+
+        editor.on "change", (e)->
+          text = editor.getValue()
+          console.log("Loading #{text}")
+          Parser.Load text
+
         return
 
 The main class for V3SPA framework.
