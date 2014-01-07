@@ -6,6 +6,7 @@
 
 
 #Prerequistes
+
 Fedora 18
 
   Compiling (optional):
@@ -56,6 +57,13 @@ OS X (10.8)
 #Installation
 
 #Usage
+
+Enable Coffeescript autocompile (optional):
+
+  $ npm install   #install coffeescript dependencies
+  $ grunt watch
+
+Run:
 
 $ python vespa.py
 
