@@ -12,7 +12,8 @@ module.exports = function(grunt) {
     coffee: {
       compileJoined: {
         options:{
-        join: true
+        join: true,
+        literate: true
         },
         files: {
           'static/js/vespa.js': [
@@ -20,8 +21,8 @@ module.exports = function(grunt) {
             'src/*.litcoffee',
           ],
           'static/js/avispa.js': [
-            'external/avispa/src/*.litcoffee',
             'external/avispa/src/objects/*.litcoffee',
+            'external/avispa/src/*.litcoffee',
           ]
         }
       }
