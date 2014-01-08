@@ -1,6 +1,4 @@
 
-    window.Models = {}
-
     Views   = {}
     Dialogs = {}
 
@@ -12,12 +10,13 @@
 
     vespa = null
 
+    editor = null
+
     #DT.Views.Plugins['controller'] = Backbone.View.extend
     #    initialize: () ->
     #        controller ?= new Controller()
     #        @$el = views.graph.$el
     #        return
-
 
 This is the entry point into the V3SPA framework.
 
@@ -35,47 +34,18 @@ This is the entry point into the V3SPA framework.
         templates =
             editor: $( '#tmpl_editor' ).text()
 
-        vespa ?= new Vespa()
-
-        lobsterChecker = new LobsterJSON
-
-        editor = ace.edit("editor");
-        editor.setTheme("ace/theme/chaos");
-        editor.getSession().setMode("ace/mode/lobster");
-        editor.setKeyboardHandler("vim");
-        editor.setBehavioursEnabled(true);
-        editor.setSelectionStyle('line');
-        editor.setHighlightActiveLine(true);
-        editor.setShowInvisibles(false);
-        editor.setDisplayIndentGuides(false);
-        editor.renderer.setHScrollBarAlwaysVisible(false);
-        editor.setAnimatedScroll(false);
-        editor.renderer.setShowGutter(true);
-        editor.renderer.setShowPrintMargin(false);
-        editor.getSession().setUseSoftTabs(true);
-        editor.setHighlightSelectedWord(true);
-
-Check to see whether or not the Lobster code provided is parseable.
-
-        editor.on "change", (e)->
-          text = editor.getValue()
-          try
-            decoded = lobsterChecker.decode text
-          catch error
-            console.log("Unable to parse Lobster")
-            console.log error
-            return
-
-          parsed = lobsterChecker.translate decoded
-          console.log "Parsed: #{parsed}"
+        vespa ?= new Vespa({editor: {id: "editor"}})
 
         return
 
 The main class for V3SPA framework.
 
     class Vespa
-        constructor: () ->
+        constructor: (args) ->
             vespa = @
+
+            @editor = new Editor 
+                el: "#editor"
 
             @avispa = new Avispa
                 el: $('#surface svg')

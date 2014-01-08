@@ -1,4 +1,3 @@
-
 This is the Lobster editor view.
 
     Editor = Backbone.View.extend
@@ -6,23 +5,43 @@ This is the Lobster editor view.
         className: 'dialog'
 
         initialize: () ->
-            @$el
-                .attr('title', 'Editor')
-                .html('<textarea resizable="0"></textarea>')
-                .dialog
-                    resizable : true
-                    width     : 400
-                    minWidth  : 400
-                    height    : 400
-                    minHeight : 400
-                    modal     : false
-                    hide:
-                        effect: 'fade'
-                        duration: 200
-                    buttons:
-                        'Update': () ->
-                            $(@).dialog( "close" )
-                        'Cancel': () ->
-                            $(@).dialog( "close" )
+          lobsterChecker = new LobsterJSON
 
-            return @
+          editor = ace.edit(@$el[0].id)
+          editor.setTheme("ace/theme/chaos");
+          editor.getSession().setMode("ace/mode/lobster");
+          editor.setKeyboardHandler("vim");
+          editor.setBehavioursEnabled(true);
+          editor.setSelectionStyle('line');
+          editor.setHighlightActiveLine(true);
+          editor.setShowInvisibles(false);
+          editor.setDisplayIndentGuides(false);
+          editor.renderer.setHScrollBarAlwaysVisible(false);
+          editor.setAnimatedScroll(false);
+          editor.renderer.setShowGutter(true);
+          editor.renderer.setShowPrintMargin(false);
+          editor.getSession().setUseSoftTabs(true);
+          editor.setHighlightSelectedWord(true);
+
+  Check to see whether or not the Lobster code provided is parseable.
+
+          editor.on "change", (e)=>
+            text = editor.getValue()
+            try
+              decoded = lobsterChecker.decode text
+            catch error
+              editor.getSession().setAnnotations([{
+                row: error.line - 1,
+                column: error.column,
+                type: 'warning',
+                text: "Syntax Error: #{error.message}"
+              }])
+              return
+
+            editor.getSession().clearAnnotations()
+            try
+              parsed = lobsterChecker.translate decoded
+            catch error
+              console.log error
+              return
+            @data = parsed

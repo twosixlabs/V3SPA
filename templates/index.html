@@ -21,7 +21,7 @@ class A () {
     port s : { position = subject } ;
     port o : { position = object } ;
 }
-{
+
 domain a = A();
 domain b = A();
 domain c = A();
@@ -31,7 +31,7 @@ domain f = A();
 domain g = A();
 domain h = A();
 domain i = A();
-}
+
 a.s --> b.o;
 b.s --> c.o;
 c.s --> d.o;
@@ -41,25 +41,6 @@ f.s --> g.o;
 g.s --> h.o;
 h.s --> i.o;
 i.s --> a.o;</div></div>
-
-<!--<script>-->
-    <!--var editor = ace.edit("editor");-->
-    <!--editor.setTheme("ace/theme/chaos");-->
-    <!--editor.getSession().setMode("ace/mode/lobster");-->
-    <!--editor.setKeyboardHandler("vim");-->
-    <!--editor.setBehavioursEnabled(true);-->
-    <!--editor.setSelectionStyle('line');-->
-    <!--editor.setHighlightActiveLine(true);-->
-    <!--editor.setShowInvisibles(false);-->
-    <!--editor.setDisplayIndentGuides(false);-->
-    <!--editor.renderer.setHScrollBarAlwaysVisible(false);-->
-    <!--editor.setAnimatedScroll(false);-->
-    <!--editor.renderer.setShowGutter(true);-->
-    <!--editor.renderer.setShowPrintMargin(false);-->
-    <!--editor.getSession().setUseSoftTabs(true);-->
-    <!--editor.setHighlightSelectedWord(true);-->
-<!--</script>-->
-
 
     <div id="surface">
       <svg xmlns="http://www.w3.org/2000/svg" class="avispa">

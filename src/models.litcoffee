@@ -1,3 +1,7 @@
+Create Models here so it doesn't matter what order
+these files get loaded
+
+    window.Models = {}
 
 Backbone models that use the CRUD paradigm
 
