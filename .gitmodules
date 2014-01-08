@@ -1,0 +1,3 @@
+[submodule "external/node-json-lobster"]
+	path = external/node-json-lobster
+	url = git@gitlab.labs:v3spa/node-json-lobster.git
