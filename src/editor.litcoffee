@@ -5,7 +5,7 @@ This is the Lobster editor view.
         className: 'dialog'
 
         initialize: () ->
-          lobsterChecker = new LobsterJSON
+          lobsterChecker = new LobsterJSON[0]
 
           editor = ace.edit(@$el[0].id)
           editor.setTheme("ace/theme/chaos");
@@ -42,6 +42,11 @@ This is the Lobster editor view.
             try
               parsed = lobsterChecker.translate decoded
             catch error
-              console.log error
+              editor.getSession().setAnnotations([{
+                row: error.line - 1,
+                column: error.column,
+                type: 'error',
+                text: "Syntax Error: #{error.message}"
+              }])
               return
             @data = parsed
