@@ -37,6 +37,8 @@ This is the entry point into the V3SPA framework.
 
         vespa ?= new Vespa()
 
+        lobsterChecker = new LobsterJSON
+
         editor = ace.edit("editor");
         editor.setTheme("ace/theme/chaos");
         editor.getSession().setMode("ace/mode/lobster");
@@ -53,10 +55,19 @@ This is the entry point into the V3SPA framework.
         editor.getSession().setUseSoftTabs(true);
         editor.setHighlightSelectedWord(true);
 
+Check to see whether or not the Lobster code provided is parseable.
+
         editor.on "change", (e)->
           text = editor.getValue()
-          console.log("Loading #{text}")
-          Parser.Load text
+          try
+            decoded = lobsterChecker.decode text
+          catch error
+            console.log("Unable to parse Lobster")
+            console.log error
+            return
+
+          parsed = lobsterChecker.translate decoded
+          console.log "Parsed: #{parsed}"
 
         return
 
