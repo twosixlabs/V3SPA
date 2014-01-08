@@ -51,12 +51,12 @@ module.exports = function(grunt) {
         },
         files: {
           'static/js/vespa.js': [
-            'src/vespa.litcoffee',
             'src/models.litcoffee',
             'src/router.litcoffee',
             'src/parser.litcoffee',
             'src/lobster/*.litcoffee',
             'src/editor.litcoffee',
+            'src/vespa.litcoffee',
           ],
           'static/js/avispa.js': [
             'external/avispa/src/avispa.litcoffee',
