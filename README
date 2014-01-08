@@ -58,13 +58,23 @@ OS X (10.8)
 
 #Usage
 
-Enable Coffeescript autocompile (optional):
+Install Dependencies
 
-  $ npm install   #install coffeescript dependencies
+  $ npm install
+
+Build external modules:
+
+  $ git submodule update
+  $ cd external/node-json-lobster/
+  $ npm install # install dependencies
+  $ cd -
+  $ grunt rebuild
+
+Enable Coffeescript autocompile (optional):
   $ grunt watch
 
 Run:
 
-$ python vespa.py
+  $ python vespa.py
 
 Override settings from etc/server.ini by creating etc/server.ini.local
