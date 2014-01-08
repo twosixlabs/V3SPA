@@ -1,12 +1,44 @@
 module.exports = function(grunt) {
   grunt.registerTask('watch', ['watch'])
 
+  grunt.registerTask('subbuild', function(dir) {
+    var done = this.async();
+
+    grunt.log.writeln('processing ' + dir);
+
+    grunt.util.spawn({
+      grunt: true,
+      args:[ 'package' ],
+      opts: {
+        cwd: dir
+      }
+    },
+
+    function(err, result, code) {
+      if (err == null) {
+        grunt.log.writeln('processed ' + dir);
+        done();
+      }
+      else {
+        grunt.log.writeln('processing ' + dir + ' failed: ' + code);
+        done(false);
+      }
+    })
+  });
+
   grunt.initConfig({
     less: {
       style: {
         files: {
-          "public/css/vespa.css": "src/vespa.less",
-          "public/css/avispa.css": "external/avispa/src/avispa.less",
+          "static/css/vespa.css": "src/vespa.less",
+          "static/css/avispa.css": "external/avispa/src/avispa.less",
+        }
+      }
+    },
+    uglify: {
+      dist: {
+        files: {
+          'static/js/lobster-json.js': 'external/node-json-lobster/dist/lobster-json.js'
         }
       }
     },
@@ -38,6 +70,7 @@ module.exports = function(grunt) {
         }
       }
     },
+
     watch: {
       coffee: {
         files: ['src/*.litcoffee', 'src/lobster/*.litcoffee'],
@@ -56,5 +89,9 @@ module.exports = function(grunt) {
 
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-contrib-uglify')
   grunt.loadNpmTasks('grunt-contrib-coffee');
+
+  grunt.registerTask('rebuild', ['subbuild:external/node-json-lobster', 'uglify'])
+
 }
