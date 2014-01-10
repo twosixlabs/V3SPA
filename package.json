@@ -1,0 +1,14 @@
+{
+   "name": "V3SPA",
+     "version": "0.0.1",
+       "dependencies": {
+           "grunt-cli": "latest",
+           "grunt-contrib-concat": "latest",
+           "grunt-contrib-uglify": "latest",
+           "grunt-contrib-less": "latest",
+           "grunt-contrib-coffee": "latest",
+           "grunt-contrib-watch": "latest",
+           "grunt-contrib-copy": "latest",
+           "grunt-coffee-build": "latest"
+         }
+}
