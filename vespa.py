@@ -28,10 +28,9 @@ def main():
 
     patterns = [
         (r'/',             api.handlers.Index     ),
-        ( r'/ws/([a-z]+)', api.handlers.WebSocket ),
         (r'/login',        api.handlers.Login     ),
         (r'/logout',       api.handlers.Logout    ),
-        ]
+        ] +  api.handlers.WebSocketRouter.urls
 
     settings = dict(
         static_path   = os.path.join(api.root, 'static'),

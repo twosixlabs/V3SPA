@@ -2,9 +2,10 @@
 import socket
 import logging
 
-import tornado.websocket
+from sockjs.tornado import SockJSRouter, SockJSConnection
 
-class WebSocket(tornado.websocket.WebSocketHandler):
+class WebSocket(SockJSConnection):
+
     def open(self, channel):
         self.stream.socket.setsockopt(socket.SOL_TCP, socket.TCP_NODELAY, 1)
         self.application.sockets[self] = self
@@ -17,3 +18,6 @@ class WebSocket(tornado.websocket.WebSocketHandler):
 
     def on_close(self):
         del self.application.sockets[self]
+
+WebSocketRouter = SockJSRouter(WebSocket, '/ws')
+
