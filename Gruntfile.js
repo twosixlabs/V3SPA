@@ -16,6 +16,20 @@ module.exports = function(grunt) {
             cwd: 'external/ace/build/src/',
             filter: 'isFile'
           },
+          {
+            expand: true,
+            dest: 'static/fonts/',
+            src: '*',
+            cwd: 'external/bootstrap/dist/fonts/',
+            filter: 'isFile'
+          },
+          {
+            expand: true,
+            dest: 'static/img/',
+            src: '*',
+            cwd: 'src/img/',
+            filter: 'isFile'
+          }
         ]
       }
     },

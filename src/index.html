@@ -9,7 +9,7 @@
     <script type="text/javascript" src="js/angular-route.min.js"></script>
     <script type="text/javascript" src="js/angular-ui-ace.js"></script>
     <script src='js/vespa.js' type='text/javascript'></script>
-    <!--<link href='lib/bootstrap/dist/css/bootstrap-theme.css' type='text/css' rel='stylesheet' />-->
+    <script src='js/avispa.js' type='text/javascript'></script>
     <link type="text/css" rel="stylesheet" href="css/avispa.css" />
     <link type="text/css" rel="stylesheet" href="css/vespa.css" />
   </head>
@@ -29,7 +29,7 @@
       <p class='navbar-right navbar-text'> &copy;2013 <b>Invincea Labs</b> </p>
     </div>
     <div class='container-full'>
-      <div class='row'>
+      <div class='row main'>
         <div class='col-md-4'>
           <div ng-controller='ideCtrl' class='editor-container'>
             <div id='editor' ng-model="editor_data" ui-ace="{ onLoad: aceLoaded }">
@@ -39,41 +39,30 @@
         </div>
         <div class='col-md-8'>
           <div id='visualizer' ng-view>
-            <!--<div id='surface'>-->
-            <!--<svg xmlns="http://www.w3.org/2000/svg" class="avispa">-->
-            <!--<defs>-->
-            <!--<marker id="Arrow"-->
-            <!--viewBox="0 0 10 10" refX="7" refY="5"-->
-            <!--markerUnits="strokeWidth"-->
-            <!--markerWidth="4" markerHeight="4"-->
-            <!--fill="#eee" stroke="#999" stroke-width="1px" stroke-dasharray="10,0"-->
-            <!--orient="auto">-->
-            <!--<path d="M 1 1 L 9 5 L 1 9 z" />-->
-            <!--</marker>-->
-            <!--</defs>-->
-            <!--<g class="pan">-->
-            <!--<g class="zoom">-->
-            <!--<g class="groups"></g>-->
-            <!--<g class="links"></g>-->
-            <!--<g class="objects"></g>-->
-            <!--<g class="labels"></g>-->
-            <!--</g>-->
-            <!--</g>-->
-            <!--</svg>-->
-            <!--</div>-->
           </div>
         </div>
       </div>
       <div id='modal'></div>
       <div class='row'>
-        <div class='col-md-2'></div>
-        <div class='col-md-8'>
-          <div id="status_pane">
-            <button id="expand">+</button>
-            <b style="color: red;">0 errors</b> &nbsp; <b style="color: orange;">1 warnings</b>
+        <div class='col-md-12'>
+          <div class='panel panel-default'>
+            <div class='panel-heading'>
+              <h4 class='panel-title'>Console</h4>
+            </div>
+            <div class='panel-body'>
+              <div class='btn-group pull-left'>
+                <button type='button' class='btn btn-default btn-xs'>
+                  <span class='glyphicon glyphicon-plus'></span>
+                </button>
+              </div>
+              <ul class='list-inline'>
+                <li class='text-danger'> <strong>1 error </strong></li>
+                <li class='text-warning'><strong>1 warnings</strong></li>
+              </ul>
+              <div class='clearfix'> </div>
+            </div>
           </div>
         </div>
-        <div class='col-md-2'></div>
       </div>
     </div>
   </body>

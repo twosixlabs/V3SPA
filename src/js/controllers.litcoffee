@@ -1,5 +1,7 @@
     vespaControllers = angular.module('vespaControllers', ['ui.ace'])
 
+The main controller. avispa is a subcontroller.
+
     vespaControllers.controller 'ideCtrl', ($scope) ->
 
       $scope.aceLoaded = (editor) ->
@@ -17,13 +19,22 @@
         editor.renderer.setShowPrintMargin(false);
         editor.getSession().setUseSoftTabs(true);
         editor.setHighlightSelectedWord(true);
-        $("#editor").height "#{$(window).height()}px"
+
+Ace needs a statically sized div to initialize, but we want it
+to be the full page, so make it so.
+
+        $("#editor").height "#{$(window).height() * 0.85 }px"
         editor.resize()
 
 
 
-      console.log "Loaded"
       $scope.editor_data = "hello"
 
 
+
+
     vespaControllers.controller 'avispaCtrl', ($scope) ->
+
+      $scope.$on '$locationChangeStart', (event) ->
+        console.log "Activated"
+
