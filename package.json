@@ -9,6 +9,7 @@
            "grunt-contrib-coffee": "latest",
            "grunt-contrib-watch": "latest",
            "grunt-contrib-copy": "latest",
+           "grunt-contrib-concat": "latest",
            "grunt-coffee-build": "latest"
          }
 }

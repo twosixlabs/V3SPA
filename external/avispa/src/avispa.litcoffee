@@ -28,7 +28,7 @@ Expose a global view class so that consumers of the API can instantiate a view.
             @dragItem = null
             @arrow    = null
 
-            @position = new Models.Position
+            @position =
                 x: 0
                 y: 0
 

@@ -49,9 +49,21 @@ module.exports = function(grunt) {
             expand: true, cwd: 'external/angular', 
             dest: 'static/js/', src: 'angular*.js'
           },
-          { 'static/js/jquery-2.0.3.js': 'external/jquery-2.0.3.min.js'},
+          { 
+            expand: true, cwd: 'external/backbone', 
+            dest: 'static/js/', src: '*.js'
+          },
           { 'static/js/bootstrap.js': 'external/bootstrap/dist/js/bootstrap.js'}
         ]
+      }
+    },
+    concat: {
+      options: {
+        separator: ';',
+      },
+      dist: {
+        src: ['external/jquery-2.0.3.min.js', 'external/jquery-ui-1.10.3.custom.min.js'],
+        dest: 'static/js/jquery-combined.js'
       }
     },
     coffee: {
@@ -80,7 +92,9 @@ module.exports = function(grunt) {
 
     watch: {
       coffee: {
-        files: ['src/js/*.litcoffee', 'src/lobster/*.litcoffee'],
+        files: ['src/js/*.litcoffee',
+                'src/lobster/*.litcoffee',
+                'external/avispa/src/*.litcoffee'],
         tasks: ['coffee'],
       },
       css: {
@@ -103,7 +117,8 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify')
   grunt.loadNpmTasks('grunt-contrib-coffee');
   grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-contrib-concat');
 
-  grunt.registerTask('default', ['coffee', 'uglify', 'less', 'copy'])
+  grunt.registerTask('default', ['coffee', 'uglify', 'concat', 'less', 'copy'])
 
 }
