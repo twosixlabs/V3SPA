@@ -1,0 +1,16 @@
+class Process() {
+  port active1 : {position = subject};
+  port active2 : {position = subject};
+}
+
+class Network() {
+  port readwrite1 : {position = object};
+  port readwrite2 : {position = object};
+}
+
+domain internet = Network();
+domain low = Process();
+
+low.active1 <--> internet.readwrite1;
+
+assert [low.*] -> [internet.*] :: exists;

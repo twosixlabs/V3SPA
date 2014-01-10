@@ -1,0 +1,60 @@
+// many levels of nesting
+
+class A() {
+  port a;
+  port b;
+  class B() {
+    port a;
+    port b;
+    class C() {
+      port a;
+      port b;
+      class D() {
+        port a;
+        port b;
+        class E() {
+          port a;
+          port b;
+          class F() {
+            port a;
+            port b;
+            class G() {
+              port a;
+              port b;
+              class H() {
+                port a;
+                port b;
+              }
+              domain h1 = H();
+              a -- h1.a;
+              b -- h1.b; 
+            }
+            domain g1 = G();
+            a -- g1.a;
+            b -- g1.b;
+          }
+          domain f1 = F();
+          a -- f1.a;
+          b -- f1.b;
+        }
+        domain e1 = E();
+        a -- e1.a;
+        b -- e1.b;
+      }
+      domain d1 = D();
+      a -- d1.a;
+      b -- d1.b;
+    }
+    domain c1 = C();
+    a -- c1.a;
+    b -- c1.b;
+  }
+  domain b1 = B();
+  a -- b1.a;
+  b -- b1.b;
+}
+
+domain a1 = A();
+domain b1 = A();
+a1.a -- b1.b;
+

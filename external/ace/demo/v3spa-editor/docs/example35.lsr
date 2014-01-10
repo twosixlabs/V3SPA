@@ -1,0 +1,22 @@
+class Process() {
+  port ext : {position = subject};
+  port active : {position = subject};
+
+  domain internet = Network();
+
+  active <--> internet.readwrite ;
+
+  assert [this.*] -> [internet.*] :: exists ;
+  assert [this.active] -> [internet.*] :: exists ;
+}
+
+class Network() {
+  port readwrite : {position = object};
+}
+
+domain proc = Process();
+
+domain secret = Network();
+proc.ext <--> secret.readwrite ;
+
+assert [proc.ext] -> [secret.readwrite] :: exists ;

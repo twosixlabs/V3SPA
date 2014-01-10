@@ -1,0 +1,20 @@
+// type with use of *
+
+class Request() { }
+class NoRequest() { }
+
+class B() {
+  class A() {
+    port a : {type=Request, position=subject} ;
+    port b : {type=NoRequest, position=subject} ;
+  }
+  port x : {type=*, position=object} ;
+  domain y = A();
+  x -- y.a;
+  x -- y.b;
+}
+
+domain e = B();
+
+
+

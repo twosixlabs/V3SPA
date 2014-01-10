@@ -1,0 +1,144 @@
+class Process() { 
+  port s: {position = subject }  ;  
+  port o: {position = object }  ;  
+}
+
+domain devices = Process() ;
+domain pcscd = Process() ;
+devices.s <--> pcscd.o  ;
+
+domain remotelogin = Process() ;
+devices.s <--> remotelogin.o  ;
+
+domain xserver = Process() ;
+devices.s <--> xserver.o  ;
+
+domain init = Process() ;
+devices.s <--> init.o  ;
+
+domain locallogin = Process() ;
+devices.s <--> locallogin.o  ;
+
+domain pcmcia = Process() ;
+devices.s <--> pcmcia.o  ;
+
+domain sysnetwork = Process() ;
+devices.s <--> sysnetwork.o  ;
+
+domain userdomain = Process() ;
+devices.s <--> userdomain.o  ;
+
+domain amanda = Process() ;
+devices.s <--> amanda.o  ;
+
+domain backup = Process() ;
+devices.s <--> backup.o  ;
+
+domain bootloader = Process() ;
+devices.s <--> bootloader.o  ;
+
+domain dpkg = Process() ;
+devices.s <--> dpkg.o  ;
+
+domain quota = Process() ;
+devices.s <--> quota.o  ;
+
+domain readahead = Process() ;
+devices.s <--> readahead.o  ;
+
+domain rpm = Process() ;
+devices.s <--> rpm.o  ;
+
+domain sxid = Process() ;
+devices.s <--> sxid.o  ;
+
+domain sdix = Process() ;
+devices.s <--> sdix.o  ;
+
+domain slocate = Process() ;
+devices.s <--> slocate.o  ;
+
+domain apcupsd = Process() ;
+devices.s <--> apcupsd.o  ;
+
+domain bluetooth = Process() ;
+devices.s <--> bluetooth.o  ;
+
+domain cron = Process() ;
+devices.s <--> cron.o  ;
+
+domain cups = Process() ;
+devices.s <--> cups.o  ;
+
+domain hal = Process() ;
+devices.s <--> hal.o  ;
+
+domain fstools = Process() ;
+devices.s <--> fstools.o  ;
+
+domain authlogin = Process() ;
+devices.s <--> authlogin.o  ;
+
+domain ssh = Process() ;
+devices.s <--> ssh.o  ;
+
+domain openct = Process() ;
+devices.s <--> openct.o  ;
+
+domain terminal = Process() ;
+terminal.s <--> authlogin.o  ;
+
+domain zen = Process() ;
+terminal.s <--> zen.o  ;
+
+domain finger = Process() ;
+terminal.s <--> finger.o  ;
+
+domain ppp = Process() ;
+init.s <--> ppp.o  ;
+
+domain corecommands = Process() ;
+init.s <--> corecommands.o  ;
+
+
+domain files = Process() ;
+init.s <--> files.o  ;
+userdomain.s <--> files.o  ;
+
+domain modutils = Process() ;
+userdomain.s <--> modutils.o  ;
+
+domain miscfiles = Process() ;
+userdomain.s <--> miscfiles.o  ;
+
+domain postfix = Process() ;
+domain mta = Process() ;
+mta.s <--> postfix.o  ;
+
+domain tcpd = Process() ;
+domain fpd = Process() ;
+fpd.s <--> tcpd.o  ;
+
+domain entrophy = Process() ;
+domain audioentrophy = Process() ;
+audioentrophy.s <--> entrophy.o  ;
+
+domain kernel = Process() ;
+domain clamav = Process() ;
+kernel.s <--> clamav.o  ;
+
+kernel.s <--> hal.o  ;
+
+domain brctl = Process() ;
+kernel.s <--> brctl.o  ;
+
+domain corenetwork = Process() ;
+kernel.s <--> corenetwork.o  ;
+
+domain rpc = Process() ;
+kernel.s <--> rpc.o  ;
+
+domain stunnel = Process() ;
+corenetwork.o <--> stunnel.s  ;
+domain filesystem = Process() ;
+filesystem.s <--> rpc.o  ;

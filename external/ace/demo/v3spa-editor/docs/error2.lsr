@@ -1,0 +1,17 @@
+// fail case
+// type defintions with different type values cannot be connected
+
+class Request() { }
+
+class NoRequest() { }
+
+class A() {
+  port a : {type=Request, position=subject} ;
+  port b : {type=NoRequest};
+}
+
+domain d = A();
+domain e = A();
+
+d.a -- e.b;
+

@@ -1,0 +1,15 @@
+class Process() {
+  port active1 : {position = subject};
+  port active2 : {position = subject};
+}
+
+class Network() {
+  port readwrite1 : {position = object};
+  port readwrite2 : {position = object};
+
+  domain proc = Process();
+
+  assert [this.*] -> [this.proc] :: never;
+}
+
+domain net = Network();

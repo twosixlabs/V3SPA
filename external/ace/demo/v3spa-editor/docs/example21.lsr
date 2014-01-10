@@ -1,0 +1,24 @@
+class A () {
+    port s : { position = subject } ;
+    port o : { position = object } ;
+}
+
+domain a = A();
+domain b = A();
+domain c = A();
+domain d = A();
+domain e = A();
+domain f = A();
+domain g = A();
+domain h = A();
+domain i = A();
+
+a.s --> b.o;
+b.s --> c.o;
+c.s --> d.o;
+d.s --> e.o;
+e.s --> f.o;
+f.s --> g.o;
+g.s --> h.o;
+h.s --> i.o;
+i.s --> a.o;

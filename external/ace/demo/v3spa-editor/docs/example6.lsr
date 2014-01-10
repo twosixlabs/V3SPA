@@ -1,0 +1,167 @@
+class IO () {
+    port inPort1 : { position = object };
+    port outPort1 : { position = subject };
+    port inPort2 : { position = object };
+    port outPort2 : { position = subject };
+}
+
+domain a = IO();
+domain b = IO();
+domain c = IO();
+domain d = IO();
+domain e = IO();
+domain f = IO();
+domain g = IO();
+domain h = IO();
+domain i = IO();
+domain j = IO();
+domain k = IO();
+domain l = IO();
+domain m = IO();
+
+domain n = IO();
+domain o = IO();
+domain p = IO();
+domain q = IO();
+domain r = IO();
+domain s = IO();
+
+domain t = IO();
+
+domain u = IO();
+domain v = IO();
+domain w = IO();
+domain x = IO();
+domain y = IO();
+domain z = IO();
+
+a.outPort1 --> b.inPort1;
+a.outPort2 --> n.inPort2;
+a.inPort1 <-- g.outPort1;
+a.inPort2 <-- t.outPort1;
+
+b.outPort1 --> c.inPort1;
+b.outPort2 --> o.inPort2;
+b.inPort1 <-- h.outPort1;
+b.inPort2 <-- u.outPort1;
+
+c.outPort1 --> d.inPort1;
+c.outPort2 --> p.inPort2;
+c.inPort1 <-- i.outPort1;
+c.inPort2 <-- v.outPort1;
+
+d.outPort1 --> e.inPort1;
+d.outPort2 --> q.inPort2;
+d.inPort1 <-- j.outPort1;
+d.inPort2 <-- w.outPort1;
+
+e.outPort1 --> f.inPort1;
+e.outPort2 --> r.inPort2;
+e.inPort1 <-- k.outPort1;
+e.inPort2 <-- x.outPort1;
+
+f.outPort1 --> g.inPort1;
+f.outPort2 --> s.inPort2;
+f.inPort1 <-- l.outPort1;
+f.inPort2 <-- y.outPort1;
+
+g.outPort1 --> h.inPort1;
+g.outPort2 --> t.inPort2;
+g.inPort1 <-- m.outPort1;
+// fixme: parser dies here.  Why???
+// g.inPort2 <-- z.outPort1;
+
+// h.outPort1 --> i.inPort1;
+// h.outPort2 --> u.inPort2;
+// h.inPort1 <-- n.outPort1;
+// h.inPort2 <-- a.outPort1;
+
+// i.outPort1 --> j.inPort1;
+// i.outPort2 --> v.inPort2;
+// i.inPort1 <-- o.outPort1;
+// i.inPort2 <-- b.outPort1;
+
+// j.outPort1 --> k.inPort1;
+// j.outPort2 --> w.inPort2;
+// j.inPort1 <-- p.outPort1;
+// j.inPort2 <-- c.outPort1;
+
+// k.outPort1 --> l.inPort1;
+// k.outPort2 --> x.inPort2;
+// k.inPort1 <-- q.outPort1;
+// k.inPort2 <-- d.outPort1;
+
+// l.outPort1 --> m.inPort1;
+// l.outPort2 --> y.inPort2;
+// l.inPort1 <-- r.outPort1;
+// l.inPort2 <-- e.outPort1;
+
+// m.outPort1 --> n.inPort1;
+// m.outPort2 --> z.inPort2;
+// m.inPort1 <-- s.outPort1;
+// m.inPort2 <-- f.outPort1;
+
+// n.outPort1 --> o.inPort1;
+// n.outPort2 --> a.inPort2;
+// n.inPort1 <-- t.outPort1;
+// n.inPort2 <-- g.outPort1;
+
+// o.outPort1 --> p.inPort1;
+// o.outPort2 --> b.inPort2;
+// o.inPort1 <-- u.outPort1;
+// o.inPort2 <-- h.outPort1;
+
+// p.outPort1 --> q.inPort1;
+// p.outPort2 --> c.inPort2;
+// p.inPort1 <-- v.outPort1;
+// p.inPort2 <-- i.outPort1;
+
+// q.outPort1 --> r.inPort1;
+// q.outPort2 --> d.inPort2;
+// q.inPort1 <-- w.outPort1;
+// q.inPort2 <-- j.outPort1;
+
+// r.outPort1 --> s.inPort1;
+// r.outPort2 --> e.inPort2;
+// r.inPort1 <-- x.outPort1;
+// r.inPort2 <-- k.outPort1;
+
+// s.outPort1 --> t.inPort1;
+// s.outPort2 --> f.inPort2;
+// s.inPort1 <-- y.outPort1;
+// s.inPort2 <-- l.outPort1;
+
+// t.outPort1 --> u.inPort1;
+// t.outPort2 --> g.inPort2;
+// t.inPort1 <-- z.outPort1;
+// t.inPort2 <-- m.outPort1;
+
+// u.outPort1 --> v.inPort1;
+// u.outPort2 --> h.inPort2;
+// u.inPort1 <-- a.outPort1;
+// u.inPort2 <-- n.outPort1;
+
+// v.outPort1 --> w.inPort1;
+// v.outPort2 --> i.inPort2;
+// v.inPort1 <-- b.outPort1;
+// v.inPort2 <-- o.outPort1;
+
+// w.outPort1 --> x.inPort1;
+// w.outPort2 --> j.inPort2;
+// w.inPort1 <-- c.outPort1;
+// w.inPort2 <-- p.outPort1;
+
+// x.outPort1 --> y.inPort1;
+// x.outPort2 --> k.inPort2;
+// x.inPort1 <-- d.outPort1;
+// x.inPort2 <-- q.outPort1;
+
+// y.outPort1 --> z.inPort1;
+// y.outPort2 --> l.inPort2;
+// y.inPort1 <-- e.outPort1;
+// y.inPort2 <-- r.outPort1;
+
+// z.outPort1 --> a.inPort1;
+// z.outPort2 --> m.inPort2;
+// z.inPort1 <-- f.outPort1;
+// z.inPort2 <-- s.outPort1;

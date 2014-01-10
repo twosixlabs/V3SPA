@@ -1,0 +1,30 @@
+class Process() {  port active : {position = subject};}
+class Network() {  
+  port readwrite : {position = object};
+  port ctrl : {position = object} ;
+}
+
+domain internet = Network();
+domain secret = Network();
+domain topsecret = Network();
+domain low = Process();
+domain high = Process();
+high.active <--> secret.readwrite ;
+low.active <--> internet.readwrite ;
+// low.active --> secret.readwrite;
+
+// reverse direction test
+secret.readwrite <-- low.active;
+high.active --> topsecret.readwrite;
+
+assert [internet.readwrite] -> [high.*] :: exists ;
+assert [low.*] -> [high.*] :: exists ;
+assert [high.*] -> [internet.*] :: never;
+assert [high.*] -> [low.*] :: never;
+assert [secret.*] -> [internet.*] :: never;
+assert [secret.*] -> [low.*] :: never;
+
+assert [internet.*] -> [topsecret.*] :: .* [low.*] .* [secret.*] .* [high.*] .* ;
+
+// this one is a little weird as the end points are included in the path.
+assert [internet.*] -> [topsecret.*] :: .* [internet.*] .* [low.*] .* [secret.*] .* [high.*] .* [topsecret.*] .*;

@@ -1,0 +1,16 @@
+// Type property checking
+// pass through of type
+
+class Requests() {}  
+
+class X(t) {
+  port d : {type=t, position=subject};
+  port e : {type=t, position=object};
+ }
+
+domain d = X(Requests);
+domain e = X(Requests);
+
+d.d -- e.e;	
+
+

@@ -1,0 +1,14 @@
+// input ports are incompatible with bidirectional connections
+
+class A() {
+  port in : { direction = input };
+}
+
+class B() {
+  port in;
+}
+
+domain a = A();
+domain b = B();
+
+a.in <--> b.in;

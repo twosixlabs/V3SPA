@@ -1,0 +1,36 @@
+class X() {
+  port s : {position=subject} ; 
+}
+class Y() {
+  port z ; 
+}
+
+domain a = X();
+domain b = Y();
+domain c = X();
+domain d = Y();
+
+a.s --> b.z;
+b.z --> c.s;
+c.s --> d.z;
+d.z --> a.s;
+
+  assert [a.*] -> [b.*] :: exists;
+  assert [a.*] -> [c.*] :: exists;
+assert [a.*] -> [d.*] :: exists; // fails
+
+assert [b.*] -> [a.*] :: exists; // fails
+  assert [b.*] -> [c.*] :: exists;
+assert [b.*] -> [d.*] :: exists; // fails
+
+  assert [c.*] -> [d.*] :: exists;
+  assert [c.*] -> [a.*] :: exists;
+assert [c.*] -> [b.*] :: exists; // fails
+
+  assert [d.*] -> [a.*] :: exists;
+assert [d.*] -> [b.*] :: exists; // fails
+assert [d.*] -> [c.*] :: exists; // fails
+
+//  assert [a.*] -> [a.*] :: exists;  // nonesense case
+
+

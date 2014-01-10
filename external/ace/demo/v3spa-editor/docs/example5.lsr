@@ -1,0 +1,29 @@
+class C () {
+  port port3 : { position = subject };
+}
+
+class D () {
+    port port4 : { position = object };
+    domain domainCD = C ();
+}
+
+class A () {
+    port port1 : { position = subject };
+
+    domain domainC = C ();
+    domain domainD = D ();
+
+    domainC.port3 <-- port1;
+    domainD.port4 <--> domainC.port3;
+}
+
+class B () {
+    port port2;
+}
+
+domain domainA = A ();
+domain domainB = B ();
+domain domainB2 = B ();
+
+domainA.port1 <-- domainB.port2;
+domainA.port1 <-- domainB2.port2;

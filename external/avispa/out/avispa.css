@@ -1,0 +1,53 @@
+g.group rect {
+  cursor: pointer;
+  fill: #fff;
+  opacity: 0.75;
+  stroke: #999;
+  stroke-width: 1px;
+}
+g.group rect.hover {
+  stroke: #333;
+  stroke-width: 2px;
+}
+g.group text {
+  cursor: pointer;
+  font: bold 8pt Verdana, Helvetica, sans-serif;
+  fill: #000;
+  text-anchor: left;
+}
+g.node circle {
+  cursor: pointer;
+  fill: #fff;
+  stroke: #999;
+  stroke-width: 1px;
+}
+g.node circle:hover {
+  stroke: #333;
+  stroke-width: 2px;
+}
+g.node text {
+  cursor: pointer;
+  font: bold 8pt Verdana, Helvetica, sans-serif;
+  fill: #000;
+  text-anchor: middle;
+}
+g.link line {
+  fill: none;
+  stroke: #666;
+  stroke-width: 3px;
+  stroke-linecap: round;
+}
+g.link path {
+  fill: none;
+  stroke: #999;
+  stroke-width: 3px;
+  stroke-linecap: round;
+  cursor: pointer;
+  stroke-dasharray: 8,4;
+}
+g.link text {
+  font: bold 6pt Verdana, Helvetica, sans-serif;
+  fill: #666;
+  cursor: pointer;
+  text-anchor: middle;
+}

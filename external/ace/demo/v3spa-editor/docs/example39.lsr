@@ -1,0 +1,33 @@
+// ports p and q are assumed to be connected
+
+class W() {
+    port a;
+    port b;
+    port c;
+
+    assert [this.a] -> [this.c] :: never;
+}
+
+class X() {
+    port d;
+}
+
+class Y() {
+    port e;
+}
+
+class Z() {
+    port f;
+}
+
+domain w = W();
+domain x = X();
+domain y = Y();
+domain z = Z();
+
+x.d --> w.a;
+y.e --> w.b;
+w.c --> z.f;
+
+assert [y.e] -> [z.f] :: exists;
+assert [x.d] -> [z.f] :: never;

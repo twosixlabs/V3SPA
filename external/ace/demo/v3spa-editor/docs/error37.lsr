@@ -1,0 +1,11 @@
+// Direction set to a class (instead of input/output/bidirectional)
+class B() {}
+
+class A() {
+  port in : { direction = B };
+}
+
+domain a1 = A();
+domain a2 = A();
+
+a1.in -- a2.in;

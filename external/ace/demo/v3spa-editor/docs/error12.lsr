@@ -1,0 +1,23 @@
+// direction fail case
+
+class X() {
+  port i : {direction=input} ;
+  port o : {direction=output, position=subject } ;
+  port b : {direction=bidirectional, position=subject };
+  port na ;
+}
+
+class Y() {
+  port i : {direction=input} ;
+  port o : {direction=output, position=subject} ;
+  port b : {direction=bidirectional};
+  port na : {position=object};
+}
+
+domain d = X();
+domain e = Y();
+domain f = X();
+domain g = Y();
+domain h = X();
+
+h.b <--> d.i;

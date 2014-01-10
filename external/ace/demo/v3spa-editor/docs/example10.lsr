@@ -1,0 +1,28 @@
+class A () {
+    port portA;
+
+    port portA1;
+    port portA2;
+    port portA3;
+
+}
+
+class B () {
+    port portB;
+}
+
+class C () {
+    port portC1;
+    port portC2;
+    port portC3;
+}
+
+domain a = A();
+domain b = B();
+domain c = C();
+
+a.portA -- b.portB;
+
+a.portA1 -- c.portC1;
+a.portA2 -- c.portC2;
+a.portA3 -- c.portC3;

@@ -1,0 +1,22 @@
+// Type property checking
+// a) connect type of value with type of same value
+// b) connect type of value with no type property port
+// c) connect type which is defined at domain placement
+
+class Request() { } 
+
+class X(t) {
+  port a : {type=Request, position=subject} ;
+  port b : {type=Request} ;
+  port c ;
+  port d : {type=t, position=subject};
+  port e : {type=t, position=object};
+ }
+
+domain d = X(Request);
+domain e = X(Request);
+d.b -- e.a;	// a
+d.c -- e.a;	// b
+d.d -- e.e;	// c
+
+

@@ -1,0 +1,39 @@
+class A () {
+    port s : { position = subject } ;
+}
+
+class B () {
+    port s : { position = subject } ;
+    port o : { position = object } ;
+}
+
+class C () {
+    port o : { position = object } ;
+    port s : { position = subject } ;
+}
+
+class D () {
+    port o : { position = object } ;
+    port s : { position = subject } ;
+}
+
+class E () {
+    port o : { position = object } ;
+}
+
+domain a = A();
+domain b = B();
+domain c = C();
+domain d = D();
+domain e = E();
+
+a.s --> b.o;
+b.s --> c.o;
+c.s --> d.o;
+d.s --> e.o;
+
+domain b1 = B();
+b1.s --> c.o;
+
+domain d1 = B();
+c.s --> d1.o;

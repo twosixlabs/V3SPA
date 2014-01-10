@@ -1,0 +1,18 @@
+// Incompatible positions
+
+class Subj1 () {
+  port subj1 : { position = subject } ;
+}
+
+class Obj1 () {
+  port obj1 ;
+  class Obj0 () {
+   port obj0 : { position = subject };
+  }
+  domain d1 = Obj0 ();
+  obj1 -- d1.obj0;
+}
+
+domain x = Subj1 ();
+domain y = Obj1 ();
+x.subj1 -- y.obj1;
