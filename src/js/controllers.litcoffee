@@ -1,8 +1,12 @@
-    vespaControllers = angular.module('vespaControllers', ['ui.ace'])
+    vespaControllers = angular.module('vespaControllers', ['ui.ace', 'vespa.socket'])
 
 The main controller. avispa is a subcontroller.
 
-    vespaControllers.controller 'ideCtrl', ($scope, socket) ->
+    vespaControllers.controller 'ideCtrl', ($scope, SockJSService) ->
+
+      ws_sock = SockJSService("http://#{location.host}/ws", null , {debug: true})
+
+      $scope.editor = null
 
       $scope.aceLoaded = (editor) ->
         editor.setTheme("ace/theme/chaos");
@@ -23,17 +27,22 @@ The main controller. avispa is a subcontroller.
 Ace needs a statically sized div to initialize, but we want it
 to be the full page, so make it so.
 
-        $("#editor").height "#{$(window).height() * 0.85 }px"
+        $("#editor").height "#{$(window).height() * 0.75 }px"
         editor.resize()
+        $scope.editor = editor
 
-Set a WS callback every time we change what's in the editor.
+Check syntax button callback
 
-        editor.on "change", (e)->
-          req =
-            lobster: e.getValue()
+      $scope.check_lobster = ->
 
-          socket.emit 'lobster:validate', req, (result)->
+        req =
+          domain: 'lobster'
+          request: 'validate'
+          payload: $scope.editor.getValue()
 
+        ws_sock.send req, (result)->
+          console.log  "Got result"
+          console.log result
 
 
       $scope.editor_data = """

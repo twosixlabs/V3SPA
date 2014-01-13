@@ -45,6 +45,7 @@ module.exports = function(grunt) {
       dist: {
         files: [
           {'static/js/lobster-json.js': 'external/node-json-lobster/dist/lobster-json.js'},
+          {'static/js/sockjs.0.3.min.js': 'external/sockjs.0.3.min.js'},
           { 
             expand: true, cwd: 'external/angular', 
             dest: 'static/js/', src: 'angular*.js'
