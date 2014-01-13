@@ -2,7 +2,7 @@
 
 The main controller. avispa is a subcontroller.
 
-    vespaControllers.controller 'ideCtrl', ($scope, SockJSService) ->
+    vespaControllers.controller 'ideCtrl', ($scope, $rootScope, SockJSService) ->
 
       ws_sock = SockJSService("http://#{location.host}/ws", null , {debug: true})
 
@@ -40,10 +40,11 @@ Check syntax button callback
           request: 'validate'
           payload: $scope.editor.getValue()
 
-        ws_sock.send req, (result)->
-          console.log  "Got result"
-          console.log result
+        $scope.loading = true
 
+        ws_sock.send req, (result)->
+          $scope.loading = false
+          $rootScope.$broadcast 'lobsterUpdate', result
 
       $scope.editor_data = """
       class A () {
@@ -72,13 +73,14 @@ Check syntax button callback
       i.s --> a.o;
       """
 
-
-
-
     vespaControllers.controller 'avispaCtrl', ($scope) ->
 
       $scope.avispa = new Avispa
         el: $('#surface svg')
+
+      $scope.$on 'lobsterUpdate', (json)->
+        console.log "Got lobsterUpdate event!"
+
 
       $('#surface').append $scope.avispa.$el
 

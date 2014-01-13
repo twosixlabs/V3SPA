@@ -1,4 +1,5 @@
 import subprocess
+import time
 import tempfile
 import pkg_resources
 
@@ -31,6 +32,7 @@ class LobsterDomain(object):
         }
 
   def handle(self, msg):
+    time.sleep(3)
     if msg['request'] == 'validate':
       return self.validate(msg)
     else:
