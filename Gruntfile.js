@@ -78,6 +78,7 @@ module.exports = function(grunt) {
         files: {
           'static/js/vespa.js': [
             'src/js/*.litcoffee',
+            'src/js/controllers/*.litcoffee',
           ],
           'static/js/avispa.js': [
             'external/avispa/src/avispa.litcoffee',
@@ -96,7 +97,9 @@ module.exports = function(grunt) {
       coffee: {
         files: ['src/js/*.litcoffee',
                 'src/lobster/*.litcoffee',
-                'external/avispa/src/*.litcoffee'],
+                'src/js/controllers/*.litcoffee',
+                'external/avispa/src/*.litcoffee',
+                'external/avispa/src/objects/*.litcoffee'],
         tasks: ['coffee'],
       },
       css: {

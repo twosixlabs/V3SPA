@@ -76,17 +76,6 @@ Check syntax button callback
       i.s --> a.o;
       """
 
-    vespaControllers.controller 'avispaCtrl', ($scope) ->
-
-      $scope.avispa = new Avispa
-        el: $('#surface svg')
-
-      $scope.$on 'lobsterUpdate', (json)->
-        console.log "Got lobsterUpdate event!"
-
-
-      $('#surface').append $scope.avispa.$el
-
 The console controller is very simple. It simply binds it's errors
 scope to the VespaLogger scope
 
