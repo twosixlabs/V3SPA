@@ -30,7 +30,7 @@ If we have a parent, keep track of our offset from the parent
 
                 @parent.position.bind 'change', @ParentDrag, @
 
-            @position = new Models.Position(position)
+            @position = new GenericModel(position)
             @position.bind 'change', @render, @
 
 The init method allows classes to extend the BaseObject without re-implementing this initialize function

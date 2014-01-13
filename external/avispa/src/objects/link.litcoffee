@@ -27,15 +27,15 @@ Base class for "link" objects
             @left  = @options.left
             @right = @options.right
 
-            @arc = new Backbone.Model
+            @arc = new GenericModel
                 arc: 10
 
-            @arc.bind 'change', @render
+            @arc.bind 'change', @render, @
 
 Bind to the position of the left and right sides of the connection
 
-            @left.position.bind  'change', @render
-            @right.position.bind 'change', @render
+            @left.position.bind  'change', @render, @
+            @right.position.bind 'change', @render, @
 
             @render()
 
