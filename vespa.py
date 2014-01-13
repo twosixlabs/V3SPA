@@ -26,11 +26,13 @@ def main():
         logging.critical('Could not read cookie.secret')
         return -1
 
+    websocket_handler = api.handlers.WSRouter(api.handlers.WebSocket, '/ws')
+
     patterns = [
         (r'/',             api.handlers.Index     ),
         (r'/login',        api.handlers.Login     ),
         (r'/logout',       api.handlers.Logout    ),
-        ] +  api.handlers.WebSocketRouter.urls
+        ] +  websocket_handler.urls
 
     settings = dict(
         static_path   = os.path.join(api.root, 'static'),
@@ -41,6 +43,7 @@ def main():
         )
 
     api.app = tornado.web.Application(patterns, **settings)
+    websocket_handler.set_application(api.app)
     api.app.sockets = {}
 
     try:

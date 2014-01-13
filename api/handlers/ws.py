@@ -1,23 +1,32 @@
-
 import socket
 import logging
+import json
 
 from sockjs.tornado import SockJSRouter, SockJSConnection
+import ws_domains
 
 class WebSocket(SockJSConnection):
 
-    def open(self, channel):
-        self.stream.socket.setsockopt(socket.SOL_TCP, socket.TCP_NODELAY, 1)
-        self.application.sockets[self] = self
+    def on_open(self, channel):
+        logging.warn("OPENED CHANNEL: {0}".format(channel.ip))
 
     def on_message(self, msg):
-        for ws in self.application.sockets:
-            if ws is self:
-                continue
-            ws.write_message(msg)
+        try:
+          resp = ws_domains.dispatch(json.loads(msg))
+        except Exception as e:
+          if self.session.server.app.settings['debug']:
+            self.send(json.dumps({'error': str(e)}))
+        else:
+          if resp is not None:
+            self.send(json.dumps(resp))
 
-    def on_close(self):
-        del self.application.sockets[self]
+class WSRouter(SockJSRouter):
+  def __init__(self, *args, **kwargs):
+    SockJSRouter.__init__(self, *args, **kwargs)
+    try:
+      self.app = kwargs['application']
+    except KeyError:
+      pass
 
-WebSocketRouter = SockJSRouter(WebSocket, '/ws')
-
+  def set_application(self, app):
+    self.app = app
