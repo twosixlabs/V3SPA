@@ -12,10 +12,18 @@ class WebSocket(SockJSConnection):
 
     def on_message(self, msg):
         try:
-          resp = ws_domains.dispatch(json.loads(msg))
+          msg_obj = json.loads(msg)
+          resp = ws_domains.dispatch(msg_obj)
         except Exception as e:
           if self.session.server.app.settings['debug']:
-            self.send(json.dumps({'error': str(e)}))
+            resp = {
+                'error': str(e),
+                }
+
+            if 'response_id' in msg_obj:
+              resp['label'] = msg_obj['response_id']
+
+            self.send(json.dumps(resp))
         else:
           if resp is not None:
             self.send(json.dumps(resp))

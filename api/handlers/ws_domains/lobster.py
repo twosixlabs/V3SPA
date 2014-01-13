@@ -1,3 +1,7 @@
+import subprocess
+import tempfile
+import pkg_resources
+
 class LobsterDomain(object):
   """Docstring for LobsterDomain """
 
@@ -5,9 +9,32 @@ class LobsterDomain(object):
     """@todo: to be defined """
     pass
 
+  def validate(self, msg):
+    """ Validate a Lobster file received from the IDE
+    """
+
+    with tempfile.NamedTemporaryFile() as temp:
+      temp.write(msg['payload'])
+      temp.flush()
+
+      path = [pkg_resources.resource_filename('api.bin', 'lobster-json'),
+              temp.name]
+
+      try:
+        output = subprocess.check_output(path)
+      except subprocess.CalledProcessError as e:
+        raise Error("Unable to call lobster-json: {0}".format(e))
+
+    return {
+        'label': msg['response_id'],
+        'payload': output
+        }
+
   def handle(self, msg):
-    import pdb; pdb.set_trace()
-    pass
+    if msg['request'] == 'validate':
+      return self.validate(msg)
+    else:
+      raise
 
 def instantiate():
   return LobsterDomain()
