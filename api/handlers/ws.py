@@ -17,7 +17,8 @@ class WebSocket(SockJSConnection):
         except Exception as e:
           if self.session.server.app.settings['debug']:
             resp = {
-                'error': str(e),
+                'payload': str(e),
+                'error': True
                 }
 
             if 'response_id' in msg_obj:

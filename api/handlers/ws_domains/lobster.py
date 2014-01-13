@@ -22,9 +22,9 @@ class LobsterDomain(object):
               temp.name]
 
       try:
-        output = subprocess.check_output(path)
+        output = subprocess.check_output(path, stderr=subprocess.STDOUT)
       except subprocess.CalledProcessError as e:
-        raise Error("Unable to call lobster-json: {0}".format(e))
+        raise Exception("Error: {0}".format(e))
 
     return {
         'label': msg['response_id'],
@@ -32,7 +32,6 @@ class LobsterDomain(object):
         }
 
   def handle(self, msg):
-    time.sleep(3)
     if msg['request'] == 'validate':
       return self.validate(msg)
     else:

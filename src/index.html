@@ -72,20 +72,30 @@
       <div id='modal'></div>
       <div class='row'>
         <div class='col-md-12'>
-          <div class='panel panel-default'>
+          <div class='panel panel-default' ng-controller='consoleCtrl'>
             <div class='panel-heading'>
               <h4 class='panel-title'>Console</h4>
             </div>
-            <div class='panel-body'>
-              <div class='btn-group pull-left'>
-                <button type='button' class='btn btn-default btn-xs'>
-                  <span class='glyphicon glyphicon-plus'></span>
-                </button>
-              </div>
-              <ul class='list-inline'>
-                <li class='text-danger'> <strong>1 error </strong></li>
-                <li class='text-warning'><strong>1 warnings</strong></li>
-              </ul>
+            <div class='panel-body' >
+              <!--<div class='btn-group pull-left'>-->
+                <!--<button type='button' class='btn btn-default btn-xs'>-->
+                  <!--<span class='glyphicon glyphicon-plus'></span>-->
+                <!--</button>-->
+              <!--</div>-->
+              <table cellspacing='0' class='table table-condensed'>
+                <tbody>
+                  <tr ng-repeat="error in errors | orderBy:'-timestamp'"
+                      ng-class="{'text-warning': error.level == 'error'}" class='small'>
+                    <td>{{error.timestamp}}</td>
+                    <td>{{error.domain}}</td>
+                    <td ng-class="{'text-warning': error.level == 'error'}">{{error.message}}</td>
+                  </tr>
+                </tbody>
+              </table>
+              <!--<ul class='list-inline'>-->
+                <!--<li class='text-danger'> <strong>1 error </strong></li>-->
+                <!--<li class='text-warning'><strong>1 warnings</strong></li>-->
+              <!--</ul>-->
               <div class='clearfix'> </div>
             </div>
           </div>
