@@ -9,6 +9,7 @@
 }
 
 .container-full {
+  padding-top: 10px;
   margin: 0 15px;
 }
 
@@ -16,6 +17,7 @@
   margin-bottom: 0;
 }
 
+/* This is necessary to make the editor appear. Actual height is dynamic */
 .ace_editor {
 height: 400px;
 }
@@ -24,8 +26,11 @@ height: 400px;
   margin-bottom: 10px;
 }
 
-.visualizer {
-  height: 100%;
+.editor-toggle {
+position: absolute;
+top: 60px;
+left: 20px;
+z-index: 10000;
 }
 
 DIV#surface

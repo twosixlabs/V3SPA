@@ -32,40 +32,56 @@
       </ul>
       <p class='navbar-right navbar-text'> &copy;2013 <b>Invincea Labs</b> </p>
     </div>
-    <div class='container-full'>
+    <div class='container-full' ng-controller='ideCtrl'>
+      <div ng-hide='editorVisible' class='editor-toggle'>
+        <button type='button' class='button btn btn-sm btn-info'
+                ng-click='toggleEditor()'>
+          Show Editor
+        </button>
+      </div>
       <div class='row main'>
-        <div class='col-md-4'>
-            <div ng-controller='ideCtrl' class='editor-container'>
+        <div ng-class="{'col-md-4': editorVisible}"' ng-show='editorVisible'>
+            <div class='editor-container'>
           <div class='panel panel-default'>
             <div class='panel-body'>
 
               <div >
                 <div class='btn-group-sm'>
-                <button class='btn btn-default'
-                   ng-class="{active: loading}"
-                   ng-click='check_lobster()'>Check Syntax
-                </button>
-                <div class='btn'
-                     spinner-icon='loading'
-                     opts="{
-                        'length': 5,
-                        'width': 2,
-                        'radius': 3,
-                        'speed': 0.7
-                        }"
-                     ></div>
+                  <button class='btn btn-default'
+                    ng-class="{active: loading}"
+                    ng-click='check_lobster()'>Check Syntax
+                  </button>
+                  <div class='btn'
+                    spinner-icon='loading'
+                    opts="{
+                    'length': 5,
+                    'width': 2,
+                    'radius': 3,
+                    'speed': 0.7
+                    }"
+                    >
+                  </div>
+                  <button type='button'
+                          class='button btn btn-sm btn-default pull-right'
+                          ng-click='toggleEditor()'>
+                  <span class='glyphicon glyphicon-remove'></span>
+                  <span>Close</span>
+                  </button>
                 </div>
               </div>
               <div class='clearfix horizontal-pad'></div>
-              <div id='editor' ng-model="editor_data" ui-ace="{ onLoad: aceLoaded }">
+              <div id='editor' ng-model="editor_data" 
+                   ui-ace="{ onLoad: aceLoaded }"
+                   auto-height='0.75'
+                   on-resize='$scope.editor.resize()'>
                 {{data}}
               </div>
             </div>
           </div>
           </div>
         </div>
-        <div class='col-md-8'>
-          <div id='visualizer' ng-view>
+        <div ng-class="{'col-md-12': !editorVisible, 'col-md-8': editorVisible}">
+          <div id='visualizer' ng-view auto-height='0.75'>
           </div>
         </div>
       </div>

@@ -29,23 +29,3 @@
           @counter += increment
           return @counter.toString(36)
 
-    v3spa.directive 'spinnerIcon', ->
-      ret =
-        restrict: 'A'
-        replace: true
-        transclude: true
-        scope: 
-          loading: '= spinnerIcon'
-          opts: '= opts'
-        template:  """
-          <div>
-            <div class='spinner-container' ng-show='loading'></div>
-            <div ng-hide='loading'></div>
-          </div>
-          """
-        link: (scope, element, attrs) ->
-          spinner = new Spinner(scope.opts).spin()
-          container = element.find('.spinner-container')[0]
-          container.appendChild(spinner.el)
-
-      return ret

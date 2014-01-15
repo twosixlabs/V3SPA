@@ -2,11 +2,16 @@
 
 The main controller. avispa is a subcontroller.
 
-    vespaControllers.controller 'ideCtrl', ($scope, $rootScope, SockJSService, VespaLogger) ->
+    vespaControllers.controller 'ideCtrl', ($scope, $rootScope, SockJSService, VespaLogger, $window) ->
 
       ws_sock = SockJSService("http://#{location.host}/ws", null , {debug: true})
 
-      $scope.editor = null
+This controls our editor visibility.
+
+      $scope.toggleEditor = ->
+        $scope.editorVisible = !$scope.editorVisible
+
+      $scope.editorVisible = true
 
       $scope.aceLoaded = (editor) ->
         editor.setTheme("ace/theme/chaos");
@@ -27,7 +32,6 @@ The main controller. avispa is a subcontroller.
 Ace needs a statically sized div to initialize, but we want it
 to be the full page, so make it so.
 
-        $("#editor").height "#{$(window).height() * 0.75 }px"
         editor.resize()
         $scope.editor = editor
 
@@ -48,6 +52,8 @@ Check syntax button callback
             VespaLogger.log 'lobster', 'error', result.payload
           else
             $rootScope.$broadcast 'lobsterUpdate', result
+
+This is just the initial data. We should remove it at some point.
 
       $scope.editor_data = """
       class A () {
