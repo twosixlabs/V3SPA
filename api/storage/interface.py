@@ -10,7 +10,6 @@ __all__ = ['initialize', 'Entries', 'Entry']
 def initialize():
     engine = api.config.get('storage', 'engine')
 
-
     path = 'api.storage.engines.' + engine
 
     try:
@@ -22,11 +21,13 @@ def initialize():
         mod = getattr(mod, sub)
 
     try:
-        getattr(mod, 'Database')
+        db = getattr(mod, 'Database')
     except AttributeError:
         raise api.error('Bad storage engine: %s', engine)
 
+    api.db = db()
     logging.info('Storage engine: %s', engine)
+
 
 class Entries:
     def __init__(self, entries):
@@ -59,6 +60,7 @@ class Entries:
     def json(self):
         return json.dumps(self.entries, indent=2)
 
+
 class Entry(UserDict.DictMixin):
     def __init__(self, entry):
         self.id     = entry['id']
@@ -67,6 +69,13 @@ class Entry(UserDict.DictMixin):
 
     def Init(self):
         pass
+
+    @classmethod
+    def Find(cls, params, sort):
+        result = api.db.Find(cls.TABLE, params)
+        if result is None:
+          return []
+        return map(cls, result)
 
     @classmethod
     def Create(cls, values):
