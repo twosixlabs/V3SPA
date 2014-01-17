@@ -4,8 +4,6 @@ The main controller. avispa is a subcontroller.
 
     vespaControllers.controller 'ideCtrl', ($scope, $rootScope, SockJSService, VespaLogger, $window) ->
 
-      ws_sock = SockJSService("http://#{location.host}/ws", null , {debug: true})
-
 This controls our editor visibility.
 
       $scope.toggleEditor = ->
@@ -46,7 +44,7 @@ Check syntax button callback
 
         $scope.loading = true
 
-        ws_sock.send req, (result)->
+        SockJSService.send req, (result)->
           $scope.loading = false
           if result.error
             VespaLogger.log 'lobster', 'error', result.payload

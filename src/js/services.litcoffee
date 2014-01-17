@@ -2,7 +2,7 @@
 
     socket.service 'VespaLogger',
       class VespaLogger
-        constructor: ->
+        constructor: ()->
           @messages = []
           @hooks = []
 
@@ -19,19 +19,40 @@
         clear: ->
           @messages = []
 
-    socket.factory 'SockJSService', ($rootScope, TokenService)->
+    socket.service 'SockJSService',
 
       class WSService
-        constructor: (base_url, protocols)->
-          @sock = SockJS(base_url, protocols)
+        constructor: (@$timeout, @$rootScope, @TokenService)->
+          @base_url = "http://#{location.host}/ws"
+          @sock = SockJS(@base_url, null, {debug: true})
           @pending = []
           @callbacks = {}
           @msg_callbacks = {}
 
+          @connection_info = 
+            timeout: 1000
+            last_attempt: new Date()
+
+          @set_handlers()
+
+        reconnect: =>
+          @connection_info.timeout = @connection_info.timeout * 2
+          @connection_info.last_attempt = new Date()
+          @sock = SockJS(@base_url, @protocols)
+          @set_handlers()
+
+        set_handlers: ->
           @sock.onopen = (event) =>
             console.log "Connection established. Sending #{@pending.length} buffered messages"
             for msg in @pending
               @sock.send(JSON.stringify(msg))
+
+          @sock.onclose = (event)=>
+            if new Date() - @connection_info.last_attempt > @connection_info.timeout
+              @connection_info.timeout = 1000
+
+            console.log "Connection lost. Will attempt reconnection in #{@connection_info.timeout / 1000} seconds"
+            @$timeout @reconnect, @connection_info.timeout, false
 
           @sock.onmessage = (event) =>
             msg = JSON.parse(event.data)
@@ -39,7 +60,7 @@
             if msg.error
               callback = @msg_callbacks[msg.label]
               if callback?
-                $rootScope.$apply ->
+                @$rootScope.$apply ->
                   callback(msg)
                 delete @msg_callbacks[msg.label]
               return
@@ -49,7 +70,7 @@ general callbacks
 
             callback = @msg_callbacks[msg.label]
             if callback
-              $rootScope.$apply ->
+              @$rootScope.$apply ->
                 callback(msg)
               return
 
@@ -58,7 +79,7 @@ general callbacks
               console.log "Have no handler for message: #{msg.label}"
               return
 
-            $rootScope.$apply ->
+            @$rootScope.$apply ->
               callback(msg)
 
         on: (eventName, callback) =>
@@ -70,7 +91,7 @@ Sometimes we might want to handle a response specific to the requests.
 We generate a token and do a callback specifically on that token.
 
           if response
-            token = TokenService.generate()
+            token = @TokenService.generate()
             @msg_callbacks[token] = response
             data.response_id = token
 
@@ -81,6 +102,3 @@ We generate a token and do a callback specifically on that token.
             throw new Error "Socket not connected"
           else
             @sock.send JSON.stringify(data)
-
-      return (url, proto)->
-        new WSService(url, proto)
