@@ -1,8 +1,9 @@
-    vespaControllers = angular.module('vespaControllers', ['ui.ace', 'vespa.socket'])
+    vespaControllers = angular.module('vespaControllers', 
+                                      ['ui.ace', 'vespa.socket', 'ui.bootstrap'])
 
 The main controller. avispa is a subcontroller.
 
-    vespaControllers.controller 'ideCtrl', ($scope, $rootScope, SockJSService, VespaLogger, $window) ->
+    vespaControllers.controller 'ideCtrl', ($scope, $rootScope, SockJSService, VespaLogger, $modal) ->
 
 This controls our editor visibility.
 
@@ -79,6 +80,64 @@ This is just the initial data. We should remove it at some point.
       h.s --> i.o;
       i.s --> a.o;
       """
+
+Create a modal for loading policies
+
+      $scope.load_policy = ->
+        instance = $modal.open
+          templateUrl: 'policyLoadModal.html'
+          controller: ($scope, $modalInstance, SockJSService, AsyncFileReader) ->
+
+            $scope.input = {}
+            $scope.input_error = true
+
+            $scope.$watchCollection('input', ->
+                $scope.input_error = not (
+                  $scope.input.policy? and $scope.input.lobster?)
+            )
+
+            $scope.read_file = (file)->
+
+            $scope.load = ->
+
+              policy_file = $('#policyFile')[0].files[0]
+              lobster_file = $('#policyFile')[0].files[0]
+
+              AsyncFileReader.read {policy: policy_file, lobster: lobster_file}, (files)->
+
+                req = 
+                  domain: 'policy'
+                  request: 'create'
+                  payload: files
+
+              $modalInstance.close()
+
+
+            $scope.cancel = ->
+              $modalInstance.dismiss('cancel')
+
+If we get given files, read them as text and send them over the websocket
+
+        instance.result.then(
+          (inputs)-> 
+            console.log(inputs)
+
+
+            request = 
+              domain: 'policy'
+              request: 'create'
+              payload:
+                application: reader.readAsText()
+                dsl: reader.readAsText(lobster_file)
+
+            SockJSService.send(req)
+
+
+          ()->
+            console.log("Modal dismissed")
+        )
+
+
 
 The console controller is very simple. It simply binds it's errors
 scope to the VespaLogger scope

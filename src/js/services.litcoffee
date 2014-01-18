@@ -102,3 +102,48 @@ We generate a token and do a callback specifically on that token.
             throw new Error "Socket not connected"
           else
             @sock.send JSON.stringify(data)
+
+A service which uses the HTML5 File API to read a selected file
+and upload it to the server using the websocket endpoint specified
+
+    socket.service 'AsyncFileReader', 
+      class Reader
+          constructor: (@$q, @VespaLogger) ->
+
+          _read_file: (id, blob)->
+              deferred = @$q.defer()
+              reader = new FileReader()
+
+              reader.onload = (event)->
+                deferred.resolve(id, reader, event)
+
+              reader.onerror = (event)->
+                deferred.reject(event)
+
+              reader.readAsText(blob)
+              return deferred.promise
+
+          read: (fileblobs, callback)->
+
+            promises = for key, blob of fileblobs
+              @_read_file(key, blob)
+
+            @$q.all promises
+              .then(
+                (data)->
+                  # Success
+                  files = {}
+                  for result in data
+                    files[result[0]] = result[1]
+
+                  callback(files)
+
+                (data)->
+                  for reader, event in data
+                    VespaLogger.log 'read', 'error', "Failed to read #{reader.name}"
+              )
+
+
+
+
+          

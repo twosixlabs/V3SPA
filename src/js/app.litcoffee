@@ -29,3 +29,8 @@
           @counter += increment
           return @counter.toString(36)
 
+    v3spa.filter 'filepath', ->
+      return (input)->
+        if not input?
+          return ""
+        return input.replace(/\\/g, '/').replace(/.*\//, '')
