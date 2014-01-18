@@ -14,8 +14,8 @@ def initialize():
 
     try:
         mod = __import__(path)
-    except ImportError:
-        raise api.error('Unknown storage engine: %s', engine)
+    except ImportError as e:
+        raise api.error('Unknown storage engine: %s [%s]', engine, e)
 
     for sub in path.split('.')[1:]:
         mod = getattr(mod, sub)
@@ -63,6 +63,7 @@ class Entries:
 
 class Entry(UserDict.DictMixin):
     def __init__(self, entry):
+        import pdb; pdb.set_trace()
         self.id     = entry['id']
         self.entry = dict(entry)
         self.Init()
@@ -71,8 +72,8 @@ class Entry(UserDict.DictMixin):
         pass
 
     @classmethod
-    def Find(cls, params, sort):
-        result = api.db.Find(cls.TABLE, params)
+    def Find(cls, criteria, selection):
+        result = api.db.Find(cls.TABLE, criteria, selection)
         if result is None:
           return []
         return map(cls, result)
@@ -102,7 +103,7 @@ class Entry(UserDict.DictMixin):
 
     @property
     def json(self):
-        return json.dumps(dict(self.entry), indent=2)
+        return api.db.json.dumps(dict(self.entry), indent=2)
 
     def __getitem__(self, key):
         return self.entry.__getitem__(key)

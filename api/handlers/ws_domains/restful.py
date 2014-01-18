@@ -18,7 +18,14 @@ class ResourceDomain(api.storage.interface.Entry):
         response['label'] = msg['response_id']
 
     if method == 'find':
-      response['payload'] = cls.Find(params, False)
+      try:
+          response['payload'] = cls.Find(
+              params.get('criteria', {}),
+              params.get('selection', {})
+          )
+      except KeyError:
+        raise Exception("Invalid payload for 'find': {0}".format(
+                        msg['payload']))
     elif method == 'create':
       newobject = cls(params)
       response['payload'] =  newobject.Insert()

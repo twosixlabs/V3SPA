@@ -1,43 +1,36 @@
 import api
-import motor
+import pymongo
+import bson.json_util
 from tornado import gen
+import logging
+logger = logging.getLogger(__name__)
 
 class Database(object):
+
+  json = bson.json_util
 
   def __init__(self):
     try:
       path = api.config.get('storage', 'path')
-      self._client = motor.MotorClient().open_sync()
+      self._client = pymongo.MongoClient()
     except:
-      self._client = motor.MotorClient().open_sync()
+      self._client = pymongo.MongoClient()
 
     self.db = self._client.vespa_dev
 
-  @gen.engine
-  def Find(self,collection, params):
-    cursor = self.db[collection].find(params)
-    yield motor.Op(cursor.to_list, length=100)
+  def Find(self, collection, criteria, projection, populate=None):
+    cursor = self.db[collection].find(criteria, projection)
+    results = list(cursor.limit(100))
+    return results
 
-  @gen.engine
   def FindOne(self, collection, params):
-    yield motor.Op(self.db[collection].find_one(params))
+    return self.db[collection].find_one(params)
 
-  @gen.engine
   def Insert(self, collection, entry):
-    yield motor.Op(self.db[collection].save(entry))
+    return self.db[collection].save(entry)
 
-  @gen.engine
   def Update(self, collection, entry):
-    yield motor.Op(self.db[collection].update(entry))
+    return self.db[collection].update(entry)
 
-  @gen.engine
   def Remove(self, collection, id):
-    yield motor.Op(self.db[collection].remove({'_id': id}))
-
-
-#def Database():
-
-  #if _db is None:
-    #_db = MongoWrapper()
-
-  #return _db
+    return self.db[collection].remove({'_id': id})
