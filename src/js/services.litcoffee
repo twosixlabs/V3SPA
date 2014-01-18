@@ -2,7 +2,7 @@
 
     socket.service 'VespaLogger',
       class VespaLogger
-        constructor: ()->
+        constructor: (@$timeout)->
           @messages = []
           @hooks = []
 
@@ -12,9 +12,11 @@
             domain: domain
             level: level
             message: message
-          @messages.push(msg)
-          if @messages.length > 10
-            @messages.splice(0, @messages.length - 10)
+
+          @$timeout =>
+            @messages.push(msg)
+            if @messages.length > 10
+              @messages.splice(0, @messages.length - 10)
 
         clear: ->
           @messages = []
@@ -36,7 +38,7 @@
           @set_handlers()
 
         reconnect: =>
-          if @connection_info.timeout < 32
+          if @connection_info.timeout < 32000
               @connection_info.timeout = @connection_info.timeout * 2
           @connection_info.last_attempt = new Date()
           @sock = SockJS(@base_url, @protocols)
