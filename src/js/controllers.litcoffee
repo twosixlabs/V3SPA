@@ -117,7 +117,7 @@ If we get given files, read them as text and send them over the websocket
                 domain: 'policy'
                 request: 'create'
                 payload: 
-                  _id: inputs.label
+                  id: inputs.label
                   application: files.application
                   dsl: files.dsl
 

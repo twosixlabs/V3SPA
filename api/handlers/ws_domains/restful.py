@@ -13,9 +13,9 @@ class ResourceDomain(api.storage.interface.Entry):
     else:
       params = dict()
 
-    response = {
-        'label': msg['response_id']
-        }
+    response = {}
+    if 'response_id' in msg:
+        response['label'] = msg['response_id']
 
     if method == 'find':
       response['payload'] = cls.Find(params, False)

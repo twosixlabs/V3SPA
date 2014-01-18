@@ -22,7 +22,7 @@
     socket.service 'SockJSService',
 
       class WSService
-        constructor: (@$timeout, @$rootScope, @TokenService)->
+        constructor: (@$timeout, @$rootScope, @TokenService, @VespaLogger)->
           @base_url = "http://#{location.host}/ws"
           @sock = SockJS(@base_url, null, {debug: true})
           @pending = []
@@ -36,7 +36,8 @@
           @set_handlers()
 
         reconnect: =>
-          @connection_info.timeout = @connection_info.timeout * 2
+          if @connection_info.timeout < 32
+              @connection_info.timeout = @connection_info.timeout * 2
           @connection_info.last_attempt = new Date()
           @sock = SockJS(@base_url, @protocols)
           @set_handlers()
@@ -58,12 +59,15 @@
             msg = JSON.parse(event.data)
 
             if msg.error
-              callback = @msg_callbacks[msg.label]
-              if callback?
-                @$rootScope.$apply ->
-                  callback(msg)
-                delete @msg_callbacks[msg.label]
+              @VespaLogger.log 'server', 'error', msg.payload
               return
+
+            callback = @msg_callbacks[msg.label]
+            if callback?
+              @$rootScope.$apply ->
+                callback(msg)
+              delete @msg_callbacks[msg.label]
+            return
 
 Look for a message specific callback first, then try
 general callbacks
@@ -147,8 +151,3 @@ Defer the callback so it doesnt happen in this digest cycle
                   for reader, event in data
                     VespaLogger.log 'read', 'error', "Failed to read #{reader.name}"
               )
-
-
-
-
-          

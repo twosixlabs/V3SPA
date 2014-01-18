@@ -15,9 +15,9 @@ def dispatch(msg):
     raise Exception("Unable to understand formatting of WS message {0}"
                     .format(msg))
 
-  try:
-    return __DOMAINS__[msg['domain']].handle(msg)
-  except KeyError:
+  if msg['domain'] not in __DOMAINS__:
     logging.error("No domain handler known for '{0}'".format(msg['domain']))
     raise KeyError("No domain handler known for '{0}'".format(msg['domain']))
+
+  return __DOMAINS__[msg['domain']].handle(msg)
 
