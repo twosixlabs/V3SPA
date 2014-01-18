@@ -108,14 +108,14 @@ and upload it to the server using the websocket endpoint specified
 
     socket.service 'AsyncFileReader', 
       class Reader
-          constructor: (@$q, @VespaLogger) ->
+          constructor: (@$q, @VespaLogger, @$timeout) ->
 
           _read_file: (id, blob)->
               deferred = @$q.defer()
               reader = new FileReader()
 
               reader.onload = (event)->
-                deferred.resolve(id, reader, event)
+                deferred.resolve([id, reader.result])
 
               reader.onerror = (event)->
                 deferred.reject(event)
@@ -123,20 +123,25 @@ and upload it to the server using the websocket endpoint specified
               reader.readAsText(blob)
               return deferred.promise
 
-          read: (fileblobs, callback)->
+          read: (fileblobs, callback)=>
 
             promises = for key, blob of fileblobs
               @_read_file(key, blob)
 
-            @$q.all promises
+            @$q.all(promises)
               .then(
-                (data)->
+                (data)=>
                   # Success
                   files = {}
                   for result in data
                     files[result[0]] = result[1]
 
-                  callback(files)
+Defer the callback so it doesnt happen in this digest cycle
+
+                  @$timeout(
+                    ->(callback(files))
+                    0, false)
+                  return
 
                 (data)->
                   for reader, event in data

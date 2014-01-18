@@ -3,7 +3,7 @@
 
 The main controller. avispa is a subcontroller.
 
-    vespaControllers.controller 'ideCtrl', ($scope, $rootScope, SockJSService, VespaLogger, $modal) ->
+    vespaControllers.controller 'ideCtrl', ($scope, $rootScope, SockJSService, VespaLogger, $modal, AsyncFileReader) ->
 
 This controls our editor visibility.
 
@@ -86,32 +86,18 @@ Create a modal for loading policies
       $scope.load_policy = ->
         instance = $modal.open
           templateUrl: 'policyLoadModal.html'
-          controller: ($scope, $modalInstance, SockJSService, AsyncFileReader) ->
+          controller: ($scope, $modalInstance) ->
 
             $scope.input = {}
-            $scope.input_error = true
-
-            $scope.$watchCollection('input', ->
-                $scope.input_error = not (
-                  $scope.input.policy? and $scope.input.lobster?)
-            )
-
-            $scope.read_file = (file)->
 
             $scope.load = ->
 
-              policy_file = $('#policyFile')[0].files[0]
-              lobster_file = $('#policyFile')[0].files[0]
+              inputs = 
+                label: $scope.input.label
+                policy_file: $('#policyFile')[0].files[0]
+                lobster_file:  $('#policyFile')[0].files[0]
 
-              AsyncFileReader.read {policy: policy_file, lobster: lobster_file}, (files)->
-
-                req = 
-                  domain: 'policy'
-                  request: 'create'
-                  payload: files
-
-              $modalInstance.close()
-
+              $modalInstance.close(inputs)
 
             $scope.cancel = ->
               $modalInstance.dismiss('cancel')
@@ -122,16 +108,20 @@ If we get given files, read them as text and send them over the websocket
           (inputs)-> 
             console.log(inputs)
 
+            filelist = 
+              application: inputs.policy_file
+              dsl: inputs.lobster_file
 
-            request = 
-              domain: 'policy'
-              request: 'create'
-              payload:
-                application: reader.readAsText()
-                dsl: reader.readAsText(lobster_file)
+            AsyncFileReader.read filelist, (files)->
+              req = 
+                domain: 'policy'
+                request: 'create'
+                payload: 
+                  _id: inputs.label
+                  application: files.application
+                  dsl: files.dsl
 
-            SockJSService.send(req)
-
+              SockJSService.send(req)
 
           ()->
             console.log("Modal dismissed")
