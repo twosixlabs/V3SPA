@@ -4,7 +4,7 @@
        "dependencies": {
            "grunt-cli": "latest",
            "grunt-contrib-concat": "latest",
-           "grunt-contrib-uglify": "latest",
+           "grunt-contrib-uglify": "0.2.7",
            "grunt-contrib-less": "latest",
            "grunt-contrib-coffee": "latest",
            "grunt-contrib-watch": "latest",

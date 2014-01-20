@@ -50,9 +50,19 @@ module.exports = function(grunt) {
     },
     uglify: {
       dist: {
+        options: {
+          beautify: {
+            ascii_only: true,
+          },
+        },
         files: [
           {'static/js/lobster-json.js': 'external/node-json-lobster/dist/lobster-json.js'},
-          {'static/js/sockjs.0.3.min.js': 'external/sockjs.0.3.min.js'},
+          {
+            mangle: false,
+            compress: false,
+            dest: 'static/js/sockjs.0.3.min.js',
+            src: 'external/sockjs.0.3.min.js'
+          },
           {'static/js/spin.min.js': 'external/spin.min.js'},
           { 
             expand: true, cwd: 'external/angular', 
