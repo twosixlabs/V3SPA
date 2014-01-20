@@ -62,14 +62,13 @@
 
             if msg.error
               @VespaLogger.log 'server', 'error', msg.payload
-              return
 
-            callback = @msg_callbacks[msg.label]
-            if callback?
-              @$rootScope.$apply ->
-                callback(msg)
-              delete @msg_callbacks[msg.label]
-            return
+              callback = @msg_callbacks[msg.label]
+              if callback?
+                @$rootScope.$apply ->
+                  callback(msg)
+                delete @msg_callbacks[msg.label]
+              return
 
 Look for a message specific callback first, then try
 general callbacks

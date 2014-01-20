@@ -70,7 +70,8 @@
                       </button>
                       <button class='btn btn-default btn-sm' style='width:33%;'
                         ng-class="{active: loading}"
-                        ng-click='check_lobster()'>Visualize
+                        ng-click='check_lobster()'
+                        ng-disabled='!policy.dsl'>Visualize
                       </button>
                       <button type='button'
                         class='button btn btn-sm btn-default' style='width:34%;'
