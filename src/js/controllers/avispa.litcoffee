@@ -14,6 +14,9 @@ When we update, first clear the Avispas stuff
 TODO: Make avispa clear itself.
 
       $scope.$on 'lobsterUpdate', (event, data)->
+        $scope.objects = {}
+        $scope.parent = [null]
+
         $('#surface svg .objects')[0].innerHTML = ''
         $('#surface svg .links')[0].innerHTML = ''
         $('#surface svg .labels')[0].innerHTML = ''
