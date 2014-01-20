@@ -50,53 +50,74 @@
             <div class='panel panel-default'>
               <div class='panel-body'>
                 <div class='form-group'>
-                  <div class='input-group select2-bootstrap-prepend'>
-                    <span class='input-group-btn'>
-                      <button class='btn btn-default btn-sm' type='button'
-                        ng-click='load_policy()'>
-                        Load
-                      </button>
-                    </span>
-                    <input class='form-control' id='policySelect'
-                    ui-select2='policySelectOpts'
-                    ng-model='policySelected' type='hidden'/>
+                  <div>
+                    <div class='row'>
+                      <span class='lead'>Editor</span>
+                      <div class='btn'
+                        spinner-icon='loading'
+                        opts="{
+                        'length': 5,
+                        'width': 2,
+                        'radius': 3,
+                        'speed': 0.7
+                        }"
+                        >
+                      </div>
+                      <div class='pull-right'>
+                        <a href='#' ng-click='toggleEditor()'>
+                          <span class='glyphicon glyphicon-remove'></span>
+                        </a>
+                      </div>
+                    </div>
+                    <div class='row'>
+                      <div class='btn-group btn-group-sm col-md-12'>
+                        <button class='btn btn-default btn-sm' 
+                          ng-click='new_policy()'>New Policy
+                        </button>
+                        <button class='btn btn-default btn-sm' 
+                          ng-class="{active: loading}"
+                          ng-click='check_lobster()'
+                          ng-disabled='!policy.dsl'>Visualize
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <div>
+                  <div class='horizontal-pad'></div>
                   <div class='row'>
-                    <div class='btn-group btn-group-sm col-md-10'>
-                      <button class='btn btn-default btn-sm' style='width:33%;'
-                        ng-click='new_policy()'>New Policy
-                      </button>
-                      <button class='btn btn-default btn-sm' style='width:33%;'
-                        ng-class="{active: loading}"
-                        ng-click='check_lobster()'
-                        ng-disabled='!policy.dsl'>Visualize
-                      </button>
-                      <button type='button'
-                        class='button btn btn-sm btn-default' style='width:34%;'
-                        ng-click='toggleEditor()'>
-                        <span class='glyphicon glyphicon-remove'></span>
-                        <span>Close</span>
-                      </button>
-                    </div>
-                    <div class='btn col-md-2'
-                      spinner-icon='loading'
-                      opts="{
-                      'length': 5,
-                      'width': 2,
-                      'radius': 3,
-                      'speed': 0.7
-                      }"
-                      >
+                    <div class='input-group select2-bootstrap-prepend col-md-12'>
+                      <span class='input-group-btn'>
+                        <button class='btn btn-default btn-sm' type='button'
+                          ng-click='load_policy()'>
+                          Load
+                        </button>
+                      </span>
+                      <input class='form-control' id='policySelect'
+                      ui-select2='policySelectOpts'
+                      ng-model='policySelected' type='hidden'/>
                     </div>
                   </div>
-                  <div class='clearfix horizontal-pad'></div>
-                  <div id='editor' ng-model="policy.dsl" 
+                  <div class='horizontal-pad'></div>
+                  <div class='row'>
+                    <div class='col-md-12'>
+                      <div class='form-group'>
+                        <label class='control-label pad-right'>Editor View</label>
+                        <label class='radio-inline'>
+                          <input type='radio' ng-model='policy.view' 
+                                 name='editorView' value='dsl'>
+                          Lobster
+                        </label>
+                        <label class='radio-inline'>
+                          <input type='radio' ng-model='policy.view'
+                                 name='editorView' value='app' />
+                          Application
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                  <div ng-model="policy.dsl" 
                     ui-ace="{ onLoad: aceLoaded }"
                     auto-height='0.7'
                     on-resize='$scope.editor.resize()'>
-                    {{data}}
                   </div>
                 </div>
               </div>
@@ -117,14 +138,14 @@
             </div>
             <div class='panel-body' >
               <!--<div class='btn-group pull-left'>-->
-                <!--<button type='button' class='btn btn-default btn-xs'>-->
-                  <!--<span class='glyphicon glyphicon-plus'></span>-->
-                <!--</button>-->
+              <!--<button type='button' class='btn btn-default btn-xs'>-->
+              <!--<span class='glyphicon glyphicon-plus'></span>-->
+              <!--</button>-->
               <!--</div>-->
               <table cellspacing='0' class='table table-condensed'>
                 <tbody>
                   <tr ng-repeat="error in errors | orderBy:'-timestamp'"
-                      ng-class="{'text-warning': error.level == 'error'}" class='small'>
+                    ng-class="{'text-warning': error.level == 'error'}" class='small'>
                     <td>{{error.timestamp}}</td>
                     <td>{{error.domain}}</td>
                     <td ng-class="{'text-warning': error.level == 'error'}">{{error.message}}</td>
@@ -132,8 +153,8 @@
                 </tbody>
               </table>
               <!--<ul class='list-inline'>-->
-                <!--<li class='text-danger'> <strong>1 error </strong></li>-->
-                <!--<li class='text-warning'><strong>1 warnings</strong></li>-->
+              <!--<li class='text-danger'> <strong>1 error </strong></li>-->
+              <!--<li class='text-warning'><strong>1 warnings</strong></li>-->
               <!--</ul>-->
               <div class='clearfix'> </div>
             </div>
@@ -141,8 +162,8 @@
         </div>
       </div>
     </div>
-<script type='text/ng-template' id='policyLoadModal.html'>
-          <div class='modal-header'>
+    <script type='text/ng-template' id='policyLoadModal.html'>
+      <div class='modal-header'>
             <h4 class='modal-title' id='loadPolicyModalLabel'>Load Policy</h4>
           </div>
             <form name='form' no-validate>
@@ -187,6 +208,6 @@
                     class="btn btn-primary" ng-click='load()'>Load</button>
                     </div>
           </form>
-</script>
+    </script>
   </body>
 </html>

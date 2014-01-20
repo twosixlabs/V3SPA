@@ -5,6 +5,11 @@ The main controller. avispa is a subcontroller.
 
     vespaControllers.controller 'ideCtrl', ($scope, $rootScope, SockJSService, VespaLogger, $modal, AsyncFileReader) ->
 
+      $scope.policy =
+        application: ""
+        dsl: ""
+        view: 'dsl'
+
       $scope.policySelectOpts = 
         query: (query)->
           req = 
@@ -32,8 +37,7 @@ This controls our editor visibility.
       $scope.editorVisible = true
 
       $scope.aceLoaded = (editor) ->
-        editor.setTheme("ace/theme/chaos");
-        editor.getSession().setMode("ace/mode/lobster");
+        editor.setTheme("ace/theme/solarized_light");
         editor.setKeyboardHandler("vim");
         editor.setBehavioursEnabled(true);
         editor.setSelectionStyle('line');
@@ -44,14 +48,40 @@ This controls our editor visibility.
         editor.setAnimatedScroll(false);
         editor.renderer.setShowGutter(true);
         editor.renderer.setShowPrintMargin(false);
-        editor.getSession().setUseSoftTabs(true);
         editor.setHighlightSelectedWord(true);
+
+        $scope.editor = editor
+
+        lobsterSession = new ace.EditSession $scope.policy.dsl, 'ace/mode/lobster'
+        applicationSession = new ace.EditSession $scope.policy.application, 'ace/mode/text'
+
+Two way bind editor changing and model changing
+
+        lobsterSession.on 'change', (text)->
+          $scope.policy.dsl = lobsterSession.getValue()
+        $scope.$watch 'policy.dsl', (contents)->
+          lobsterSession.setValue $scope.policy.dsl
+
+
+        applicationSession.on 'change', (text)->
+          $scope.policy.application = applicationSession.getValue()
+        $scope.$watch 'policy.application', (contents)->
+          applicationSession.setValue $scope.policy.application
+
+Watch the view control and switch the editor session
+
+        $scope.$watch 'policy.view', (value)->
+          if value == 'dsl'
+            editor.setSession(lobsterSession)
+          else
+            editor.setSession(applicationSession)
+
+        editor.setSession(lobsterSession)
 
 Ace needs a statically sized div to initialize, but we want it
 to be the full page, so make it so.
 
         editor.resize()
-        $scope.editor = editor
 
 Check syntax button callback
 
@@ -71,11 +101,6 @@ Check syntax button callback
           else
             $rootScope.$broadcast 'lobsterUpdate', result
 
-This is just the initial data. We should remove it at some point.
-
-      $scope.policy = {}
-      $scope.policy.dsl = ""
-
 Load a policy from the server
 
       $scope.load_policy = ->
@@ -88,6 +113,7 @@ Load a policy from the server
           payload: $scope.policySelected.id
 
         SockJSService.send req, (data)->
+          data.payload.view = 'dsl'
           $scope.policy = data.payload
 
 Create a modal for uploading policies
