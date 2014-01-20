@@ -22,8 +22,9 @@ The main controller. avispa is a subcontroller.
           SockJSService.send req, (data)->
             dropdown = 
               results:  for d in data.payload
-                id: d._id
+                id: d._id.$oid
                 text: d.id
+                data: d
                 disabled: d._id.$oid == $scope.policy._id?.$oid
 
             query.callback(dropdown)
@@ -110,7 +111,7 @@ Load a policy from the server
         req = 
           domain: 'policy'
           request: 'get'
-          payload: $scope.policySelected.id
+          payload: $scope.policySelected.data._id
 
         SockJSService.send req, (data)->
           data.payload.view = 'dsl'
