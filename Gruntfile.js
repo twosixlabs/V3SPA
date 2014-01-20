@@ -18,6 +18,13 @@ module.exports = function(grunt) {
           },
           {
             expand: true,
+            dest:'static/js/select2/', 
+            src: '**',
+            cwd: 'external/select2-3.4.5/',
+            filter: 'isFile'
+          },
+          {
+            expand: true,
             dest: 'static/fonts/',
             src: '*',
             cwd: 'external/bootstrap/dist/fonts/',
@@ -56,7 +63,6 @@ module.exports = function(grunt) {
             dest: 'static/js/', src: '*.js'
           },
           { 'static/js/bootstrap.js': 'external/bootstrap/dist/js/bootstrap.js'},
-          { 'static/js/select2.js': 'external/select2-3.4.5/select2.js'}
         ]
       }
     },
