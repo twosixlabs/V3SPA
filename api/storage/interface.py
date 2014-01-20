@@ -63,7 +63,6 @@ class Entries:
 
 class Entry(UserDict.DictMixin):
     def __init__(self, entry):
-        import pdb; pdb.set_trace()
         self.id     = entry['id']
         self.entry = dict(entry)
         self.Init()

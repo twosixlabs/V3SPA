@@ -26,6 +26,8 @@ class ResourceDomain(api.storage.interface.Entry):
       except KeyError:
         raise Exception("Invalid payload for 'find': {0}".format(
                         msg['payload']))
+    elif method == 'get':
+      response['payload'] = cls.Read(params)
     elif method == 'create':
       newobject = cls(params)
       response['payload'] =  newobject.Insert()

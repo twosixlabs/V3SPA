@@ -55,7 +55,8 @@ module.exports = function(grunt) {
             expand: true, cwd: 'external/backbone', 
             dest: 'static/js/', src: '*.js'
           },
-          { 'static/js/bootstrap.js': 'external/bootstrap/dist/js/bootstrap.js'}
+          { 'static/js/bootstrap.js': 'external/bootstrap/dist/js/bootstrap.js'},
+          { 'static/js/select2.js': 'external/select2-3.4.5/select2.js'}
         ]
       }
     },

@@ -1,9 +1,25 @@
     vespaControllers = angular.module('vespaControllers', 
-                                      ['ui.ace', 'vespa.socket', 'ui.bootstrap'])
+        ['ui.ace', 'vespa.socket', 'ui.bootstrap', 'ui.select2'])
 
 The main controller. avispa is a subcontroller.
 
     vespaControllers.controller 'ideCtrl', ($scope, $rootScope, SockJSService, VespaLogger, $modal, AsyncFileReader) ->
+
+      $scope.policySelectOpts = 
+        query: (query)->
+          req = 
+            domain: 'policy'
+            request: 'find'
+            payload:
+              selection: 
+                id: true
+
+          SockJSService.send req, (data)->
+            dropdown = 
+              results: ({id: d._id, text: d.id, disabled: d._id == $scope.policySelected} for d in data.payload)
+
+            query.callback(dropdown)
+
 
 This controls our editor visibility.
 
@@ -81,9 +97,24 @@ This is just the initial data. We should remove it at some point.
       i.s --> a.o;
       """
 
-Create a modal for loading policies
+Load a policy from the server
 
       $scope.load_policy = ->
+        if not $scope.policySelected?
+          return
+
+        req = 
+          domain: 'policy'
+          request: 'get'
+          payload: $scope.policySelected.id
+
+        SockJSService.send req, (data)->
+          $scope.editor_data = data.payload.dsl
+
+
+Create a modal for uploading policies
+
+      $scope.new_policy = ->
         instance = $modal.open
           templateUrl: 'policyLoadModal.html'
           controller: ($scope, $modalInstance) ->
