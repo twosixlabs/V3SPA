@@ -16,7 +16,10 @@ The main controller. avispa is a subcontroller.
 
           SockJSService.send req, (data)->
             dropdown = 
-              results: ({id: d._id, text: d.id, disabled: d._id == $scope.policySelected} for d in data.payload)
+              results:  for d in data.payload
+                id: d._id
+                text: d.id
+                disabled: d._id.$oid == $scope.policy._id?.$oid
 
             query.callback(dropdown)
 
@@ -70,32 +73,8 @@ Check syntax button callback
 
 This is just the initial data. We should remove it at some point.
 
-      $scope.editor_data = """
-      class A () {
-            port s : { position = subject } ;
-            port o : { position = object } ;
-      }
-      
-      domain a = A();
-      domain b = A();
-      domain c = A();
-      domain d = A();
-      domain e = A();
-      domain f = A();
-      domain g = A();
-      domain h = A();
-      domain i = A();
-      
-      a.s --> b.o;
-      b.s --> c.o;
-      c.s --> d.o;
-      d.s --> e.o;
-      e.s --> f.o;
-      f.s --> g.o;
-      g.s --> h.o;
-      h.s --> i.o;
-      i.s --> a.o;
-      """
+      $scope.policy = {}
+      $scope.policy.dsl = ""
 
 Load a policy from the server
 
@@ -109,8 +88,7 @@ Load a policy from the server
           payload: $scope.policySelected.id
 
         SockJSService.send req, (data)->
-          $scope.editor_data = data.payload.dsl
-
+          $scope.policy = data.payload
 
 Create a modal for uploading policies
 
