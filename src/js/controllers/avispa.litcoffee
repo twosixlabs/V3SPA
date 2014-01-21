@@ -87,7 +87,8 @@ ID's MUST be fully qualified, or Avispa renders horribly wrong.
 
               $scope.createDomain subdomain.name, $scope.parent, subdomain
 
-              $scope.parent.unshift($scope.objects[subdomain.name])
+              subdomain_id = fqid subdomain.name, $scope.parent[0]
+              $scope.parent.unshift $scope.objects[subdomain_id]
               $scope.parseDomain(subdomain)
               $scope.parent.shift()
 
@@ -104,11 +105,18 @@ ID's MUST be fully qualified, or Avispa renders horribly wrong.
 
               bounds.x += 70
 
+Get the object id of the port which this connection is connected
+to. This can either be a FQN (<domain>.<port>) or a local port name,
+(just <port>).
+
           get_port_id = (parent, connection)->
-            return "#{parent.subdomains[connection.domain].name}.#{connection.port}"
+            parent_fqid = fqid("", $scope.parent[0])
+            if connection.domain?
+              return parent_fqid + "#{parent.subdomains[connection.domain].name}.#{connection.port}"
+            else
+              return parent_fqid + "#{connection.port}"
 
           for idx,connection of domain.connections
-              left_port_id = 
               $scope.createLink connection.connection,
                   $scope.objects[get_port_id(domain,connection.left)],
                   $scope.objects[get_port_id(domain,connection.right)]
