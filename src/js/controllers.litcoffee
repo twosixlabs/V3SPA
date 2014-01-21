@@ -131,7 +131,7 @@ Create a modal for uploading policies
               inputs = 
                 label: $scope.input.label
                 policy_file: $('#policyFile')[0].files[0]
-                lobster_file:  $('#policyFile')[0].files[0]
+                lobster_file:  $('#lobsterFile')[0].files[0]
 
               $modalInstance.close(inputs)
 
