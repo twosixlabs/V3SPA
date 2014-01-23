@@ -36,7 +36,7 @@ def main():
 
     settings = dict(
         static_path   = os.path.join(api.root, 'static'),
-        template_path = os.path.join(api.root, 'templates'),
+        template_path = os.path.join(api.root, 'server_templates'),
         cookie_secret = cookie_secret,
         login_url     = '/login',
         debug         = True
