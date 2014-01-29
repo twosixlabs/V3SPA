@@ -14,19 +14,31 @@ When we update, first clear the Avispas stuff
 TODO: Make avispa clear itself.
 
       $scope.$on 'lobsterUpdate', (event, data)->
-        $scope.objects = {}
-        $scope.parent = [null]
+        json_data = JSON.parse(data.payload)
 
-        $('#surface svg .objects')[0].innerHTML = ''
-        $('#surface svg .links')[0].innerHTML = ''
-        $('#surface svg .labels')[0].innerHTML = ''
-        $('#surface svg .groups')[0].innerHTML = ''
-        $scope.json_lobster = JSON.parse(data.payload)
-        $scope.avispa = new Avispa
-          el: $('#surface svg')
+Log any errors we got.
 
-        console.log "Got lobsterUpdate event!"
-        $scope.parseDomain($scope.json_lobster)
+        for error in json_data.errors
+          VespaLogger.log 'lobster', 'error', error.message
+
+Even if we got errors, but still got a domain object, then
+try to render it.
+
+
+        if json_data.domain
+          $scope.objects = {}
+          $scope.parent = [null]
+
+          $('#surface svg .objects')[0].innerHTML = ''
+          $('#surface svg .links')[0].innerHTML = ''
+          $('#surface svg .labels')[0].innerHTML = ''
+          $('#surface svg .groups')[0].innerHTML = ''
+          $scope.json_lobster = json_data.domain
+          $scope.avispa = new Avispa
+            el: $('#surface svg')
+
+          console.log "Got lobsterUpdate event!"
+          $scope.parseDomain($scope.json_lobster)
 
 
 The following is more or less mapped from the backbone style code.
