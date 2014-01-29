@@ -1,5 +1,6 @@
 import logging
 
+from tornado import concurrent
 import lobster
 import policies
 
@@ -7,7 +8,9 @@ __DOMAINS__  = {}
 __DOMAINS__['lobster'] = lobster.instantiate()
 __DOMAINS__['policy'] = policies.Policy
 
-def dispatch(msg):
+
+@concurrent.return_future
+def dispatch(msg, callback=None):
 
   if not all(map(lambda x: x in msg, ('domain', 'request', 'payload'))):
     logging.critical("Unable to understand formatting of WS message {0}"
@@ -19,5 +22,4 @@ def dispatch(msg):
     logging.error("No domain handler known for '{0}'".format(msg['domain']))
     raise KeyError("No domain handler known for '{0}'".format(msg['domain']))
 
-  return __DOMAINS__[msg['domain']].handle(msg)
-
+  callback(__DOMAINS__[msg['domain']].handle(msg))
