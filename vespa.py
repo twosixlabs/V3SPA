@@ -3,8 +3,12 @@
 import sys
 import os
 import logging
+logging.getLogger().setLevel(logging.DEBUG)
 
 import api
+api.settings.parse()
+api.storage.initialize()
+
 import api.handlers
 
 import tornado.web
@@ -12,9 +16,8 @@ import tornado.ioloop
 
 api.ioloop = tornado.ioloop.IOLoop.instance()
 
+
 def main():
-    api.settings.parse()
-    api.storage.initialize()
 
     addr = api.args.addr or api.config.get('server', 'address')
     port = api.args.port or api.config.getint('server', 'port')

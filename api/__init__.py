@@ -12,5 +12,6 @@ class error(Exception):
     def __str__(self):
         return self.str
 
+
 import settings
 import storage
