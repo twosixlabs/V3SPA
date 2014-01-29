@@ -133,25 +133,45 @@
               <h4 class='panel-title'>Console</h4>
             </div>
             <div class='panel-body' >
-              <!--<div class='btn-group pull-left'>-->
-              <!--<button type='button' class='btn btn-default btn-xs'>-->
-              <!--<span class='glyphicon glyphicon-plus'></span>-->
-              <!--</button>-->
-              <!--</div>-->
               <table cellspacing='0' class='table table-condensed'>
+                <thead>
+                  <tr>
+                    <th>Time</th>
+                    <th>Severity</th>
+                    <th>Domain</th>
+                    <th>Message</th>
+                  </tr>
+                </thead>
                 <tbody>
-                  <tr ng-repeat="error in errors | orderBy:'-timestamp'"
-                    ng-class="{'text-warning': error.level == 'error'}" class='small'>
+                  <tr ng-repeat="error in errors | orderBy:'-timestamp'" class='small'>
                     <td>{{error.timestamp}}</td>
+                    <td ng-click>
+                      <span class='label' ng-class="errorClass(error, 'label-')">
+                        {{error.level}}
+                      </span>
+                    </td>
                     <td>{{error.domain}}</td>
-                    <td ng-class="{'text-warning': error.level == 'error'}">{{error.message}}</td>
+                    <td  ng-hide="error.display">
+                      {{error.message[0]}}
+                      </td>
+                      <td ng-show="error.display"
+                      <div class='full-error'>
+                        <p>
+                        </p>
+                        <p ng-repeat="line in error.message">
+                        {{line}}
+                        </p>
+                      </div>
+                    </td>
+                    <td>
+                      <span ng-click="error.display = true" 
+                            ng-hide="error.messages.length == 1 || error.display" class='glyphicon glyphicon-plus'></span>
+                      <span ng-click="error.display = false" 
+                            ng-show="error.display" class='glyphicon glyphicon-minus'></span>
+                    </td>
                   </tr>
                 </tbody>
               </table>
-              <!--<ul class='list-inline'>-->
-              <!--<li class='text-danger'> <strong>1 error </strong></li>-->
-              <!--<li class='text-warning'><strong>1 warnings</strong></li>-->
-              <!--</ul>-->
               <div class='clearfix'> </div>
             </div>
           </div>

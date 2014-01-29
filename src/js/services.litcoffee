@@ -11,7 +11,7 @@
             timestamp: new Date().getTime()
             domain: domain
             level: level
-            message: message
+            message: message.split('\n')
 
           @$timeout =>
             @messages.push(msg)

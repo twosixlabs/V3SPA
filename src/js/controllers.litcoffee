@@ -171,3 +171,9 @@ scope to the VespaLogger scope
     vespaControllers.controller 'consoleCtrl', ($scope, VespaLogger) ->
 
       $scope.errors = VespaLogger.messages
+
+      $scope.errorClass = (error, prepend)->
+        switch error.level
+          when 'error' then return "#{prepend}danger"
+          when 'info' then return "#{prepend}default"
+          when 'warning' then return "#{prepend}warning"
