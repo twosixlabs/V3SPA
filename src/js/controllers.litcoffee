@@ -32,10 +32,15 @@ The main controller. avispa is a subcontroller.
 
 This controls our editor visibility.
 
-      $scope.toggleEditor = ->
-        $scope.editorVisible = !$scope.editorVisible
+      $scope.resizeEditor = (direction)->
+        switch direction
+          when 'larger'
+            $scope.editorSize += 1 if $scope.editorSize < 2
+          when 'smaller'
+            $scope.editorSize -= 1
 
-      $scope.editorVisible = true
+      $scope.editorSize = 1
+        
 
       $scope.aceLoaded = (editor) ->
         editor.setTheme("ace/theme/solarized_light");

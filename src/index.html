@@ -34,14 +34,17 @@
       <p class='navbar-right navbar-text'> &copy;2014 <b>Invincea Labs</b> </p>
     </div>
     <div class='container-full' ng-controller='ideCtrl'>
-      <div ng-hide='editorVisible' class='editor-toggle'>
+      <div ng-hide='editorSize > 0' class='editor-toggle'>
         <button type='button' class='button btn btn-sm btn-info'
-          ng-click='toggleEditor()'>
+          ng-click='resizeEditor("larger")'>
           Show Editor
         </button>
       </div>
       <div class='row main'>
-        <div ng-class="{'col-md-4': editorVisible}"' ng-show='editorVisible'>
+        <div ng-class="{'col-md-4': editorSize == 1,
+                        'col-md-8': editorSize == 2
+          }" 
+          ng-show='editorSize > 0'>
           <div class='editor-container'>
             <div class='panel panel-default'>
               <div class='panel-body'>
@@ -60,8 +63,12 @@
                         >
                       </div>
                       <div class='pull-right'>
-                        <a href='#' ng-click='toggleEditor()'>
-                          <span class='glyphicon glyphicon-remove'></span>
+                        <a href='#' ng-click='resizeEditor("smaller")'>
+                          <span class='glyphicon glyphicon-arrow-left'></span>
+                        </a>
+                        <a ng-hide='editorSize > 1'
+                           ng-click="resizeEditor('larger')" href='#'>
+                          <span class='glyphicon glyphicon-arrow-right'></span>
                         </a>
                       </div>
                     </div>
@@ -120,17 +127,18 @@
             </div>
           </div>
         </div>
-        <div ng-class="{'col-md-12': !editorVisible, 'col-md-8': editorVisible}">
+        <div ng-class="{'col-md-12': editorSize == 0,
+                        'col-md-8': editorSize == 1,
+                        'col-md-4': editorSize == 2}">
           <div id='visualizer' ng-view auto-height='0.70'>
           </div>
         </div>
       </div>
-      <div id='modal'></div>
       <div class='row'>
         <div class='col-md-12'>
           <div class='panel panel-default' ng-controller='consoleCtrl'>
             <div class='panel-heading'>
-              <h4 class='panel-title'>Console</h4>
+              <span class='lead'>Console</span>
             </div>
             <div class='panel-body' >
               <table cellspacing='0' class='table table-condensed'>
