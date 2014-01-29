@@ -42,7 +42,7 @@ def main():
         template_path = os.path.join(api.root, 'server_templates'),
         cookie_secret = cookie_secret,
         login_url     = '/login',
-        debug         = True
+        debug         = api.config.get('main', 'debug')
         )
 
     api.app = tornado.web.Application(patterns, **settings)

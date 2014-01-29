@@ -4,7 +4,7 @@ from tornado import concurrent
 import lobster
 import policies
 
-__DOMAINS__  = {}
+__DOMAINS__ = {}
 __DOMAINS__['lobster'] = lobster.instantiate()
 __DOMAINS__['policy'] = policies.Policy
 
@@ -22,4 +22,6 @@ def dispatch(msg, callback=None):
     logging.error("No domain handler known for '{0}'".format(msg['domain']))
     raise KeyError("No domain handler known for '{0}'".format(msg['domain']))
 
-  callback(__DOMAINS__[msg['domain']].handle(msg))
+  result = __DOMAINS__[msg['domain']].handle(msg)
+
+  callback(result)
