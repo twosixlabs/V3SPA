@@ -40,7 +40,7 @@ This controls our editor visibility.
             $scope.editorSize -= 1
 
       $scope.editorSize = 1
-        
+
 
       $scope.aceLoaded = (editor) ->
         editor.setTheme("ace/theme/solarized_light");

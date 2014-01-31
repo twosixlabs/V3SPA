@@ -1,27 +1,8 @@
-import pkg_resources
 import api
 import logging
 logger = logging.getLogger(__name__)
 
-from tornado.process import Subprocess
-from tornado.gen import coroutine, Task, Return
-
 from tornado import httpclient
-
-
-@coroutine
-def call_subprocess(cmd):
-
-    proc = Subprocess(cmd,
-                      stdout=Subprocess.STREAM,
-                      stderr=Subprocess.STREAM)
-
-    result, error = yield [Task(proc.stdout.read),
-                           Task(proc.stderr.read)]
-
-    logging.info("Returned: {0}, {1}".format(result, error))
-
-    raise Return((result, error))
 
 
 class LobsterDomain(object):
@@ -29,27 +10,35 @@ class LobsterDomain(object):
     """Docstring for LobsterDomain """
 
     def __init__(self):
-        """ Start the Lobster server """
-        backend = api.config.get('lobster_backend', 'resource')
+        """ Test the connection to the lobster server. """
 
-        bin_path = pkg_resources.resource_filename(
-            ".".join(backend.split('.')[:-1]),
-            backend.split('.')[-1])
+        backend_uri = "http://{0}/info".format(
+            api.config.get('lobster_backend', 'uri'))
 
-        args = [bin_path, "--port", api.config.get('lobster_backend', 'port')]
+        try:
+            http_client = httpclient.HTTPClient()
+            http_client.fetch(
+                backend_uri,
+                method='POST',
+                body="NONE",
+                request_timeout=10.0
+            )
+        except httpclient.HTTPError as e:
+            if e.code == 599:
+                raise SystemExit(
+                    "Could not contact Lobster backend at http://{0}"
+                    .format(api.config.get('lobster_backend', 'uri')))
 
-        call_subprocess(args)
-
-    def backend_exited(self, errcode):
-        if errcode != 0:
-            raise SystemExit()
+            else:
+                # Our request wasn't valid anyway, we just wanted a response
+                pass
 
     def validate(self, msg):
         """ Validate a Lobster file received from the IDE
         """
 
-        backend_uri = "http://localhost:{0}/parse".format(
-            api.config.get('lobster_backend', 'port'))
+        backend_uri = "http://{0}/parse".format(
+            api.config.get('lobster_backend', 'uri'))
 
         http_client = httpclient.HTTPClient()
 
