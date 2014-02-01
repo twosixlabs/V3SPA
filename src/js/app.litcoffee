@@ -9,6 +9,9 @@
           .when '/avispa', 
             templateUrl: 'partials/avispa.html',
             controller: 'avispaCtrl'
+          .when '/hive',
+            templateUrl: 'partials/hive.html',
+            controller: 'hiveCtrl'
 
           .otherwise 
             redirectTo: '/avispa'
