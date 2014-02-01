@@ -56,7 +56,7 @@ module.exports = function(grunt) {
           },
         },
         files: [
-          {'static/js/lobster-json.js': 'external/node-json-lobster/dist/lobster-json.js'},
+          {'static/js/hive.js': 'external/d3hive/hive.js'},
           {
             mangle: false,
             compress: false,
