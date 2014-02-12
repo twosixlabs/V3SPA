@@ -1,8 +1,3 @@
-
-    `
-    //= require ../../external/spin.min.js
-    `
-
     #= include ../../external/avispa/src/avispa.litcoffee
 
     #= require directives.litcoffee
@@ -37,6 +32,3 @@
           return ""
         return input.replace(/\\/g, '/').replace(/.*\//, '')
 
-    `
-    //= require ../../external/d3hive/hive.js
-    `

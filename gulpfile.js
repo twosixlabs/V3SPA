@@ -3,6 +3,7 @@ var gutil = require('gulp-util')
 var coffee = require('gulp-coffee')
 var include = require('gulp-include')
 var rename = require('gulp-rename')
+var uglify = require('gulp-uglify')
 var debug = require('gulp-debug')
 
 var paths = {
@@ -24,6 +25,19 @@ gulp.task('scripts', function(){
   .pipe(gulp.dest('static/js'))
 })
 
+gulp.task("script_assets", function() {
+  gulp.src('external/assets.js')
+  .pipe(include({extensions: 'js'}))
+  .pipe(gulp.dest('static/js'))
+  .pipe(uglify({
+    outSourceMap: true,
+  }))
+  .pipe(rename(function(path){
+    path.extname = '.min.js'
+  }))
+  .pipe(gulp.dest('static/js'))
+})
+
 gulp.task('html', function(){
   gulp.src(paths.html)
   .pipe(gulp.dest('static'))
@@ -31,7 +45,8 @@ gulp.task('html', function(){
 
 gulp.task('reloader', function() {
   gulp.watch(paths.html, [ 'html' ])
+  gulp.watch('external/assets.js', [ 'script_assets' ])
   gulp.watch(['src/**/*coffee'], [ 'scripts' ])
 })
 
-gulp.task('default', ['scripts'])
+gulp.task('default', ['scripts', 'script_assets', 'html'])

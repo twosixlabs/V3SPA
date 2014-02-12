@@ -1,11 +1,4 @@
 
-    #= include util.litcoffee
-    #= require templates.litcoffee
-    #= require objects/base.litcoffee
-    #= require objects/node.litcoffee
-    #= require objects/link.litcoffee
-    #= require objects/group.litcoffee
-
     context = null
 
 Expose a global view class so that consumers of the API can instantiate a view.
@@ -165,4 +158,11 @@ Expose a global view class so that consumers of the API can instantiate a view.
         OnContextMenu: (event) ->
             console.log('yeah')
             return cancelEvent(event)
+
+    #= include util.litcoffee
+    #= require templates.litcoffee
+    #= require objects/base.litcoffee
+    #= require objects/node.litcoffee
+    #= require objects/link.litcoffee
+    #= require objects/group.litcoffee
 
