@@ -5,17 +5,6 @@
     <script src='js/jquery-combined.js' type='text/javascript'></script>
     <script src='js/bootstrap.js' type='text/javascript'></script>
     <script type="text/javascript" src="js/ace/ace.js"></script>
-    <!--<script type="text/javascript" src="js/spin.min.js"></script>-->
-    <!--<script type="text/javascript" src="js/angular.js"></script>-->
-    <!--<script type="text/javascript" src="js/angular-route.min.js"></script>-->
-    <!--<script type="text/javascript" src="js/angular-ui-ace.js"></script>-->
-    <!--<script type="text/javascript" src="js/angular-ui-bootstrap-0.10.0.min.js"></script>-->
-    <!--<script type="text/javascript" src="js/underscore-min.js"></script>-->
-    <!--<script type="text/javascript" src="js/select2/select2.js"></script>-->
-    <!--<script type="text/javascript" src="js/angular-select2.js"></script>-->
-    <!--<script type="text/javascript" src="js/backbone-min.js"></script>-->
-    <!--<script type='text/javascript' src="js/sockjs.0.3.min.js"> </script>-->
-    <!--<script type='text/javascript' src="js/d3.v3.min.js"> </script>-->
     <script type='text/javascript' src="js/assets.js"> </script>
     <script src='js/avispa.js' type='text/javascript'></script>
     <script src='js/vespa.js' type='text/javascript'></script>
@@ -65,15 +54,16 @@
                         >
                       </div>
                       <div class='pull-right'>
-                        <a href='#' ng-click='resizeEditor("smaller")'>
+                        <a ng-click='resizeEditor("smaller")'>
                           <span class='glyphicon glyphicon-arrow-left'></span>
                         </a>
                         <a ng-hide='editorSize > 1'
-                           ng-click="resizeEditor('larger')" href='#'>
+                           ng-click="resizeEditor('larger')" >
                           <span class='glyphicon glyphicon-arrow-right'></span>
                         </a>
                       </div>
                     </div>
+                    <div class='clearfix'></div>
                     <div class='row'>
                       <div class='btn-group btn-group-sm col-md-12'>
                         <button class='btn btn-default btn-sm' 
