@@ -1,4 +1,4 @@
-    v3spa = angular.module 'vespa'
+    v3spa = angular.module 'vespa.directives', []
 
     v3spa.directive 'autoHeight', ($window) ->
       ret =

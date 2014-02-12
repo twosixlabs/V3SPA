@@ -13,7 +13,7 @@ module.exports = function(grunt) {
             expand: true,
             dest:'static/js/ace/', 
             src: '**',
-            cwd: 'external/ace/build/src/',
+            cwd: 'external/ace/build/src-noconflict/',
             filter: 'isFile'
           },
           {
@@ -51,12 +51,18 @@ module.exports = function(grunt) {
     uglify: {
       dist: {
         options: {
-          beautify: {
-            ascii_only: true,
-          },
+          //beautify: {
+            //ascii_only: true,
+          //},
+          mangle: false,
+          compress: false,
+          //beautify: true,
         },
         files: [
-          {'static/js/hive.js': 'external/d3hive/hive.js'},
+          {
+            src: 'external/d3hive/hive.js',
+            dest: 'static/js/hive.js',
+          },
           {
             mangle: false,
             compress: false,

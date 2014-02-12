@@ -1,4 +1,20 @@
-    socket = angular.module 'vespa.socket', ['vespa']
+    socket = angular.module 'vespa.socket', []
+
+    socket.service 'TokenService', 
+      class TokenGenerator
+        constructor: ->
+          @MAX = 9e15
+          @MIN = 1e15
+          @safegap = 1000
+          @counter = @MIN
+
+        generate: ->
+          increment = Math.floor(@safegap*Math.random())
+          if @counter > (@MAX - increment)
+            @counter = @MIN
+          @counter += increment
+          return @counter.toString(36)
+
 
     socket.service 'VespaLogger',
       class VespaLogger

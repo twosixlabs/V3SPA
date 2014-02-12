@@ -1,15 +1,23 @@
 {
-   "name": "V3SPA",
-     "version": "0.0.1",
-       "dependencies": {
-           "grunt-cli": "latest",
-           "grunt-contrib-concat": "latest",
-           "grunt-contrib-uglify": "0.2.7",
-           "grunt-contrib-less": "latest",
-           "grunt-contrib-coffee": "latest",
-           "grunt-contrib-watch": "latest",
-           "grunt-contrib-copy": "latest",
-           "grunt-contrib-concat": "latest",
-           "grunt-coffee-build": "latest"
-         }
+  "name": "V3SPA",
+  "version": "0.0.1",
+  "dependencies": {
+    "grunt-cli": "latest",
+    "grunt-contrib-concat": "latest",
+    "grunt-contrib-uglify": "0.2.7",
+    "grunt-contrib-less": "latest",
+    "grunt-contrib-coffee": "latest",
+    "grunt-contrib-watch": "latest",
+    "grunt-contrib-copy": "latest",
+    "grunt-coffee-build": "latest",
+    "gulp-include": "cwacek/gulp-include#improved",
+    "gulp-coffee": "~1.4.1",
+    "gulp": "~3.5.2",
+    "gulp-util": "~2.2.14",
+    "gulp-rename": "~1.0.0",
+    "gulp-debug": "~0.2.0",
+    "jade": "~1.1.5",
+    "browserify": "~3.28.2",
+    "jadeify": "~2.1.1"
+  }
 }
