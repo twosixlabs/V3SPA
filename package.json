@@ -19,6 +19,7 @@
     "jade": "~1.1.5",
     "browserify": "~3.28.2",
     "jadeify": "~2.1.1",
-    "gulp-uglify": "~0.2.1"
+    "gulp-uglify": "~0.2.1",
+    "gulp-less": "~1.2.1"
   }
 }
