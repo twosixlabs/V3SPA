@@ -10,5 +10,6 @@
 //= include angular/angular-select2.js
 //= include backbone/underscore-min.js
 //= include backbone/backbone-min.js
+//= require jquery-svgpan.min.js
 //= require spin.min.js
 //= require d3hive/dist/hive.js
