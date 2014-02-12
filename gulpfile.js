@@ -61,8 +61,9 @@ gulp.task('less', function() {
 
 gulp.task('reloader', function() {
   gulp.watch(paths.html, [ 'html' ])
-  gulp.watch(['external/**/*.js'], [ 'script_assets' ])
+  gulp.watch(['external/**/*.js'], ['script_assets'])
   gulp.watch(['src/**/*coffee'], [ 'application' ])
+  gulp.watch(paths.less, ['less'])
 })
 
 gulp.task('default', ['application', 'less', 'script_assets', 'html'])
