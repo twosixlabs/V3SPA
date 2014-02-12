@@ -66,4 +66,4 @@ gulp.task('reloader', function() {
   gulp.watch(['src/**/*coffee'], [ 'application' ])
 })
 
-gulp.task('default', ['scripts', 'script_assets', 'html'])
+gulp.task('default', ['application', 'less', 'script_assets', 'html'])
