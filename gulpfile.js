@@ -8,10 +8,9 @@ var debug = require('gulp-debug')
 var less = require("gulp-less")
 
 var paths = {
-  html: ['src/index.html', 'src/partials/*.html'],
+  html: ['src/**/*.html'],
   less: ['src/less/*.less'],
 }
-
 
 
 /* Build the application files by including
@@ -57,12 +56,12 @@ gulp.task('html', function(){
 gulp.task('less', function() {
   gulp.src('src/less/vespa.less')
   .pipe(less())
-  .pipe(gulp.dest('static/less'))
+  .pipe(gulp.dest('static/css'))
 })
 
 gulp.task('reloader', function() {
   gulp.watch(paths.html, [ 'html' ])
-  gulp.watch('external/assets.js', [ 'script_assets' ])
+  gulp.watch(['external/**/*.js'], [ 'script_assets' ])
   gulp.watch(['src/**/*coffee'], [ 'application' ])
 })
 
