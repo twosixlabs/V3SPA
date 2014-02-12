@@ -9,4 +9,9 @@
         json_data = JSON.parse(data.payload)
         plotter '#surface', json_data.domain, (tooltip_html)->
 
-          $('#hivetooltip').html(tooltip_html)
+          if not tooltip_html?
+            $("#hivetooltip").hide()
+            $("#hivetooltip").html("")
+          else
+            $('#hivetooltip').html(tooltip_html)
+            $("#hivetooltip").show()
