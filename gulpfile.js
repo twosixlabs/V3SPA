@@ -6,6 +6,7 @@ var rename = require('gulp-rename')
 var uglify = require('gulp-uglify')
 var debug = require('gulp-debug')
 var less = require("gulp-less")
+var chug = require('gulp-chug')
 
 var paths = {
   html: ['src/**/*.html'],

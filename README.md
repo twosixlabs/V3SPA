@@ -17,6 +17,7 @@ To set up the environment:
     $ sudo yum install npm
 
     $ # All
+    $ git submodule update --init
     $ sudo npm install -g gulp
     $ # Install the local packages
     $ npm install
@@ -31,6 +32,8 @@ compiling assets and putting them in the right place.
 
 To build assets:
 
+    $ cd external/d3hive && npm install && gulp
+    $ cd -
     $ gulp
 
 To start the asset auto-reloader for development (you may need to
