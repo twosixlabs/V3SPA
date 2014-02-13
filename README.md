@@ -17,7 +17,7 @@ To set up the environment:
     $ sudo yum install npm
 
     $ # All
-    $ sudo npm install -g grunt-cli
+    $ sudo npm install -g gulp
     $ # Install the local packages
     $ npm install
     $ mkvirtualenv vespa  # (optional, recommended, requires virtualenvwrapper)
@@ -31,12 +31,12 @@ compiling assets and putting them in the right place.
 
 To build assets:
 
-    $ grunt
+    $ gulp
 
 To start the asset auto-reloader for development (you may need to
 run just 'grunt' once first).
 
-    $ grunt watch
+    $ gulp reloader
 
 ## Layout
 
