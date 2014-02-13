@@ -10,8 +10,45 @@ var less = require("gulp-less")
 var paths = {
   html: ['src/**/*.html'],
   less: ['src/less/*.less'],
+  ace: ['external/ace/build/src-min-noconflict/*'],
+  select2: [
+    'external/select2-3.4.5/*.js',
+    'external/select2-3.4.5/*.css',
+    'external/select2-3.4.5/*.gif',
+    'external/select2-3.4.5/*.png',
+  ],
+  fonts: [
+    'external/bootstrap/dist/fonts/*'
+  ],
+  images: [
+    'src/img/*'
+  ]
 }
 
+gulp.task('select2', function() {
+  gulp.src(paths.select2)
+  .pipe(rename(function(path) {
+  }))
+  .pipe(gulp.dest("static/select2"))
+})
+
+gulp.task('fonts', function() {
+  gulp.src(paths.fonts)
+  .pipe(rename(function(path) {
+  }))
+  .pipe(gulp.dest("static/fonts"))
+})
+
+gulp.task('ace', function() {
+  gulp.src(paths.ace)
+  .pipe(gulp.dest('static/ace'))
+})
+
+gulp.task('images', function() {
+  gulp.src(paths.images)
+  .pipe(gulp.dest('static/img'))
+
+})
 
 /* Build the application files by including
  * all literate coffeescript files, compiling
@@ -52,6 +89,12 @@ gulp.task('html', function(){
   .pipe(gulp.dest('static'))
 })
 
+/* Copy external assets to the static directory */
+gulp.task('assets', function(){
+  gulp.src(paths.assets)
+  .pipe(gulp.dest('static'))
+})
+
 /* Run the LESS preprocessor */
 gulp.task('less', function() {
   gulp.src('src/less/vespa.less')
@@ -66,4 +109,13 @@ gulp.task('reloader', function() {
   gulp.watch(paths.less, ['less'])
 })
 
-gulp.task('default', ['application', 'less', 'script_assets', 'html'])
+gulp.task('default', [
+  'application',
+            'less',
+            'script_assets',
+            'html',
+            'select2',
+            'ace',
+            'images',
+            'fonts'
+])
