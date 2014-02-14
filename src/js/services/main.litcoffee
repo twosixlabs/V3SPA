@@ -1,4 +1,4 @@
-    socket = angular.module 'vespa.socket', []
+    socket = angular.module 'vespa.services', []
 
     socket.service 'TokenService', 
       class TokenGenerator

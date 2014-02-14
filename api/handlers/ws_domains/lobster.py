@@ -12,17 +12,22 @@ class LobsterDomain(object):
     def __init__(self):
         """ Test the connection to the lobster server. """
 
-        backend_uri = "http://{0}/info".format(
+        backend_uri = "http://{0}/version".format(
             api.config.get('lobster_backend', 'uri'))
+
 
         try:
             http_client = httpclient.HTTPClient()
-            http_client.fetch(
+            result = http_client.fetch(
                 backend_uri,
-                method='POST',
-                body="NONE",
+                method='GET',
                 request_timeout=10.0
             )
+
+            resp = api.db.json.loads(result.body)
+            self._lobster_version = resp['version']
+            logging.info("Connected to lobster backend server v{0}"
+                         .format(self._lobster_version))
         except httpclient.HTTPError as e:
             if e.code == 599:
                 raise SystemExit(
