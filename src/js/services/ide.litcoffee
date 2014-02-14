@@ -8,7 +8,7 @@ errors, and generally being awesome.
     mod.service 'IDEBackend',
       class IDEBackend
         constructor: (@VespaLogger, @$rootScope,
-        @SockJSService, @$q)->
+        @SockJSService, @$q, @$timeout)->
 
           @current_policy = 
             application: ""
@@ -23,7 +23,7 @@ errors, and generally being awesome.
             dsl_changed: []
             app_changed: []
             json_changed: []
-            validate_error: []
+            validation: []
 
         isCurrent: (id)=>
           id? and id == @current_policy.dbid
@@ -75,6 +75,12 @@ application representation) can be done from here
         update_dsl: (newtext)=>
           @current_policy.dsl = newtext
 
+          # If we are currently running a validation cycle,
+          # then set a timeout for 10 seconds, then re-validate if 
+          # someone wants us to
+          self = @
+          @$timeout self.validate_dsl, if self.validating == true then 10000 else 0
+
 Return the JSON representation if valid, and null if it is
 invalid
 
@@ -86,6 +92,9 @@ Send a request to the server to validate the current
 contents of @current_policy
 
         validate_dsl: =>
+          if @validating
+            return
+          @validating = true
           deferred = @$q.defer()
 
           req =
@@ -95,20 +104,24 @@ contents of @current_policy
 
           @SockJSService.send req, (result)=>
             if result.error  # Service error
+              @validating = false
               deferred.reject result.payload
 
             else  # valid response. Must parse
               @current_policy.json = JSON.parse result.payload
+
+              for hook in @hooks.validation
+                hook(@current_policy.json.errors)
+
               if @current_policy.json.errors.length > 0
                 @current_policy.valid = false
-                for hook in @hooks.validate_error
-                  hook(@current_policy.json.errors)
 
               else
                 @current_policy.valid = true
                 _.each @hooks.json_changed, (hook)=>
                   hook(@current_policy.json)
 
+              @validating = false
               deferred.resolve()
 
           return deferred.promise

@@ -11,9 +11,9 @@ The main controller. avispa is a subcontroller.
         $timeout ->
           $scope.policy = IDEBackend.current_policy
 
+      $scope.visualizer_type = 'avispa'
       $timeout ->
         $scope.view = 'dsl'
-        $scope.visualizer_type = 'avispa'
 
 
 This controls our editor visibility.
@@ -56,7 +56,7 @@ Two way bind editor changing and model changing
           $timeout ->
             lobsterSession.setValue contents
 
-        IDEBackend.add_hook 'validate_error', (errors)->
+        IDEBackend.add_hook 'validation', (errors)->
           format_error = (err)->
             ret = 
               row: err.line - 1
