@@ -7,3 +7,6 @@ import restful
 class Policy(restful.ResourceDomain):
     TABLE = 'policies'
 
+
+def __instantiate__():
+  return Policy

@@ -130,7 +130,8 @@ Load a policy from the server
           req = 
             domain: 'policy'
             request: 'get'
-            payload: id
+            payload: 
+              _id: id
 
           @SockJSService.send req, (data)=>
             if data.error

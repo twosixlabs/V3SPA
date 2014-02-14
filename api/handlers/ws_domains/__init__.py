@@ -4,14 +4,11 @@ from tornado import concurrent
 from api.util import LazyModule
 import pkgutil
 
-import lobster
-import policies
-import location
-
 
 __DOMAINS__ = {}
 for loader, name, ispkg in pkgutil.iter_modules(__path__):
-  __DOMAINS__[name] = LazyModule(loader, '__instantiate__')
+  __DOMAINS__[name] = LazyModule('api.handlers.ws_domains.' + name,
+                                 loader, '__instantiate__')
 
 @concurrent.return_future
 def dispatch(msg, callback=None):
