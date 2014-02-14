@@ -39,7 +39,9 @@
                 <div class='form-group'>
                   <div>
                     <div class='row'>
+                      <div class='col-md-12'>
                       <span class='lead'>Editor</span>
+                      <span class='text-muted'>{{policy.id}}</span>
                       <div class='btn'
                         spinner-icon='loading'
                         opts="{
@@ -59,36 +61,35 @@
                           <span class='glyphicon glyphicon-arrow-right'></span>
                         </a>
                       </div>
+                      </div>
                     </div>
                     <div class='clearfix'></div>
                     <div class='row'>
-                      <div class='form-group'>
-                        <div class='btn-group btn-group-sm col-md-12'>
-                          <button class='btn btn-default btn-sm' 
-                            ng-click='new_policy()'>New Policy
-                          </button>
+                      <div class='col-md-12'>
+                        <div class='btn-group btn-group-sm'>
+                          <div class='btn-group btn-group-sm'>
+                            <button class='btn btn-default btn-sm dropdown-toggle' data-toggle='dropdown'>
+                              File <span class='caret'></span>
+                            </button>
+                            <ul role='menu' class='dropdown-menu'>
+                              <li>
+                              <a ng-click='new_policy()'>New Blank Policy</a>
+                              </li>
+                              <li>
+                              <a ng-click='upload_policy()'>Upload Existing Policy</a>
+                              </li>
+                              <li>
+                              <a ng-click='open_policy()'>Open</a>
+                              </li>
+                            </ul>
+                          </div>
                           <button class='btn btn-default btn-sm' 
                             ng-class="{active: loading}"
                             ng-click='check_lobster()'
-                            ng-disabled='!policy.dsl'>Visualize
+                            ng-disabled='!policy.dsl'>Save/View
                           </button>
                         </div>
                       </div>
-
-                    </div>
-                  </div>
-                  <div class='horizontal-pad'></div>
-                  <div class='row'>
-                    <div class='input-group select2-bootstrap-prepend col-md-12'>
-                      <span class='input-group-btn'>
-                        <button class='btn btn-default btn-sm' type='button'
-                          ng-click='load_policy()'>
-                          Load
-                        </button>
-                      </span>
-                      <input class='form-control' id='policySelect'
-                      ui-select2='policySelectOpts'
-                      ng-model='policySelected' type='hidden'/>
                     </div>
                   </div>
                   <div class='horizontal-pad'></div>
@@ -96,7 +97,7 @@
                       <div class='form-group'>
                         <label class='control-label pad-right'>Visualizer Type</label>
                         <div class='btn-group'>
-                          <button btn-radio="'avispa'" type='button' class='btn btn-sm btn-default' ng-model="visualizer_type">Structured</button>
+                          <button btn-radio="'avispa'" type='button' class='btn btn-sm btn-default' active ng-model="visualizer_type">Structured</button>
                           <button btn-radio="'hive'" type='button' class='btn btn-sm btn-default' ng-model='visualizer_type'> Hive</button>
                         </div>
                       </div>
@@ -185,6 +186,56 @@
         </div>
       </div>
     </div>
+    <script type='text/ng-template' id='policyOpenModal.html'>
+      <div class='modal-body'>
+        <h4 class='modal-title'>Open Policy</h4>
+        <div class='form-group'>
+          <input class='form-control' id='policySelect'
+          ui-select2='policySelectOpts'
+          placeholder="Select a policy"
+          ng-model='selection.value' type='hidden'/>
+          <span class='help-block'>Select a policy from the list of previously uploaded policies</span>
+        </div>
+            <button type="button" class="btn btn-default" ng-click='cancel()'>Cancel</button>
+            <button type="button" ng-disabled='form.$invalid'
+                    class="btn btn-primary" ng-click='load()'>Load</button>
+                    </div>
+      </script>
+    <script type='text/ng-template' id='policyNewModal.html'>
+      <div class='modal-header'>
+        <h4 class='modal-title'>New Policy</h4>
+      </div>
+      <div class='modal-body'>
+      <form class='form-horizontal' name='newPolicy' no-validate>
+        <div class='form-group' ng-class="{'.has-warning': newPolicy.name.$invalid}">
+          <label class='col-md-2 control-label'>Name:</label>
+          <div class='col-md-1'></div>
+          <div class='col-md-8'>
+          <input name='name' type='text' class='form-control'
+                 ng-model='policy.name' required/>
+           </div>
+           <div class='col-md-1'></div>
+        </div>
+        <div class='form-group' >
+          <label class='col-md-2 control-label'>Policy Type:</label>
+           <div class='col-md-1'></div>
+          <div class='col-md-8 btn-group btn-group-sm'>
+            <button btn-radio="'selinux'" type='button' class='btn btn-sm btn-default' ng-model='policy.type'>SELinux</button>
+            <button btn-radio="'iptables'" type='button' class='btn btn-sm btn-default' active ng-model="policy.type">IPTables</button>
+          </div>
+          <div class='col-md-1'></div>
+          </div>
+          <div class='form-group'>
+            <div class='col-md-3'></div>
+            <div class='col-md-8'>
+            <button type="button" class="btn btn-default" ng-click='cancel()'>Cancel</button>
+            <button type="button" ng-disabled='newPolicy.$invalid'
+                    class="btn btn-primary" ng-click='load()'>Create</button>
+ </div>
+ <div class='col-md-1'></div>
+ </div>
+      </div>
+      </script>
     <script type='text/ng-template' id='policyLoadModal.html'>
       <div class='modal-header'>
             <h4 class='modal-title' id='loadPolicyModalLabel'>Load Policy</h4>

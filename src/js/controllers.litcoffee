@@ -7,28 +7,13 @@ The main controller. avispa is a subcontroller.
 
       $scope.policy = IDEBackend.current_policy
 
+      IDEBackend.add_hook 'policy_load', (info)->
+        $timeout ->
+          $scope.policy = IDEBackend.current_policy
+
       $timeout ->
         $scope.view = 'dsl'
         $scope.visualizer_type = 'avispa'
-
-      $scope.policySelectOpts = 
-        query: (query)->
-          req = 
-            domain: 'policy'
-            request: 'find'
-            payload:
-              selection: 
-                id: true
-
-          SockJSService.send req, (data)->
-            dropdown = 
-              results:  for d in data.payload
-                id: d._id.$oid
-                text: d.id
-                data: d
-                disabled: d._id.$oid == $scope.policy._id?.$oid
-
-            query.callback(dropdown)
 
 
 This controls our editor visibility.
@@ -68,7 +53,8 @@ Two way bind editor changing and model changing
           IDEBackend.update_dsl(lobsterSession.getValue())
 
         IDEBackend.add_hook 'dsl_changed', (contents)->
-          lobsterSession.setValue contents
+          $timeout ->
+            lobsterSession.setValue contents
 
         IDEBackend.add_hook 'validate_error', (errors)->
           format_error = (err)->
@@ -122,32 +108,78 @@ Check syntax button callback
             $scope.loading = false
         )
 
-Load a policy from the server
+Create a modal for opening a policy
 
-      $scope.load_policy = ->
-        if not $scope.policySelected?
-          return
+      $scope.open_policy = ->
+        instance = $modal.open
+          templateUrl: 'policyOpenModal.html'
+          controller: ($scope, $modalInstance) ->
 
-        $scope.loading = true
-        promise = IDEBackend.load_policy $scope.policySelected.data._id
+            $scope.selection = 
+              value: null
 
-        promise.then(
-          (data)->
-            console.log "Loaded policy successfully"
-            $scope.loading = false
-        ,
-          (error)->
-            $.growl "Failed to load policy", 
-              type: 'warning'
-            console.log "Policy load failed: #{error}"
-            $scope.loading = false
-        )
+            $scope.cancel = $modalInstance.dismiss
 
-        $scope.view = 'dsl'
+            $scope.policySelectOpts = 
+              query: (query)->
+                promise = IDEBackend.list_policies()
+                promise.then(
+                  (policy_list)->
+                    dropdown = 
+                      results:  for d in policy_list
+                        id: d._id.$oid
+                        text: d.id
+                        data: d
+                        disabled: IDEBackend.isCurrent(d._id.$oid)
+
+                    query.callback(dropdown)
+                )
+
+            scope = $scope
+            $scope.load = ->
+              if not scope.selection.value?
+                $modalInstance.dismiss()
+
+              $scope.loading = true
+              promise = IDEBackend.load_policy $scope.selection.value.data._id
+
+              promise.then(
+                (data)->
+                  console.log "Loaded policy successfully"
+                  $scope.loading = false
+              ,
+                (error)->
+                  $.growl "Failed to load policy", 
+                    type: 'warning'
+                  console.log "Policy load failed: #{error}"
+                  $scope.loading = false
+              )
+
+              $modalInstance.close()
+
+Modal dialog for new policy
+
+      $scope.new_policy = ->
+        instance = $modal.open
+          templateUrl: 'policyNewModal.html'
+          controller: ($scope, $modalInstance)->
+
+            $scope.policy = 
+              type: 'selinux'
+
+            $scope.load = ->
+              $modalInstance.close($scope.policy)
+
+            $scope.cancel = $modalInstance.dismiss
+
+        instance.result.then (policy)->
+            IDEBackend.new_policy
+              id: policy.name
+              type: policy.type
 
 Create a modal for uploading policies
 
-      $scope.new_policy = ->
+      $scope.upload_policy = ->
         instance = $modal.open
           templateUrl: 'policyLoadModal.html'
           controller: ($scope, $modalInstance) ->

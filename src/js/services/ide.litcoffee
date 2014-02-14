@@ -19,10 +19,14 @@ errors, and generally being awesome.
             valid: false
 
           @hooks = 
+            policy_load: []
             dsl_changed: []
             app_changed: []
             json_changed: []
             validate_error: []
+
+        isCurrent: (id)=>
+          id? and id == @current_policy.dbid
 
 Add a hook on certain changes in the backend. The action
 will be called as appropriate.
@@ -38,6 +42,31 @@ will be called as appropriate.
             action != hook_fn
           console.log("Hooks for #{event} are now:")
           console.log(@hooks[event])
+
+Create a new policy, but don't save it or anything
+
+        new_policy: (args)=>
+          @current_policy = 
+            application: ""
+            dsl: ""
+            json: null
+            id: null
+            dbid: null
+            type: null
+            valid: false
+
+          for arg, val of args
+              @current_policy[arg] = val
+
+          for hook in @hooks.dsl_changed
+            hook(@current_policy.dsl)
+
+          for hook in @hooks.app_changed
+            hook(@current_policy.application)
+
+          for hook in @hooks.policy_load
+            hook(@current_policy)
+
 
 An easy handle to update the stored representation of
 the DSL. Any required callbacks (like updating the
@@ -114,6 +143,9 @@ Load a policy from the server
               title: "Loaded"
               message: "#{@current_policy.id}"
 
+            # Validate the dsl that was returned immediately
+            @validate_dsl()
+
             deferred.resolve(@current_policy)
 
           return deferred.promise
@@ -127,4 +159,23 @@ Upload a new policy to the server
 
         upload_policy: (data)=>
 
+
+        list_policies: =>
+          deferred = @$q.defer()
+
+          req = 
+            domain: 'policy'
+            request: 'find'
+            payload:
+              selection: 
+                id: true
+
+          @SockJSService.send req, (data)->
+            if data.error?
+              deferred.reject(data.payload)
+            else
+              deferred.resolve(data.payload)
+
+
+          return deferred.promise
 
