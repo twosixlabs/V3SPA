@@ -13,3 +13,4 @@
 //= require jquery-svgpan.min.js
 //= require spin.min.js
 //= require d3hive/dist/hive.js
+//= require bootstrap-growl/bootstrap-growl.js

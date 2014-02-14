@@ -1,14 +1,13 @@
     vespaControllers = angular.module('vespaControllers', 
-        ['ui.ace', 'vespa.socket', 'ui.bootstrap', 'ui.select2'])
+        ['ui.ace', 'vespa.services', 'ui.bootstrap', 'ui.select2'])
 
 The main controller. avispa is a subcontroller.
 
-    vespaControllers.controller 'ideCtrl', ($scope, $rootScope, SockJSService, VespaLogger, $modal, AsyncFileReader) ->
+    vespaControllers.controller 'ideCtrl', ($scope, $rootScope, SockJSService, VespaLogger, $modal, AsyncFileReader, IDEBackend, $timeout) ->
 
-      $scope.policy =
-        application: ""
-        dsl: ""
-        view: 'dsl'
+      $scope.policy = IDEBackend.current_policy
+
+      $scope.view = 'dsl'
 
       $scope.policySelectOpts = 
         query: (query)->
@@ -64,25 +63,36 @@ This controls our editor visibility.
 Two way bind editor changing and model changing
 
         lobsterSession.on 'change', (text)->
-          $scope.policy.dsl = lobsterSession.getValue()
-        $scope.$watch 'policy.dsl', (contents)->
-          lobsterSession.setValue $scope.policy.dsl
+          IDEBackend.update_dsl(lobsterSession.getValue())
 
+        IDEBackend.add_hook 'dsl_changed', (contents)->
+          lobsterSession.setValue contents
 
-        applicationSession.on 'change', (text)->
-          $scope.policy.application = applicationSession.getValue()
-        $scope.$watch 'policy.application', (contents)->
-          applicationSession.setValue $scope.policy.application
+        IDEBackend.add_hook 'validate_error', (errors)->
+          format_error = (err)->
+            ret = 
+              row: err.line - 1
+              column: err.column
+              type: 'error'
+              text: err.message
+
+          lobsterSession.setAnnotations ( format_error(e) for e in errors )
+
+        IDEBackend.add_hook 'app_changed', (contents)->
+          applicationSession.setValue contents
 
 Watch the view control and switch the editor session
 
-        $scope.$watch 'policy.view', (value)->
+        $scope.$watch 'view', (value)->
           if value == 'dsl'
             editor.setSession(lobsterSession)
+            editor.setReadOnly(false)
           else
             editor.setSession(applicationSession)
+            editor.setReadOnly(true)
 
-        editor.setSession(lobsterSession)
+        $timeout ->
+          $scope.view = 'dsl'
 
 Ace needs a statically sized div to initialize, but we want it
 to be the full page, so make it so.
@@ -93,19 +103,17 @@ Check syntax button callback
 
       $scope.check_lobster = ->
 
-        req =
-          domain: 'lobster'
-          request: 'validate'
-          payload: $scope.editor.getValue()
-
         $scope.loading = true
+        response = IDEBackend.validate_dsl()
 
-        SockJSService.send req, (result)->
-          $scope.loading = false
-          if result.error
-            VespaLogger.log 'lobster', 'error', result.payload
-          else
-            $rootScope.$broadcast 'lobsterUpdate', result
+        response.then(
+          (result)->
+            console.log result
+            $scope.loading = false
+          (error)->
+            console.log error
+            $scope.loading = false
+        )
 
 Load a policy from the server
 
@@ -113,14 +121,22 @@ Load a policy from the server
         if not $scope.policySelected?
           return
 
-        req = 
-          domain: 'policy'
-          request: 'get'
-          payload: $scope.policySelected.data._id
+        $scope.loading = true
+        promise = IDEBackend.load_policy $scope.policySelected.data._id
 
-        SockJSService.send req, (data)->
-          data.payload.view = 'dsl'
-          $scope.policy = data.payload
+        promise.then(
+          (data)->
+            console.log "Loaded policy successfully"
+            $scope.loading = false
+        ,
+          (error)->
+            $.growl "Failed to load policy", 
+              type: 'warning'
+            console.log "Policy load failed: #{error}"
+            $scope.loading = false
+        )
+
+        $scope.view = 'dsl'
 
 Create a modal for uploading policies
 
