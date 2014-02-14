@@ -27,7 +27,7 @@ Percolate changes to the server
           updates.id = @id
 
           req = 
-            domain: 'positions'
+            domain: 'location'
             request: 'update'
             payload: updates
 
@@ -44,9 +44,10 @@ Percolate changes to the server
           d = $q.defer()
 
           req = 
-            domain: 'positions'
+            domain: 'location'
             request: 'get'
-            payload: @id
+            payload: 
+              id: @id
 
           SockJSService.send req, (result)=>
             if result.error 

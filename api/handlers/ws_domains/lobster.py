@@ -76,5 +76,5 @@ class LobsterDomain(object):
             raise
 
 
-def instantiate():
+def __instantiate__():
     return LobsterDomain()

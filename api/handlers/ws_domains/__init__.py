@@ -1,13 +1,17 @@
 import logging
 
 from tornado import concurrent
+from api.util import LazyModule
+import pkgutil
+
 import lobster
 import policies
+import location
+
 
 __DOMAINS__ = {}
-__DOMAINS__['lobster'] = lobster.instantiate()
-__DOMAINS__['policy'] = policies.Policy
-
+for loader, name, ispkg in pkgutil.iter_modules(__path__):
+  __DOMAINS__[name] = LazyModule(loader, '__instantiate__')
 
 @concurrent.return_future
 def dispatch(msg, callback=None):
