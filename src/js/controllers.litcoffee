@@ -3,11 +3,13 @@
 
 The main controller. avispa is a subcontroller.
 
-    vespaControllers.controller 'ideCtrl', ($scope, $rootScope, SockJSService, VespaLogger, $modal, AsyncFileReader, IDEBackend, $timeout) ->
+    vespaControllers.controller 'ideCtrl', ($scope, $rootScope, SockJSService, VespaLogger, $modal, AsyncFileReader, IDEBackend, $timeout, $location) ->
 
       $scope.policy = IDEBackend.current_policy
 
-      $scope.view = 'dsl'
+      $timeout ->
+        $scope.view = 'dsl'
+        $scope.visualizer_type = 'avispa'
 
       $scope.policySelectOpts = 
         query: (query)->
@@ -91,8 +93,13 @@ Watch the view control and switch the editor session
             editor.setSession(applicationSession)
             editor.setReadOnly(true)
 
-        $timeout ->
-          $scope.view = 'dsl'
+        $scope.$watch 'visualizer_type', (value)->
+          if value == 'avispa'
+            $location.path('/avispa')
+          else if value =='hive'
+            $location.path('/hive')
+          else
+            console.error("Invalid visualizer type")
 
 Ace needs a statically sized div to initialize, but we want it
 to be the full page, so make it so.
@@ -183,7 +190,6 @@ If we get given files, read them as text and send them over the websocket
           ()->
             console.log("Modal dismissed")
         )
-
 
 
 The console controller is very simple. It simply binds it's errors

@@ -1,6 +1,7 @@
     vespaControllers = angular.module('vespaControllers')
 
-    vespaControllers.controller 'avispaCtrl', ($scope, VespaLogger) ->
+    vespaControllers.controller 'avispaCtrl', ($scope, VespaLogger,
+        IDEBackend, $timeout) ->
 
       $scope.objects ?= {}
       $scope.parent ?= [null]
@@ -10,22 +11,11 @@
 
       $('#surface').append $scope.avispa.$el
 
-When we update, first clear the Avispas stuff
-TODO: Make avispa clear itself.
+A general update function for the Avispa view.
 
-      $scope.$on 'lobsterUpdate', (event, data)->
-        json_data = JSON.parse(data.payload)
+      update_view = (data)->
 
-Log any errors we got.
-
-        for error in json_data.errors
-          VespaLogger.log 'lobster', 'error', error.message
-
-Even if we got errors, but still got a domain object, then
-try to render it.
-
-
-        if json_data.domain
+        if data.domain
           $scope.objects = {}
           $scope.parent = [null]
 
@@ -33,13 +23,19 @@ try to render it.
           $('#surface svg .links')[0].innerHTML = ''
           $('#surface svg .labels')[0].innerHTML = ''
           $('#surface svg .groups')[0].innerHTML = ''
-          $scope.json_lobster = json_data.domain
           $scope.avispa = new Avispa
             el: $('#surface svg')
 
-          console.log "Got lobsterUpdate event!"
-          $scope.parseDomain($scope.json_lobster)
+          $scope.parseDomain(data.domain)
 
+      IDEBackend.add_hook "json_changed", update_view
+      $scope.$on "$destroy", ->
+        IDEBackend.unhook "json_changed", update_view
+
+      start_data = IDEBackend.get_json()
+      if start_data
+        $timeout ->
+          update_view(start_data)
 
 The following is more or less mapped from the backbone style code.
 ID's MUST be fully qualified, or Avispa renders horribly wrong.
