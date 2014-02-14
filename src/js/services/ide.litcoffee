@@ -34,14 +34,10 @@ will be called as appropriate.
         add_hook: (event, action)=>
           @hooks[event] ?= []
           @hooks[event].push(action)
-          console.log("Hooks for #{event} are now:")
-          console.log(@hooks[event])
 
         unhook: (event, action)=>
           @hooks[event] = _.filter @hooks[event], (hook_fn)->
             action != hook_fn
-          console.log("Hooks for #{event} are now:")
-          console.log(@hooks[event])
 
 Create a new policy, but don't save it or anything
 
