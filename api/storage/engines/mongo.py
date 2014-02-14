@@ -11,14 +11,15 @@ class Database(object):
 
   def __init__(self):
     try:
-      path = api.config.get('storage', 'path')
-      self._client = pymongo.MongoClient()
+      path = api.config.get('storage', 'uri')
+      self._client = pymongo.MongoClient(path)
     except:
       self._client = pymongo.MongoClient()
 
-    self.db = self._client.vespa_dev
+    db_name = api.config.get('storage', 'db_name')
+    self.db = self._client[db_name]
 
-  def Find(self, collection, criteria, projection, populate=None):
+  def Find(self, collection, criteria, projection, **opts):
     cursor = self.db[collection].find(criteria, projection)
     results = list(cursor.limit(100))
     return results
@@ -27,7 +28,8 @@ class Database(object):
     return self.db[collection].find_one(Database.json.ObjectId(id))
 
   def Insert(self, collection, entry):
-    entry['_id'] = Database.json.ObjectId(entry['_id'])
+    if '_id' in entry:
+      entry['_id'] = Database.json.ObjectId(entry['_id'])
     return self.db[collection].save(entry)
 
   def Update(self, collection, entry):

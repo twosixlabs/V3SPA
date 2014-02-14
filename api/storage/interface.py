@@ -86,8 +86,14 @@ class Entry(UserDict.DictMixin):
         return self
 
     @classmethod
-    def Read(cls, _id):
-        entry = api.db.FindOne(cls.TABLE, _id)
+    def Read(cls, params):
+        if isinstance(params, dict):
+          try:
+            entry = api.db.Find(cls.TABLE, params, None, limit=1)[0]
+          except IndexError:
+            entry = None
+        else:
+          entry = api.db.FindOne(cls.TABLE, params)
         return cls(entry) if entry else None
 
     def Update(self, values=None):

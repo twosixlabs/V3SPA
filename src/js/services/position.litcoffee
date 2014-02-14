@@ -11,7 +11,7 @@
         update: (data)=>
           changed = false
           for k, v of data
-            if @data[k] != v
+            if @data == null or @data[k] != v
               changed = true
               @data[k] = v
 
@@ -25,6 +25,7 @@ Percolate changes to the server
 
           updates = _.clone @data
           updates.id = @id
+          updates._id = @data._id
 
           req = 
             domain: 'location'

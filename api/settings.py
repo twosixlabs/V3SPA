@@ -6,6 +6,9 @@ import ConfigParser
 import logging
 
 import api
+api.args = None
+api.config = ConfigParser.SafeConfigParser(dict_type=collections.OrderedDict)
+api.config.optionxform = str
 
 argparser = argparse.ArgumentParser()
 argparser.add_argument('--ini')
