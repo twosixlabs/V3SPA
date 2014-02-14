@@ -32,10 +32,14 @@ class ResourceDomain(api.storage.interface.Entry):
       newobject = cls(params)
       response['payload'] =  newobject.Insert()
     elif method == 'update':
-      newobject = cls.Read(params['id'])
-      response['payload'] = newobject.Update( params)
+      if '_id' in params and params['_id'] is not None:
+        newobject = cls.Read(params['_id'])
+        response['payload'] = newobject.Update( params)
+      else:
+        newobject = cls(params)
+        response['payload'] =  newobject.Insert()
     elif method == 'delete':
-      newobject = cls.Read(params['id'])
+      newobject = cls.Read(params['_id'])
       response['payload'] = newobject.Delete()
     else:
       raise Exception("Unrecognized method: {0}"

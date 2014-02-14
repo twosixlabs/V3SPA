@@ -23,14 +23,16 @@ class Database(object):
     results = list(cursor.limit(100))
     return results
 
-  def FindOne(self, collection, params):
-    return self.db[collection].find_one(params)
+  def FindOne(self, collection, id):
+    return self.db[collection].find_one(Database.json.ObjectId(id))
 
   def Insert(self, collection, entry):
+    entry['_id'] = Database.json.ObjectId(entry['_id'])
     return self.db[collection].save(entry)
 
   def Update(self, collection, entry):
+    entry['_id'] = Database.json.ObjectId(entry['_id'])
     return self.db[collection].update(entry)
 
   def Remove(self, collection, id):
-    return self.db[collection].remove({'_id': id})
+    return self.db[collection].remove({'_id': Database.json.ObjectId(id)})

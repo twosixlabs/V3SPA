@@ -93,7 +93,10 @@ class Entry(UserDict.DictMixin):
     def Update(self, values=None):
         if values:
             self.entry.update(values)
-        api.db.Update(self.TABLE, self.entry)
+        # WE use Insert here because it replaces, 
+        # and we're not doing anything so complicated as needed 
+        # by  MongoDB's update
+        api.db.Insert(self.TABLE, self.entry)
         return self
 
     def Delete(self):

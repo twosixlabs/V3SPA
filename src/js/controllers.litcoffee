@@ -92,21 +92,10 @@ to be the full page, so make it so.
 
         editor.resize()
 
-Check syntax button callback
+Save the current file
 
-      $scope.check_lobster = ->
-
-        $scope.loading = true
-        response = IDEBackend.validate_dsl()
-
-        response.then(
-          (result)->
-            console.log result
-            $scope.loading = false
-          (error)->
-            console.log error
-            $scope.loading = false
-        )
+      $scope.save_policy = ->
+        IDEBackend.save_policy()
 
 Create a modal for opening a policy
 

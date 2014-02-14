@@ -15,7 +15,7 @@ errors, and generally being awesome.
             dsl: ""
             json: null
             id: null
-            dbid: null
+            _id: null
             valid: false
 
           @hooks = 
@@ -26,7 +26,7 @@ errors, and generally being awesome.
             validation: []
 
         isCurrent: (id)=>
-          id? and id == @current_policy.dbid
+          id? and id == @current_policy._id
 
 Add a hook on certain changes in the backend. The action
 will be called as appropriate.
@@ -51,7 +51,7 @@ Create a new policy, but don't save it or anything
             dsl: ""
             json: null
             id: null
-            dbid: null
+            _id: null
             type: null
             valid: false
 
@@ -142,7 +142,7 @@ Load a policy from the server
 
             @current_policy.application = data.payload.application
             @current_policy.dsl = data.payload.dsl
-            @current_policy.dbid = data.payload._id.$oid
+            @current_policy._id = data.payload._id.$oid
             @current_policy.id = data.payload.id
             @current_policy.valid = false
 
@@ -166,7 +166,28 @@ Load a policy from the server
 Save a modified policy to the server
 
         save_policy: =>
-          throw new Error("not yet implemented")
+
+          deferred = @$q.defer()
+
+          req =
+            domain: 'policy'
+            request: 'update'
+            payload: @current_policy
+
+
+          @SockJSService.send req, (resp)=>
+            if resp.error  # Service error
+              @VespaLogger.log 'policy', 'error', resp.payload
+              deferred.reject resp.payload
+
+            else  # valid response. Must parse
+              @current_policy._id = resp.payload._id.$oid 
+              @VespaLogger.log 'policy', 'info', 
+                "Saved #{@current_policy.id} successfully"
+              deferred.resolve @current_policy._id
+
+          return deferred.promise
+
 
 Upload a new policy to the server
 

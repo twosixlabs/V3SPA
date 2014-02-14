@@ -40,6 +40,15 @@
                   <div>
                     <div class='row'>
                       <div class='col-md-12'>
+                      <div class='pull-right'>
+                        <a ng-click='resizeEditor("smaller")'>
+                          <span class='glyphicon glyphicon-arrow-left'></span>
+                        </a>
+                        <a ng-hide='editorSize > 1'
+                           ng-click="resizeEditor('larger')" >
+                          <span class='glyphicon glyphicon-arrow-right'></span>
+                        </a>
+                      </div>
                       <span class='lead'>Editor</span>
                       <span class='text-muted'>{{policy.id}}</span>
                       <div class='btn'
@@ -51,15 +60,6 @@
                         'speed': 0.7
                         }"
                         >
-                      </div>
-                      <div class='pull-right'>
-                        <a ng-click='resizeEditor("smaller")'>
-                          <span class='glyphicon glyphicon-arrow-left'></span>
-                        </a>
-                        <a ng-hide='editorSize > 1'
-                           ng-click="resizeEditor('larger')" >
-                          <span class='glyphicon glyphicon-arrow-right'></span>
-                        </a>
                       </div>
                       </div>
                     </div>
@@ -85,8 +85,8 @@
                           </div>
                           <button class='btn btn-default btn-sm' 
                             ng-class="{active: loading}"
-                            ng-click='check_lobster()'
-                            ng-disabled='!policy.dsl'>Save/View
+                            ng-click='save_policy()'
+                            ng-disabled='!policy.dsl'>Save
                           </button>
                         </div>
                       </div>
