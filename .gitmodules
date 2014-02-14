@@ -1,3 +1,6 @@
 [submodule "external/d3hive"]
 	path = external/d3hive
 	url = git@gitlab.labs:v3spa/d3hive.git
+[submodule "external/svg-pan-zoom"]
+	path = external/svg-pan-zoom
+	url = https://github.com/cwacek/svg-pan-zoom
