@@ -3,6 +3,7 @@
     #= require directives.litcoffee
     #= require services/main.litcoffee
     #= require services/ide.litcoffee
+    #= require services/position.litcoffee
     #= require controllers.litcoffee
     #= require_tree controllers
 

@@ -1,9 +1,12 @@
     vespaControllers = angular.module('vespaControllers')
 
-    vespaControllers.controller 'hiveCtrl', ($scope, VespaLogger, IDEBackend)->
+    vespaControllers.controller 'hiveCtrl', ($scope, VespaLogger, IDEBackend, PositionManager)->
       plotter = require('hive')
 
+
       update_listener = (json_data)->
+
+        positionMgr = PositionManager("hive.viewport::#{IDEBackend.current_policy._id}")
 
         plotter '#surface', json_data.domain, (tooltip_html)->
 
@@ -13,6 +16,31 @@
           else
             $('#hivetooltip').html(tooltip_html)
             $("#hivetooltip").show()
+
+
+        svgPanZoom.init
+          selector: '#surface svg'
+          panEnabled: true
+          zoomEnabled: true
+          dragEnabled: false
+          minZoom: 0.5
+          maxZoom: 10
+          onZoom: (scale, transform)->
+            positionMgr.update transform
+          onPanComplete: (coords, transform) ->
+            positionMgr.update transform
+
+        $scope.$watch(
+          ->
+            (positionMgr.data)
+        , 
+          (newv, oldv)->
+            if not newv? or _.keys(newv).length == 0
+              return
+            g = svgPanZoom.getSVGViewport($("#surface svg")[0])
+            svgPanZoom.set_transform(g, newv)
+        )
+
 
       IDEBackend.add_hook 'json_changed', update_listener
       $scope.$on '$destroy', ->
