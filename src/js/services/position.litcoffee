@@ -10,10 +10,11 @@
 
         update: (data)=>
           changed = false
+          @data ?= {}
           for k, v of data
-            if @data == null or @data[k] != v
-              changed = true
+            if @data[k] != v
               @data[k] = v
+              changed = true
 
           if changed
             @percolate()
