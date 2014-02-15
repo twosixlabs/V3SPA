@@ -1,0 +1,60 @@
+
+.axis {
+  stroke:               #000;
+  stroke-width:         1.5px;
+}
+
+.node {
+  .node_shape {
+    stroke: #000;
+
+  }
+}
+
+.active_ib { stroke: blue;
+          &:extend(.node .node_shape);}
+.active_ob { stroke: green;
+          &:extend(.node .node_shape);}
+.active_mo { stroke: red;
+          &:extend(.node .node_shape);}
+
+.link {
+  fill:                           none;
+  stroke:                         #aaa;
+  stroke-opacity:                 0.2;
+  stroke-width:                   2px;
+}
+
+.link_active {
+  stroke-opacity:                 1;
+  stroke-width:                   4px;
+  &:extend(.link);
+}
+
+.active_ib {
+stroke:       #c09853;
+              .link_active;
+}
+
+.active_ob {
+stroke:       #468847;
+              .link_active;
+}
+
+.active_neutral {
+stroke:       #3a87ad;
+              .link_active;
+}
+
+.active_mo {
+stroke:       #b94a48;
+              .link_active;
+}
+
+.notes .ib                        { color:        blue;   }
+.notes .im                        { color:        green;  }
+.notes .mo                        { color:        red;    }
+
+.hive_link_container span {
+  padding: 0 4px;
+  }
