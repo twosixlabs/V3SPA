@@ -1,4 +1,6 @@
 import api.storage.interface
+import logging
+logger = logging.getLogger(__name__)
 
 class ResourceDomain(api.storage.interface.Entry):
 

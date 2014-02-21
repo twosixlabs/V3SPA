@@ -3,10 +3,13 @@
     services.factory 'PositionManager', (SockJSService, $q, $cacheFactory)->
 
       class PositionMgr
-        constructor: (@id)->
+        constructor: (@id, defaults = {})->
 
-          @data = {}
-          @retrieve()
+          @percolate = _.throttle @_percolate, 1000
+
+          @data = defaults
+          @loaded = @retrieve()
+          @notifiers = []
 
         update: (data)=>
           changed = false
@@ -18,10 +21,17 @@
 
           if changed
             @percolate()
+            _.each @notifiers, (cb)->
+              cb()
+
+Register a notifier for when the underlying data changes.
+
+        on_change: (callback)->
+          @notifiers.push callback
 
 Percolate changes to the server
 
-        percolate: =>
+        _percolate: =>
           d = $q.defer()
 
           updates = _.clone @data
@@ -55,7 +65,15 @@ Percolate changes to the server
             if result.error 
               d.reject result.payload
             else
-              @data = result.payload
+              if result.payload? and not _.isEmpty(result.payload)
+                # The server updated the location. Update the data
+                # and notify anyone who might care.
+                _.extend @data, result.payload
+                _.each @notifiers, (cb)->
+                  cb()
+              else
+                # the defaults were better, send them to the server
+                @percolate()
               d.resolve result.payload
 
           return d.promise
@@ -66,9 +84,9 @@ can be used to retrieve positions. Retrieve a cached manager if possible.
 
       cache = $cacheFactory('position_managers', {capacity: 5})
 
-      return (id)->
+      return (id, defaults)->
         manager = cache.get(id)
         if not manager?
-          manager = new PositionMgr(id)
+          manager = new PositionMgr(id, defaults)
           cache.put(id, manager)
         return manager

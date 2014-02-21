@@ -11,6 +11,8 @@
 
       $('#surface').append $scope.avispa.$el
 
+Manage the position of items within this view.
+
 Clean up the Avispa view
 
       cleanup = ->
@@ -142,9 +144,32 @@ to. This can either be a FQN (<domain>.<port>) or a local port name,
 Lobster-specific definitions for Avispa
 
     class GenericModel
-      constructor: (vals)->
+      constructor: (vals, identifier)->
         @observers = {}
-        @data = vals
+
+If we have an identifier, then instantiate a PositionManager
+and use it's data variable as the data variable. Otherwise just
+store it locally.
+
+        if identifier?
+We are outside of Angular, so we need to retrieve the services
+from the injector
+
+          injector = angular.element('body').injector()
+          PositionManager = injector.get('PositionManager')
+          IDEBackend = injector.get('IDEBackend')
+
+          @posMgr = PositionManager(
+            "avispa.#{identifier}::#{IDEBackend.current_policy._id}",
+            vals
+          )
+          @data = @posMgr.data
+
+          @posMgr.on_change =>
+            @notify ['change']
+
+        else
+          @data = vals
 
       bind: (event, func, _this)->
         @observers[event] ?= []
@@ -159,8 +184,14 @@ Lobster-specific definitions for Avispa
         return @data[key]
 
       set: (obj)->
-        for k, v of obj
-          @data[k] = v
+        @_set(obj)
+
+      _set: (obj)->
+        if @posMgr?
+          @posMgr.update(obj)
+        else
+          for k, v of obj
+            @data[k] = v
 
         @notify(['change'])
 
@@ -169,6 +200,7 @@ Lobster-specific definitions for Avispa
     Domain = Avispa.Group.extend
 
         init: () ->
+
             @$label = $SVG('text')
                 .attr('dx', '0.5em')
                 .attr('dy', '1.5em')
