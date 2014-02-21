@@ -8,6 +8,11 @@
 
         positionMgr = PositionManager("hive.viewport::#{IDEBackend.current_policy._id}")
 
+        if not json_data.domain?
+          json_data.domain = 
+            connections: []
+            subdomains: []
+
         plotter '#surface', json_data.domain, (tooltip_html)->
 
           if not tooltip_html?
