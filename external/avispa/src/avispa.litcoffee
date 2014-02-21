@@ -29,31 +29,58 @@ Expose a global view class so that consumers of the API can instantiate a view.
             @dragItem = null
             @arrow    = null
 
-            position = 
-                x: 0
-                y: 0
+If we have svgPanZoom, use it to pan and zoom around.
 
-            @position = new GenericModel position, "avispa.context" 
+            if svgPanZoom?
+              @have_svg_pan_zoom = true
+We are outside of Angular, so we need to retrieve the services
+from the injector
 
-            @zoom =
-                step : 0.125
-                min  : 0.125
-                max  : 2.5
+              injector = angular.element('body').injector()
+              PositionManager = injector.get('PositionManager')
+              IDEBackend = injector.get('IDEBackend')
+              positionMgr = PositionManager(
+                "avispa.viewport::#{IDEBackend.current_policy._id}")
+
+              svgPanZoom.init
+                  selector: '#surface svg'
+                  panEnabled: true
+                  zoomEnabled: true
+                  dragEnabled: false
+                  minZoom: 0.5
+                  maxZoom: 10
+                  onZoom: (scale, transform)->
+                    positionMgr.update transform
+                  onPanComplete: (coords, transform) ->
+                    positionMgr.update transform
+
+              positionMgr.on_change ->
+                g = svgPanZoom.getSVGViewport($("#surface svg")[0])
+                svgPanZoom.set_transform(g, positionMgr.data)
+
+If there is no svgPanZoom, then use the one Matt put together
+
+            else
+              @zoom =
+                  step : 0.125
+                  min  : 0.125
+                  max  : 2.5
+              @$pan     = @$el.find('g.pan')
+              @$zoom    = @$el.find('g.zoom')
+
+              @$pan.x = window.innerWidth  / 2
+              @$pan.y = window.innerHeight / 2
+
+              @Pan(0,0)
 
             @$parent  = @$el.parent()
-
-            @$pan     = @$el.find('g.pan')
-            @$zoom    = @$el.find('g.zoom')
 
             @$groups  = @$el.find('g.groups')
             @$links   = @$el.find('g.links')
             @$objects = @$el.find('g.objects')
             @$labels  = @$el.find('g.labels')
 
-            @$pan.x = window.innerWidth  / 2
-            @$pan.y = window.innerHeight / 2
 
-            @Pan(0,0)
 
             @secondstage()
 
@@ -119,7 +146,7 @@ Expose a global view class so that consumers of the API can instantiate a view.
 
         OnMouseMove: (event) ->
             # drag the entire scene around
-            if @offset
+            if @offset and not @have_svg_pan_zoom
                 @Pan(event.clientX - @offset[0], event.clientY - @offset[1])
                 @offset = [event.clientX, event.clientY]
 
@@ -155,13 +182,12 @@ Expose a global view class so that consumers of the API can instantiate a view.
             return cancelEvent(event)
 
         OnMouseWheel: (event) ->
-            @Zoom(normalizeWheel(event))
-            @$('#zoomslider').slider('option', 'value', @scale)
+            if not @have_svg_pan_zoom
+              @Zoom(normalizeWheel(event))
+              @$('#zoomslider').slider('option', 'value', @scale)
             return cancelEvent(event)
 
         OnContextMenu: (event) ->
-            console.log('yeah')
-            return cancelEvent(event)
 
     #= include util.litcoffee
     #= require templates.litcoffee
