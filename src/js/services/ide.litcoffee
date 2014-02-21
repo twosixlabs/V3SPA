@@ -25,6 +25,8 @@ errors, and generally being awesome.
             json_changed: []
             validation: []
 
+          @validate_dsl = _.throttle @_validate_dsl, 1000
+
         isCurrent: (id)=>
           id? and id == @current_policy._id
 
@@ -87,10 +89,7 @@ invalid
 Send a request to the server to validate the current
 contents of @current_policy
 
-        validate_dsl: =>
-          if @validating
-            return
-          @validating = true
+        _validate_dsl: =>
           deferred = @$q.defer()
 
           req =
@@ -100,7 +99,6 @@ contents of @current_policy
 
           @SockJSService.send req, (result)=>
             if result.error  # Service error
-              @validating = false
 
               deferred.reject result.payload
 
@@ -119,7 +117,6 @@ contents of @current_policy
               else
                 @current_policy.valid = true
 
-              @validating = false
               deferred.resolve()
 
           return deferred.promise
