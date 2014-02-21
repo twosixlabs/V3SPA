@@ -30,9 +30,7 @@ class LobsterDomain(object):
                          .format(self._lobster_version))
         except httpclient.HTTPError as e:
             if e.code == 599:
-                raise SystemExit(
-                    "Could not contact Lobster backend at http://{0}"
-                    .format(api.config.get('lobster_backend', 'uri')))
+                raise Exception("backend:lobster - Unavailable")
 
             else:
                 # Our request wasn't valid anyway, we just wanted a response
