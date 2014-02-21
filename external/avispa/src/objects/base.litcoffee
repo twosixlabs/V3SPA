@@ -23,9 +23,8 @@ Expect a position to be passed in
 If we have a parent, keep track of our offset from the parent
 
             if @parent
-                @offset = 
-                  x: position.x
-                  y: position.y
+                position.offset_x = position.x
+                position.offset_y = position.x
 
                 position.x += @parent.position.get('x')
                 position.y += @parent.position.get('y')
@@ -48,8 +47,8 @@ The init method allows classes to extend the BaseObject without re-implementing 
 
         ParentDrag: (ppos) ->
             @position.set
-                x: @offset.x + ppos.get('x')
-                y: @offset.y + ppos.get('y')
+                x: @position.get('offset_x') + ppos.get('x')
+                y: @position.get('offset_y') + ppos.get('y')
             return
 
         OnMouseDown: (event) ->

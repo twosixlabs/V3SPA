@@ -39,24 +39,31 @@ from the injector
               injector = angular.element('body').injector()
               PositionManager = injector.get('PositionManager')
               IDEBackend = injector.get('IDEBackend')
-              positionMgr = PositionManager(
-                "avispa.viewport::#{IDEBackend.current_policy._id}")
 
-              svgPanZoom.init
-                  selector: '#surface svg'
-                  panEnabled: true
-                  zoomEnabled: true
-                  dragEnabled: false
-                  minZoom: 0.5
-                  maxZoom: 10
-                  onZoom: (scale, transform)->
-                    positionMgr.update transform
-                  onPanComplete: (coords, transform) ->
-                    positionMgr.update transform
+Only actually initialize the context scroller if there is a
+policy loaded. Otherwise we'll load the 'null' position for
+no reason.
 
-              positionMgr.on_change ->
-                g = svgPanZoom.getSVGViewport($("#surface svg")[0])
-                svgPanZoom.set_transform(g, positionMgr.data)
+              if IDEBackend.current_policy._id?
+
+                positionMgr = PositionManager(
+                  "avispa.viewport::#{IDEBackend.current_policy._id}")
+
+                svgPanZoom.init
+                    selector: '#surface svg'
+                    panEnabled: true
+                    zoomEnabled: true
+                    dragEnabled: false
+                    minZoom: 0.5
+                    maxZoom: 10
+                    onZoom: (scale, transform)->
+                      positionMgr.update transform
+                    onPanComplete: (coords, transform) ->
+                      positionMgr.update transform
+
+                positionMgr.on_change ->
+                  g = svgPanZoom.getSVGViewport($("#surface svg")[0])
+                  svgPanZoom.set_transform(g, positionMgr.data)
 
 If there is no svgPanZoom, then use the one Matt put together
 

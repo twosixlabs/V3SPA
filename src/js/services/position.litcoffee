@@ -5,10 +5,14 @@
       class PositionMgr
         constructor: (@id, defaults = {})->
 
-          @percolate = _.throttle @_percolate, 1000
+          @percolate = _.throttle @_percolate, 1000, leading: false
 
           @data = defaults
-          @loaded = @retrieve()
+
+          @loading = true
+          @retrieve().then =>
+            @loading = false
+
           @notifiers = []
 
         update: (data)=>
@@ -20,7 +24,8 @@
               changed = true
 
           if changed
-            @percolate()
+            if not @loading
+              @percolate()
             _.each @notifiers, (cb)->
               cb()
 
@@ -32,6 +37,7 @@ Register a notifier for when the underlying data changes.
 Percolate changes to the server
 
         _percolate: =>
+
           d = $q.defer()
 
           updates = _.clone @data
@@ -73,7 +79,11 @@ Percolate changes to the server
                   cb()
               else
                 # the defaults were better, send them to the server
-                @percolate()
+                # use _percolate because we want to send immediately
+                # and get the object id back so we can reference it properly.
+                percolated = @_percolate()
+                percolated.then (data)=>
+                  _.extend @data, data
               d.resolve result.payload
 
           return d.promise

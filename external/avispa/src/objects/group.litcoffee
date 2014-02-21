@@ -61,9 +61,8 @@ space space there is around the edges of this group.
                 else if new_positions.y - ppos.y > boundsy
                     new_positions.y = ppos.y + boundsy
 
-                @offset =
-                  x: new_positions.x - ppos.x
-                  y: new_positions.y - ppos.y
+                new_positions.offset_x = new_positions.x - ppos.x
+                new_positions.offset_y = new_positions.y - ppos.y
 
             @position.set new_positions
 

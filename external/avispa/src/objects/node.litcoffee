@@ -65,9 +65,8 @@ Base class for "node" objects
                 else if new_positions.y > ppos.y + ppos.h
                     new_positions.y = ppos.y + ppos.h
 
-                @offset = 
-                  x: new_positions.x - ppos.x
-                  y: new_positions.y - ppos.y
+                new_positions.offset_x = new_positions.x - ppos.x
+                new_positions.offset_y = new_positions.y - ppos.y
 
             @position.set new_positions
 
