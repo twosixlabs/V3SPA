@@ -3,6 +3,7 @@
     vespaControllers.controller 'avispaCtrl', ($scope, VespaLogger,
         IDEBackend, $timeout) ->
 
+      $scope.domain_data = null
       $scope.objects ?= {}
       $scope.parent ?= [null]
 
@@ -25,29 +26,33 @@ Clean up the Avispa view
           $('#surface svg .groups')[0].innerHTML = ''
 
 
-A general update function for the Avispa view.
+A general update function for the Avispa view. This only refreshes
+when the domain data has actually changed to prevent flickering.
 
       update_view = (data)->
 
-        if data.domain
-          cleanup()
-          $scope.avispa = new Avispa
-            el: $('#surface svg')
+        if data.domain 
+          if not _.isEqual(data.domain, $scope.domain_data)
+            $scope.domain_data = data.domain
 
-          $scope.parseDomain(data.domain)
+            cleanup()
+            $scope.avispa = new Avispa
+              el: $('#surface svg')
+
+            $scope.parseDomain(data.domain)
 
         else
-          cleanup()
+            cleanup()
 
 
       IDEBackend.add_hook "json_changed", update_view
       $scope.$on "$destroy", ->
         IDEBackend.unhook "json_changed", update_view
 
-      start_data = IDEBackend.get_json()
-      if start_data
-        $timeout ->
-          update_view(start_data)
+      #start_data = IDEBackend.get_json()
+      #if start_data
+      #  $timeout ->
+      #    update_view(start_data)
 
 The following is more or less mapped from the backbone style code.
 ID's MUST be fully qualified, or Avispa renders horribly wrong.
@@ -58,13 +63,13 @@ ID's MUST be fully qualified, or Avispa renders horribly wrong.
         else
           return id
 
-      $scope.createDomain = (id, parents, obj) ->
+      $scope.createDomain = (id, parents, obj, coords) ->
           uid = fqid(id, parents[0])
           domain = new Domain
               _id: uid
               parent: parents[0]
               name: obj.name
-              position: obj.coords
+              position: coords
 
           $scope.objects[uid] = domain
 
@@ -73,13 +78,13 @@ ID's MUST be fully qualified, or Avispa renders horribly wrong.
           #else vespa.avispa.$objects.append domain.$el
           $scope.avispa.$groups.append domain.$el
 
-      $scope.createPort = (id, parents, obj) ->
+      $scope.createPort = (id, parents, obj, coords) ->
           uid = fqid(id, parents[0])
           port = new Port
               _id: uid
               parent: parents[0]
               label: id
-              position: obj.coords
+              position: coords
 
           $scope.objects[uid] = port
 
@@ -98,14 +103,15 @@ ID's MUST be fully qualified, or Avispa renders horribly wrong.
           domains = x: 10
           bounds = x: 40, y: 40
 
-          for id,subdomain of domain.subdomains
-              subdomain.coords =
+          for id, subdomain of domain.subdomains
+            do (id, subdomain)->
+              coords =
                   x: domains.x
                   y: 100
                   w: 220 * Object.keys(subdomain.subdomains).length || 200
                   h: 220 * Object.keys(subdomain.subdomains).length || 200
 
-              $scope.createDomain subdomain.name, $scope.parent, subdomain
+              $scope.createDomain subdomain.name, $scope.parent, subdomain, coords
 
               subdomain_id = fqid subdomain.name, $scope.parent[0]
               $scope.parent.unshift $scope.objects[subdomain_id]
@@ -115,13 +121,13 @@ ID's MUST be fully qualified, or Avispa renders horribly wrong.
               domains.x += 210
 
           for id, port of domain.ports
-              port.coords =
+              coords =
                   x: bounds.x
                   y: bounds.y
                   radius: 30
                   fill: '#eeeeec'
 
-              $scope.createPort id,  $scope.parent, port
+              $scope.createPort id,  $scope.parent, port, coords
 
               bounds.x += 70
 
