@@ -9,6 +9,7 @@ Expose a global view class so that consumers of the API can instantiate a view.
             'mousedown.avispa'      : 'OnMouseDown'
             'mousemove.avispa'      : 'OnMouseMove'
             'mouseup.avispa'        : 'OnMouseUp'
+            'mouseleave.avispa'     : 'OnMouseUp'
             'mousewheel.avispa'     : 'OnMouseWheel'
             'DOMMouseScroll.avispa' : 'OnMouseWheel'
             'contextmenu.avispa'    : 'OnContextMenu'
@@ -28,9 +29,11 @@ Expose a global view class so that consumers of the API can instantiate a view.
             @dragItem = null
             @arrow    = null
 
-            @position =
+            position = 
                 x: 0
                 y: 0
+
+            @position = new GenericModel position, "avispa.context" 
 
             @zoom =
                 step : 0.125
@@ -141,6 +144,7 @@ Expose a global view class so that consumers of the API can instantiate a view.
 
                 @dragItem.MouseUp(event) if @dragItem?.MouseUp
                 @dragItem = null
+
 
             else
                 switch event.which

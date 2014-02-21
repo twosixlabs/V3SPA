@@ -17,18 +17,23 @@ The "Position" model is defined by the project that is importing Avispa.
 
 Expect a position to be passed in
 
-            position = @options.position
             @parent  = @options.parent
+            position = @options.position
 
 If we have a parent, keep track of our offset from the parent
 
             if @parent
-                @offset = x: position.x, y: position.y
+                @offset = 
+                  x: position.x
+                  y: position.y
 
                 position.x += @parent.position.get('x')
                 position.y += @parent.position.get('y')
 
                 @parent.position.bind 'change', @ParentDrag, @
+
+            else
+              position = @options.position
 
             @position = new GenericModel(position, @options._id)
             @position.bind 'change', @render, @
@@ -50,14 +55,8 @@ The init method allows classes to extend the BaseObject without re-implementing 
         OnMouseDown: (event) ->
             @jitter = 0
 
-            @x1 = (event.clientX / context.scale) - @position.get('x')
-            @y1 = (event.clientY / context.scale) - @position.get('y')
-
-            if @parent
-                @ox1 = @offset.x - @position.get('x')
-                @oy1 = @offset.y - @position.get('y')
-
-            # TODO: calculate the bounds of the parent element
+            @clickOffsetX = (event.clientX / context.scale) - @position.get('x')
+            @clickOffsetY = (event.clientY / context.scale) - @position.get('y') 
 
             context.dragItem = @
 

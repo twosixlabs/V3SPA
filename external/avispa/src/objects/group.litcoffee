@@ -32,29 +32,39 @@ Base class for "group" objects
 
 
         Drag: (event) ->
-            x = (event.clientX / context.scale) - @x1
-            y = (event.clientY / context.scale) - @y1
+            new_positions =
+              x: (event.clientX / context.scale) - @clickOffsetX 
+              y: (event.clientY / context.scale) - @clickOffsetY
 
-            if @offset
-                @offset.x = @ox1 + x
-                @offset.y = @oy1 + y
+
+If we have a parent element, we want to make sure that our box is at least
+10 pixels inside of it at all times. We start by calculating the amount of
+space space there is around the edges of this group.
+
+            if @parent
+                ppos = 
+                  x: @parent.position.get('x')
+                  y: @parent.position.get('y')
+                  w: @parent.position.get('w')
+                  h: @parent.position.get('h')
 
                 boundsx = @parent.position.get('w') - @position.get('w') - 10
                 boundsy = @parent.position.get('h') - @position.get('h') - 10
 
-                if @offset.x < 10
-                    @offset.x = 10
-                    x = @parent.position.get('x') + 10
-                else if @offset.x > boundsx
-                    @offset.x = boundsx
-                    x = @parent.position.get('x') + boundsx
-                if @offset.y < 10
-                    @offset.y = 10
-                    y = @parent.position.get('y') + 10
-                else if @offset.y > boundsy
-                    @offset.y = boundsy
-                    y = @parent.position.get('y') + boundsy
+                if new_positions.x < (ppos.x + 10)
+                    new_positions.x = ppos.x + 10
+                else if new_positions.x - ppos.x > boundsx
+                    new_positions.x = ppos.x + boundsx
 
-            @position.set 'x': x, 'y': y
+                if new_positions.y < (ppos.y + 10)
+                    new_positions.y = ppos.y + 10
+                else if new_positions.y - ppos.y > boundsy
+                    new_positions.y = ppos.y + boundsy
+
+                @offset =
+                  x: new_positions.x - ppos.x
+                  y: new_positions.y - ppos.y
+
+            @position.set new_positions
 
             return cancelEvent(event)

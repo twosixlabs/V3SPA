@@ -40,26 +40,35 @@ Base class for "node" objects
 
 
         Drag: (event) ->
-            x = (event.clientX / context.scale) - @x1
-            y = (event.clientY / context.scale) - @y1
+            new_x = (event.clientX / context.scale) - @clickOffsetX
+            new_y = (event.clientY / context.scale) - @clickOffsetY
 
-            if @offset
-                @offset.x = @ox1 + x
-                @offset.y = @oy1 + y
+            new_positions = 
+              x: new_x 
+              y: new_y 
 
-                if @offset.x < 0
-                    @offset.x = 0
-                    x = @parent.position.get('x')
-                else if @offset.x > @parent.position.get('w')
-                    @offset.x = @parent.position.get('w')
-                    x = @parent.position.get('x') + @parent.position.get('w')
-                if @offset.y < 0
-                    @offset.y = 0
-                    y = @parent.position.get('y')
-                else if @offset.y > @parent.position.get('h')
-                    @offset.y = @parent.position.get('h')
-                    y = @parent.position.get('y') + @parent.position.get('h')
+            if @parent
 
-            @position.set 'x': x, 'y': y
+                ppos = 
+                  x: @parent.position.get('x')
+                  y: @parent.position.get('y')
+                  w: @parent.position.get('w')
+                  h: @parent.position.get('h')
+
+                if new_positions.x < ppos.x
+                    new_positions.x = ppos.x
+                else if new_positions.x > ppos.x + ppos.w
+                    new_positions.x = ppos.x + ppos.w
+
+                if new_positions.y < ppos.y
+                    new_positions.y = ppos.y
+                else if new_positions.y > ppos.y + ppos.h
+                    new_positions.y = ppos.y + ppos.h
+
+                @offset = 
+                  x: new_positions.x - ppos.x
+                  y: new_positions.y - ppos.y
+
+            @position.set new_positions
 
             return cancelEvent(event)
