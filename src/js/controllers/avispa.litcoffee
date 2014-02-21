@@ -11,11 +11,9 @@
 
       $('#surface').append $scope.avispa.$el
 
-A general update function for the Avispa view.
+Clean up the Avispa view
 
-      update_view = (data)->
-
-        if data.domain
+      cleanup = ->
           $scope.objects = {}
           $scope.parent = [null]
 
@@ -23,10 +21,22 @@ A general update function for the Avispa view.
           $('#surface svg .links')[0].innerHTML = ''
           $('#surface svg .labels')[0].innerHTML = ''
           $('#surface svg .groups')[0].innerHTML = ''
+
+
+A general update function for the Avispa view.
+
+      update_view = (data)->
+
+        if data.domain
+          cleanup()
           $scope.avispa = new Avispa
             el: $('#surface svg')
 
           $scope.parseDomain(data.domain)
+
+        else
+          cleanup()
+
 
       IDEBackend.add_hook "json_changed", update_view
       $scope.$on "$destroy", ->

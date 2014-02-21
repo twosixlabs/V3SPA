@@ -101,6 +101,7 @@ contents of @current_policy
           @SockJSService.send req, (result)=>
             if result.error  # Service error
               @validating = false
+
               deferred.reject result.payload
 
             else  # valid response. Must parse
@@ -109,13 +110,14 @@ contents of @current_policy
               for hook in @hooks.validation
                 hook(@current_policy.json.errors)
 
+              _.each @hooks.json_changed, (hook)=>
+                hook(@current_policy.json)
+
               if @current_policy.json.errors.length > 0
                 @current_policy.valid = false
 
               else
                 @current_policy.valid = true
-                _.each @hooks.json_changed, (hook)=>
-                  hook(@current_policy.json)
 
               @validating = false
               deferred.resolve()
