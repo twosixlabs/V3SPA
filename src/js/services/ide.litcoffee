@@ -86,6 +86,23 @@ invalid
           if @current_policy.valid
             return @current_policy.json
 
+Send notifications to those listing to validation hooks
+about highlighting that should be performed.
+
+        highlight: (object)=>
+          annotations = 
+            highlights: []
+          annotations.highlights.push @_parseClassSourcePosition (object)
+          annotations.highlights.push @_parseDomainSourcePosition (object)
+
+
+          _.each @hooks.validation, (hook)->
+            hook annotations
+
+        unhighlight: =>
+          _.each @hooks.validation, (hook)->
+            hook([])
+
 Send a request to the server to validate the current
 contents of @current_policy
 
@@ -106,7 +123,9 @@ contents of @current_policy
               @current_policy.json = JSON.parse result.payload
 
               for hook in @hooks.validation
-                hook(@current_policy.json.errors)
+                annotations = 
+                  errors: @current_policy.json.errors
+                hook(annotations)
 
               _.each @hooks.json_changed, (hook)=>
                 hook(@current_policy.json)
@@ -208,4 +227,45 @@ Upload a new policy to the server
 
 
           return deferred.promise
+
+Given the JSON representation, parse out the type
+of information described by these functions. These
+are written here to make it easier to change if the
+format of the JSON changes (as it likely will).
+
+        _parseClassSourcePosition: (object)-> 
+          annotation = _.find object.classAnnotations, (elem)->
+            elem.name == 'SourcePos'
+
+          info = 
+            range:
+              start:
+                row: annotation.args[1] - 1
+                column: annotation.args[2] - 1
+              end:
+                row: annotation.args[1] - 1
+                column: "class #{object.class}".length
+            description: "unknown"
+            type: "source_class"
+            apply_to: 'lobster'
+
+          return info
+
+        _parseDomainSourcePosition: (object)-> 
+          annotation = _.find object.domainAnnotations, (elem)->
+            elem.name == 'SourcePos'
+
+          info = 
+            range:
+              start:
+                row: annotation.args[1] - 1
+                column: annotation.args[2] - 1
+              end:
+                row: annotation.args[1] - 1
+                column: "domain #{object.name}".length
+            description: "unknown"
+            type: "source_domain"
+            apply_to: 'lobster'
+
+          return info
 

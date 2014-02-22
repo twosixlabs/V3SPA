@@ -70,6 +70,7 @@ ID's MUST be fully qualified, or Avispa renders horribly wrong.
               parent: parents[0]
               name: obj.name
               position: coords
+              data: obj
 
           $scope.objects[uid] = domain
 
@@ -85,17 +86,19 @@ ID's MUST be fully qualified, or Avispa renders horribly wrong.
               parent: parents[0]
               label: id
               position: coords
+              data: obj
 
           $scope.objects[uid] = port
 
           #parent.$el.append port.$el
           $scope.avispa.$objects.append port.$el
 
-      $scope.createLink = (dir, left, right) ->
+      $scope.createLink = (dir, left, right, data) ->
           link = new Avispa.Link
               direction: dir
               left: left
               right: right
+              data: data
 
           $scope.avispa.$links.append link.$el
 
@@ -142,10 +145,11 @@ to. This can either be a FQN (<domain>.<port>) or a local port name,
             else
               return parent_fqid + "#{connection.port}"
 
-          for idx,connection of domain.connections
+          for idx, connection of domain.connections
               $scope.createLink connection.connection,
                   $scope.objects[get_port_id(domain,connection.left)],
-                  $scope.objects[get_port_id(domain,connection.right)]
+                  $scope.objects[get_port_id(domain,connection.right)],
+                  connection
 
 Lobster-specific definitions for Avispa
 

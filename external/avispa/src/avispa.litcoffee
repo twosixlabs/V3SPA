@@ -29,16 +29,18 @@ Expose a global view class so that consumers of the API can instantiate a view.
             @dragItem = null
             @arrow    = null
 
+This loads the IDEBackend service into the context, so that any
+of the Avispa code can access it.
+
+            injector = angular.element('body').injector()
+            PositionManager = injector.get('PositionManager')
+            IDEBackend = injector.get('IDEBackend')
+            context.ide_backend = IDEBackend
+
 If we have svgPanZoom, use it to pan and zoom around.
 
             if svgPanZoom?
               @have_svg_pan_zoom = true
-We are outside of Angular, so we need to retrieve the services
-from the injector
-
-              injector = angular.element('body').injector()
-              PositionManager = injector.get('PositionManager')
-              IDEBackend = injector.get('IDEBackend')
 
 Only actually initialize the context scroller if there is a
 policy loaded. Otherwise we'll load the 'null' position for

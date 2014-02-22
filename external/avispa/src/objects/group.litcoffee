@@ -23,11 +23,15 @@ Base class for "group" objects
         OnMouseEnter: (event) ->
             if not context.dragItem?
                 @$rect.attr('class', 'hover')
+
+                context.ide_backend.highlight(@options.data)
+
             return cancelEvent(event)
 
         OnMouseLeave: (event) ->
             if not context.dragItem?
                 @$rect.removeAttr('class')
+                context.ide_backend.unhighlight()
             return cancelEvent(event)
 
 

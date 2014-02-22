@@ -56,7 +56,9 @@ Two way bind editor changing and model changing
           $timeout ->
             lobsterSession.setValue contents
 
-        IDEBackend.add_hook 'validation', (errors)->
+        $scope.editor_markers = []
+
+        IDEBackend.add_hook 'validation', (annotations)->
           format_error = (err)->
             ret = 
               row: err.line - 1
@@ -64,7 +66,37 @@ Two way bind editor changing and model changing
               type: 'error'
               text: err.message
 
-          lobsterSession.setAnnotations ( format_error(e) for e in errors )
+          lobsterSession.setAnnotations _.map(annotations?.errors, (e)->
+            format_error(e) for e in annotations.errors 
+          )
+
+          ace_range = ace.require("ace/range")
+
+          _.filter $scope.editor_markers, (elem)->
+            $scope.editor.getSession().removeMarker(elem)
+            return false
+
+          # highlight for e in annotations.highlighter
+          _.each annotations.highlights, (hl)->
+            range = new ace_range.Range(
+              hl.range.start.row,
+              hl.range.start.column,
+              hl.range.end.row,
+              hl.range.end.column
+            )
+
+            if hl.apply_to == 'lobster'
+              session = lobsterSession
+            else
+              session = applicationSession
+
+            marker = session.addMarker(
+              range,
+              "#{hl.type}_marker",
+              "text"
+            )
+
+            $scope.editor_markers.push marker
 
         IDEBackend.add_hook 'app_changed', (contents)->
           applicationSession.setValue contents
