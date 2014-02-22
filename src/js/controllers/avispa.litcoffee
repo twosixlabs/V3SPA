@@ -32,6 +32,10 @@ when the domain data has actually changed to prevent flickering.
       update_view = (data)->
 
         if data.domain 
+          #pos = PositionManager(
+          #  "avispa.#{identifier}::#{IDEBackend.current_policy._id}",
+          #  vals
+          #)
           if not _.isEqual(data.domain, $scope.domain_data)
             $scope.domain_data = data.domain
 
@@ -48,11 +52,6 @@ when the domain data has actually changed to prevent flickering.
       IDEBackend.add_hook "json_changed", update_view
       $scope.$on "$destroy", ->
         IDEBackend.unhook "json_changed", update_view
-
-      #start_data = IDEBackend.get_json()
-      #if start_data
-      #  $timeout ->
-      #    update_view(start_data)
 
 The following is more or less mapped from the backbone style code.
 ID's MUST be fully qualified, or Avispa renders horribly wrong.
@@ -150,6 +149,12 @@ to. This can either be a FQN (<domain>.<port>) or a local port name,
                   $scope.objects[get_port_id(domain,connection.left)],
                   $scope.objects[get_port_id(domain,connection.right)],
                   connection
+
+Actually load the thing the first time.
+
+      start_data = IDEBackend.get_json()
+      if start_data
+          update_view(start_data)
 
 Lobster-specific definitions for Avispa
 

@@ -92,7 +92,7 @@ Percolate changes to the server
 When the factory function is called, actually return an object that
 can be used to retrieve positions. Retrieve a cached manager if possible.
 
-      cache = $cacheFactory('position_managers', {capacity: 5})
+      cache = $cacheFactory('position_managers', {capacity: 50})
 
       return (id, defaults)->
         manager = cache.get(id)
