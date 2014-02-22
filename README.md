@@ -1,6 +1,5 @@
 V3SPA Angularized
 =================
-
 ## Requirements
 
 - nodejs
