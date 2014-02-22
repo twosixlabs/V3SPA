@@ -76,8 +76,7 @@ application representation) can be done from here
           # If we are currently running a validation cycle,
           # then set a timeout for 10 seconds, then re-validate if 
           # someone wants us to
-          self = @
-          @$timeout self.validate_dsl, if self.validating == true then 10000 else 0
+          @validate_dsl()
 
 Return the JSON representation if valid, and null if it is
 invalid

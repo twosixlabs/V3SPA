@@ -67,7 +67,7 @@ Two way bind editor changing and model changing
               text: err.message
 
           lobsterSession.setAnnotations _.map(annotations?.errors, (e)->
-            format_error(e) for e in annotations.errors 
+            format_error(e)
           )
 
           ace_range = ace.require("ace/range")
