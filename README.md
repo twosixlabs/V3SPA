@@ -27,14 +27,6 @@ To set up the environment:
     $ source vespa/bin/activate
     $ sudo pip install -r requirements.txt 
 
-#    $ # All
-#    $ git submodule update --init
-#    $ sudo npm install -g gulp
-#    $ # Install the local packages
-#    $ npm install
-#    $ mkvirtualenv vespa  # (optional, recommended, requires virtualenvwrapper)
-#    $ pip install -r requirements.txt
-
 ## Building 
 
 All of the assets are now served from static/, but they aren't
