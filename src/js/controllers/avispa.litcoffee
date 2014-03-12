@@ -46,6 +46,7 @@ when the domain data has actually changed to prevent flickering.
             $scope.parseDomain(data.domain)
 
         else
+            $scope.domain_data = null
             cleanup()
 
 
