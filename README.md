@@ -6,22 +6,34 @@ V3SPA Angularized
 - npm
 - python
 - pip
+- mongodb
 
 To set up the environment:
 
     $ # OS X
     $ brew install node 
 
-    $ # Fedora
-    $ sudo yum install npm
-
-    $ # All
+    $ # Fedora (v20)
+    $ sudo yum install gcc kernel-devel kernel-headers dkms make bzip2 perl nodejs npm python-pip git python-devel mongodb-server
+    $ pip install virtualenv
+    $ mkdir vespa && cd vespa
+    $ git init
+    $ git clone http://gitlab.labs/v3spa/ide.git
+    $ cd ide
     $ git submodule update --init
     $ sudo npm install -g gulp
-    $ # Install the local packages
-    $ npm install
-    $ mkvirtualenv vespa  # (optional, recommended, requires virtualenvwrapper)
-    $ pip install -r requirements.txt
+    $ sudo npm install
+    $ virtualenv vespa
+    $ source vespa/bin/activate
+    $ sudo pip install -r requirements.txt 
+
+#    $ # All
+#    $ git submodule update --init
+#    $ sudo npm install -g gulp
+#    $ # Install the local packages
+#    $ npm install
+#    $ mkvirtualenv vespa  # (optional, recommended, requires virtualenvwrapper)
+#    $ pip install -r requirements.txt
 
 ## Building 
 
