@@ -1,45 +1,52 @@
-      <div class='modal-header'>
-            <h4 class='modal-title' id='loadPolicyModalLabel'>Load Policy</h4>
-          </div>
-            <form name='form' no-validate>
-          <div id='policyModal' class="modal-body">
-          <div class='form-horizontal'>
-          <div class='form-group'>
-            <label class='control-label'>Name</label>
-            <input type='text' placeholder='Example Policy' 
-                   class='form-control' value='' name='' 
-                   ng-model='input.label' required/>
-          </div>
-            <div class='form-group'>
-            <label>Policy File</label>
-            <div class='input-group'>
-            <input type='text' class='form-control' readonly value='{{input.policy|filepath}}'/>
-            <span class='input-group-btn'>
+<div class='modal-header'>
+  <h4 class='modal-title' id='loadPolicyModalLabel'>Load Policy</h4>
+</div>
+<form name='form' no-validate>
+  <div id='policyModal' class="modal-body">
+    <div class='form-horizontal'>
+      <div class='form-group'>
+        <label class='control-label'>Name</label>
+        <input type='text' placeholder='Example Policy' 
+        class='form-control' value='' name='' 
+        ng-model='input.label' required/>
+      </div>
+      <div class='form-group'>
+        <label>Policy File</label>
+        <div class='input-group'>
+          <input type='text' class='form-control' readonly value='{{input.policy|filepath}}'/>
+          <span class='input-group-btn'>
             <span class='btn btn-primary btn-file'>
               Browse<input id='policyFile' type='file' ng-model='input.policy' required/>
-            </span>                       
-            </span> 
-           </div>
-            </div>
-          </div>
-            <div class='form-group' ng-class="{'.has-warning': 'form.lobsterfile.$invalid'}">
-              <label>Lobster File</label>
-            <div class='input-group'>
-            <input 
-                   type='text' class='form-control' 
-                   readonly value='{{input.lobster|filepath}}'/>
-            <span class='input-group-btn'>
-            <span class='btn btn-primary btn-file'>
-              Browse<input id='lobsterFile' type='file' 
-                     ng-model='input.lobster' required name='lobsterfile' />
-            </span>                       
-            </span> 
-           </div>
-            </div>
-          </div>
-            <div class='modal-footer'>
-            <button type="button" class="btn btn-default" ng-click='cancel()'>Cancel</button>
-            <button type="button" ng-disabled='form.$invalid'
-                    class="btn btn-primary" ng-click='load()'>Load</button>
-                    </div>
-          </form>
+            </span>
+          </span>
+        </div>
+      </div>
+    </div>
+    <p>Each policy must be associated with a reference policy version. You can either
+    select one from those available using the dropdown or upload a new one.</p>
+
+    <div ng-hide='uploading.status'>
+    <input class='form-control' id='refPolicySelect'
+    ui-select2='list_refpolicies'
+    placeholder="Select existing reference policy"
+    ng-model='input.refpolicy' type='hidden'/>
+    <div id='refPolicyDrop' class='well well-sm text-muted drop-zone'
+      file-upload-drop='upload_refpolicy'>
+      Drop a zipped up reference policy source here
+    </div>
+    </div>
+
+    <div ng-show='uploading.status'>
+      <span class='text-info'>Uploading {{uploading.name}}</span>
+      <progressbar value='uploading.status' max='100'>
+    </div>
+    <span class='text-warning' ng-show='fileerrors != null'>
+      {{fileerrors}}
+    </span>
+  </div>
+  <div class='modal-footer'>
+    <button type="button" class="btn btn-default" ng-click='cancel()'>Cancel</button>
+    <button type="button" ng-disabled='form.$invalid'
+      class="btn btn-primary" ng-click='load()'>Load</button>
+  </div>
+</form>

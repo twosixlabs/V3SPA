@@ -131,7 +131,7 @@ and upload it to the server using the websocket endpoint specified
       class Reader
           constructor: (@$q, @VespaLogger, @$timeout) ->
 
-          _read_file: (id, blob)->
+          _read_file: (id, blob, type)->
               deferred = @$q.defer()
               reader = new FileReader()
 
@@ -141,13 +141,43 @@ and upload it to the server using the websocket endpoint specified
               reader.onerror = (event)->
                 deferred.reject(event)
 
-              reader.readAsText(blob)
+              if type == 'text'
+                reader.readAsText(blob)
+              else if type == 'binary'
+                reader.readAsDataURL(blob)
+
               return deferred.promise
+
+          read_binary_chunks: (file, callback, chunk=16384)->
+            @have_error = false
+            filesize = file.size
+
+            read_chunk = (file, from)=>
+
+              if @have_error
+                console.log "Stopping FileReader because of errors"
+                return
+
+              if from + chunk > filesize
+                chunk = filesize - from
+
+              return if chunk <= 0
+
+              blob = file.slice(from, from+chunk)
+
+              promise = @_read_file(file.name, blob, 'binary')
+
+              promise.then (done)->
+                [nm, data] = done
+                callback data.split(',')[1], from, chunk, filesize
+                read_chunk(file, from + chunk)
+
+            read_chunk(file, 0)
 
           read: (fileblobs, callback)=>
 
             promises = for key, blob of fileblobs
-              @_read_file(key, blob)
+              @_read_file(key, blob, 'text')
 
             @$q.all(promises)
               .then(

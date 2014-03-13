@@ -1,5 +1,6 @@
     vespaControllers = angular.module('vespaControllers', 
-        ['ui.ace', 'vespa.services', 'ui.bootstrap', 'ui.select2'])
+        ['ui.ace', 'vespa.services', 'ui.bootstrap', 'ui.select2',
+        'angularFileUpload', 'vespa.directives'])
 
 The main controller. avispa is a subcontroller.
 
@@ -134,49 +135,7 @@ Create a modal for opening a policy
       $scope.open_policy = ->
         instance = $modal.open
           templateUrl: 'policyOpenModal.html'
-          controller: ($scope, $modalInstance) ->
-
-            $scope.selection = 
-              value: null
-
-            $scope.cancel = $modalInstance.dismiss
-
-            $scope.policySelectOpts = 
-              query: (query)->
-                promise = IDEBackend.list_policies()
-                promise.then(
-                  (policy_list)->
-                    dropdown = 
-                      results:  for d in policy_list
-                        id: d._id.$oid
-                        text: d.id
-                        data: d
-                        disabled: IDEBackend.isCurrent(d._id.$oid)
-
-                    query.callback(dropdown)
-                )
-
-            scope = $scope
-            $scope.load = ->
-              if not scope.selection.value?
-                $modalInstance.dismiss()
-
-              $scope.loading = true
-              promise = IDEBackend.load_policy $scope.selection.value.data._id
-
-              promise.then(
-                (data)->
-                  console.log "Loaded policy successfully"
-                  $scope.loading = false
-              ,
-                (error)->
-                  $.growl "Failed to load policy", 
-                    type: 'warning'
-                  console.log "Policy load failed: #{error}"
-                  $scope.loading = false
-              )
-
-              $modalInstance.close()
+          controller:  'modal.policy_open'
 
 Modal dialog for new policy
 
@@ -203,21 +162,7 @@ Create a modal for uploading policies
       $scope.upload_policy = ->
         instance = $modal.open
           templateUrl: 'policyLoadModal.html'
-          controller: ($scope, $modalInstance) ->
-
-            $scope.input = {}
-
-            $scope.load = ->
-
-              inputs = 
-                label: $scope.input.label
-                policy_file: $('#policyFile')[0].files[0]
-                lobster_file:  $('#lobsterFile')[0].files[0]
-
-              $modalInstance.close(inputs)
-
-            $scope.cancel = ->
-              $modalInstance.dismiss('cancel')
+          controller: 'modal.policy_load'
 
 If we get given files, read them as text and send them over the websocket
 

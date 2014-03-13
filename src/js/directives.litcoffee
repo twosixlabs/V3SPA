@@ -42,6 +42,42 @@
 
       return ret
 
+    v3spa.directive 'fileUploadDrop', ->
+      dir = 
+        restrict: 'A'
+        scope: 
+          on_drop: '&fileUploadDrop'
+        link: (scope, elem)->
+          elem.bind 'drop', (e)->
+              dataTrans = e.dataTransfer
+              dataTrans ?= e.originalEvent.dataTransfer
+
+              e.preventDefault()
+              e.stopPropagation()
+
+              elem.removeClass('file-drop-over')
+              method = scope.on_drop()
+              method(dataTrans.files[0])
+
+          elem.bind 'dragover', (e)->
+
+            dataTrans = event.dataTransfer
+            dataTrans ?= event.originalEvent.dataTransfer
+
+            e.preventDefault()
+            e.stopPropagation()
+
+            elem.addClass('file-drop-over')
+            dataTrans.dropEffect = 'copy'
+
+          elem.bind 'dragleave', (e)->
+            e.preventDefault()
+            e.stopPropagation()
+
+            elem.removeClass('file-drop-over')
+
+      return dir
+
     v3spa.directive 'v3spaEditor', ->
       ret = 
         restrict: 'A'
