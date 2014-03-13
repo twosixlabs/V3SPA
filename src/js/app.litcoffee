@@ -28,6 +28,15 @@
             redirectTo: '/avispa'
     ])
 
+    v3spa.run ($templateCache, $http)->
+      $templateCache.put('policyLoadModal.html',
+                         $http.get('partials/modal_load.html'))
+      $templateCache.put('policyNewModal.html',
+                         $http.get('partials/modal_new.html'))
+      $templateCache.put('policyOpenModal.html',
+                         $http.get('partials/modal_open.html'))
+
+
     v3spa.filter 'filepath', ->
       return (input)->
         if not input?

@@ -1,0 +1,45 @@
+      <div class='modal-header'>
+            <h4 class='modal-title' id='loadPolicyModalLabel'>Load Policy</h4>
+          </div>
+            <form name='form' no-validate>
+          <div id='policyModal' class="modal-body">
+          <div class='form-horizontal'>
+          <div class='form-group'>
+            <label class='control-label'>Name</label>
+            <input type='text' placeholder='Example Policy' 
+                   class='form-control' value='' name='' 
+                   ng-model='input.label' required/>
+          </div>
+            <div class='form-group'>
+            <label>Policy File</label>
+            <div class='input-group'>
+            <input type='text' class='form-control' readonly value='{{input.policy|filepath}}'/>
+            <span class='input-group-btn'>
+            <span class='btn btn-primary btn-file'>
+              Browse<input id='policyFile' type='file' ng-model='input.policy' required/>
+            </span>                       
+            </span> 
+           </div>
+            </div>
+          </div>
+            <div class='form-group' ng-class="{'.has-warning': 'form.lobsterfile.$invalid'}">
+              <label>Lobster File</label>
+            <div class='input-group'>
+            <input 
+                   type='text' class='form-control' 
+                   readonly value='{{input.lobster|filepath}}'/>
+            <span class='input-group-btn'>
+            <span class='btn btn-primary btn-file'>
+              Browse<input id='lobsterFile' type='file' 
+                     ng-model='input.lobster' required name='lobsterfile' />
+            </span>                       
+            </span> 
+           </div>
+            </div>
+          </div>
+            <div class='modal-footer'>
+            <button type="button" class="btn btn-default" ng-click='cancel()'>Cancel</button>
+            <button type="button" ng-disabled='form.$invalid'
+                    class="btn btn-primary" ng-click='load()'>Load</button>
+                    </div>
+          </form>

@@ -1,0 +1,14 @@
+
+<div class='modal-body'>
+  <h4 class='modal-title'>Open Policy</h4>
+  <div class='form-group'>
+    <input class='form-control' id='policySelect'
+    ui-select2='policySelectOpts'
+    placeholder="Select a policy"
+    ng-model='selection.value' type='hidden'/>
+    <span class='help-block'>Select a policy from the list of previously uploaded policies</span>
+  </div>
+  <button type="button" class="btn btn-default" ng-click='cancel()'>Cancel</button>
+  <button type="button" ng-disabled='form.$invalid'
+    class="btn btn-primary" ng-click='load()'>Load</button>
+</div>
