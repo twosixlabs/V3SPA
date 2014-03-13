@@ -62,3 +62,8 @@ Mongo and two more binaries need to be launched.
     $ mongod --dbpath ./mongodb &
     $ ./ide/api/bin/lobster-server &
     $ ./ide/vespa.py &
+    
+## Automated Install
+
+There is a vagrant file and shell script provided to execute all the steps 
+during provisioning without launching Mongo or the two binaries at the end.
