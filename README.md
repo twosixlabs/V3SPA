@@ -13,7 +13,7 @@ To set up the environment:
     $ # OS X
     $ brew install node 
 
-    $ # Fedora (v20)
+    $ # Fedora
     $ sudo yum install gcc kernel-devel kernel-headers dkms make bzip2 perl nodejs npm python-pip git python-devel mongodb-server
     $ pip install virtualenv
     $ mkdir vespa && cd vespa
@@ -35,16 +35,30 @@ compiling assets and putting them in the right place.
 
 To build assets:
 
-    $ cd external/d3hive && npm install && gulp
+    $ cd external/d3hive
+    $ sudo npm install 
+    $ gulp
     $ cd -
     $ gulp
-
-To start the asset auto-reloader for development (you may need to
-run just 'grunt' once first).
-
-    $ gulp reloader
 
 ## Layout
 
 All of the client side code is now located in src/. All external
 libraries are in external.
+
+## Database
+
+Mongo is installed at this point, but you need to create a location
+for database storage. Then launch Mongod. 
+(Assuming you are in vespa directory.)
+
+    $ mkdir ./mongodb
+    
+## Running
+
+Mongo and two more binaries need to be launched. 
+(Assuming you are in the vespa dirrectory.)
+
+    $ mongod --dbpath ./mongodb &
+    $ ./ide/api/bin/lobster-server &
+    $ ./ide/vespa.py &
