@@ -7,6 +7,22 @@
           @uploader_running = false
           @chunks_to_upload = []
 
+          @current
+
+        load: (name)=>
+          req = 
+            domain: 'refpolicy'
+            request: 'get'
+            payload: 
+              id: name
+
+        current_as_select2: =>
+          return null unless @current?
+          ret =
+            id: @current._id
+            text: @current.id
+            data: @current
+
         upload_chunk: (name, chunk, start, len, total)=>
           deferred = @$q.defer()
 
@@ -48,6 +64,29 @@ If this is the only thing in the queue, start the uploader
                 @_upload_chunks()
               else
                 @uploader_running = false
+
+
+        list_modules: (oid)=>
+          deferred = @$q.defer()
+
+          req = 
+            domain: 'refpolicy'
+            request: 'find'
+            payload: 
+              criteria:
+                _id: oid
+                valid: true
+              selection:
+                id: true
+                modules: true
+
+          @SockJSService.send req, (data)->
+            if data.error?
+              deferred.reject(data.payload)
+            else
+              deferred.resolve(data.payload)
+
+          return deferred.promise
 
 
         list: =>

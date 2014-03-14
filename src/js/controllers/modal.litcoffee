@@ -74,16 +74,29 @@
             $scope.cancel = ->
               $modalInstance.dismiss('cancel')
 
-    vespaControllers.controller 'modal.policy_open', ($scope, $modalInstance) ->
+    vespaControllers.controller 'modal.policy_open', (
+      $scope, $modalInstance, RefPolicy, IDEBackend) ->
 
             $scope.selection = 
-              value: null
+                refpolicy: RefPolicy.current_as_select2()
+
+            $scope.modules = null
+            $scope.$watch( 
+              ->
+                $scope.selection.refpolicy
+            ,
+              (newv, oldv)->
+                if newv?
+                  promise = RefPolicy.list_modules(newv.id)
+                  promise.then (data)->
+                    $scope.modules = data[0].modules
+            )
 
             $scope.cancel = $modalInstance.dismiss
 
             $scope.policySelectOpts = 
               query: (query)->
-                promise = IDEBackend.list_policies()
+                promise = RefPolicy.list()
                 promise.then(
                   (policy_list)->
                     dropdown = 
@@ -91,7 +104,7 @@
                         id: d._id.$oid
                         text: d.id
                         data: d
-                        disabled: IDEBackend.isCurrent(d._id.$oid)
+                        disabled: IDEBackend.current_policy._id == d._id.$oid
 
                     query.callback(dropdown)
                 )

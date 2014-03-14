@@ -20,6 +20,9 @@ class Database(object):
     self.db = self._client[db_name]
 
   def Find(self, collection, criteria, projection, **opts):
+    if '_id' in criteria:
+      criteria['_id'] = Database.json.ObjectId(criteria['_id'])
+
     cursor = self.db[collection].find(criteria, projection)
     results = list(cursor.limit(100))
     return results

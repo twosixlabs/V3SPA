@@ -11,6 +11,7 @@ errors, and generally being awesome.
         @SockJSService, @$q, @$timeout)->
 
           @current_policy = 
+            reference_policy: null
             application: ""
             dsl: ""
             json: null

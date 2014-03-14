@@ -112,3 +112,50 @@ position: absolute;
 .file-drop-over {
   border-color: @brand-success;
 }
+
+.scrollable-2 {
+  .scrollable-table(2);
+}
+
+.scrollable-3 {
+  .scrollable-table(3);
+}
+.scrollable-4 {
+  .scrollable-table(4);
+}
+
+.scrollable-5 {
+  .scrollable-table(5);
+}
+
+.scrollable-table(@cols) {
+  table {
+width: 100%;
+  }
+
+  thead, tbody, tr, td, th { display: block; }
+  tr {
+    &:after {
+      content: ' ';
+      display: block;
+      visibility: hidden;
+      clear: both;
+    }
+  }
+
+  thead th {
+    heigh: 30px;
+  }
+
+  tbody {
+    height: 150px;
+    overflow-y: auto;
+    }
+
+  thead {}
+
+  tbody td, thead th {
+    width: percentage(.98 / @cols);
+float: left;
+  }
+}
