@@ -106,7 +106,10 @@ class Entry(UserDict.DictMixin):
         return self
 
     def Delete(self):
-        api.db.Remove(self.TABLE, self.id)
+        try:
+          api.db.Remove(self.TABLE, self['_id'])
+        except KeyError:  # It wasn't in the database anyway
+          pass
         return True
 
     @property
