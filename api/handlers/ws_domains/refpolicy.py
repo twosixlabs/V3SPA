@@ -9,6 +9,28 @@ import restful
 import api
 
 
+def iter_lines(fil_or_str):
+  if isinstance(fil_or_str, (basestring)):
+    fil_or_str = fil_or_str.split('\n')
+
+  for line in fil_or_str:
+    yield line
+
+
+def extract_module_version(module_text):
+    """ Extracts the name and version from a module TE file """
+    mod_defn_re = re.compile(
+        r'policy_module\((?P<name>[a-zA-Z0-9\.\/_-]+),\s*(?P<version>[0-9]+\.[0-9]+(:?\.[0-9]+)?)\)')
+
+    for line in iter_lines(module_text):
+      match = mod_defn_re.match(line)
+      if match:
+        return match.group('name'), match.group('version')
+
+    else:  # no matches
+      raise Exception(".te file had no module string")
+
+
 class RefPolicy(restful.ResourceDomain):
     TABLE = 'refpolicy'
 
@@ -94,36 +116,37 @@ class RefPolicy(restful.ResourceDomain):
                          onerror=print_error)
 
         modules = {}
-        mod_defn_re = re.compile(
-            r'policy_module\((?P<name>[a-zA-Z]+),\s*(?P<version>[0-9]+\.[0-9]+\.[0-9]+)\)')
 
         for dirpath, dirnames, filenames in walker:
             modnames = set((fn.split('.')[0] for fn in filenames))
 
             for mod in modnames:
                 with open(os.path.join(dirpath, mod + ".te")) as te_file:
-                    for line in te_file:
-                        match = mod_defn_re.match(line)
-                        if match:
-                            if match.group( 'name' ) in modules:
-                                raise Exception(
-                                    "Reference policy contains duplicate "
-                                    "module: '{0}'".format(match.group('name'))
-                                )
-                            modules[match.group('name')] = {
-                                'name': match.group('name'),
-                                'version': match.group('version'),
-                                'te_file':
-                                os.path.join(dirpath, mod + ".te"),
-                                'fc_file':
-                                os.path.join(
-                                    dirpath,
-                                    mod + ".fc") if mod + ".fc" in filenames else None,
-                                'if_file':
-                                os.path.join(
-                                    dirpath,
-                                    mod + ".if") if mod + ".if" in filenames else None
-                            }
+                  try:
+                    modname, version = extract_module_version(te_file)
+                  except Exception:
+                    raise
+
+                if modname in modules:
+                    raise Exception(
+                        "Reference policy contains duplicate "
+                        "module: '{0}'".format(modname)
+                    )
+
+                modules[modname] = {
+                    'name': modname,
+                    'version': version,
+                    'te_file':
+                    os.path.join(dirpath, mod + ".te"),
+                    'fc_file':
+                    os.path.join(
+                        dirpath,
+                        mod + ".fc") if mod + ".fc" in filenames else None,
+                    'if_file':
+                    os.path.join(
+                        dirpath,
+                        mod + ".if") if mod + ".if" in filenames else None
+                }
 
         return modules
 
