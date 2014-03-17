@@ -5,7 +5,8 @@ import logging
 
 import api
 
-__all__ = ['initialize', 'Entries', 'Entry']
+__all__ = ['initialize', 'Entry']
+
 
 def initialize():
     engine = api.config.get('storage', 'engine')
@@ -29,41 +30,41 @@ def initialize():
     logging.info('Storage engine: %s', engine)
 
 
-class Entries:
-    def __init__(self, entries):
-        self.entries = entries
+#class Entries:
+    #def __init__(self, entries):
+        #self.entries = entries
 
-    @classmethod
-    def Read(cls, params=None, sort=None):
-        return cls(api.db.Find(cls.ENTRY.TABLE, params, sort))
+    #@classmethod
+    #def Read(cls, params=None, sort=None):
+        #return cls(api.db.Find(cls.ENTRY.TABLE, params, sort))
 
-    def Delete(self):
-        for entry in self.entries:
-            self.ENTRY(entry).Delete()
-        pass
+    #def Delete(self):
+        #for entry in self.entries:
+            #self.ENTRY(entry).Delete()
+        #pass
 
-    @classmethod
-    def Count(cls):
-        return api.db.Count(cls.ENTRY.TABLE)
+    #@classmethod
+    #def Count(cls):
+        #return api.db.Count(cls.ENTRY.TABLE)
 
-    def __len__(self):
-        return len(self.entries)
+    #def __len__(self):
+        #return len(self.entries)
 
-    def __iter__(self):
-        for entry in self.entries:
-            yield self.ENTRY(entry)
+    #def __iter__(self):
+        #for entry in self.entries:
+            #yield self.ENTRY(entry)
 
-    def __getitem__(self, idx):
-        return self.entries.__getitem__(idx)
+    #def __getitem__(self, idx):
+        #return self.entries.__getitem__(idx)
 
-    @property
-    def json(self):
-        return json.dumps(self.entries, indent=2)
+    #@property
+    #def json(self):
+        #return json.dumps(self.entries, indent=2)
 
 
 class Entry(UserDict.DictMixin):
     def __init__(self, entry):
-        self.id     = entry['id']
+        self.id = entry['id']
         self.entry = dict(entry)
         self.Init()
 

@@ -170,20 +170,22 @@ If we get given files, read them as text and send them over the websocket
           (inputs)-> 
             console.log(inputs)
 
-            filelist = 
-              application: inputs.policy_file
-              dsl: inputs.lobster_file
+            filelist = inputs.files
 
             AsyncFileReader.read filelist, (files)->
               req = 
                 domain: 'policy'
                 request: 'create'
                 payload: 
-                  id: inputs.label
-                  application: files.application
-                  dsl: files.dsl
+                  refpolicy: inputs.refpolicy.data._id
+                  files: files
+                  type: 'selinux'
 
-              SockJSService.send(req)
+              SockJSService.send req, (result)->
+                if result.error
+                  $.growl {title: 'Failed to upload module', message: result.payload}, 
+                    type: 'danger'
+                  console.log result
 
           ()->
             console.log("Modal dismissed")

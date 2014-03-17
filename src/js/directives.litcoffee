@@ -57,7 +57,7 @@
 
               elem.removeClass('file-drop-over')
               method = scope.on_drop()
-              method(dataTrans.files[0])
+              method(dataTrans.files[0], elem.attr('name'))
 
           elem.bind 'dragover', (e)->
 

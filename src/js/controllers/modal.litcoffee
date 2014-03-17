@@ -5,12 +5,21 @@
 
             $scope.input = 
               refpolicy: null
+              files: {}
+
+            $scope.invalid = ->
+              return not ($scope.input.refpolicy? and 
+                          $scope.input.files.te?)
 
             $scope.fileerrors = null
 
             $scope.uploading = 
               status: false
               name: null
+
+            $scope.add_file_input = (file, input_name)->
+              $scope.$apply ->
+                $scope.input.files[input_name] = file
 
             $scope.upload_refpolicy = (file)->
               if file.type != 'application/zip'
@@ -63,13 +72,7 @@
                 )
 
             $scope.load = ->
-
-              inputs = 
-                label: $scope.input.label
-                policy_file: $('#policyFile')[0].files[0]
-                lobster_file:  $('#lobsterFile')[0].files[0]
-
-              $modalInstance.close(inputs)
+              $modalInstance.close($scope.input)
 
             $scope.cancel = ->
               $modalInstance.dismiss('cancel')
