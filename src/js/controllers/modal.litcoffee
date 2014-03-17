@@ -80,6 +80,9 @@
             $scope.selection = 
                 refpolicy: RefPolicy.current_as_select2()
 
+Watcher to make sure the reference policy modules get listed
+when the reference policy is selected.
+
             $scope.modules = null
             $scope.$watch( 
               ->
@@ -93,6 +96,8 @@
             )
 
             $scope.cancel = $modalInstance.dismiss
+
+Loader for the reference policy dropdown
 
             $scope.policySelectOpts = 
               query: (query)->
@@ -109,13 +114,15 @@
                     query.callback(dropdown)
                 )
 
-            scope = $scope
-            $scope.load = ->
-              if not scope.selection.value?
+Load the clicked on policy into the IDE.
+
+            $scope.load = (name)->
+              if not $scope.selection.refpolicy?
                 $modalInstance.dismiss()
 
               $scope.loading = true
-              promise = IDEBackend.load_policy $scope.selection.value.data._id
+
+              promise = IDEBackend.load_policy $scope.selection.refpolicy.id, name
 
               promise.then(
                 (data)->

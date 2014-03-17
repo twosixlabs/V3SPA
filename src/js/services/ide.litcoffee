@@ -149,23 +149,28 @@ contents of @current_policy
 
 Load a policy from the server
 
-        load_policy: (id)=>
+        load_policy: (refpolicy_id, module_name)=>
           deferred = @$q.defer()
 
           req = 
             domain: 'policy'
             request: 'get'
             payload: 
-              _id: id
+              refpolicy_id: refpolicy_id
+              name: module_name
 
           @SockJSService.send req, (data)=>
             if data.error
               deferred.reject(data.payload)
 
-            @current_policy.application = data.payload.application
-            @current_policy.dsl = data.payload.dsl
-            @current_policy._id = data.payload._id.$oid
-            @current_policy.id = data.payload.id
+            mod = data.payload.module
+
+            @reference_policy = data.payload.refpolicy
+
+            @current_policy.application = mod.application
+            @current_policy.dsl = mod.dsl
+            @current_policy._id = mod._id.$oid
+            @current_policy.id = mod.id
             @current_policy.valid = false
 
             for hook in @hooks.dsl_changed
