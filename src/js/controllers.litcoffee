@@ -177,7 +177,7 @@ If we get given files, read them as text and send them over the websocket
                 domain: 'policy'
                 request: 'create'
                 payload: 
-                  refpolicy: inputs.refpolicy.data._id
+                  refpolicy_id: inputs.refpolicy.data._id
                   files: files
                   type: 'selinux'
 

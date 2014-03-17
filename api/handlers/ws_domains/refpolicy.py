@@ -31,6 +31,27 @@ def extract_module_version(module_text):
       raise Exception(".te file had no module string")
 
 
+def read_module_files(module_data):
+  """ Read the files belonging to a module from disk and return
+  their data as a dictionary. """
+
+  files = {}
+
+  if 'te_file' in module_data:
+    with open(module_data['te_file']) as fin:
+      files['te'] = fin.read()
+
+  if 'if_file' in module_data:
+    with open(module_data['if_file']) as fin:
+      files['if'] = fin.read()
+
+  if 'fc_file' in module_data:
+    with open(module_data['fc_file']) as fin:
+      files['fc'] = fin.read()
+
+  return files
+
+
 class RefPolicy(restful.ResourceDomain):
     TABLE = 'refpolicy'
 
@@ -158,7 +179,6 @@ class RefPolicy(restful.ResourceDomain):
         """
         import zipfile
 
-        import pdb; pdb.set_trace()
         name = self['id'][:-4] if self['id'].endswith('.zip') else self['id']
         zipped_policy = self['tmpfile']
         policy_dir = os.path.join(

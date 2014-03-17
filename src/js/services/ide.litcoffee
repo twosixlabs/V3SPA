@@ -157,7 +157,7 @@ Load a policy from the server
             request: 'get'
             payload: 
               refpolicy_id: refpolicy_id
-              name: module_name
+              id: module_name
 
           @SockJSService.send req, (data)=>
             if data.error

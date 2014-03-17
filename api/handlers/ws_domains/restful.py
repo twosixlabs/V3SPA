@@ -34,7 +34,7 @@ class ResourceDomain(api.storage.interface.Entry):
         try:
             response['payload'] = cls.Find(
                 params.get('criteria', {}),
-                params.get('selection', {})
+                params.get('selection', None)
             )
             return response
         except KeyError:

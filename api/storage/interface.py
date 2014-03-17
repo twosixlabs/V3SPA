@@ -72,7 +72,7 @@ class Entry(UserDict.DictMixin):
         pass
 
     @classmethod
-    def Find(cls, criteria, selection):
+    def Find(cls, criteria, selection=None):
         result = api.db.Find(cls.TABLE, criteria, selection)
         if result is None:
           return []
