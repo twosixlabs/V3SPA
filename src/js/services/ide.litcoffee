@@ -11,9 +11,8 @@ errors, and generally being awesome.
         @SockJSService, @$q, @$timeout)->
 
           @current_policy = 
-            reference_policy: null
-            application: ""
-            dsl: ""
+            refpolicy_id: null
+            documents: {}
             json: null
             id: null
             _id: null
@@ -46,8 +45,7 @@ Create a new policy, but don't save it or anything
 
         new_policy: (args)=>
           @current_policy = 
-            application: ""
-            dsl: ""
+            documents: {}
             json: null
             id: null
             _id: null
@@ -58,10 +56,10 @@ Create a new policy, but don't save it or anything
               @current_policy[arg] = val
 
           for hook in @hooks.dsl_changed
-            hook(@current_policy.dsl)
+            hook(@current_policy.documents)
 
           for hook in @hooks.app_changed
-            hook(@current_policy.application)
+            hook(@current_policy.documents)
 
           for hook in @hooks.policy_load
             hook(@current_policy)
@@ -72,7 +70,7 @@ the DSL. Any required callbacks (like updating the
 application representation) can be done from here
 
         update_dsl: (newtext)=>
-          @current_policy.dsl = newtext
+          @current_policy.documents.dsl = newtext
 
           # If we are currently running a validation cycle,
           # then set a timeout for 10 seconds, then re-validate if 
@@ -112,7 +110,7 @@ contents of @current_policy
           req =
             domain: 'lobster'
             request: 'validate'
-            payload: @current_policy.dsl
+            payload: @current_policy.documents.dsl
 
           @SockJSService.send req, (result)=>
             if result.error  # Service error
@@ -162,14 +160,13 @@ Load a policy from the server
           @SockJSService.send req, (data)=>
             if data.error
               deferred.reject(data.payload)
+              return
 
-            mod = data.payload.module
-
-            @reference_policy = data.payload.refpolicy
-
-            @current_policy.application = mod.application
-            @current_policy.dsl = mod.dsl
+            mod = data.payload
+            @current_policy = mod
             @current_policy._id = mod._id.$oid
+            @current_policy.refpolicy_id = mod.refpolicy_id.$oid
+            @current_policy.documents = mod.documents
             @current_policy.id = mod.id
             @current_policy.valid = false
 
