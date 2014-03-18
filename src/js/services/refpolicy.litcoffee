@@ -7,14 +7,17 @@
           @uploader_running = false
           @chunks_to_upload = []
 
-          @current
-
-        load: (name)=>
+        load: (id)=>
           req = 
             domain: 'refpolicy'
             request: 'get'
-            payload: 
-              id: name
+            payload: id
+
+          @SockJSService.send req, (data)=>
+            if data.error?
+              @current = null
+            else
+              @current = data.payload
 
         current_as_select2: =>
           return null unless @current?

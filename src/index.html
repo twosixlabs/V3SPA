@@ -49,7 +49,7 @@
                           <span class='glyphicon glyphicon-arrow-right'></span>
                         </a>
                       </div>
-                      <span class='lead'>Editor</span>
+                      <span class='lead'>{{policy.refpolicy || "Editor"}}</span>
                       <span class='text-muted'>{{policy.id}}</span>
                       <div class='btn'
                         spinner-icon='loading'
@@ -94,33 +94,31 @@
                   </div>
                   <div class='horizontal-pad'></div>
                   <div class='row'>
-                      <div class='form-group'>
-                        <label class='control-label pad-right'>Visualizer Type</label>
-                        <div class='btn-group'>
-                          <button btn-radio="'avispa'" type='button' class='btn btn-sm btn-default' active ng-model="visualizer_type">Structured</button>
-                          <button btn-radio="'hive'" type='button' class='btn btn-sm btn-default' ng-model='visualizer_type'> Hive</button>
-                        </div>
-                      </div>
-                    <div class='col-md-12'>
-                      <div class='form-group'>
-                        <label class='control-label pad-right'>Editor View</label>
-                        <label class='radio-inline'>
-                          <input type='radio' ng-model='view' 
-                                 name='editorView' value='dsl'>
-                          Lobster
-                        </label>
-                        <label class='radio-inline'>
-                          <input type='radio' ng-model='view'
-                                 name='editorView' value='app' />
-                          Application
-                        </label>
+                    <div class='form-group'>
+                      <label class='control-label pad-right'>Visualizer Type</label>
+                      <div class='btn-group'>
+                        <button btn-radio="'avispa'" type='button' class='btn btn-sm btn-default' active ng-model="visualizer_type">Structured</button>
+                        <button btn-radio="'hive'" type='button' class='btn btn-sm btn-default' ng-model='visualizer_type'> Hive</button>
                       </div>
                     </div>
                   </div>
-                  <div ng-model="policy.dsl" 
-                    ui-ace="{ onLoad: aceLoaded }"
-                    auto-height='0.6'
-                    on-resize='$scope.editor.resize()'>
+                  <div class='editor'>
+                    <div ng-show='policy.id'>
+                      <tabset id='editor_tabs'>
+                      <tab id='tab_{{nm}}' ng-repeat='(nm, doc) in policy.documents' 
+                           heading='{{nm}}' select='setEditorTab(nm)'>
+                      </tab>
+                      </tabset>
+                    </div>
+                    <div class='editor-box'>
+                      <div ui-ace="{ onLoad: aceLoaded }"
+                        auto-height='0.6'
+                        on-resize='$scope.editor.resize()'>
+                      </div>
+                      <div class='faded-overlay' ng-hide='policy.id'>
+                        <p class='lead'>Open or create a policy from the 'Policy' menu above</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

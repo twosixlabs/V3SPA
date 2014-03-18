@@ -6,16 +6,29 @@ The main controller. avispa is a subcontroller.
 
     vespaControllers.controller 'ideCtrl', ($scope, $rootScope, SockJSService, VespaLogger, $modal, AsyncFileReader, IDEBackend, $timeout, $location) ->
 
+      $scope._ = _
+
       $scope.policy = IDEBackend.current_policy
 
       IDEBackend.add_hook 'policy_load', (info)->
         $timeout ->
           $scope.policy = IDEBackend.current_policy
 
+          $scope.editorSessions = {}
+          for nm, doc of $scope.policy.documents
+            do (nm, doc)->
+              mode = if doc.mode then doc.mode else 'text'
+              session = new ace.EditSession doc.text, "ace/mode/#{mode}"
+
+              session.on 'change', (text)->
+                IDEBackend.update_document nm, session.getValue()
+              $scope.editorSessions[nm] = 
+                session: session
+
+
       $scope.visualizer_type = 'avispa'
       $timeout ->
         $scope.view = 'dsl'
-
 
 This controls our editor visibility.
 
@@ -27,7 +40,6 @@ This controls our editor visibility.
             $scope.editorSize -= 1
 
       $scope.editorSize = 1
-
 
       $scope.aceLoaded = (editor) ->
         editor.setTheme("ace/theme/solarized_light");
@@ -45,17 +57,25 @@ This controls our editor visibility.
 
         $scope.editor = editor
 
-        lobsterSession = new ace.EditSession $scope.policy.dsl, 'ace/mode/lobster'
-        applicationSession = new ace.EditSession $scope.policy.application, 'ace/mode/text'
+        $scope.editorSessions = {}
+        for nm, doc of $scope.policy.documents
+          do (nm, doc)->
+            mode = if doc.mode then doc.mode else 'text'
+            session = new ace.EditSession doc.text, "ace/mode/#{mode}"
 
-Two way bind editor changing and model changing
+            session.on 'change', (text)->
+              IDEBackend.update_document nm, session.getValue()
 
-        lobsterSession.on 'change', (text)->
-          IDEBackend.update_dsl(lobsterSession.getValue())
+            $scope.editorSessions[nm] = 
+              session: session
 
-        IDEBackend.add_hook 'dsl_changed', (contents)->
-          $timeout ->
-            lobsterSession.setValue contents
+
+        IDEBackend.add_hook 'doc_changed', (doc, contents)->
+          $timeout(
+            ->
+              $scope.editorSessions[doc].session.setValue contents
+          , 2)
+
 
         $scope.editor_markers = []
 
@@ -67,9 +87,10 @@ Two way bind editor changing and model changing
               type: 'error'
               text: err.message
 
-          lobsterSession.setAnnotations _.map(annotations?.errors, (e)->
-            format_error(e)
-          )
+          $timeout ->
+            editorSession.dsl.setAnnotations _.map(annotations?.errors, (e)->
+              format_error(e)
+            )
 
           ace_range = ace.require("ace/range")
 
@@ -77,40 +98,66 @@ Two way bind editor changing and model changing
             $scope.editor.getSession().removeMarker(elem)
             return false
 
-          # highlight for e in annotations.highlighter
-          _.each annotations.highlights, (hl)->
-            range = new ace_range.Range(
-              hl.range.start.row,
-              hl.range.start.column,
-              hl.range.end.row,
-              hl.range.end.column
-            )
+          $timeout ->
+            # highlight for e in annotations.highlighter
+            _.each annotations.highlights, (hl)->
+              range = new ace_range.Range(
+                hl.range.start.row,
+                hl.range.start.column,
+                hl.range.end.row,
+                hl.range.end.column
+              )
 
-            if hl.apply_to == 'lobster'
-              session = lobsterSession
-            else
-              session = applicationSession
+              session = $scope.editorSessions[hl.apply_to].session
 
-            marker = session.addMarker(
-              range,
-              "#{hl.type}_marker",
-              "text"
-            )
+              marker = session.addMarker(
+                range,
+                "#{hl.type}_marker",
+                "text"
+              )
 
-            $scope.editor_markers.push marker
-
-        IDEBackend.add_hook 'app_changed', (contents)->
-          applicationSession.setValue contents
+              $scope.editor_markers.push marker
 
 Watch the view control and switch the editor session
 
-        $scope.$watch 'view', (value)->
-          if value == 'dsl'
-            editor.setSession(lobsterSession)
-            editor.setReadOnly(false)
-          else
-            editor.setSession(applicationSession)
-            editor.setReadOnly(true)
+        $scope.setEditorTab = (name)->
+          $timeout ->
+            sessInfo = $scope.editorSessions[name]
+
+            if sessInfo.tab? and not _.isEmpty sessInfo.tab
+              prevIndex = sessInfo.tab.css('z-index')
+
+            idx = 0
+            for nm, info of $scope.editorSessions
+              idx++
+              if not info.tab? or _.isEmpty info.tab
+                info.tab = angular.element "#editor_tabs \#tab_#{nm}"
+
+              if nm == name
+                info.tab.css 'z-index', 4
+              else
+                if prevIndex?
+                  nowindex = info.tab.css('z-index')
+                  if nowindex > prevIndex
+                    info.tab.css 'z-index', nowindex - 1
+                else
+                  info.tab.css 'z-index', _.size($scope.editorSessions) - idx
+
+
+            editor.setSession(sessInfo.session)
+
+            if not $scope.policy.documents[name].editable
+              editor.setOptions
+                readOnly: true
+                highlightActiveLine: false
+                highlightGutterLine: false
+              editor.renderer.$cursorLayer.element.style.opacity=0
+            else
+              editor.setOptions
+                readOnly: false
+                highlightActiveLine: true
+                highlightGutterLine: true
+              editor.renderer.$cursorLayer.element.style.opacity=1
 
         $scope.$watch 'visualizer_type', (value)->
           if value == 'avispa'
@@ -177,8 +224,8 @@ If we get given files, read them as text and send them over the websocket
                 domain: 'policy'
                 request: 'create'
                 payload: 
-                  refpolicy: inputs.refpolicy.data._id
-                  files: files
+                  refpolicy_id: inputs.refpolicy.data._id
+                  documents: files
                   type: 'selinux'
 
               SockJSService.send req, (result)->

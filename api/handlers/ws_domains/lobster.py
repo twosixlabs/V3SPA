@@ -15,7 +15,6 @@ class LobsterDomain(object):
         backend_uri = "http://{0}/version".format(
             api.config.get('lobster_backend', 'uri'))
 
-
         try:
             http_client = httpclient.HTTPClient()
             result = http_client.fetch(
@@ -36,21 +35,19 @@ class LobsterDomain(object):
                 # Our request wasn't valid anyway, we just wanted a response
                 pass
 
-    def validate(self, msg):
-        """ Validate a Lobster file received from the IDE
-        """
-
-        backend_uri = "http://{0}/parse".format(
-            api.config.get('lobster_backend', 'uri'))
-
+    @staticmethod
+    def _make_request(method, path, payload, timeout=10.0):
         http_client = httpclient.HTTPClient()
+        backend_uri = "http://{0}{1}".format(
+            api.config.get('lobster_backend', 'uri'),
+            path)
 
         try:
             output = http_client.fetch(
                 backend_uri,
-                method='POST',
-                body=msg['payload'],
-                request_timeout=10.0
+                method=method,
+                body=payload,
+                request_timeout=timeout
             )
         except httpclient.HTTPError as e:
             if e.code == 599:
@@ -61,11 +58,39 @@ class LobsterDomain(object):
                         "Backend error: [{0}] {1}".format(e.code, e.message))
                 else:
                     raise Exception("backend:lobster - Unspecified Error")
+        else:
+          return output
+
+    def validate(self, msg):
+        """ Validate a Lobster file received from the IDE
+        """
+
+        output = self._make_request('POST', '/parse', msg['payload'])
 
         return {
             'label': msg['response_id'],
             'payload': output.body
         }
+
+    def translate_selinux(self, params):
+        """ Given a set of parameters of the form, return the
+        lobster DSL for the module.
+
+            {
+              "refpolicy": "minimal",
+              "modules": [
+                { "name": "test",
+                  "if": " ... source of .if file ...",
+                  "te": " ... source of .te file ...",
+                  "fc": " ... source of .fc file ..."
+                }
+              ]
+            }
+        """
+        output = self._make_request('POST', '/import/selinux',
+            params if isinstance(params, basestring) else api.db.json.dumps(params))
+
+        return api.db.json.loads(output.body)
 
     def handle(self, msg):
         if msg['request'] == 'validate':

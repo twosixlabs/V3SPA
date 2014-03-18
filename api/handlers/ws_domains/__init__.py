@@ -10,6 +10,16 @@ for loader, name, ispkg in pkgutil.iter_modules(__path__):
   __DOMAINS__[name] = LazyModule('api.handlers.ws_domains.' + name,
                                  loader, '__instantiate__')
 
+
+def call(domain, method, *args, **kwargs):
+  if domain not in __DOMAINS__:
+    raise KeyError("No domain handler known for '{0}'".format(domain))
+
+  method = getattr(__DOMAINS__[domain], method)
+
+  return method(*args, **kwargs)
+
+
 @concurrent.return_future
 def dispatch(msg, callback=None):
 

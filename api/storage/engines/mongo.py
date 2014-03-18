@@ -5,8 +5,10 @@ from tornado import gen
 import logging
 logger = logging.getLogger(__name__)
 
+
 class Database(object):
 
+  idtype = bson.json_util.ObjectId
   json = bson.json_util
 
   def __init__(self):

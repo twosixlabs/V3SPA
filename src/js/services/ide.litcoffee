@@ -8,12 +8,11 @@ errors, and generally being awesome.
     mod.service 'IDEBackend',
       class IDEBackend
         constructor: (@VespaLogger, @$rootScope,
-        @SockJSService, @$q, @$timeout)->
+        @SockJSService, @$q, @$timeout,@RefPolicy)->
 
           @current_policy = 
-            reference_policy: null
-            application: ""
-            dsl: ""
+            refpolicy_id: null
+            documents: {}
             json: null
             id: null
             _id: null
@@ -21,8 +20,7 @@ errors, and generally being awesome.
 
           @hooks = 
             policy_load: []
-            dsl_changed: []
-            app_changed: []
+            doc_changed: []
             json_changed: []
             validation: []
 
@@ -46,8 +44,7 @@ Create a new policy, but don't save it or anything
 
         new_policy: (args)=>
           @current_policy = 
-            application: ""
-            dsl: ""
+            documents: {}
             json: null
             id: null
             _id: null
@@ -57,27 +54,23 @@ Create a new policy, but don't save it or anything
           for arg, val of args
               @current_policy[arg] = val
 
-          for hook in @hooks.dsl_changed
-            hook(@current_policy.dsl)
-
-          for hook in @hooks.app_changed
-            hook(@current_policy.application)
-
           for hook in @hooks.policy_load
             hook(@current_policy)
+
+          for hook in @hooks.doc_changed
+            for doc, contents of @current_policy.documents
+              hook(doc, contents)
 
 
 An easy handle to update the stored representation of
 the DSL. Any required callbacks (like updating the
 application representation) can be done from here
 
-        update_dsl: (newtext)=>
-          @current_policy.dsl = newtext
+        update_document: (doc, newtext)->
+          @current_policy.documents[doc].text = newtext
 
-          # If we are currently running a validation cycle,
-          # then set a timeout for 10 seconds, then re-validate if 
-          # someone wants us to
-          @validate_dsl()
+          if doc == 'dsl'
+            @validate_dsl()
 
 Return the JSON representation if valid, and null if it is
 invalid
@@ -112,7 +105,7 @@ contents of @current_policy
           req =
             domain: 'lobster'
             request: 'validate'
-            payload: @current_policy.dsl
+            payload: @current_policy.documents.dsl.text
 
           @SockJSService.send req, (result)=>
             if result.error  # Service error
@@ -149,30 +142,39 @@ contents of @current_policy
 
 Load a policy from the server
 
-        load_policy: (id)=>
+        load_policy: (refpolicy_id, module_name)=>
           deferred = @$q.defer()
 
           req = 
             domain: 'policy'
             request: 'get'
             payload: 
-              _id: id
+              refpolicy_id: refpolicy_id
+              id: module_name
 
           @SockJSService.send req, (data)=>
             if data.error
               deferred.reject(data.payload)
+              return
 
-            @current_policy.application = data.payload.application
-            @current_policy.dsl = data.payload.dsl
-            @current_policy._id = data.payload._id.$oid
-            @current_policy.id = data.payload.id
+            mod = data.payload
+            @current_policy = mod
+            @current_policy._id = mod._id.$oid
+
+            if mod.refpolicy_id.$oid != @current_policy.refpolicy_id
+              @current_policy.refpolicy_id = mod.refpolicy_id.$oid
+              @RefPolicy.load @current_policy.refpolicy_id
+
+            @current_policy.documents = mod.documents
+            @current_policy.id = mod.id
             @current_policy.valid = false
 
-            for hook in @hooks.dsl_changed
-              hook(@current_policy.dsl)
+            for hook in @hooks.policy_load
+              hook(@current_policy)
 
-            for hook in @hooks.app_changed
-              hook(@current_policy.application)
+            for hook in @hooks.doc_changed
+              for docname, doc of @current_policy.documents
+                hook(docname, doc.text)
 
             $.growl 
               title: "Loaded"

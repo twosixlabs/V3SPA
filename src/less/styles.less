@@ -18,6 +18,10 @@
     }
 }
 
+.faded-overlay {
+  z-index: 1;
+}
+
 .container-full {
   padding-top: 10px;
   margin: 0 15px;
@@ -27,10 +31,72 @@
   margin-bottom: 0;
 }
 
-/* This is necessary to make the editor appear. Actual height is dynamic */
-.ace_editor {
+.editor {
+
+  .nav-tabs {
+    border-bottom: 1px solid @editor-tabs-border-color;
+    font-size: @font-size-small;
+
+    > li {
+      float: left;
+      // Make the list-items overlay the bottom border
+      margin-bottom: -1px;
+      margin-right: -10px;
+
+      // Actual tabs (as links)
+      > a {
+        margin-right: 2px;
+        line-height: @line-height-base;
+        border: 1px solid @editor-tabs-border-color;
+        border-radius: @editor-tabs-radius @editor-tabs-radius 0 0;
+        padding: 5px 20px;
+        background-color: @editor-tabs-bg-color;
+
+        &:hover {
+          border-color: @editor-tabs-link-hover-border-color @editor-tabs-link-hover-border-color @editor-tabs-border-color;
+          background-color: @editor-tabs-active-link-hover-bg;
+        }
+      }
+
+      // Active state, and it's :hover to override normal :hover
+      &.active > a {
+        &,
+        &:hover,
+        &:focus {
+          color: @editor-tabs-active-link-hover-color;
+          background-color: @editor-tabs-active-link-hover-bg;
+          border: 1px solid @editor-tabs-active-link-hover-border-color;
+          border-bottom-color: transparent;
+          cursor: default;
+
+          background-color: @editor-tabs-active-link-hover-bg;
+        }
+      }
+    }
+  }
+
+    .editor-box {
+
+position: relative;
+
+          .faded-overlay {
+            z-index: 3;
+position: absolute;
+top: 0;
+left: 0;
+padding: 50px 10px;
+         background-color: rgba(230,230,230,0.7);
+height: 100%;
+width: 100%;
+       text-align: center;
+          }
+
+          .ace_editor {
 height: 400px;
-}
+        z-index: 2;
+          }
+    }
+  }
 
 .horizontal-pad {
   margin-bottom: 10px;

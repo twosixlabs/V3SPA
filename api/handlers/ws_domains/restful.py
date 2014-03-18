@@ -34,7 +34,7 @@ class ResourceDomain(api.storage.interface.Entry):
         try:
             response['payload'] = cls.Find(
                 params.get('criteria', {}),
-                params.get('selection', {})
+                params.get('selection', None)
             )
             return response
         except KeyError:
@@ -43,6 +43,7 @@ class ResourceDomain(api.storage.interface.Entry):
 
     @classmethod
     def do_get(cls, params, response):
+        import pdb; pdb.set_trace()
         response['payload'] = cls.Read(params)
         return response
 
