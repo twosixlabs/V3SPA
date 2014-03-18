@@ -20,8 +20,7 @@ errors, and generally being awesome.
 
           @hooks = 
             policy_load: []
-            dsl_changed: []
-            app_changed: []
+            doc_changed: []
             json_changed: []
             validation: []
 
@@ -55,27 +54,23 @@ Create a new policy, but don't save it or anything
           for arg, val of args
               @current_policy[arg] = val
 
-          for hook in @hooks.dsl_changed
-            hook(@current_policy.documents)
-
-          for hook in @hooks.app_changed
-            hook(@current_policy.documents)
-
           for hook in @hooks.policy_load
             hook(@current_policy)
+
+          for hook in @hooks.doc_changed
+            for doc, contents of @current_policy.documents
+              hook(doc, contents)
 
 
 An easy handle to update the stored representation of
 the DSL. Any required callbacks (like updating the
 application representation) can be done from here
 
-        update_dsl: (newtext)=>
-          @current_policy.documents.dsl = newtext
+        update_document: (doc, newtext)->
+          @current_policy.documents[doc].text = newtext
 
-          # If we are currently running a validation cycle,
-          # then set a timeout for 10 seconds, then re-validate if 
-          # someone wants us to
-          @validate_dsl()
+          if doc == 'dsl'
+            @validate_dsl()
 
 Return the JSON representation if valid, and null if it is
 invalid
@@ -110,7 +105,7 @@ contents of @current_policy
           req =
             domain: 'lobster'
             request: 'validate'
-            payload: @current_policy.documents.dsl
+            payload: @current_policy.documents.dsl.text
 
           @SockJSService.send req, (result)=>
             if result.error  # Service error
@@ -170,11 +165,12 @@ Load a policy from the server
             @current_policy.id = mod.id
             @current_policy.valid = false
 
-            for hook in @hooks.dsl_changed
-              hook(@current_policy.dsl)
+            for hook in @hooks.policy_load
+              hook(@current_policy)
 
-            for hook in @hooks.app_changed
-              hook(@current_policy.application)
+            for hook in @hooks.doc_changed
+              for docname, doc of @current_policy.documents
+                hook(docname, doc.text)
 
             $.growl 
               title: "Loaded"

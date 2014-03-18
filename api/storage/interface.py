@@ -30,38 +30,6 @@ def initialize():
     logging.info('Storage engine: %s', engine)
 
 
-#class Entries:
-    #def __init__(self, entries):
-        #self.entries = entries
-
-    #@classmethod
-    #def Read(cls, params=None, sort=None):
-        #return cls(api.db.Find(cls.ENTRY.TABLE, params, sort))
-
-    #def Delete(self):
-        #for entry in self.entries:
-            #self.ENTRY(entry).Delete()
-        #pass
-
-    #@classmethod
-    #def Count(cls):
-        #return api.db.Count(cls.ENTRY.TABLE)
-
-    #def __len__(self):
-        #return len(self.entries)
-
-    #def __iter__(self):
-        #for entry in self.entries:
-            #yield self.ENTRY(entry)
-
-    #def __getitem__(self, idx):
-        #return self.entries.__getitem__(idx)
-
-    #@property
-    #def json(self):
-        #return json.dumps(self.entries, indent=2)
-
-
 class Entry(UserDict.DictMixin):
     def __init__(self, entry):
         self.id = entry['id']
@@ -116,6 +84,10 @@ class Entry(UserDict.DictMixin):
     @property
     def json(self):
         return api.db.json.dumps(dict(self.entry), indent=2)
+
+    def __getattr__(self, attr):
+      if attr in self.entry:
+        return self.entry.__getitem__(attr)
 
     def __getitem__(self, key):
         return self.entry.__getitem__(key)

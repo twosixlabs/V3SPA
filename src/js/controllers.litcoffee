@@ -12,10 +12,19 @@ The main controller. avispa is a subcontroller.
         $timeout ->
           $scope.policy = IDEBackend.current_policy
 
+          $scope.editorSessions = {}
+          for nm, doc of $scope.policy.documents
+            do (nm, doc)->
+              mode = if doc.mode then doc.mode else 'text'
+              session = new ace.EditSession doc.text, "ace/mode/#{mode}"
+
+              session.on 'change', (text)->
+                IDEBackend.update_document nm, session.getValue()
+              $scope.editorSessions[nm] = session
+
       $scope.visualizer_type = 'avispa'
       $timeout ->
         $scope.view = 'dsl'
-
 
 This controls our editor visibility.
 
@@ -44,7 +53,8 @@ This controls our editor visibility.
 
         $scope.editor = editor
 
-        $scope.editorSessions = for nm, doc of $scope.policy.documents
+        $scope.editorSessions = {}
+        for nm, doc of $scope.policy.documents
           do (nm, doc)->
             mode = if doc.mode then doc.mode else 'text'
             session = new ace.EditSession doc.text, "ace/mode/#{mode}"
@@ -52,9 +62,14 @@ This controls our editor visibility.
             session.on 'change', (text)->
               IDEBackend.update_document nm, session.getValue()
 
+            $scope.editorSessions[nm] = session
+
         IDEBackend.add_hook 'doc_changed', (doc, contents)->
-          $timeout ->
-            $scope.editorSessions[doc].setValue contents
+          $timeout(
+            ->
+              $scope.editorSessions[doc].setValue contents
+          , 2)
+
 
         $scope.editor_markers = []
 

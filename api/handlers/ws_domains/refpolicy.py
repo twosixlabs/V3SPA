@@ -160,6 +160,7 @@ class RefPolicy(restful.ResourceDomain):
                 modules[modname] = {
                     'name': modname,
                     'version': version,
+                    'policy_id': None,
                     'te_file':
                     os.path.join(dirpath, mod + ".te"),
                     'fc_file':
