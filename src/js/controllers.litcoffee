@@ -28,7 +28,6 @@ This controls our editor visibility.
 
       $scope.editorSize = 1
 
-
       $scope.aceLoaded = (editor) ->
         editor.setTheme("ace/theme/solarized_light");
         editor.setKeyboardHandler("vim");
@@ -45,17 +44,17 @@ This controls our editor visibility.
 
         $scope.editor = editor
 
-        lobsterSession = new ace.EditSession $scope.policy.dsl, 'ace/mode/lobster'
-        applicationSession = new ace.EditSession $scope.policy.application, 'ace/mode/text'
+        $scope.editorSessions = for nm, doc of $scope.policy.documents
+          do (nm, doc)->
+            mode = if doc.mode then doc.mode else 'text'
+            session = new ace.EditSession doc.text, "ace/mode/#{mode}"
 
-Two way bind editor changing and model changing
+            session.on 'change', (text)->
+              IDEBackend.update_document nm, session.getValue()
 
-        lobsterSession.on 'change', (text)->
-          IDEBackend.update_dsl(lobsterSession.getValue())
-
-        IDEBackend.add_hook 'dsl_changed', (contents)->
+        IDEBackend.add_hook 'doc_changed', (doc, contents)->
           $timeout ->
-            lobsterSession.setValue contents
+            $scope.editorSessions[doc].setValue contents
 
         $scope.editor_markers = []
 
@@ -67,7 +66,7 @@ Two way bind editor changing and model changing
               type: 'error'
               text: err.message
 
-          lobsterSession.setAnnotations _.map(annotations?.errors, (e)->
+          editorSession.dsl.setAnnotations _.map(annotations?.errors, (e)->
             format_error(e)
           )
 
@@ -86,10 +85,7 @@ Two way bind editor changing and model changing
               hl.range.end.column
             )
 
-            if hl.apply_to == 'lobster'
-              session = lobsterSession
-            else
-              session = applicationSession
+            session = $scope.editorSessions[hl.apply_to]
 
             marker = session.addMarker(
               range,
@@ -99,18 +95,22 @@ Two way bind editor changing and model changing
 
             $scope.editor_markers.push marker
 
-        IDEBackend.add_hook 'app_changed', (contents)->
-          applicationSession.setValue contents
-
 Watch the view control and switch the editor session
 
-        $scope.$watch 'view', (value)->
-          if value == 'dsl'
-            editor.setSession(lobsterSession)
-            editor.setReadOnly(false)
+        $scope.setEditorTab = (name)->
+          editor.setSession($scope.editorSessions[name])
+          if not $scope.policy.documents[name].editable
+            editor.setOptions
+              readOnly: true
+              highlightActiveLine: false
+              highlightGutterLine: false
+            editor.renderer.$cursorLayer.element.style.opacity=0
           else
-            editor.setSession(applicationSession)
-            editor.setReadOnly(true)
+            editor.setOptions
+              readOnly: false
+              highlightActiveLine: true
+              highlightGutterLine: true
+            editor.renderer.$cursorLayer.element.style.opacity=1
 
         $scope.$watch 'visualizer_type', (value)->
           if value == 'avispa'
@@ -178,7 +178,7 @@ If we get given files, read them as text and send them over the websocket
                 request: 'create'
                 payload: 
                   refpolicy_id: inputs.refpolicy.data._id
-                  files: files
+                  documents: files
                   type: 'selinux'
 
               SockJSService.send req, (result)->

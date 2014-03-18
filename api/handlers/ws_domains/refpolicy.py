@@ -31,7 +31,7 @@ def extract_module_version(module_text):
       raise Exception(".te file had no module string")
 
 
-def read_module_files(module_data):
+def read_module_files(module_data, **addl_props):
   """ Read the files belonging to a module from disk and return
   their data as a dictionary. """
 
@@ -39,15 +39,18 @@ def read_module_files(module_data):
 
   if 'te_file' in module_data:
     with open(module_data['te_file']) as fin:
-      files['te'] = fin.read()
+      files['te'] = {'text': fin.read()}
+      files['te'].update(**addl_props)
 
   if 'if_file' in module_data:
     with open(module_data['if_file']) as fin:
-      files['if'] = fin.read()
+      files['if'] = {'text': fin.read()}
+      files['if'].update(**addl_props)
 
   if 'fc_file' in module_data:
     with open(module_data['fc_file']) as fin:
-      files['fc'] = fin.read()
+      files['fc'] = {'text': fin.read()}
+      files['fc'].update(**addl_props)
 
   return files
 
