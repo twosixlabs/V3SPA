@@ -6,6 +6,8 @@ The main controller. avispa is a subcontroller.
 
     vespaControllers.controller 'ideCtrl', ($scope, $rootScope, SockJSService, VespaLogger, $modal, AsyncFileReader, IDEBackend, $timeout, $location) ->
 
+      $scope._ = _
+
       $scope.policy = IDEBackend.current_policy
 
       IDEBackend.add_hook 'policy_load', (info)->
@@ -20,7 +22,9 @@ The main controller. avispa is a subcontroller.
 
               session.on 'change', (text)->
                 IDEBackend.update_document nm, session.getValue()
-              $scope.editorSessions[nm] = session
+              $scope.editorSessions[nm] = 
+                session: session
+
 
       $scope.visualizer_type = 'avispa'
       $timeout ->
@@ -62,12 +66,14 @@ This controls our editor visibility.
             session.on 'change', (text)->
               IDEBackend.update_document nm, session.getValue()
 
-            $scope.editorSessions[nm] = session
+            $scope.editorSessions[nm] = 
+              session: session
+
 
         IDEBackend.add_hook 'doc_changed', (doc, contents)->
           $timeout(
             ->
-              $scope.editorSessions[doc].setValue contents
+              $scope.editorSessions[doc].session.setValue contents
           , 2)
 
 
@@ -81,9 +87,10 @@ This controls our editor visibility.
               type: 'error'
               text: err.message
 
-          editorSession.dsl.setAnnotations _.map(annotations?.errors, (e)->
-            format_error(e)
-          )
+          $timeout ->
+            editorSession.dsl.setAnnotations _.map(annotations?.errors, (e)->
+              format_error(e)
+            )
 
           ace_range = ace.require("ace/range")
 
@@ -91,41 +98,66 @@ This controls our editor visibility.
             $scope.editor.getSession().removeMarker(elem)
             return false
 
-          # highlight for e in annotations.highlighter
-          _.each annotations.highlights, (hl)->
-            range = new ace_range.Range(
-              hl.range.start.row,
-              hl.range.start.column,
-              hl.range.end.row,
-              hl.range.end.column
-            )
+          $timeout ->
+            # highlight for e in annotations.highlighter
+            _.each annotations.highlights, (hl)->
+              range = new ace_range.Range(
+                hl.range.start.row,
+                hl.range.start.column,
+                hl.range.end.row,
+                hl.range.end.column
+              )
 
-            session = $scope.editorSessions[hl.apply_to]
+              session = $scope.editorSessions[hl.apply_to].session
 
-            marker = session.addMarker(
-              range,
-              "#{hl.type}_marker",
-              "text"
-            )
+              marker = session.addMarker(
+                range,
+                "#{hl.type}_marker",
+                "text"
+              )
 
-            $scope.editor_markers.push marker
+              $scope.editor_markers.push marker
 
 Watch the view control and switch the editor session
 
         $scope.setEditorTab = (name)->
-          editor.setSession($scope.editorSessions[name])
-          if not $scope.policy.documents[name].editable
-            editor.setOptions
-              readOnly: true
-              highlightActiveLine: false
-              highlightGutterLine: false
-            editor.renderer.$cursorLayer.element.style.opacity=0
-          else
-            editor.setOptions
-              readOnly: false
-              highlightActiveLine: true
-              highlightGutterLine: true
-            editor.renderer.$cursorLayer.element.style.opacity=1
+          $timeout ->
+            sessInfo = $scope.editorSessions[name]
+
+            if sessInfo.tab? and not _.isEmpty sessInfo.tab
+              prevIndex = sessInfo.tab.css('z-index')
+
+            idx = 0
+            for nm, info of $scope.editorSessions
+              idx++
+              if not info.tab? or _.isEmpty info.tab
+                info.tab = angular.element "#editor_tabs \#tab_#{nm}"
+
+              if nm == name
+                info.tab.css 'z-index', 4
+              else
+                if prevIndex?
+                  nowindex = info.tab.css('z-index')
+                  if nowindex > prevIndex
+                    info.tab.css 'z-index', nowindex - 1
+                else
+                  info.tab.css 'z-index', _.size($scope.editorSessions) - idx
+
+
+            editor.setSession(sessInfo.session)
+
+            if not $scope.policy.documents[name].editable
+              editor.setOptions
+                readOnly: true
+                highlightActiveLine: false
+                highlightGutterLine: false
+              editor.renderer.$cursorLayer.element.style.opacity=0
+            else
+              editor.setOptions
+                readOnly: false
+                highlightActiveLine: true
+                highlightGutterLine: true
+              editor.renderer.$cursorLayer.element.style.opacity=1
 
         $scope.$watch 'visualizer_type', (value)->
           if value == 'avispa'

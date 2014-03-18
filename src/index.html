@@ -104,9 +104,9 @@
                   </div>
                   <div class='editor'>
                     <div ng-show='policy.id'>
-                      <tabset >
-                      <tab ng-repeat='(nm, doc) in policy.documents' 
-                      heading='{{nm}}' select='setEditorTab(nm)'>
+                      <tabset id='editor_tabs'>
+                      <tab id='tab_{{nm}}' ng-repeat='(nm, doc) in policy.documents' 
+                           heading='{{nm}}' select='setEditorTab(nm)'>
                       </tab>
                       </tabset>
                     </div>
