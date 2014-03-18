@@ -18,6 +18,10 @@
     }
 }
 
+.faded-overlay {
+  z-index: 1;
+}
+
 .container-full {
   padding-top: 10px;
   margin: 0 15px;
@@ -27,9 +31,26 @@
   margin-bottom: 0;
 }
 
-/* This is necessary to make the editor appear. Actual height is dynamic */
-.ace_editor {
-height: 400px;
+.editor-box {
+
+  position: relative;
+
+            .faded-overlay {
+              z-index: 3;
+              position: absolute;
+              top: 0;
+              left: 0;
+              padding: 50px 10px;
+              background-color: rgba(200,200,200,0.7);
+              height: 100%;
+              width: 100%;
+              text-align: center;
+            }
+
+  .ace_editor {
+  height: 400px;
+  z-index: 2;
+  }
 }
 
 .horizontal-pad {
