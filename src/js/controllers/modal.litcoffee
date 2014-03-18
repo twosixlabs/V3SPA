@@ -112,7 +112,7 @@ Loader for the reference policy dropdown
                         id: d._id.$oid
                         text: d.id
                         data: d
-                        disabled: IDEBackend.current_policy._id == d._id.$oid
+                        disabled: IDEBackend.current_policy.refpolicy_id == d._id.$oid
 
                     query.callback(dropdown)
                 )

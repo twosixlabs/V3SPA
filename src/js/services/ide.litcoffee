@@ -8,7 +8,7 @@ errors, and generally being awesome.
     mod.service 'IDEBackend',
       class IDEBackend
         constructor: (@VespaLogger, @$rootScope,
-        @SockJSService, @$q, @$timeout)->
+        @SockJSService, @$q, @$timeout,@RefPolicy)->
 
           @current_policy = 
             refpolicy_id: null
@@ -160,7 +160,11 @@ Load a policy from the server
             mod = data.payload
             @current_policy = mod
             @current_policy._id = mod._id.$oid
-            @current_policy.refpolicy_id = mod.refpolicy_id.$oid
+
+            if mod.refpolicy_id.$oid != @current_policy.refpolicy_id
+              @current_policy.refpolicy_id = mod.refpolicy_id.$oid
+              @RefPolicy.load @current_policy.refpolicy_id
+
             @current_policy.documents = mod.documents
             @current_policy.id = mod.id
             @current_policy.valid = false
