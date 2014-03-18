@@ -58,7 +58,7 @@ gulp.task('application', function(){
   gulp.src('src/js/app.litcoffee')
   .pipe(include({
       extensions:  "litcoffee"
-  }))
+  })).on('error', gutil.log)
   .pipe(coffee()).on('error', gutil.log)
   .pipe(include({
     extensions: "js"
