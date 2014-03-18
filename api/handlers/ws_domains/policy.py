@@ -62,6 +62,7 @@ class Policy(restful.ResourceDomain):
 
             dynamic_policy = cls(dynamic_policy_data)
 
+
         if 'dsl' not in dynamic_policy['documents']:
           translate_args = {
               'refpolicy': refpol.id,
@@ -78,8 +79,7 @@ class Policy(restful.ResourceDomain):
           dynamic_policy['documents']['dsl'] = {
               'text': dsl['result'],
               'mode': 'lobster'
-
-              }
+          }
 
           dynamic_policy.Insert()
 

@@ -35,6 +35,7 @@ class LobsterDomain(object):
                 # Our request wasn't valid anyway, we just wanted a response
                 pass
 
+    @staticmethod
     def _make_request(method, path, payload, timeout=10.0):
         http_client = httpclient.HTTPClient()
         backend_uri = "http://{0}{1}".format(
@@ -86,9 +87,10 @@ class LobsterDomain(object):
               ]
             }
         """
-        output = self._make_request('POST', '/parse', params)
-        return output
+        output = self._make_request('POST', '/import/selinux',
+            params if isinstance(params, basestring) else api.db.json.dumps(params))
 
+        return api.db.json.loads(output.body)
 
     def handle(self, msg):
         if msg['request'] == 'validate':
