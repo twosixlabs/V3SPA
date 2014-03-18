@@ -99,7 +99,7 @@ gulp.task('assets', function(){
 /* Run the LESS preprocessor */
 gulp.task('less', function() {
   gulp.src('src/less/vespa.less')
-  .pipe(less())
+  .pipe(less()).on('error', gutil.log)
   .pipe(gulp.dest('static/css'))
 })
 

@@ -94,32 +94,17 @@
                   </div>
                   <div class='horizontal-pad'></div>
                   <div class='row'>
-                      <div class='form-group'>
-                        <label class='control-label pad-right'>Visualizer Type</label>
-                        <div class='btn-group'>
-                          <button btn-radio="'avispa'" type='button' class='btn btn-sm btn-default' active ng-model="visualizer_type">Structured</button>
-                          <button btn-radio="'hive'" type='button' class='btn btn-sm btn-default' ng-model='visualizer_type'> Hive</button>
-                        </div>
-                      </div>
-                    <div class='col-md-12'>
-                      <div class='form-group'>
-                        <label class='control-label pad-right'>Editor View</label>
-                        <label class='radio-inline'>
-                          <input type='radio' ng-model='view' 
-                                 name='editorView' value='dsl'>
-                          Lobster
-                        </label>
-                        <label class='radio-inline'>
-                          <input type='radio' ng-model='view'
-                                 name='editorView' value='app' />
-                          Application
-                        </label>
+                    <div class='form-group'>
+                      <label class='control-label pad-right'>Visualizer Type</label>
+                      <div class='btn-group'>
+                        <button btn-radio="'avispa'" type='button' class='btn btn-sm btn-default' active ng-model="visualizer_type">Structured</button>
+                        <button btn-radio="'hive'" type='button' class='btn btn-sm btn-default' ng-model='visualizer_type'> Hive</button>
                       </div>
                     </div>
                   </div>
                   <div class='editor'>
                     <div ng-show='policy.id'>
-                      <tabset justified='true'>
+                      <tabset >
                       <tab ng-repeat='(nm, doc) in policy.documents' 
                       heading='{{nm}}' select='setEditorTab(nm)'>
                       </tab>
