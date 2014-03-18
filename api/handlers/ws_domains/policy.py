@@ -43,7 +43,7 @@ class Policy(restful.ResourceDomain):
     def do_get(cls, params, response):
 
         if 'refpolicy_id' in params:
-          params['refpolicy_id'] = api.db.idtype(params['refpolicy_id'])
+            params['refpolicy_id'] = api.db.idtype(params['refpolicy_id'])
 
         refpol = refpolicy.RefPolicy.Read(params['refpolicy_id'])
         module = refpol['modules'][params['id']]
@@ -68,32 +68,38 @@ class Policy(restful.ResourceDomain):
             dynamic_policy = cls(dynamic_policy_data)
 
         if 'dsl' not in dynamic_policy['documents']:
-          # If the dsl doesn't exist, then we need to load it. However, we
-          # need to load it with respect to the type of module this is (i.e. if
-          # it's already present in the reference policy on disk
+            # If the dsl doesn't exist, then we need to load it. However, we
+            # need to load it with respect to the type of module this is (i.e. if
+            # it's already present in the reference policy on disk
 
-          translate_args = {
-              'refpolicy': refpol.id,
-              'modules': []
-          }
+            translate_args = {
+                'refpolicy': refpol.id,
+                'modules': []
+            }
 
-          if dynamic_policy['modified'] is True:
-              # If None, it means this module has not be modified
-              translate_args['modules'].append({
-                  'name': params['id'],
-                  'if': dynamic_policy['documents'].get('if', "")['text'],
-                  'te': dynamic_policy['documents'].get('te', "")['text'],
-                  'fc': dynamic_policy['documents'].get('fc', "")['text']
-              })
+            if dynamic_policy['modified'] is True:
+                # If None, it means this module has not be modified
+                translate_args['modules'].append({
+                    'name': params['id'],
+                    'if': dynamic_policy['documents']
+                    .get('if', {}).get('text', ""),
+                    'te': dynamic_policy['documents']
+                    .get('te', {}).get('text', ""),
+                    'fc': dynamic_policy['documents']
+                    .get('fc', {}).get('text', "")
+                })
 
-          dsl = ws_domains.call('lobster', 'translate_selinux', translate_args)
+            dsl = ws_domains.call(
+                'lobster',
+                'translate_selinux',
+                translate_args)
 
-          dynamic_policy['documents']['dsl'] = {
-              'text': dsl['result'],
-              'mode': 'lobster'
-          }
+            dynamic_policy['documents']['dsl'] = {
+                'text': dsl['result'],
+                'mode': 'lobster'
+            }
 
-          dynamic_policy = dynamic_policy.Insert()
+            dynamic_policy = dynamic_policy.Insert()
 
         # save the policy_id
         refpol['modules'][params['id']]['policy_id'] = dynamic_policy._id
