@@ -43,7 +43,6 @@ class ResourceDomain(api.storage.interface.Entry):
 
     @classmethod
     def do_get(cls, params, response):
-        import pdb; pdb.set_trace()
         response['payload'] = cls.Read(params)
         return response
 
