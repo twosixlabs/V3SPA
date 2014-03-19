@@ -13,8 +13,6 @@ The main controller. avispa is a subcontroller.
       IDEBackend.add_hook 'policy_load', (info)->
         $timeout ->
           $scope.policy = IDEBackend.current_policy
-          RefPolicy.current_refpol().then (data)->
-            $scope.policy.refpolicy = data
 
           $scope.editorSessions = {}
           for nm, doc of $scope.policy.documents
