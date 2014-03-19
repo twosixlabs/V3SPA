@@ -10,16 +10,24 @@
     <script src='js/vespa.js' type='text/javascript'></script>
   </head>
   <body>
-    <div role='navigation' class='navbar navbar-default navbar-static-top'>
+    <div role='navigation' class='navbar navbar-default navbar-static-top' 
+         ng-controller='navCtrl'>
       <div class='navbar-header'>
-        <span class='navbar-brand'>V3SPA</span>
+        <span class='navbar-brand'><strong>V3SPA</strong></span>
       </div>
-      <ul class='nav navbar-nav'>
-        <li>
-        <a class='navbar-link' >Logout</a>
-        </li>
+      <p class='navbar-text'>
+      <strong>Reference Policy: </strong>
+      <span ng-hide='refpolicy.id'>
+        None
+      <a ng-hide='refpolicy.id' ng-click='load_refpolicy()'>(Load)</a>
+      </span>
+      <span ng-show='refpolicy.id'>
+        {{refpolicy.id}}
+        <a ng-click='load_refpolicy()'>(switch)</a>
+      </span>
+      </p>
       </ul>
-      <p class='navbar-right navbar-text'> &copy;2014 <b>Invincea Labs</b> </p>
+      <p class='navbar-right navbar-text small'> &copy;2014 <b>Invincea Labs</b> </p>
     </div>
     <div class='container-full' ng-controller='ideCtrl'>
       <div ng-hide='editorSize > 0' class='editor-toggle'>

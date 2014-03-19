@@ -29,6 +29,8 @@
             redirectTo: '/avispa'
     ])
 
+Preload all of the templates that we're going to use.
+
     v3spa.run ($templateCache, $http)->
       $templateCache.put('policyLoadModal.html',
                          $http.get('partials/modal_load.html'))
@@ -36,6 +38,8 @@
                          $http.get('partials/modal_new.html'))
       $templateCache.put('policyOpenModal.html',
                          $http.get('partials/modal_open.html'))
+      $templateCache.put('refpolicyModal.html',
+                         $http.get('partials/modal_refpolicy.html'))
 
 
     v3spa.filter 'filepath', ->
