@@ -204,6 +204,7 @@ Save a modified policy to the server
             request: 'update'
             payload: @current_policy
 
+          delete req.payload.json
 
           @SockJSService.send req, (resp)=>
             if resp.error  # Service error

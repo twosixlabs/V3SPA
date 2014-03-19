@@ -236,6 +236,7 @@ Modal dialog for new policy
               IDEBackend.new_policy
                 id: policy.name
                 type: policy.type
+                refpolicy_id: RefPolicy.current._id
 
 
 Create a modal for uploading policies. First we check if a reference policy

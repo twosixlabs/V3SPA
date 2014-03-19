@@ -40,6 +40,23 @@ class Policy(restful.ResourceDomain):
         return response
 
     @classmethod
+    def do_update(cls, params, response):
+      response = restful.ResourceDomain.do_update(params, response)
+
+      refpol = refpolicy.RefPolicy.Read(params['refpolicy_id'])
+      refpol['modules'][params['id']] = {
+          'name': params['id'],
+          'version': 1.0,
+          'policy_id': params._id,
+          'te_file': None,
+          'fc_file': None,
+          'if_file': None
+      }
+
+      refpol.Update()
+      return response
+
+    @classmethod
     def do_get(cls, params, response):
 
         if 'refpolicy_id' in params:
