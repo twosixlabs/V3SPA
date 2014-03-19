@@ -68,13 +68,13 @@ class RefPolicy(restful.ResourceDomain):
         except:
             pass
 
-        metadata = cls.Read({'id': params['name']})
-        print params['index']
+        name = params['name'][:-4] if params['name'].endswith('.zip') else params['name']
+        metadata = cls.Read({'id': name})
         print metadata
 
         if metadata is None:
             metadata = cls({
-                'id': params['name'],
+                'id': name,
                 'written': params['index'],
                 'total': params['total'],
                 'tmpfile': os.path.join(
@@ -183,7 +183,7 @@ class RefPolicy(restful.ResourceDomain):
         """
         import zipfile
 
-        name = self['id'][:-4] if self['id'].endswith('.zip') else self['id']
+        name = self['id']
         zipped_policy = self['tmpfile']
         policy_dir = os.path.join(
             api.config.get('storage', 'bulk_storage_dir'),

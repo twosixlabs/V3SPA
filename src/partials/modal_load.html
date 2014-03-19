@@ -4,30 +4,6 @@
 <form name='form' no-validate>
   <div id='policyModal' class="modal-body">
     <div class='form-horizontal'>
-    <p>Each policy must be associated with a reference policy version. You can either
-    select one from those available using the dropdown or upload a new one.</p>
-
-    <div ng-hide='uploading.status'>
-    <input class='form-control' id='refPolicySelect'
-    ui-select2='list_refpolicies'
-    placeholder="Select existing reference policy"
-    ng-model='input.refpolicy' type='hidden'/>
-    <div id='refPolicyDrop' class='well well-sm text-muted drop-zone'
-      file-upload-drop='upload_refpolicy'>
-      Drop a zipped up reference policy source here
-    </div>
-    </div>
-
-    <div ng-show='uploading.status'>
-      <span class='text-info'>Uploading {{uploading.name}}</span>
-      <progressbar value='uploading.status' max='100'>
-    </div>
-    <span class='text-warning' ng-show='fileerrors != null'>
-      {{fileerrors}}
-    </span>
-
-    <hr/>
-
     <p>Upload SELinux policy module files. Type enforcement files are required.</p>
       <div class='row'>
         <div class='col-md-4'>

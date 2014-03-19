@@ -88,6 +88,7 @@ class Entry(UserDict.DictMixin):
     def __getattr__(self, attr):
       if attr in self.entry:
         return self.entry.__getitem__(attr)
+      return object.__getattr__(self, attr)
 
     def __getitem__(self, key):
         return self.entry.__getitem__(key)

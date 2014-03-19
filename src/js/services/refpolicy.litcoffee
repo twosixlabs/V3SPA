@@ -7,25 +7,21 @@
           @uploader_running = false
           @chunks_to_upload = []
           @current = null
-          @_current_promise = null
+          @_deferred_load = null
+          @loading = null
 
-        current_refpol: =>
-          deferred = @$q.defer()
-
-          if @current
-            deferred.resolve(@current)
-
-          else if @_current_promise?
-            @_current_promise.then (data)->
-              deferred.resolve(data)
-          else
-            deferred.reject(null)
-
-          return deferred.promise
+        promise: =>
+          if @loading?
+            return @loading
+          @_deferred_load = @$q.defer()
+          return @_deferred_load.promise
 
         load: (id)=>
-          deferred  = @$q.defer()
-          @_current_promise = deferred.promise
+          if @current?.id == id
+            return
+
+          deferred = @_deferred_load || @$q.defer()
+          @loading = deferred.promise
 
           req = 
             domain: 'refpolicy'
@@ -36,9 +32,13 @@
             if data.error?
               @current = null
               deferred.reject(@current)
+              @loading = null
             else
               @current = data.payload
               deferred.resolve(@current)
+              @loading = null
+
+          return @loading
 
         current_as_select2: =>
           return null unless @current?

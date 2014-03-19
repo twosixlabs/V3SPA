@@ -13,8 +13,6 @@ The main controller. avispa is a subcontroller.
       IDEBackend.add_hook 'policy_load', (info)->
         $timeout ->
           $scope.policy = IDEBackend.current_policy
-          RefPolicy.current_refpol().then (data)->
-            $scope.policy.refpolicy = data
 
           $scope.editorSessions = {}
           for nm, doc of $scope.policy.documents
@@ -179,66 +177,103 @@ Save the current file
       $scope.save_policy = ->
         IDEBackend.save_policy()
 
+This function makes sure that a Reference Policy
+has been loaded before calling the function
+`open_modal`. It does so by opening the
+reference policy load modal first if it has
+not been loaded.
+
+      ensure_refpolicy = (open_modal)->
+        if RefPolicy.loading?
+          RefPolicy.loading.then ->
+            open_modal()
+
+        else if RefPolicy.current?
+          open_modal()
+
+        else
+          # Load a reference policy
+          instance = $modal.open
+              templateUrl: 'refpolicyModal.html'
+              controller: 'modal.refpolicy'
+
+          instance.result.then (policy)->
+              RefPolicy.load(policy.id).then (policy)->
+                # When the refpolicy has actually been loaded,
+                # open the upload modal.
+                open_modal()
+
 Create a modal for opening a policy
 
       $scope.open_policy = ->
-        instance = $modal.open
-          templateUrl: 'policyOpenModal.html'
-          controller:  'modal.policy_open'
+
+        ensure_refpolicy ->
+          instance = $modal.open
+            templateUrl: 'policyOpenModal.html'
+            controller:  'modal.policy_open'
 
 Modal dialog for new policy
 
       $scope.new_policy = ->
-        instance = $modal.open
-          templateUrl: 'policyNewModal.html'
-          controller: ($scope, $modalInstance)->
+        ensure_refpolicy ->
+          instance = $modal.open
+            templateUrl: 'policyNewModal.html'
+            controller: ($scope, $modalInstance)->
 
-            $scope.policy = 
-              type: 'selinux'
+              $scope.policy = 
+                type: 'selinux'
 
-            $scope.load = ->
-              $modalInstance.close($scope.policy)
+              $scope.load = ->
+                $modalInstance.close($scope.policy)
 
-            $scope.cancel = $modalInstance.dismiss
+              $scope.cancel = $modalInstance.dismiss
 
-        instance.result.then (policy)->
-            IDEBackend.new_policy
-              id: policy.name
-              type: policy.type
+          instance.result.then (policy)->
+              IDEBackend.new_policy
+                id: policy.name
+                type: policy.type
 
-Create a modal for uploading policies
+
+Create a modal for uploading policies. First we check if a reference policy
+is loaded. If it is, then we open the upload modal. Otherwise we open the
+RefpolicyLoad modal first, then open the file upload modal.
 
       $scope.upload_policy = ->
-        instance = $modal.open
-          templateUrl: 'policyLoadModal.html'
-          controller: 'modal.policy_load'
+
+First we define the load modal function so we can call it conditionally later
+
+        ensure_refpolicy ->
+
+          instance = $modal.open
+            templateUrl: 'policyLoadModal.html'
+            controller: 'modal.policy_load'
 
 If we get given files, read them as text and send them over the websocket
 
-        instance.result.then(
-          (inputs)-> 
-            console.log(inputs)
+          instance.result.then(
+            (inputs)-> 
+              console.log(inputs)
 
-            filelist = inputs.files
+              filelist = inputs.files
 
-            AsyncFileReader.read filelist, (files)->
-              req = 
-                domain: 'policy'
-                request: 'create'
-                payload: 
-                  refpolicy_id: inputs.refpolicy.data._id
-                  documents: files
-                  type: 'selinux'
+              AsyncFileReader.read filelist, (files)->
+                req = 
+                  domain: 'policy'
+                  request: 'create'
+                  payload: 
+                    refpolicy_id: inputs.refpolicy.data._id
+                    documents: files
+                    type: 'selinux'
 
-              SockJSService.send req, (result)->
-                if result.error
-                  $.growl {title: 'Failed to upload module', message: result.payload}, 
-                    type: 'danger'
-                  console.log result
+                SockJSService.send req, (result)->
+                  if result.error
+                    $.growl {title: 'Failed to upload module', message: result.payload}, 
+                      type: 'danger'
+                    console.log result
 
-          ()->
-            console.log("Modal dismissed")
-        )
+            ()->
+              console.log("Modal dismissed")
+          )
 
 
 The console controller is very simple. It simply binds it's errors
