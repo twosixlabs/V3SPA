@@ -54,12 +54,18 @@ Create a new policy, but don't save it or anything
           for arg, val of args
               @current_policy[arg] = val
 
+          if @current_policy.type == 'selinux'
+            @current_policy.documents = 
+              dsl:
+                mode: 'lobster'
+                text: ''
+
           for hook in @hooks.policy_load
             hook(@current_policy)
 
           for hook in @hooks.doc_changed
-            for doc, contents of @current_policy.documents
-              hook(doc, contents)
+            for docname, doc of @current_policy.documents
+              hook(docname, doc.text)
 
 
 An easy handle to update the stored representation of
@@ -161,10 +167,6 @@ Load a policy from the server
             @current_policy = mod
             @current_policy._id = mod._id.$oid
 
-            if mod.refpolicy_id.$oid != @current_policy.refpolicy_id
-              @current_policy.refpolicy_id = mod.refpolicy_id.$oid
-              @RefPolicy.load @current_policy.refpolicy_id
-
             @current_policy.documents = mod.documents
             @current_policy.id = mod.id
             @current_policy.valid = false
@@ -198,6 +200,7 @@ Save a modified policy to the server
             request: 'update'
             payload: @current_policy
 
+          delete req.payload.json
 
           @SockJSService.send req, (resp)=>
             if resp.error  # Service error

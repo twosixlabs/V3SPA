@@ -35,6 +35,7 @@
               @loading = null
             else
               @current = data.payload
+              @current._id = @current._id.$oid
               deferred.resolve(@current)
               @loading = null
 

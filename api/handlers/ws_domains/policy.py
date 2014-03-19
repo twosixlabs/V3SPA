@@ -40,6 +40,28 @@ class Policy(restful.ResourceDomain):
         return response
 
     @classmethod
+    def do_update(cls, params, response):
+      if '_id' in params and params['_id'] is not None:
+          newobject = cls.Read(params['_id'])
+          response['payload'] = newobject.Update(params)
+      else:
+          newobject = cls(params)
+          response['payload'] = newobject.Insert()
+
+      refpol = refpolicy.RefPolicy.Read(params['refpolicy_id'])
+      refpol['modules'][newobject.id] = {
+          'name': newobject.id,
+          'version': 1.0,
+          'policy_id': newobject._id,
+          'te_file': None,
+          'fc_file': None,
+          'if_file': None
+      }
+
+      refpol.Update()
+      return response
+
+    @classmethod
     def do_get(cls, params, response):
 
         if 'refpolicy_id' in params:
