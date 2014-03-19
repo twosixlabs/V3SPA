@@ -88,7 +88,8 @@ This controls our editor visibility.
               text: err.message
 
           $timeout ->
-            editorSession.dsl.setAnnotations _.map(annotations?.errors, (e)->
+            session = $scope.editorSessions.dsl.session
+            session.setAnnotations _.map(annotations?.errors, (e)->
               format_error(e)
             )
 
@@ -108,7 +109,10 @@ This controls our editor visibility.
                 hl.range.end.column
               )
 
-              session = $scope.editorSessions[hl.apply_to].session
+              session = $scope.editorSessions[hl.apply_to]?.session
+
+              if not session?  # Just bail
+                return
 
               marker = session.addMarker(
                 range,
@@ -146,7 +150,7 @@ Watch the view control and switch the editor session
 
             editor.setSession(sessInfo.session)
 
-            if not $scope.policy.documents[name].editable
+            if $scope.policy.documents[name].editable == false
               editor.setOptions
                 readOnly: true
                 highlightActiveLine: false

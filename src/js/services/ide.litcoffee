@@ -54,12 +54,18 @@ Create a new policy, but don't save it or anything
           for arg, val of args
               @current_policy[arg] = val
 
+          if @current_policy.type == 'selinux'
+            @current_policy.documents = 
+              dsl:
+                mode: 'lobster'
+                text: ''
+
           for hook in @hooks.policy_load
             hook(@current_policy)
 
           for hook in @hooks.doc_changed
-            for doc, contents of @current_policy.documents
-              hook(doc, contents)
+            for docname, doc of @current_policy.documents
+              hook(docname, doc.text)
 
 
 An easy handle to update the stored representation of
