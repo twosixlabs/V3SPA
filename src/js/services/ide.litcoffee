@@ -8,7 +8,7 @@ errors, and generally being awesome.
     mod.service 'IDEBackend',
       class IDEBackend
         constructor: (@VespaLogger, @$rootScope,
-        @SockJSService, @$q, @$timeout,@RefPolicy)->
+        @SockJSService, @$q, @$timeout, @RefPolicy)->
 
           @current_policy = 
             refpolicy_id: null

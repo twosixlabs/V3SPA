@@ -1,13 +1,32 @@
     mod = angular.module('vespa.services')
 
     mod.service 'RefPolicy',
-      class RefPolicy
+      class RefPolicyImpl
         constructor: (@VespaLogger, @SockJSService, @$q, @$timeout)->
 
           @uploader_running = false
           @chunks_to_upload = []
+          @current = null
+          @_current_promise = null
+
+        current_refpol: =>
+          deferred = @$q.defer()
+
+          if @current
+            deferred.resolve(@current)
+
+          else if @_current_promise?
+            @_current_promise.then (data)->
+              deferred.resolve(data)
+          else
+            deferred.reject(null)
+
+          return deferred.promise
 
         load: (id)=>
+          deferred  = @$q.defer()
+          @_current_promise = deferred.promise
+
           req = 
             domain: 'refpolicy'
             request: 'get'
@@ -16,8 +35,10 @@
           @SockJSService.send req, (data)=>
             if data.error?
               @current = null
+              deferred.reject(@current)
             else
               @current = data.payload
+              deferred.resolve(@current)
 
         current_as_select2: =>
           return null unless @current?
