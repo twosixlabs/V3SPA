@@ -167,10 +167,6 @@ Load a policy from the server
             @current_policy = mod
             @current_policy._id = mod._id.$oid
 
-            if mod.refpolicy_id.$oid != @current_policy.refpolicy_id
-              @current_policy.refpolicy_id = mod.refpolicy_id.$oid
-              @RefPolicy.load @current_policy.refpolicy_id
-
             @current_policy.documents = mod.documents
             @current_policy.id = mod.id
             @current_policy.valid = false
