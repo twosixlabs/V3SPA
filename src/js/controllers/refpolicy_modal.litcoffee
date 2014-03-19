@@ -12,6 +12,9 @@
               status: false
               name: null
 
+            $scope.invalid = ->
+              not $scope.input.refpolicy?
+
             $scope.load = ->
               $modalInstance.close($scope.input.refpolicy)
 

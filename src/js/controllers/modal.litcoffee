@@ -8,8 +8,7 @@
               files: {}
 
             $scope.invalid = ->
-              return not ($scope.input.refpolicy? and 
-                          $scope.input.files.te?)
+              return not $scope.input.files.te?
             $scope.add_file_input = (file, input_name)->
               $scope.$apply ->
                 $scope.input.files[input_name] = file
