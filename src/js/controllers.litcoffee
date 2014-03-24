@@ -81,11 +81,17 @@ This controls our editor visibility.
 
         IDEBackend.add_hook 'validation', (annotations)->
           format_error = (err)->
-            ret = 
-              row: err.line - 1
-              column: err.column
+            annotations.highlights ?= []
+            annotations.highlights.push 
+              range: err.srcloc
+              apply_to: 'dsl'
               type: 'error'
-              text: err.message
+
+            ret = 
+              row: err.srcloc.start.line - 1
+              column: err.srcloc.start.col
+              type: 'error'
+              text: "#{err.filename}: #{err.message}"
 
           $timeout ->
             session = $scope.editorSessions.dsl.session
@@ -103,10 +109,10 @@ This controls our editor visibility.
             # highlight for e in annotations.highlighter
             _.each annotations.highlights, (hl)->
               range = new ace_range.Range(
-                hl.range.start.row,
-                hl.range.start.column,
-                hl.range.end.row,
-                hl.range.end.column
+                hl.range.start.line - 1,
+                hl.range.start.col - 1,
+                hl.range.end.line - 1,
+                hl.range.end.col - 1
               )
 
               session = $scope.editorSessions[hl.apply_to]?.session
