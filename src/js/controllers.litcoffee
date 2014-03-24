@@ -80,16 +80,32 @@ This controls our editor visibility.
         $scope.editor_markers = []
 
         IDEBackend.add_hook 'validation', (annotations)->
+          dsl_session = $scope.editorSessions.dsl.session
+
           format_error = (err)->
+            pos = err.srcloc
+            unless pos.start?
+              lastRow = dsl_session.getLength()
+              while _.isEmpty(toks = dsl_session.getTokens(lastRow))
+                lastRow--
+
+              pos = 
+                start:
+                  line: lastRow + 1
+                  col: 1
+                end:
+                  line: lastRow + 1
+                  col: dsl_session.getLine(lastRow).length + 1
+
             annotations.highlights ?= []
             annotations.highlights.push 
-              range: err.srcloc
+              range:  pos
               apply_to: 'dsl'
               type: 'error'
 
             ret = 
-              row: err.srcloc.start.line - 1
-              column: err.srcloc.start.col
+              row: lastRow
+              column: pos.start.col
               type: 'error'
               text: "#{err.filename}: #{err.message}"
 
