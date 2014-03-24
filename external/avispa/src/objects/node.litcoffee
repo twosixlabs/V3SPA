@@ -31,11 +31,16 @@ Base class for "node" objects
         OnMouseEnter: (event) ->
             if not context.dragItem?
                 @$circle.attr('class', 'hover')
+
+                context.ide_backend.highlight(@options.data)
+
             return cancelEvent(event)
 
         OnMouseLeave: (event) ->
             if not context.dragItem?
                 @$circle.removeAttr('class')
+                context.ide_backend.unhighlight()
+
             return cancelEvent(event)
 
 

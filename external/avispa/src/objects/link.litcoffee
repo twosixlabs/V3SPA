@@ -126,11 +126,14 @@ Bind to the position of the left and right sides of the connection
         OnMouseEnter: () ->
             if not context.dragItem?
                 @path.css('stroke-width', '6px')
+
+                context.ide_backend.highlight(@options.data)
             return
 
         OnMouseLeave: () ->
             if not context.dragItem?
                 @path.css('stroke-width', '3px')
+                context.ide_backend.unhighlight()
             return
 
         LeftClick: (event) ->
