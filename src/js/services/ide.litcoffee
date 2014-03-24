@@ -249,6 +249,8 @@ format of the JSON changes (as it likely will).
           annotation = _.find object.classAnnotations, (elem)->
             elem.name == 'SourcePos'
 
+          return unless annotation?
+
           info = 
             range:
               start:
@@ -259,25 +261,17 @@ format of the JSON changes (as it likely will).
                 column: "class #{object.class}".length
             description: "unknown"
             type: "source_class"
-            apply_to: 'lobster'
+            apply_to: 'dsl'
 
           return info
 
         _parseDomainSourcePosition: (object)-> 
-          annotation = _.find object.domainAnnotations, (elem)->
-            elem.name == 'SourcePos'
 
           info = 
-            range:
-              start:
-                row: annotation.args[1] - 1
-                column: annotation.args[2] - 1
-              end:
-                row: annotation.args[1] - 1
-                column: "domain #{object.name}".length
+            range: object.srcloc
             description: "unknown"
             type: "source_domain"
-            apply_to: 'lobster'
+            apply_to: 'dsl'
 
           return info
 

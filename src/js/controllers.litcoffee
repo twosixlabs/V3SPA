@@ -108,6 +108,8 @@ This controls our editor visibility.
           $timeout ->
             # highlight for e in annotations.highlighter
             _.each annotations.highlights, (hl)->
+              return unless hl?
+
               range = new ace_range.Range(
                 hl.range.start.line - 1,
                 hl.range.start.col - 1,
