@@ -37,7 +37,7 @@ when the domain data has actually changed to prevent flickering.
 
       update_view = (data)->
         if _.size(data.errors) > 0
-            $scope.domain_data = null
+            $scope.policy_data = null
             cleanup()
 
         else
