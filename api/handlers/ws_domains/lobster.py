@@ -4,6 +4,7 @@ logger = logging.getLogger(__name__)
 
 from tornado import httpclient
 
+__MIN_LSR_VERSION__ = 2
 
 class LobsterDomain(object):
 
@@ -25,6 +26,11 @@ class LobsterDomain(object):
 
             resp = api.db.json.loads(result.body)
             self._lobster_version = resp['version']
+
+            if self._lobster_version < __MIN_LSR_VERSION__:
+              logging.critical("Required lobster version {0} but server speaks {1}"
+                               .format(__MIN_LSR_VERSION__, self._lobster_version))
+
             logging.info("Connected to lobster backend server v{0}"
                          .format(self._lobster_version))
         except httpclient.HTTPError as e:
