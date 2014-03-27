@@ -75,9 +75,7 @@ ID's MUST be fully qualified, or Avispa renders horribly wrong.
 
           $scope.objects.domains[id] = domain
 
-          #if parent
-          #then parent.$el.append domain.$el
-          #else vespa.avispa.$objects.append domain.$el
+          IDEBackend.add_selection_range_object 'dsl', obj.srcloc.start.line, domain
           $scope.avispa.$groups.append domain.$el
 
       $scope.createPort = (id, parents, obj, coords) ->
@@ -90,7 +88,7 @@ ID's MUST be fully qualified, or Avispa renders horribly wrong.
 
           $scope.objects.ports[id] = port
 
-          #parent.$el.append port.$el
+          IDEBackend.add_selection_range_object 'dsl', obj.srcloc.start.line, port
           $scope.avispa.$objects.append port.$el
 
       $scope.createLink = (dir, left, right, data) ->
@@ -100,6 +98,7 @@ ID's MUST be fully qualified, or Avispa renders horribly wrong.
               right: right
               data: data
 
+          IDEBackend.add_selection_range_object 'dsl', data.srcloc.start.line, link
           $scope.avispa.$links.append link.$el
 
       $scope.parseDomain = (domain) ->
