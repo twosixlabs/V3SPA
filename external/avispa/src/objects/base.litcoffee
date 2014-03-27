@@ -10,10 +10,22 @@ elements.  The root is an SVG G element that is translated when dragged.
             'mouseleave'  : 'OnMouseLeave'
             'contextmenu' : 'OnRightClick'
 
+        highlight: ->
+          classes = _.toArray @.el.classList
+          classes.push 'svg-highlight'
+          @.$el.attr 'class', _.uniq(classes).join(" ")
+
+        unhighlight: ->
+          classes = _.reject @.el.classList, (klass)->
+            klass == 'svg-highlight'
+          @.$el.attr 'class', classes.join(" ")
+
 The "Position" model is defined by the project that is importing Avispa.
 
         initialize: (@options) ->
             _.bindAll @, 'OnMouseDown'
+
+            @highlighted = false
 
 Expect a position to be passed in
 

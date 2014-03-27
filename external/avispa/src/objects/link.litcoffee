@@ -14,6 +14,16 @@ Base class for "link" objects
             'mouseleave'  : 'OnMouseLeave'
             'contextmenu' : 'OnRightClick'
 
+        highlight: ->
+          classes = _.toArray @.el.classList
+          classes.push 'svg-highlight'
+          @.$el.attr 'class', _.uniq(classes).join(" ")
+
+        unhighlight: ->
+          classes = _.reject @.el.classList, (klass)->
+            klass == 'svg-highlight'
+          @.$el.attr 'class', classes.join(" ")
+
         initialize: (@options) ->
             @path = $SVG('path')
                 .css('marker-end', 'url(#Arrow)')
@@ -126,6 +136,7 @@ Bind to the position of the left and right sides of the connection
         OnMouseEnter: () ->
             if not context.dragItem?
                 @path.css('stroke-width', '6px')
+                @path.css('stroke-opacity', '0.8')
 
                 context.ide_backend.highlight(@options.data)
             return
@@ -133,6 +144,7 @@ Bind to the position of the left and right sides of the connection
         OnMouseLeave: () ->
             if not context.dragItem?
                 @path.css('stroke-width', '3px')
+                @path.css('stroke-opacity', '0.5')
                 context.ide_backend.unhighlight()
             return
 
