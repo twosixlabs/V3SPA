@@ -22,6 +22,10 @@ The main controller. avispa is a subcontroller.
 
               session.on 'change', (text)->
                 IDEBackend.update_document nm, session.getValue()
+
+              session.selection.on 'changeSelection', (e, sel)->
+                IDEBackend.highlight_selection nm, sel.getRange()
+
               $scope.editorSessions[nm] = 
                 session: session
 

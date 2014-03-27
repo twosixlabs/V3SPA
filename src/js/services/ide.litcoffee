@@ -24,10 +24,33 @@ errors, and generally being awesome.
             json_changed: []
             validation: []
 
+          @selection_ranges = {}
+
           @validate_dsl = _.throttle @_validate_dsl, 1000
 
         isCurrent: (id)=>
           id? and id == @current_policy._id
+
+        add_selection_range_object: (doc, line, obj)->
+          @selection_ranges ?= {}
+          @selection_ranges[doc] ?= []
+          @selection_ranges[doc][line] ?= []
+
+          @selection_ranges[doc][line].push obj
+
+Call the highlight function on each object registered in
+@selection_ranges[doc] on lines within within the specified range.
+
+        highlight_selection: (doc, range)->
+          covered = _.groupBy @selection_ranges?[doc], (obj, line)->
+            if line - 1>= range.start.row and line - 1  <= range.end.row
+              return 'highlight'
+            else
+              return 'unhighlight'
+
+          _.invoke _.flatten(covered.highlight), 'highlight'
+          _.invoke _.flatten(covered.unhighlight), 'unhighlight'
+
 
 Add a hook on certain changes in the backend. The action
 will be called as appropriate.
