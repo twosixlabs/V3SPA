@@ -102,37 +102,68 @@ ID's MUST be fully qualified, or Avispa renders horribly wrong.
           $scope.avispa.$links.append link.$el
 
       $scope.parseDomain = (domain) ->
-          domains = x: 10
-          bounds = x: 40, y: 40
+          domain_pos = 
+            x: 10
+            y: 100
+            w: 200
+            h: 200
+          port_pos = x: 40, y: 40
+          port_layout_store = []
+
 
           for id in domain.subdomains
             do (id)->
-              subdomain = $scope.policy_data.domains[id]
+              if id not of $scope.policy_data.domains
+                coords =
+                    x: domain_pos.x + 10
+                    y: 100 + 10
+                    w: 50
+                    h: 50
+                $scope.createDomain id, $scope.parent, subdomain, coords
+
+              else
+
+                subdomain = $scope.policy_data.domains[id]
+                coords =
+                    x: domain_pos.x
+                    y: domain_pos.y
+                    w: (domain_pos.w * 1.1) * subdomain.subdomains.length || domain_pos.w
+                    h: (domain_pos.h * 1.1) * subdomain.subdomains.length || domain_pos.h
+
+                $scope.createDomain id, $scope.parent, subdomain, coords
+
+                $scope.parent.unshift $scope.objects.domains[id]
+                $scope.parseDomain(subdomain)
+                $scope.parent.shift()
+
+              domain_pos.x += 210
+
+          for id, idx in domain.ports
+              port_layout_store.push 
+                  index: idx
+                  x: 0
+                  y: 0
+                  px: 0
+                  py: 0
+                  id: id
+
+          port_force = d3.layout.force().nodes(port_layout_store)
+                      .size([domain_pos.w, domain_pos.h])
+
+          port_force.start()
+          for x in [1..25]
+            port_force.tick()
+          port_force.stop()
+
+          for port_layout in port_layout_store
+              port = $scope.policy_data.ports[port_layout.id]
               coords =
-                  x: domains.x
-                  y: 100
-                  w: 220 * subdomain.subdomains.length || 200
-                  h: 220 * subdomain.subdomains.length || 200
-
-              $scope.createDomain id, $scope.parent, subdomain, coords
-
-              $scope.parent.unshift $scope.objects.domains[id]
-              $scope.parseDomain(subdomain)
-              $scope.parent.shift()
-
-              domains.x += 210
-
-          for id in domain.ports
-              port = $scope.policy_data.ports[id]
-              coords =
-                  x: bounds.x
-                  y: bounds.y
+                  x: port_layout.x
+                  y: port_layout.y
                   radius: 30
                   fill: '#eeeeec'
 
               $scope.createPort id,  $scope.parent, port, coords
-
-              bounds.x += 70
 
 
       $scope.parseConns = (connections)->
