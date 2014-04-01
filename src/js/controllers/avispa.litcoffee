@@ -67,15 +67,18 @@ ID's MUST be fully qualified, or Avispa renders horribly wrong.
 
       $scope.createDomain = (id, parents, obj, coords) ->
           domain = new Domain
-              _id: obj.path
+              _id: if obj?.path then obj.path else id
               parent: parents[0]
-              name: obj.name
+              name: if obj?.name then obj.name else "[#{id}]"
               position: coords
-              data: obj
+              data: if obj? then obj else null
+              klasses: ['filtered'] unless obj?
 
           $scope.objects.domains[id] = domain
 
-          IDEBackend.add_selection_range_object 'dsl', obj.srcloc.start.line, domain
+          if obj
+            IDEBackend.add_selection_range_object 'dsl', obj.srcloc.start.line, domain
+
           $scope.avispa.$groups.append domain.$el
 
       $scope.createPort = (id, parents, obj, coords) ->
@@ -90,6 +93,8 @@ ID's MUST be fully qualified, or Avispa renders horribly wrong.
 
           IDEBackend.add_selection_range_object 'dsl', obj.srcloc.start.line, port
           $scope.avispa.$objects.append port.$el
+
+          return port
 
       $scope.createLink = (dir, left, right, data) ->
           link = new Avispa.Link
@@ -139,6 +144,7 @@ ID's MUST be fully qualified, or Avispa renders horribly wrong.
               domain_pos.x += 210
 
           for id, idx in domain.ports
+            do (id)->
               port_layout_store.push 
                   index: idx
                   x: 0
@@ -163,7 +169,7 @@ ID's MUST be fully qualified, or Avispa renders horribly wrong.
                   radius: 30
                   fill: '#eeeeec'
 
-              $scope.createPort id,  $scope.parent, port, coords
+              $scope.createPort port_layout.id,  $scope.parent, port, coords
 
 
       $scope.parseConns = (connections)->
@@ -243,7 +249,7 @@ from the injector
             @$label = $SVG('text')
                 .attr('dx', '0.5em')
                 .attr('dy', '1.5em')
-                .text(@options.name)
+                .text(@options.name or @options.id)
                 .appendTo(@$el)
 
             return @
