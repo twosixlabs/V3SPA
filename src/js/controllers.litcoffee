@@ -298,15 +298,24 @@ If we get given files, read them as text and send them over the websocket
                   domain: 'policy'
                   request: 'create'
                   payload: 
-                    refpolicy_id: inputs.refpolicy.data._id
-                    documents: files
+                    refpolicy_id: RefPolicy.current._id
+                    documents: {}
                     type: 'selinux'
+
+                for file, text of files
+                  do (file, text)->
+                    req.payload.documents[file] = 
+                      text: text
+                      editable: false
 
                 SockJSService.send req, (result)->
                   if result.error
                     $.growl {title: 'Failed to upload module', message: result.payload}, 
                       type: 'danger'
                     console.log result
+                  else
+                    $.growl {title: 'Uploaded new module', message: result.payload.id}, 
+                      type: 'success'
 
             ()->
               console.log("Modal dismissed")

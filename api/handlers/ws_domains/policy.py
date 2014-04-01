@@ -15,7 +15,7 @@ class Policy(restful.ResourceDomain):
         refpol = refpolicy.RefPolicy.Read(params['refpolicy_id'])
 
         modname, version = refpolicy.extract_module_version(
-            params['documents']['te'])
+            params['documents']['te']['text'])
 
         if modname in refpol['modules']:
             raise Exception("'{0}' is already a module in '{1}'".format(

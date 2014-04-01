@@ -1,7 +1,7 @@
     vespaControllers = angular.module('vespaControllers') 
 
     vespaControllers.controller 'modal.policy_load', (
-        $scope, $modalInstance, RefPolicy, $fileUploader, AsyncFileReader) ->
+        $scope, $modalInstance, RefPolicy, $fileUploader) ->
 
             $scope.input = 
               refpolicy: null
