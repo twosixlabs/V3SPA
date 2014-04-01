@@ -53,6 +53,9 @@
 
           @set_handlers()
 
+          @status = 
+            outstanding: 0
+
         reconnect: =>
           if @connection_info.timeout < 32000
               @connection_info.timeout = @connection_info.timeout * 2
@@ -79,18 +82,13 @@
             if msg.error
               @VespaLogger.log 'server', 'error', msg.payload
 
-              callback = @msg_callbacks[msg.label]
-              if callback?
-                @$rootScope.$apply ->
-                  callback(msg)
-                delete @msg_callbacks[msg.label]
-              return
-
 Look for a message specific callback first, then try
 general callbacks
 
             callback = @msg_callbacks[msg.label]
-            if callback
+            if callback?
+              @status.outstanding--
+              console.log "Have #{@status.outstanding} outstanding messages"
               @$rootScope.$apply ->
                 callback(msg)
               return
@@ -100,6 +98,8 @@ general callbacks
               console.log "Have no handler for message: #{msg.label}"
               return
 
+            @status.outstanding--
+            console.log "Have #{@status.outstanding} outstanding messages"
             @$rootScope.$apply ->
               callback(msg)
 
@@ -115,6 +115,8 @@ We generate a token and do a callback specifically on that token.
             token = @TokenService.generate()
             @msg_callbacks[token] = response
             data.response_id = token
+            @status.outstanding++
+            console.log "Have #{@status.outstanding} outstanding messages"
 
           if @sock.readyState == 0
             console.log "Connection not yet established. Buffering message"

@@ -12,8 +12,10 @@
   <body>
     <div role='navigation' class='navbar navbar-default navbar-static-top' 
          ng-controller='navCtrl'>
-      <div class='navbar-header'>
-        <span class='navbar-brand'><strong>V3SPA</strong></span>
+         <div class='navbar-header' >
+           <span class='navbar-brand' ng-class="{'loader-bg': have_outstanding()}" >
+             <strong>V3SPA</strong>
+           </span>
       </div>
       <p class='navbar-text'>
       <strong>Reference Policy: </strong>
@@ -100,6 +102,7 @@
                     </div>
                   </div>
                   <div class='horizontal-pad'></div>
+                  <div class='clearfix'></div>
                   <div class='row'>
                     <div class='form-group'>
                       <label class='control-label pad-right'>Visualizer Type</label>
