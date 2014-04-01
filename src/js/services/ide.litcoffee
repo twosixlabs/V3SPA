@@ -116,9 +116,10 @@ about highlighting that should be performed.
         highlight: (object)=>
           annotations = 
             highlights: []
-          annotations.highlights.push @_parseClassSourcePosition (object)
-          annotations.highlights.push @_parseDomainSourcePosition (object)
 
+          if object?
+            annotations.highlights.push @_parseClassSourcePosition (object)
+            annotations.highlights.push @_parseDomainSourcePosition (object)
 
           _.each @hooks.validation, (hook)->
             hook annotations
@@ -241,12 +242,6 @@ Save a modified policy to the server
               deferred.resolve @current_policy._id
 
           return deferred.promise
-
-
-Upload a new policy to the server
-
-        upload_policy: (data)=>
-
 
         list_policies: =>
           deferred = @$q.defer()
