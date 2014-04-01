@@ -46,6 +46,14 @@ If we have a parent, keep track of our offset from the parent
             else
               position = @options.position
 
+Allow a list of classes to be passed in.
+
+            if @options.klasses
+              classes = _.toArray @.el.classList
+              classes =_.union classes, @options.klasses
+
+              @.$el.attr 'class', classes.join ' '
+
             @position = new GenericModel(position, @options._id)
             @position.bind 'change', @render, @
 
@@ -58,9 +66,12 @@ The init method allows classes to extend the BaseObject without re-implementing 
             return @
 
         ParentDrag: (ppos) ->
-            @position.set
+            offset_pos = 
                 x: @position.get('offset_x') + ppos.get('x')
                 y: @position.get('offset_y') + ppos.get('y')
+
+            @EnforceBoundingBox offset_pos
+
             return
 
         OnMouseDown: (event) ->
@@ -72,6 +83,40 @@ The init method allows classes to extend the BaseObject without re-implementing 
             context.dragItem = @
 
             return cancelEvent(event)
+
+        EnforceBoundingBox: (coords)->
+
+If we have a parent element, we want to make sure that our box is at least
+10 pixels inside of it at all times. We start by calculating the amount of
+space space there is around the edges of this group.
+
+            if @parent
+                ppos = 
+                  x: @parent.position.get('x')
+                  y: @parent.position.get('y')
+                  w: @parent.position.get('w')
+                  h: @parent.position.get('h')
+
+                limit = 
+                  left: ppos.x + 10
+                  right: (ppos.x + ppos.w) - 10
+                  beginning: ppos.y + 10
+                  end: ppos.y + ppos.h - 10
+
+                if coords.x < limit.left
+                    coords.x = limit.left
+                else if coords.x + @position.get('w') > limit.right
+                    coords.x = limit.right - @position.get('w')
+
+                if coords.y < limit.beginning
+                    coords.y = limit.beginning
+                else if coords.y + @position.get('h') > limit.end
+                    coords.y = limit.end - @position.get('h')
+
+                coords.offset_x = coords.x - ppos.x
+                coords.offset_y = coords.y - ppos.y
+
+            @position.set coords
 
         Drag: (event) ->
             x = (event.clientX / context.scale) - @x1

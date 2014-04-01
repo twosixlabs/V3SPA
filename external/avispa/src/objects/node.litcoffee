@@ -52,27 +52,6 @@ Base class for "node" objects
               x: new_x 
               y: new_y 
 
-            if @parent
-
-                ppos = 
-                  x: @parent.position.get('x')
-                  y: @parent.position.get('y')
-                  w: @parent.position.get('w')
-                  h: @parent.position.get('h')
-
-                if new_positions.x < ppos.x
-                    new_positions.x = ppos.x
-                else if new_positions.x > ppos.x + ppos.w
-                    new_positions.x = ppos.x + ppos.w
-
-                if new_positions.y < ppos.y
-                    new_positions.y = ppos.y
-                else if new_positions.y > ppos.y + ppos.h
-                    new_positions.y = ppos.y + ppos.h
-
-                new_positions.offset_x = new_positions.x - ppos.x
-                new_positions.offset_y = new_positions.y - ppos.y
-
-            @position.set new_positions
+            @EnforceBoundingBox new_positions
 
             return cancelEvent(event)
