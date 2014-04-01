@@ -164,7 +164,7 @@
                 </thead>
                 <tbody>
                   <tr ng-repeat="error in errors | orderBy:'-timestamp'" class='small'>
-                    <td>{{error.timestamp}}</td>
+                    <td>{{error.timestamp | date:'medium'}}</td>
                     <td ng-click>
                       <span class='label' ng-class="errorClass(error, 'label-')">
                         {{error.level}}

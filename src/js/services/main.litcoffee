@@ -24,7 +24,7 @@
 
         log: (domain, level, message)->
           msg = 
-            timestamp: new Date().getTime()
+            timestamp: new Date()
             domain: domain
             level: level
             message: message.split('\n')
