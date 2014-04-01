@@ -70,7 +70,7 @@ class RefPolicy(restful.ResourceDomain):
 
         name = params['name'][:-4] if params['name'].endswith('.zip') else params['name']
         metadata = cls.Read({'id': name})
-        print metadata
+        str(metadata.written)
 
         if metadata is None:
             metadata = cls({

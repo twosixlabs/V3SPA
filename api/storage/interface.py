@@ -1,6 +1,6 @@
 
 import json
-import UserDict
+import collections
 import logging
 
 import api
@@ -30,14 +30,20 @@ def initialize():
     logging.info('Storage engine: %s', engine)
 
 
-class Entry(UserDict.DictMixin):
+class Entry(collections.MutableMapping):
     def __init__(self, entry):
         self.id = entry['id']
-        self.entry = dict(entry)
+        self.entry = dict(entry.items())
         self.Init()
 
     def Init(self):
         pass
+
+    def __len__(self):
+      return len(self.entry)
+
+    def __iter__(self):
+      return self.entry.__iter__()
 
     @classmethod
     def Find(cls, criteria, selection=None):
@@ -86,9 +92,11 @@ class Entry(UserDict.DictMixin):
         return api.db.json.dumps(dict(self.entry), indent=2)
 
     def __getattr__(self, attr):
-      if attr in self.entry:
-        return self.entry.__getitem__(attr)
-      return object.__getattribute__(self, attr)
+      try:
+        val = self.entry.get(attr)
+        return val
+      except AttributeError:
+        return object.__getattribute__(self, attr)
 
     def __getitem__(self, key):
         return self.entry.__getitem__(key)
