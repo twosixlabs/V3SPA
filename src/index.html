@@ -125,7 +125,8 @@
                     </div>
                     <div class='editor-box'>
                       <div ui-ace="{ onLoad: aceLoaded }"
-                        auto-height='0.6'
+                        auto-height="410"
+                        auto-height-type='offset_bottom_px'
                         on-resize='$scope.editor.resize()'>
                       </div>
                       <div class='faded-overlay' ng-hide='policy.id'>
@@ -141,7 +142,7 @@
         <div ng-class="{'col-md-12': editorSize == 0,
                         'col-md-8': editorSize == 1,
                         'col-md-4': editorSize == 2}">
-          <div id='visualizer' ng-view auto-height='0.70'>
+          <div id='visualizer' ng-view auto-height='230' auto-height-type='offset_bottom_px'>
           </div>
         </div>
       </div>

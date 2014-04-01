@@ -6,17 +6,24 @@
         replace: false
         transclude: false
         scope:
-          multiplier: '@autoHeight'
+          modifier: '@autoHeight'
+          type: "@autoHeightType"
           resize_callback: '&onResize'
         controller: ($scope, $element)->
           angular.element($window).bind 'resize', ->
             $scope.$apply ->
-              $element.height "#{$window.innerHeight * $scope.multiplier}px"
+              if not $scope.type? or $scope.type == 'percentage'
+                $element.height "#{$window.innerHeight * $scope.modifier}px"
+              else if $scope.type == 'offset_bottom_px'
+                $element.height "#{$window.innerHeight - $scope.modifier}px"
 
             if $scope.resize_callback
               $scope.resize_callback()
-        link: (scope, element)->
-          element.height "#{$window.innerHeight * scope.multiplier}px"
+        link: (scope, element, attrs)->
+          if not attrs.autoHeightType? or attrs.autoHeightType == 'percentage'
+            element.height "#{$window.innerHeight * attrs.autoHeight}px"
+          else if attrs.autoHeightType == 'offset_bottom_px'
+            element.height "#{$window.innerHeight - attrs.autoHeight}px"
           scope.resize_callback()
 
       return ret
