@@ -71,7 +71,8 @@ class LobsterDomain(object):
         """ Validate a Lobster file received from the IDE
         """
 
-        output = self._make_request('POST', '/parse', msg['payload'])
+        output = self._make_request('POST', '/parse?{0}'.format(msg['payload']['params']),
+            msg['payload']['text'])
 
         return {
             'label': msg['response_id'],

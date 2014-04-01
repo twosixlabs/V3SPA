@@ -28,6 +28,8 @@ errors, and generally being awesome.
 
           @validate_dsl = _.throttle @_validate_dsl, 1000
 
+          @queryparams = null
+
         isCurrent: (id)=>
           id? and id == @current_policy._id
 
@@ -134,7 +136,9 @@ contents of @current_policy
           req =
             domain: 'lobster'
             request: 'validate'
-            payload: @current_policy.documents.dsl.text
+            payload: 
+              text: @current_policy.documents.dsl.text
+              params: @queryparams
 
           @SockJSService.send req, (result)=>
             if result.error  # Service error

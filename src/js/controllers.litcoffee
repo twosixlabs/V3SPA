@@ -8,6 +8,10 @@ The main controller. avispa is a subcontroller.
 
       $scope._ = _
 
+      $scope.qparams = null
+      $scope.$watch 'qparams', (newv)->
+          IDEBackend.queryparams = newv
+
       $scope.policy = IDEBackend.current_policy
 
       IDEBackend.add_hook 'policy_load', (info)->
@@ -21,7 +25,7 @@ The main controller. avispa is a subcontroller.
               session = new ace.EditSession doc.text, "ace/mode/#{mode}"
 
               session.on 'change', (text)->
-                IDEBackend.update_document nm, session.getValue()
+                IDEBackend.update_document nm, session.getValue(), 
 
               session.selection.on 'changeSelection', (e, sel)->
                 IDEBackend.highlight_selection nm, sel.getRange()
