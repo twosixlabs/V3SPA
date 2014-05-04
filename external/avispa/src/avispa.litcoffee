@@ -56,7 +56,7 @@ no reason.
                     panEnabled: true
                     zoomEnabled: true
                     dragEnabled: false
-                    minZoom: 0.5
+                    minZoom: 0.1
                     maxZoom: 10
                     onZoom: (scale, transform)->
                       positionMgr.update transform

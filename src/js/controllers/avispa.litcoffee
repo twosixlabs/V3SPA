@@ -120,8 +120,8 @@ ID's MUST be fully qualified, or Avispa renders horribly wrong.
             do (id)->
               if id not of $scope.policy_data.domains
                 coords =
-                    x: domain_pos.x + 10
-                    y: 100 + 10
+                    offset_x: domain_pos.x + 10
+                    offset_y: 100 + 10
                     w: 50
                     h: 50
                 $scope.createDomain id, $scope.parent, subdomain, coords
@@ -130,8 +130,8 @@ ID's MUST be fully qualified, or Avispa renders horribly wrong.
 
                 subdomain = $scope.policy_data.domains[id]
                 coords =
-                    x: domain_pos.x
-                    y: domain_pos.y
+                    offset_x: domain_pos.x
+                    offset_y: domain_pos.y
                     w: (domain_pos.w * 1.1) * subdomain.subdomains.length || domain_pos.w
                     h: (domain_pos.h * 1.1) * subdomain.subdomains.length || domain_pos.h
 
@@ -164,8 +164,8 @@ ID's MUST be fully qualified, or Avispa renders horribly wrong.
           for port_layout in port_layout_store
               port = $scope.policy_data.ports[port_layout.id]
               coords =
-                  x: port_layout.x
-                  y: port_layout.y
+                  offset_x: port_layout.x
+                  offset_y: port_layout.y
                   radius: 30
                   fill: '#eeeeec'
 
@@ -206,7 +206,8 @@ from the injector
 
           @posMgr = PositionManager(
             "avispa.#{identifier}::#{IDEBackend.current_policy._id}",
-            vals
+            vals,
+            ['x', 'y']
           )
           @data = @posMgr.data
 
@@ -232,13 +233,18 @@ from the injector
         @_set(obj)
 
       _set: (obj)->
+        changed = false
         if @posMgr?
-          @posMgr.update(obj)
+          changed = @posMgr.update(obj)
         else
           for k, v of obj
-            @data[k] = v
+            do (k, v)->
+              if @data[k] != v
+                @data[k] = v
+                changed = true
 
-        @notify(['change'])
+        if changed
+          @notify(['change'])
 
     Port = Avispa.Node
 
@@ -255,11 +261,12 @@ from the injector
             return @
 
         render: () ->
+            pos = @AbsPosition()
             @$rect
-                .attr('x', @position.get('x'))
-                .attr('y', @position.get('y'))
+                .attr('x', pos.x)
+                .attr('y', pos.y)
             @$label
-                .attr('x', @position.get('x'))
-                .attr('y', @position.get('y'))
+                .attr('x', pos.x)
+                .attr('y', pos.y)
             return @
 

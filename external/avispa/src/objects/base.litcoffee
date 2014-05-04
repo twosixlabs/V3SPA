@@ -35,16 +35,7 @@ Expect a position to be passed in
 If we have a parent, keep track of our offset from the parent
 
             if @parent
-                position.offset_x = position.x
-                position.offset_y = position.x
-
-                position.x += @parent.position.get('x')
-                position.y += @parent.position.get('y')
-
                 @parent.position.bind 'change', @ParentDrag, @
-
-            else
-              position = @options.position
 
 Allow a list of classes to be passed in.
 
@@ -54,7 +45,7 @@ Allow a list of classes to be passed in.
 
               @.$el.attr 'class', classes.join ' '
 
-            @position = new GenericModel(position, @options._id)
+            @position = new GenericModel(@options.position, @options._id)
             @position.bind 'change', @render, @
 
 The init method allows classes to extend the BaseObject without re-implementing this initialize function
@@ -65,12 +56,33 @@ The init method allows classes to extend the BaseObject without re-implementing 
             @render()
             return @
 
-        ParentDrag: (ppos) ->
-            offset_pos = 
-                x: @position.get('offset_x') + ppos.get('x')
-                y: @position.get('offset_y') + ppos.get('y')
+        AbsPosition: ->
+          #if @position.get('x') and @position.get('y')
+          #    ret = 
+          #      x: @position.get('x')
+          #      y: @position.get('y') 
+          #
+          #    return ret
 
-            @EnforceBoundingBox offset_pos
+          if @parent
+              ppos = @parent.AbsPosition()
+              ret =
+                x: @position.get('offset_x') + ppos.x
+                y: @position.get('offset_y') + ppos.y
+          else
+              ret =
+                x: @position.get('offset_x')
+                y: @position.get('offset_y') 
+
+          @position.set ret
+          return ret
+
+
+        ParentDrag: (ppos) ->
+
+            @position.set
+                x: @position.get('offset_x') + ppos.get('x') 
+                y: @position.get('offset_y') + ppos.get('y') 
 
             return
 
@@ -90,6 +102,11 @@ If we have a parent element, we want to make sure that our box is at least
 10 pixels inside of it at all times. We start by calculating the amount of
 space space there is around the edges of this group.
 
+            shift_x = coords.x - @position.get('x')
+            shift_y = coords.y - @position.get('y')
+            offset_x = @position.get('offset_x') + shift_x
+            offset_y = @position.get('offset_y') + shift_y
+
             if @parent
                 ppos = 
                   x: @parent.position.get('x')
@@ -97,31 +114,28 @@ space space there is around the edges of this group.
                   w: @parent.position.get('w')
                   h: @parent.position.get('h')
 
-                limit = 
-                  left: ppos.x + 10
-                  right: (ppos.x + ppos.w) - 10
-                  beginning: ppos.y + 10
-                  end: ppos.y + ppos.h - 10
 
-                if coords.x < limit.left
-                    coords.x = limit.left
-                else if coords.x + @position.get('w') > limit.right
-                    coords.x = limit.right - @position.get('w')
+                if offset_x < 10
+                    offset_x = 10
+                else if offset_x + @position.get('w') > ppos.w - 10
+                    offset_x = ppos.w - 10 - @position.get('w')
 
-                if coords.y < limit.beginning
-                    coords.y = limit.beginning
-                else if coords.y + @position.get('h') > limit.end
-                    coords.y = limit.end - @position.get('h')
+                if offset_y < 10
+                    offset_y = 10
+                else if offset_y + @position.get('h') > ppos.h - 10
+                    offset_y = ppos.h - 10 - @position.get('h')
 
-                coords.offset_x = coords.x - ppos.x
-                coords.offset_y = coords.y - ppos.y
+            ret = 
+              offset_x: offset_x
+              offset_y: offset_y
 
-            @position.set coords
+            @position.set ret
 
         Drag: (event) ->
-            x = (event.clientX / context.scale) - @x1
-            y = (event.clientY / context.scale) - @y1
+            new_positions = 
+                x: (event.clientX / context.scale) - @x1
+                y: (event.clientY / context.scale) - @y1
 
-            @position.set 'x': x, 'y': y
+            @EnforceBoundingBox new_positions
 
             return cancelEvent(event)

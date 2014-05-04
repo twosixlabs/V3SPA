@@ -14,10 +14,11 @@ Base class for "group" objects
             return
 
         render: () ->
-            #@$el.attr('transform', "translate(#{@position.get('x')}, #{@position.get('y')})")
+
+            pos = @AbsPosition()
             @$rect
-                .attr('x', @position.get('x'))
-                .attr('y', @position.get('y'))
+                .attr('x', pos.x)
+                .attr('y', pos.y)
             return @
 
         OnMouseEnter: (event) ->

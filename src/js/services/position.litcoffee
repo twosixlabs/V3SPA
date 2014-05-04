@@ -3,7 +3,7 @@
     services.factory 'PositionManager', (SockJSService, $q, $cacheFactory)->
 
       class PositionMgr
-        constructor: (@id, defaults = {})->
+        constructor: (@id, defaults = {}, @local = {})->
 
           @percolate = _.throttle @_percolate, 1000, leading: false
 
@@ -28,6 +28,7 @@
               @percolate()
             _.each @notifiers, (cb)->
               cb()
+          return changed
 
 Register a notifier for when the underlying data changes.
 
@@ -40,9 +41,11 @@ Percolate changes to the server
 
           d = $q.defer()
 
-          updates = _.clone @data
+          updates = _.omit @data, @local
           updates.id = @id
           updates._id = @data._id
+          console.log "Percolating ", updates
+          console.log "ident: #{@id}"
 
           req = 
             domain: 'location'
@@ -66,6 +69,8 @@ Percolate changes to the server
             request: 'get'
             payload: 
               id: @id
+
+          console.log "Retrieving positions for #{@id}"
 
           SockJSService.send req, (result)=>
             if result.error 
