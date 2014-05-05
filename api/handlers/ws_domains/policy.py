@@ -64,7 +64,6 @@ class Policy(restful.ResourceDomain):
         params['modified'] = True  # by definition
         policy = cls(params)
         get_dsl_for_policy(refpol, policy)
-        import pdb; pdb.set_trace()
 
         refpol['modules'][modname] = {
             'name': modname,

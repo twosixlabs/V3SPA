@@ -70,7 +70,6 @@ class RefPolicy(restful.ResourceDomain):
 
         name = params['name'][:-4] if params['name'].endswith('.zip') else params['name']
         metadata = cls.Read({'id': name})
-        str(metadata.written)
 
         if metadata is None:
             metadata = cls({
@@ -202,7 +201,9 @@ class RefPolicy(restful.ResourceDomain):
             zf.getinfo('{0}/policy/modules/'.format(name))
         except KeyError:
             raise Exception("File does not appear to contain "
-                            "SELinux reference policy source")
+                            "SELinux reference policy source. "
+                            "Make sure the archive name is the same as "
+                            "its top-level folder.")
 
         zf.extractall(policy_dir)
 
