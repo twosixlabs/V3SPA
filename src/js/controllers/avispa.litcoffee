@@ -116,8 +116,8 @@ ID's MUST be fully qualified, or Avispa renders horribly wrong.
           port_layout_store = []
 
 
-          for id in domain.subdomains
-            do (id)->
+          for id, subdomain of domain.subdomains
+            do (id, subdomain)->
               if id not of $scope.policy_data.domains
                 coords =
                     offset_x: domain_pos.x + 10
@@ -129,11 +129,12 @@ ID's MUST be fully qualified, or Avispa renders horribly wrong.
               else
 
                 subdomain = $scope.policy_data.domains[id]
+                subdomain_count = _.size subdomain.subdomains
                 coords =
                     offset_x: domain_pos.x
                     offset_y: domain_pos.y
-                    w: (domain_pos.w * 1.1) * subdomain.subdomains.length || domain_pos.w
-                    h: (domain_pos.h * 1.1) * subdomain.subdomains.length || domain_pos.h
+                    w: (domain_pos.w * 1.1) * subdomain_count || domain_pos.w
+                    h: (domain_pos.h * 1.1) * subdomain_count || domain_pos.h
 
                 $scope.createDomain id, $scope.parent, subdomain, coords
 
@@ -155,9 +156,23 @@ ID's MUST be fully qualified, or Avispa renders horribly wrong.
 
           port_force = d3.layout.force().nodes(port_layout_store)
                       .size([domain_pos.w, domain_pos.h])
+                      .gravity(0.05)
+                      .charge(-100)
+                      .chargeDistance(domain_pos.w)
+                      .on('tick', ->
+                        for port in port_layout_store
+                          if port.x > domain_pos.w
+                            port.x = domain_pos.w
+                          else if port.x < 0
+                            port.x = 0
+                          if port.y > domain_pos.h
+                            port.y = domain_pos.h
+                          else if port.y < 0
+                            port.y = 0
+                      )
 
           port_force.start()
-          for x in [1..25]
+          for x in [1..200]
             port_force.tick()
           port_force.stop()
 
@@ -168,6 +183,7 @@ ID's MUST be fully qualified, or Avispa renders horribly wrong.
                   offset_y: port_layout.y
                   radius: 30
                   fill: '#eeeeec'
+
 
               $scope.createPort port_layout.id,  $scope.parent, port, coords
 
@@ -243,8 +259,10 @@ from the injector
                 @data[k] = v
                 changed = true
 
-        if changed
-          @notify(['change'])
+          # This is intentionally inside the else block.
+          # posMgr notifies any of its changes
+          if changed
+            @notify(['change'])
 
     Port = Avispa.Node
 
