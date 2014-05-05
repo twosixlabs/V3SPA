@@ -27,6 +27,11 @@ The "Position" model is defined by the project that is importing Avispa.
 
             @highlighted = false
 
+            @children = []
+
+            @cache_hit = 0
+            @cache_miss = 0
+
 Expect a position to be passed in
 
             @parent  = @options.parent
@@ -35,7 +40,7 @@ Expect a position to be passed in
 If we have a parent, keep track of our offset from the parent
 
             if @parent
-                @parent.position.bind 'change', @ParentDrag, @
+                @parent.children.push @
 
 Allow a list of classes to be passed in.
 
@@ -48,6 +53,8 @@ Allow a list of classes to be passed in.
             @position = new GenericModel(@options.position, @options._id)
             @position.bind 'change', @render, @
 
+            @position_cache = {}
+
 The init method allows classes to extend the BaseObject without re-implementing this initialize function
 
             @_init()
@@ -56,41 +63,46 @@ The init method allows classes to extend the BaseObject without re-implementing 
             @render()
             return @
 
-        AbsPosition: ->
-          #if @position.get('x') and @position.get('y')
-          #    ret = 
-          #      x: @position.get('x')
-          #      y: @position.get('y') 
-          #
-          #    return ret
+        AbsPosition: (expected)->
 
           if @parent
-              ppos = @parent.AbsPosition()
+              if not @ppos_cached?
+                @cache_miss++
+                @ppos_cached = @parent.AbsPosition()
+              else
+                @cache_hit++
+
               ret =
-                x: @position.get('offset_x') + ppos.x
-                y: @position.get('offset_y') + ppos.y
+                x: @position.get('offset_x') + @ppos_cached.x
+                y: @position.get('offset_y') + @ppos_cached.y
           else
               ret =
                 x: @position.get('offset_x')
-                y: @position.get('offset_y') 
+                y: @position.get('offset_y')
 
-          @position.set ret
           return ret
 
+        width: ->
+          return @position.get('w')
+
+        height: ->
+          return @position.get('h')
 
         ParentDrag: (ppos) ->
 
-            @position.set
-                x: @position.get('offset_x') + ppos.get('x') 
-                y: @position.get('offset_y') + ppos.get('y') 
-
-            return
+            @ppos_cached = null
+            @render()
+            for child in @children
+              do (child)->
+                child.ParentDrag()
 
         OnMouseDown: (event) ->
             @jitter = 0
 
-            @clickOffsetX = (event.clientX / context.scale) - @position.get('x')
-            @clickOffsetY = (event.clientY / context.scale) - @position.get('y') 
+            pos = @AbsPosition()
+
+            @clickOffsetX = (event.clientX / context.scale) - pos.x
+            @clickOffsetY = (event.clientY / context.scale) - pos.y
 
             context.dragItem = @
 
@@ -102,40 +114,42 @@ If we have a parent element, we want to make sure that our box is at least
 10 pixels inside of it at all times. We start by calculating the amount of
 space space there is around the edges of this group.
 
-            shift_x = coords.x - @position.get('x')
-            shift_y = coords.y - @position.get('y')
+            currpos = @AbsPosition()
+
+            shift_x = coords.x - currpos.x
+            shift_y = coords.y - currpos.y
             offset_x = @position.get('offset_x') + shift_x
             offset_y = @position.get('offset_y') + shift_y
 
             if @parent
-                ppos = 
-                  x: @parent.position.get('x')
-                  y: @parent.position.get('y')
-                  w: @parent.position.get('w')
-                  h: @parent.position.get('h')
-
+                ppos_abs = @parent.AbsPosition()
+                ppos =
+                  x: ppos_abs.x
+                  y: ppos_abs.y
+                  w: @parent.width()
+                  h: @parent.height()
 
                 if offset_x < 10
                     offset_x = 10
-                else if offset_x + @position.get('w') > ppos.w - 10
-                    offset_x = ppos.w - 10 - @position.get('w')
+                else if offset_x + @width() > ppos.w - 10
+                    offset_x = ppos.w - 10 - @width()
 
                 if offset_y < 10
                     offset_y = 10
-                else if offset_y + @position.get('h') > ppos.h - 10
-                    offset_y = ppos.h - 10 - @position.get('h')
+                else if offset_y + @height() > ppos.h - 10
+                    offset_y = ppos.h - 10 - @height()
 
-            ret = 
+            console.log("#{@options._id}: #{@cache_hit} hits, #{@cache_miss} misses")
+
+            ret =
               offset_x: offset_x
               offset_y: offset_y
 
-            @position.set ret
-
         Drag: (event) ->
-            new_positions = 
+            new_positions =
                 x: (event.clientX / context.scale) - @x1
                 y: (event.clientY / context.scale) - @y1
 
-            @EnforceBoundingBox new_positions
+            @position.set @EnforceBoundingBox(new_positions)
 
             return cancelEvent(event)

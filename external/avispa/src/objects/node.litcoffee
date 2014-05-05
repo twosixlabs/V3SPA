@@ -17,8 +17,18 @@ Base class for "node" objects
 
             return
 
+        width: ->
+          return @position.get('radius')
+
+        height: ->
+          return @position.get('radius')
+
         render: () ->
+            # Calculate our x,y based on offsets
+            # and store it
             pos = @AbsPosition()
+            @position.set pos
+
             @$circle
                 .attr('cx', pos.x)
                 .attr('cy', pos.y)
@@ -49,10 +59,14 @@ Base class for "node" objects
             new_x = (event.clientX / context.scale) - @clickOffsetX
             new_y = (event.clientY / context.scale) - @clickOffsetY
 
-            new_positions = 
-              x: new_x 
-              y: new_y 
+            new_positions =
+              x: new_x
+              y: new_y
 
-            @EnforceBoundingBox new_positions
+            @position.set @EnforceBoundingBox(new_positions)
+
+            for child in @children
+              do (child)->
+                child.ParentDrag()
 
             return cancelEvent(event)

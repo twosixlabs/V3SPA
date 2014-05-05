@@ -38,9 +38,13 @@ Base class for "group" objects
 
         Drag: (event) ->
             new_positions =
-              x: (event.clientX / context.scale) - @clickOffsetX 
+              x: (event.clientX / context.scale) - @clickOffsetX
               y: (event.clientY / context.scale) - @clickOffsetY
 
-            @EnforceBoundingBox new_positions
+            @position.set @EnforceBoundingBox(new_positions)
+
+            for child in @children
+              do (child)->
+                child.ParentDrag()
 
             return cancelEvent(event)
