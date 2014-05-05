@@ -29,6 +29,8 @@ Expose a global view class so that consumers of the API can instantiate a view.
             @dragItem = null
             @arrow    = null
 
+            @OnMouseMove = _.throttle @OnMouseMove, 20
+
 This loads the IDEBackend service into the context, so that any
 of the Avispa code can access it.
 
@@ -59,6 +61,7 @@ no reason.
                     minZoom: 0.1
                     maxZoom: 10
                     onZoom: (scale, transform)->
+                      context.scale = scale
                       positionMgr.update transform
                     onPanComplete: (coords, transform) ->
                       positionMgr.update transform
@@ -153,7 +156,7 @@ If there is no svgPanZoom, then use the one Matt put together
             @$('#zoomslider').slider('option', 'value', 1)
             return
 
-        OnMouseMove: (event) ->
+        OnMouseMove: (event)->
             # drag the entire scene around
             if @offset and not @have_svg_pan_zoom
                 @Pan(event.clientX - @offset[0], event.clientY - @offset[1])
