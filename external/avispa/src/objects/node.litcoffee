@@ -54,6 +54,24 @@ Base class for "node" objects
 
             return cancelEvent(event)
 
+Nodes are circles, and need to offset from the center
+of the circle, making calculations different.
+
+        EnforceXOffset: (offset, pwidth)->
+            if offset < @width()
+                offset = @width()
+            else if offset + @width() > pwidth
+                offset = pwidth - @width()
+
+            return offset
+
+        EnforceYOffset: (offset, pheight)->
+            if offset < @height()
+                offset = @height()
+            else if offset + @height() > pheight
+                offset = pheight - @height()
+
+            return offset
 
         Drag: (event) ->
             new_x = (event.clientX / context.scale) - @clickOffsetX

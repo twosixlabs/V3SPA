@@ -129,21 +129,28 @@ space space there is around the edges of this group.
                   w: @parent.width()
                   h: @parent.height()
 
-                if offset_x < 10
-                    offset_x = 10
-                else if offset_x + @width() > ppos.w - 10
-                    offset_x = ppos.w - 10 - @width()
-
-                if offset_y < 10
-                    offset_y = 10
-                else if offset_y + @height() > ppos.h - 10
-                    offset_y = ppos.h - 10 - @height()
-
-            console.log("#{@options._id}: #{@cache_hit} hits, #{@cache_miss} misses")
+                offset_x = @EnforceXOffset(offset_x, ppos.w)
+                offset_y = @EnforceYOffset(offset_y, ppos.h)
 
             ret =
               offset_x: offset_x
               offset_y: offset_y
+
+        EnforceXOffset: (offset, pwidth)->
+            if offset < 10
+                offset = 10
+            else if offset + @width() > pwidth - 10
+                offset = pwidth - 10 - @width()
+
+            return offset
+
+        EnforceYOffset: (offset, height)->
+            if offset < 10
+                offset = 10
+            else if offset + @height() > height - 10
+                offset = height - 10 - @height()
+
+            return offset
 
         Drag: (event) ->
             new_positions =
