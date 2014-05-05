@@ -22,10 +22,13 @@
             if @data[k] != v
               @data[k] = v
               changed = true
+              if not _.contains @local, k # if it's a local only, don't mark changed.
+                nonlocal_changed = true
 
           if changed
-            if not @loading
+            if nonlocal_changed and not @loading
               @percolate()
+
             _.each @notifiers, (cb)->
               cb()
           return changed
@@ -44,8 +47,6 @@ Percolate changes to the server
           updates = _.omit @data, @local
           updates.id = @id
           updates._id = @data._id
-          console.log "Percolating ", updates
-          console.log "ident: #{@id}"
 
           req = 
             domain: 'location'
@@ -70,12 +71,12 @@ Percolate changes to the server
             payload: 
               id: @id
 
-          console.log "Retrieving positions for #{@id}"
 
           SockJSService.send req, (result)=>
             if result.error 
               d.reject result.payload
             else
+              console.log "#{@id} retrieved position from server"
               if result.payload? and not _.isEmpty(result.payload)
                 # The server updated the location. Update the data
                 # and notify anyone who might care.
@@ -99,9 +100,9 @@ can be used to retrieve positions. Retrieve a cached manager if possible.
 
       cache = $cacheFactory('position_managers', {capacity: 50})
 
-      return (id, defaults)->
+      return (id, defaults, locals)->
         manager = cache.get(id)
         if not manager?
-          manager = new PositionMgr(id, defaults)
+          manager = new PositionMgr(id, defaults, locals)
           cache.put(id, manager)
         return manager
