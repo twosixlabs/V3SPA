@@ -88,7 +88,7 @@ general callbacks
             callback = @msg_callbacks[msg.label]
             if callback?
               @status.outstanding--
-              console.log "Have #{@status.outstanding} outstanding messages"
+              #console.log "Have #{@status.outstanding} outstanding messages"
               @$rootScope.$apply ->
                 callback(msg)
               return
@@ -99,7 +99,7 @@ general callbacks
               return
 
             @status.outstanding--
-            console.log "Have #{@status.outstanding} outstanding messages"
+            #console.log "Have #{@status.outstanding} outstanding messages"
             @$rootScope.$apply ->
               callback(msg)
 
@@ -116,7 +116,7 @@ We generate a token and do a callback specifically on that token.
             @msg_callbacks[token] = response
             data.response_id = token
             @status.outstanding++
-            console.log "Have #{@status.outstanding} outstanding messages"
+            #console.log "Have #{@status.outstanding} outstanding messages"
 
           if @sock.readyState == 0
             console.log "Connection not yet established. Buffering message"
