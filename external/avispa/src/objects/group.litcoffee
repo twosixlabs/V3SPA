@@ -35,7 +35,6 @@ Base class for "group" objects
                 context.ide_backend.unhighlight()
             return cancelEvent(event)
 
-
         Drag: (event) ->
             new_positions =
               x: (event.clientX / context.scale) - @clickOffsetX

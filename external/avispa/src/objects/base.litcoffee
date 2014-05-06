@@ -91,7 +91,11 @@ The init method allows classes to extend the BaseObject without re-implementing 
         ParentDrag: (ppos) ->
 
             @ppos_cached = null
+            pos = @AbsPosition()
+            pos = _.extend pos, @EnforceBoundingBox(pos)
+            @position.set pos
             @render()
+
             for child in @children
               do (child)->
                 child.ParentDrag()

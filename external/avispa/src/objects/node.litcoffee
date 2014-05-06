@@ -27,7 +27,6 @@ Base class for "node" objects
             # Calculate our x,y based on offsets
             # and store it
             pos = @AbsPosition()
-            @position.set pos
 
             @$circle
                 .attr('cx', pos.x)
