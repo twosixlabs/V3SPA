@@ -51,7 +51,7 @@ Allow a list of classes to be passed in.
               @.$el.attr 'class', classes.join ' '
 
             @position = new GenericModel(@options.position, @options._id)
-            @position.bind 'change', @render, @
+            @position.bind 'change', @ParentDrag, @
 
             @position_cache = {}
 

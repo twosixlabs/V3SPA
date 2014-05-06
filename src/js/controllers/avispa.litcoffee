@@ -49,6 +49,14 @@ when the domain data has actually changed to prevent flickering.
               el: $('#surface svg')
 
             $scope.parseDomain(data.result.domains[data.result.root])
+
+Force a redraw on all the children
+
+            for id of data.result.domains[data.result.root].subdomains
+              do (id)->
+                _.each $scope.objects.domains[id].children, (child)->
+                  child.ParentDrag()
+
             $scope.parseConns(data.result.connections)
 
 
@@ -223,7 +231,7 @@ from the injector
           @posMgr = PositionManager(
             "avispa.#{identifier}::#{IDEBackend.current_policy._id}",
             vals,
-            ['x', 'y']
+            ['x', 'y', 'w', 'h']
           )
           @data = @posMgr.data
 
@@ -283,6 +291,8 @@ from the injector
             @$rect
                 .attr('x', pos.x)
                 .attr('y', pos.y)
+                .attr('width',  @position.get('w'))
+                .attr('height', @position.get('h'))
             @$label
                 .attr('x', pos.x)
                 .attr('y', pos.y)
