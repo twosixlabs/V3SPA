@@ -70,7 +70,7 @@ Clear the current policy
         clear_policy: =>
             @current_policy =
               documents: {}
-              json: 
+              json:
                 errors: ["nodata"]
               id: null
               _id: null
@@ -143,8 +143,10 @@ about highlighting that should be performed.
             highlights: []
 
           if object?
-            annotations.highlights.push @_parseClassSourcePosition (object)
-            annotations.highlights.push @_parseDomainSourcePosition (object)
+            clsSrcPos = @_parseClassSourcePosition object
+            annotations.highlights.push clsSrcPos if clsSrcPos?
+            domSrcPos = @_parseDomainSourcePosition object
+            annotations.highlights.push domSrcPos if domSrcPos?
 
           _.each @hooks.validation, (hook)->
             hook annotations
