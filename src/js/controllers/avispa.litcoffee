@@ -114,6 +114,43 @@ ID's MUST be fully qualified, or Avispa renders horribly wrong.
           IDEBackend.add_selection_range_object 'dsl', data.srcloc.start.line, link
           $scope.avispa.$links.append link.$el
 
+Use D3's force-direction to layout a set of objects within the bounds.
+Bounds is expected to be an object that contains 'w' and 'h' values for
+width and height respectively
+
+      $scope.layout_objects = (objects, bounds)->
+
+          layout_model = []
+          _.each objects, (key)->
+              layout_model.push 
+                  x: 0
+                  y: 0
+                  px: 0
+                  py: 0
+                  id: key
+
+          port_force = d3.layout.force().nodes(port_layout_store)
+                      .size([domain_pos.w, domain_pos.h])
+                      .gravity(0.05)
+                      .charge(-100)
+                      .chargeDistance(domain_pos.w)
+                      .on('tick', ->
+                        for port in port_layout_store
+                          if port.x > domain_pos.w
+                            port.x = domain_pos.w
+                          else if port.x < 0
+                            port.x = 0
+                          if port.y > domain_pos.h
+                            port.y = domain_pos.h
+                          else if port.y < 0
+                            port.y = 0
+                      )
+
+          port_force.start()
+          for x in [1..200]
+            port_force.tick()
+          port_force.stop()
+
       $scope.parseDomain = (domain) ->
           domain_pos = 
             x: 10
@@ -159,37 +196,9 @@ ID's MUST be fully qualified, or Avispa renders horribly wrong.
 
               domain_pos.x += 210
 
-          for id, idx in domain.ports
-            do (id)->
-              port_layout_store.push 
-                  index: idx
-                  x: 0
-                  y: 0
-                  px: 0
-                  py: 0
-                  id: id
+          laid_out_ports = $scope.layout_objects domain.ports
 
-          port_force = d3.layout.force().nodes(port_layout_store)
-                      .size([domain_pos.w, domain_pos.h])
-                      .gravity(0.05)
-                      .charge(-100)
-                      .chargeDistance(domain_pos.w)
-                      .on('tick', ->
-                        for port in port_layout_store
-                          if port.x > domain_pos.w
-                            port.x = domain_pos.w
-                          else if port.x < 0
-                            port.x = 0
-                          if port.y > domain_pos.h
-                            port.y = domain_pos.h
-                          else if port.y < 0
-                            port.y = 0
-                      )
 
-          port_force.start()
-          for x in [1..200]
-            port_force.tick()
-          port_force.stop()
 
           for port_layout in port_layout_store
               port = $scope.policy_data.ports[port_layout.id]
