@@ -10,7 +10,7 @@ errors, and generally being awesome.
         constructor: (@VespaLogger, @$rootScope,
         @SockJSService, @$q, @$timeout, @RefPolicy)->
 
-          @current_policy = 
+          @current_policy =
             refpolicy_id: null
             documents: {}
             json: null
@@ -18,7 +18,7 @@ errors, and generally being awesome.
             _id: null
             valid: false
 
-          @hooks = 
+          @hooks =
             policy_load: []
             doc_changed: []
             json_changed: []
@@ -68,7 +68,7 @@ will be called as appropriate.
 Create a new policy, but don't save it or anything
 
         new_policy: (args)=>
-          @current_policy = 
+          @current_policy =
             documents: {}
             json: null
             id: null
@@ -80,7 +80,7 @@ Create a new policy, but don't save it or anything
               @current_policy[arg] = val
 
           if @current_policy.type == 'selinux'
-            @current_policy.documents = 
+            @current_policy.documents =
               dsl:
                 mode: 'lobster'
                 text: ''
@@ -114,7 +114,7 @@ Send notifications to those listing to validation hooks
 about highlighting that should be performed.
 
         highlight: (object)=>
-          annotations = 
+          annotations =
             highlights: []
 
           if object?
@@ -137,7 +137,7 @@ contents of @current_policy
           req =
             domain: 'lobster'
             request: 'validate'
-            payload: 
+            payload:
               text: @current_policy.documents.dsl.text
               params: @queryparams
 
@@ -157,7 +157,7 @@ contents of @current_policy
               @current_policy.json = JSON.parse result.payload
 
               for hook in @hooks.validation
-                annotations = 
+                annotations =
                   errors: @current_policy.json.errors
                 hook(annotations)
 
@@ -179,10 +179,10 @@ Load a policy from the server
         load_policy: (refpolicy_id, module_name)=>
           deferred = @$q.defer()
 
-          req = 
+          req =
             domain: 'policy'
             request: 'get'
-            payload: 
+            payload:
               refpolicy_id: refpolicy_id
               id: module_name
 
@@ -206,7 +206,7 @@ Load a policy from the server
               for docname, doc of @current_policy.documents
                 hook(docname, doc.text)
 
-            $.growl 
+            $.growl
               title: "Loaded"
               message: "#{@current_policy.id}"
 
@@ -236,8 +236,8 @@ Save a modified policy to the server
               deferred.reject resp.payload
 
             else  # valid response. Must parse
-              @current_policy._id = resp.payload._id.$oid 
-              @VespaLogger.log 'policy', 'info', 
+              @current_policy._id = resp.payload._id.$oid
+              @VespaLogger.log 'policy', 'info',
                 "Saved #{@current_policy.id} successfully"
               deferred.resolve @current_policy._id
 
@@ -246,11 +246,11 @@ Save a modified policy to the server
         list_policies: =>
           deferred = @$q.defer()
 
-          req = 
+          req =
             domain: 'policy'
             request: 'find'
             payload:
-              selection: 
+              selection:
                 id: true
 
           @SockJSService.send req, (data)->
@@ -267,13 +267,13 @@ of information described by these functions. These
 are written here to make it easier to change if the
 format of the JSON changes (as it likely will).
 
-        _parseClassSourcePosition: (object)-> 
+        _parseClassSourcePosition: (object)->
           annotation = _.find object.classAnnotations, (elem)->
             elem.name == 'SourcePos'
 
           return unless annotation?
 
-          info = 
+          info =
             range:
               start:
                 row: annotation.args[1] - 1
@@ -287,9 +287,9 @@ format of the JSON changes (as it likely will).
 
           return info
 
-        _parseDomainSourcePosition: (object)-> 
+        _parseDomainSourcePosition: (object)->
 
-          info = 
+          info =
             range: object.srcloc
             description: "unknown"
             type: "source_domain"
