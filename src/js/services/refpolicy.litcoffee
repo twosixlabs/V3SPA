@@ -14,6 +14,12 @@
           if @loading?
             return @loading
           @_deferred_load = @$q.defer()
+
+          # If promise comes back, no matter what the
+          # result, make this variable null
+          @_deferred_load.promise['finally'] =>
+            @_deferred_load = null
+
           return @_deferred_load.promise
 
         load: (id)=>
