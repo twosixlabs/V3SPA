@@ -14,6 +14,8 @@ The main controller. avispa is a subcontroller.
 
       $scope.policy = IDEBackend.current_policy
 
+      $scope.blank_session = new ace.EditSession "", "ace/mode/text"
+
       IDEBackend.add_hook 'policy_load', (info)->
         $timeout ->
           $scope.policy = IDEBackend.current_policy
@@ -64,6 +66,11 @@ This controls our editor visibility.
         editor.setHighlightSelectedWord(true);
 
         $scope.editor = editor
+        editor.setSession $scope.blank_session
+        editor.setOptions
+          readOnly: true
+          highlightActiveLine: false
+          highlightGutterLine: false
 
         $scope.editorSessions = {}
         for nm, doc of $scope.policy.documents
@@ -77,6 +84,17 @@ This controls our editor visibility.
             $scope.editorSessions[nm] = 
               session: session
 
+        IDEBackend.add_hook 'on_close', ->
+          $scope.editor.setSession $scope.blank_session
+          $scope.editor.setOptions
+              readOnly: true
+              highlightActiveLine: false
+              highlightGutterLine: false
+
+          for k of $scope.editorSessions
+            delete $scope.editorSessions[k]
+
+          $scope.editorSessions = {}
 
         IDEBackend.add_hook 'doc_changed', (doc, contents)->
           $timeout(

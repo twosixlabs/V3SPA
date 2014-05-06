@@ -8,7 +8,7 @@ errors, and generally being awesome.
     mod.service 'IDEBackend',
       class IDEBackend
         constructor: (@VespaLogger, @$rootScope,
-        @SockJSService, @$q, @$timeout, @RefPolicy)->
+        @SockJSService, @$q, @$timeout) ->
 
           @current_policy =
             refpolicy_id: null
@@ -64,6 +64,31 @@ will be called as appropriate.
         unhook: (event, action)=>
           @hooks[event] = _.filter @hooks[event], (hook_fn)->
             action != hook_fn
+
+Clear the current policy
+
+        clear_policy: =>
+            @current_policy =
+              documents: {}
+              json: 
+                errors: ["nodata"]
+              id: null
+              _id: null
+              type: null
+              valid: false
+
+            for hook in @hooks.policy_load
+              hook(@current_policy)
+
+            for hook in @hooks.doc_changed
+              for docname, doc of @current_policy.documents
+                hook(docname, doc.text)
+
+            _.each @hooks.json_changed, (hook)=>
+              hook(@current_policy.json)
+
+            _.each @hooks.on_close, (hook)->
+              hook()
 
 Create a new policy, but don't save it or anything
 

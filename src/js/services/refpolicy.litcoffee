@@ -2,7 +2,7 @@
 
     mod.service 'RefPolicy',
       class RefPolicyImpl
-        constructor: (@VespaLogger, @SockJSService, @$q, @$timeout)->
+        constructor: (@VespaLogger, @SockJSService, @$q, @$timeout, @IDEBackend)->
 
           @uploader_running = false
           @chunks_to_upload = []
@@ -42,6 +42,10 @@
             else
               @current = data.payload
               @current._id = @current._id.$oid
+
+              @VespaLogger.log 'policy', 'info', "Loaded Reference Policy: #{@current.id}"
+              @IDEBackend.clear_policy()
+
               deferred.resolve(@current)
               @loading = null
 
