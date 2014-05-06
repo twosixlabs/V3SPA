@@ -68,6 +68,7 @@ no reason.
 
                 positionMgr.on_change ->
                   g = svgPanZoom.getSVGViewport($("#surface svg")[0])
+                  context.scale = positionMgr.data.a
                   svgPanZoom.set_transform(g, positionMgr.data)
 
 If there is no svgPanZoom, then use the one Matt put together
