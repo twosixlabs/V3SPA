@@ -13,7 +13,7 @@
           @retrieve().then =>
             @loading = false
 
-          @notifiers = []
+          @notifier = null
 
         update: (data)=>
           changed = false
@@ -29,14 +29,13 @@
             if nonlocal_changed and not @loading
               @percolate()
 
-            _.each @notifiers, (cb)->
-              cb()
+            @notifier()
           return changed
 
 Register a notifier for when the underlying data changes.
 
         on_change: (callback)->
-          @notifiers.push callback
+          @notifier = callback
 
 Percolate changes to the server
 
@@ -81,8 +80,7 @@ Percolate changes to the server
                 # The server updated the location. Update the data
                 # and notify anyone who might care.
                 _.extend @data, result.payload
-                _.each @notifiers, (cb)->
-                  cb()
+                @notifier()
               else
                 # the defaults were better, send them to the server
                 # use _percolate because we want to send immediately
