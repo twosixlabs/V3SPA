@@ -4,7 +4,7 @@
         IDEBackend, $timeout) ->
 
       $scope.domain_data = null
-      $scope.objects ?= 
+      $scope.objects ?=
           ports: {}
           domains: {}
           connections: {}
@@ -84,7 +84,7 @@ ID's MUST be fully qualified, or Avispa renders horribly wrong.
 
           $scope.objects.domains[id] = domain
 
-          if obj
+          if obj.path # this means it's not collapsed.
             IDEBackend.add_selection_range_object 'dsl', obj.srcloc.start.line, domain
 
           $scope.avispa.$groups.append domain.$el
@@ -114,93 +114,147 @@ ID's MUST be fully qualified, or Avispa renders horribly wrong.
           IDEBackend.add_selection_range_object 'dsl', data.srcloc.start.line, link
           $scope.avispa.$links.append link.$el
 
-      $scope.parseDomain = (domain) ->
-          domain_pos = 
-            x: 10
-            y: 100
-            w: 200
-            h: 200
-          port_pos = x: 40, y: 40
-          port_layout_store = []
+Use D3's force-direction to layout a set of objects within the bounds.
+Bounds is expected to be an object that contains 'w' and 'h' values for
+width and height respectively
 
+`keyfunc` is a method which returns the descriptive key, when given
+the first two arguments of the \_.each callback. This allows disambiguation
+between lists and objects.
 
-          for id, subdomain of domain.subdomains
-            do (id, subdomain)->
-              if id not of $scope.policy_data.domains
-                coords =
-                    offset_x: domain_pos.x + 10
-                    offset_y: 100 + 10
-                    w: 50
-                    h: 50
-                $scope.createDomain id, $scope.parent, subdomain, coords
+      $scope.layout_objects = (objects, bounds, type='object', calc_bounds)->
 
-              else
-
-                subdomain = $scope.policy_data.domains[id]
-                subdomain_count = _.size subdomain.subdomains
-                size = Math.ceil(Math.sqrt(subdomain_count)) + 1
-                coords =
-                    offset_x: domain_pos.x
-                    offset_y: domain_pos.y
-                    w: (domain_pos.w * 1.1) * size || domain_pos.w
-                    h: (domain_pos.h * 1.1) * size || domain_pos.h
-
-                $scope.createDomain id, $scope.parent, subdomain, coords
-
-                # Set the width and height directly - it changes based on the 
-                # number of subnodes, and otherwise it will be cached
-                $scope.objects.domains[id].position.set
-                    w: (domain_pos.w * 1.1) * size || domain_pos.w
-                    h: (domain_pos.h * 1.1) * size || domain_pos.h
-
-                $scope.parent.unshift $scope.objects.domains[id]
-                $scope.parseDomain(subdomain)
-                $scope.parent.shift()
-
-              domain_pos.x += 210
-
-          for id, idx in domain.ports
-            do (id)->
-              port_layout_store.push 
-                  index: idx
+          layout_model = []
+          _.each objects, (val, key)->
+              key = val if type == 'array'
+              layout_model.push
                   x: 0
                   y: 0
                   px: 0
                   py: 0
-                  id: id
+                  key: key
 
-          port_force = d3.layout.force().nodes(port_layout_store)
-                      .size([domain_pos.w, domain_pos.h])
+          collide = (node)->
+            [nx1, nx2, ny1, ny2] = calc_bounds(node)
+
+            return (quad, x1, y1, x2, y2)->
+              if quad.point and (quad.point != node)
+                x = node.x - quad.point.x
+                y = node.y - quad.point.y
+                l = Math.sqrt(x * x + y * y)
+                r = (nx2 - nx1)
+
+                if l < r
+                  l = (l - r) / l * .5
+                  x *= l
+                  y *= l
+                  node.x -= x
+                  node.y -= y
+                  quad.point.x += x
+                  quad.point.y += y
+              return x1 > nx2 || x2 < nx1 || y1 > ny2 || y2 < ny1
+
+          force = d3.layout.force().nodes(layout_model)
+                      .size([bounds.w, bounds.h])
                       .gravity(0.05)
-                      .charge(-100)
-                      .chargeDistance(domain_pos.w)
+                      .charge(-1 * bounds.w)
                       .on('tick', ->
-                        for port in port_layout_store
-                          if port.x > domain_pos.w
-                            port.x = domain_pos.w
-                          else if port.x < 0
-                            port.x = 0
-                          if port.y > domain_pos.h
-                            port.y = domain_pos.h
-                          else if port.y < 0
-                            port.y = 0
+                          i = 0
+
+                          for port in layout_model
+                            #q.visit(collide(port))
+
+                            if port.x > bounds.w
+                              port.x = bounds.w
+                            else if port.x < 0
+                              port.x = 0
+                            if port.y > bounds.h
+                              port.y = bounds.h
+                            else if port.y < 0
+                              port.y = 0
                       )
 
-          port_force.start()
-          for x in [1..200]
-            port_force.tick()
-          port_force.stop()
+          force.start()
+          ctr = 0
+          while force.alpha() > 0.01
+            force.tick()
+            ctr++
+          console.log "Force ticked #{ctr} times"
+          force.stop()
 
-          for port_layout in port_layout_store
-              port = $scope.policy_data.ports[port_layout.id]
+          return layout_model
+
+      $scope.parseDomain = (domain) ->
+
+          subdomain_count = _.size domain.subdomains
+          port_count = _.size domain.ports
+
+          size = Math.ceil(Math.sqrt(subdomain_count)) + 1
+          domain_pos =
+              w: size * 220
+              h: size * 220
+
+          console.log "Layout subdomains of #{domain.path} in bounds ", domain_pos
+          subdomain_layout = $scope.layout_objects(
+            domain.subdomains, domain_pos, 'object', (n)->
+              return [n.x, n.x + 220, n.y, n.y + 220]
+          )
+
+          for layout in subdomain_layout
+            do (layout)->
+              console.log("X: #{layout.x}, Y: #{layout.y}")
+              subdomain = domain.subdomains[layout.key]
               coords =
-                  offset_x: port_layout.x
-                  offset_y: port_layout.y
+                  offset_x: layout.x
+                  offset_y: layout.y
+
+              if layout.key not of $scope.policy_data.domains
+                coords.w = 50
+                coords.h = 50
+
+                $scope.createDomain layout.key, $scope.parent, subdomain, coords
+
+              else
+
+                subdomain = $scope.policy_data.domains[layout.key]
+
+                subdomain_count = _.size subdomain.subdomains
+                size = Math.ceil(Math.sqrt(subdomain_count)) + 1
+                coords =
+                    offset_x: layout.x
+                    offset_y: layout.y
+                    w: (200 * 1.1) * size || 200
+                    h: (200 * 1.1) * size || 200
+
+                $scope.createDomain layout.key, $scope.parent, subdomain, coords
+
+                # Set the width and height directly - it changes based on the
+                # number of subnodes, and otherwise it will be cached
+                $scope.objects.domains[layout.key].position.set
+                  w: (200 * 1.1) * size || 200
+                  h: (200 * 1.1) * size || 200
+
+                $scope.parent.unshift $scope.objects.domains[layout.key]
+                $scope.parseDomain(subdomain)
+                $scope.parent.shift()
+
+Now layout the ports in this domain.
+
+          console.log "Layout ports for #{domain.path} in bounds ", domain_pos
+          port_layout = $scope.layout_objects(
+            domain.ports, domain_pos, 'array', (n)->
+              return [n.x - 15, n.x + 15, n.y - 15, n.y + 15]
+          )
+
+          for layout in port_layout
+              port = $scope.policy_data.ports[layout.key]
+              coords =
+                  offset_x: layout.x
+                  offset_y: layout.y
                   radius: 30
                   fill: '#eeeeec'
 
-
-              $scope.createPort port_layout.id,  $scope.parent, port, coords
+              $scope.createPort layout.key,  $scope.parent, port, coords
 
 
       $scope.parseConns = (connections)->
