@@ -138,13 +138,20 @@ ID's MUST be fully qualified, or Avispa renders horribly wrong.
 
                 subdomain = $scope.policy_data.domains[id]
                 subdomain_count = _.size subdomain.subdomains
+                size = Math.ceil(Math.sqrt(subdomain_count)) + 1
                 coords =
                     offset_x: domain_pos.x
                     offset_y: domain_pos.y
-                    w: (domain_pos.w * 1.1) * subdomain_count || domain_pos.w
-                    h: (domain_pos.h * 1.1) * subdomain_count || domain_pos.h
+                    w: (domain_pos.w * 1.1) * size || domain_pos.w
+                    h: (domain_pos.h * 1.1) * size || domain_pos.h
 
                 $scope.createDomain id, $scope.parent, subdomain, coords
+
+                # Set the width and height directly - it changes based on the 
+                # number of subnodes, and otherwise it will be cached
+                $scope.objects.domains[id].position.set
+                    w: (domain_pos.w * 1.1) * size || domain_pos.w
+                    h: (domain_pos.h * 1.1) * size || domain_pos.h
 
                 $scope.parent.unshift $scope.objects.domains[id]
                 $scope.parseDomain(subdomain)
