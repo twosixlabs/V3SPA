@@ -2,7 +2,7 @@
 
     mod.service 'RefPolicy',
       class RefPolicyImpl
-        constructor: (@VespaLogger, @SockJSService, @$q, @$timeout)->
+        constructor: (@VespaLogger, @SockJSService, @$q, @$timeout, @IDEBackend)->
 
           @uploader_running = false
           @chunks_to_upload = []
@@ -14,6 +14,12 @@
           if @loading?
             return @loading
           @_deferred_load = @$q.defer()
+
+          # If promise comes back, no matter what the
+          # result, make this variable null
+          @_deferred_load.promise['finally'] =>
+            @_deferred_load = null
+
           return @_deferred_load.promise
 
         load: (id)=>
@@ -36,6 +42,10 @@
             else
               @current = data.payload
               @current._id = @current._id.$oid
+
+              @VespaLogger.log 'policy', 'info', "Loaded Reference Policy: #{@current.id}"
+              @IDEBackend.clear_policy()
+
               deferred.resolve(@current)
               @loading = null
 
