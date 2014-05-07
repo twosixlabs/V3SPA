@@ -48,7 +48,7 @@ policy loaded. Otherwise we'll load the 'null' position for
 no reason.
 
               svg_pan_opts =
-                selector: '#surface svg'
+                selector: '#surface svg.avispa'
                 panEnabled: true
                 zoomEnabled: true
                 dragEnabled: false

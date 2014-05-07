@@ -9,6 +9,8 @@ elements.  The root is an SVG G element that is translated when dragged.
             'mouseenter'  : 'OnMouseEnter'
             'mouseleave'  : 'OnMouseLeave'
             'contextmenu' : 'OnRightClick'
+            'mousewheel'     : 'OnMouseWheel'
+            'DOMMouseScroll' : 'OnMouseWheel'
 
         highlight: ->
           classes = _.toArray @.el.classList
