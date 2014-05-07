@@ -357,58 +357,6 @@ Actually load the thing the first time.
 
 Lobster-specific definitions for Avispa
 
-    class GenericModel
-      constructor: (vals, identifier)->
-        @observers = {}
-
-If we have an identifier, then instantiate a PositionManager
-and use it's data variable as the data variable. Otherwise just
-store it locally.
-
-        if identifier?
-We are outside of Angular, so we need to retrieve the services
-from the injector
-
-          injector = angular.element('body').injector()
-          PositionManager = injector.get('PositionManager')
-          IDEBackend = injector.get('IDEBackend')
-
-          @posMgr = PositionManager(
-            "avispa.#{identifier}::#{IDEBackend.current_policy._id}",
-            vals,
-            ['x', 'y', 'w', 'h']
-          )
-          @data = @posMgr.data
-
-          @posMgr.on_change =>
-            @notify ['change']
-
-        else
-          @data = vals
-
-
-      get: (key)->
-        return @data[key]
-
-      set: (obj)->
-        @_set(obj)
-
-      _set: (obj)->
-        changed = false
-        if @posMgr?
-          changed = @posMgr.update(obj)
-        else
-          for k, v of obj
-            do (k, v)->
-              if @data[k] != v
-                @data[k] = v
-                changed = true
-
-          # This is intentionally inside the else block.
-          # posMgr notifies any of its changes
-          if changed
-            @notify(['change'])
-
     Port = Avispa.Node
 
     Domain = Avispa.Group.extend
