@@ -73,7 +73,10 @@ Percolate changes to the server
           return d.promise
 
         retrieve: ()=>
-          d = $q.defer()
+          if @d # currently loading
+            return
+
+          @d = $q.defer()
 
           req = 
             domain: 'location'
@@ -83,17 +86,18 @@ Percolate changes to the server
 
           SockJSService.send req, (result)=>
             if result.error 
-              d.reject result.payload
+              @d.reject result.payload
+              @d = null
             else
               console.log "#{@id} retrieved position from server"
               if result.payload? and not _.isEmpty(result.payload)
                 # The server updated the location. Update the data
                 # and notify anyone who might care.
                 _.extend @data, result.payload
-                @notify('change')
-                d.resolve
+                @d.resolve
                   remote_update: true
                   data: @
+                @d = null
               else
                 # the defaults were better, send them to the server
                 # use _percolate because we want to send immediately
@@ -102,11 +106,12 @@ Percolate changes to the server
                 percolated.then (data)=>
                   _.extend @data, data
 
-                d.resolve
+                @d.resolve
                   remote_update: false
                   data: @
+                @d = null
 
-          return d.promise
+          return @d.promise
 
 When the factory function is called, actually return an object that
 can be used to retrieve positions. Retrieve a cached manager if possible.
