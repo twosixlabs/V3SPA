@@ -361,6 +361,12 @@ Lobster-specific definitions for Avispa
 
     Domain = Avispa.Group.extend
 
+        events:
+          'mousedown'   : 'OnMouseDown'
+          'mouseenter'  : 'OnMouseEnter'
+          'mouseleave'  : 'OnMouseLeave'
+          'mousedown .expandicon': 'Expand'
+
         init: () ->
 
             @$titlebar = $SVG('svg')
@@ -415,3 +421,7 @@ Lobster-specific definitions for Avispa
 
             return @
 
+        Expand: (event)->
+
+          console.log event
+          cancelEvent(event)
