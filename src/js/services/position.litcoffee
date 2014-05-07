@@ -5,15 +5,30 @@
       class PositionMgr
         constructor: (@id, defaults = {}, @local = {})->
 
+          @observers = {}
+
           @percolate = _.throttle @_percolate, 1000, leading: false
 
           @data = defaults
 
-          @loading = true
-          @retrieve().then =>
-            @loading = false
+          @loading = false
+          #@retrieve().then =>
+          #  @loading = false
 
-          @notifier = null
+        bind: (event, func, _this)->
+          @observers[event] ?= []
+          @observers[event].push([ _this, func ])
+
+        notify: (event)->
+          for observer in @observers[event] or []
+            do (observer)=>
+              observer[1].apply observer[0], [@]
+
+        get: (key)->
+          return @data[key]
+
+        set: (obj)->
+          @update(obj)
 
         update: (data)=>
           changed = false
@@ -22,20 +37,17 @@
             if @data[k] != v
               @data[k] = v
               changed = true
-              if not _.contains @local, k # if it's a local only, don't mark changed.
+
+              # if it's a local only, don't mark changed.
+              if not _.contains @local, k
                 nonlocal_changed = true
 
           if changed
             if nonlocal_changed and not @loading
               @percolate()
 
-            @notifier()
+            @notify('change')
           return changed
-
-Register a notifier for when the underlying data changes.
-
-        on_change: (callback)->
-          @notifier = callback
 
 Percolate changes to the server
 
@@ -60,7 +72,6 @@ Percolate changes to the server
 
           return d.promise
 
-
         retrieve: ()=>
           d = $q.defer()
 
@@ -69,7 +80,6 @@ Percolate changes to the server
             request: 'get'
             payload: 
               id: @id
-
 
           SockJSService.send req, (result)=>
             if result.error 
@@ -80,7 +90,10 @@ Percolate changes to the server
                 # The server updated the location. Update the data
                 # and notify anyone who might care.
                 _.extend @data, result.payload
-                @notifier()
+                @notify('change')
+                d.resolve
+                  remote_update: true
+                  data: @
               else
                 # the defaults were better, send them to the server
                 # use _percolate because we want to send immediately
@@ -88,10 +101,12 @@ Percolate changes to the server
                 percolated = @_percolate()
                 percolated.then (data)=>
                   _.extend @data, data
-              d.resolve result.payload
+
+                d.resolve
+                  remote_update: false
+                  data: @
 
           return d.promise
-
 
 When the factory function is called, actually return an object that
 can be used to retrieve positions. Retrieve a cached manager if possible.

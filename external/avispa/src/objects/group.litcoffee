@@ -22,12 +22,19 @@ Base class for "group" objects
             return @
 
         OnMouseEnter: (event) ->
+            if context.hovering? and @options._id != context.hovering.options._id
+              if not context.dragItem?
+                  context.hovering.$rect.removeAttr('class')
+                  context.ide_backend.unhighlight()
+
+            context.hovering = @
+
             if not context.dragItem?
                 @$rect.attr('class', 'hover')
 
                 context.ide_backend.highlight(@options.data)
 
-            return cancelEvent(event)
+            return #cancelEvent(event)
 
         OnMouseLeave: (event) ->
             if not context.dragItem?

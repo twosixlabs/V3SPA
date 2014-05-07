@@ -129,7 +129,7 @@ DIV#surface
 
     background: url('/static/img/bg.png');
 
-    svg
+    svg.avispa
     {
         width: 100%;
         height: 100%;
@@ -268,8 +268,14 @@ g.svg-highlight {
   }
 }
 
-g.filtered {
-  rect {
-    fill: url(#diagStripe);
+g.group {
+  rect.domainTitle {
+    fill: @brand-primary;
+    fill-opacity: 0.6;
+  }
+
+  rect.expandicon {
+    fill: url(#expandIcon);
+    stroke: none;
   }
 }

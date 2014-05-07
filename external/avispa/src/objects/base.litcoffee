@@ -32,10 +32,12 @@ The "Position" model is defined by the project that is importing Avispa.
             @cache_hit = 0
             @cache_miss = 0
 
-Expect a position to be passed in
+Expect a position to be passed in. The position object should respond
+to 'bind', 'set' and 'get'.
 
             @parent  = @options.parent
-            position = @options.position
+            @position = @options.position
+            @position.bind 'change', @ParentDrag, @
 
 If we have a parent, keep track of our offset from the parent
 
@@ -50,17 +52,12 @@ Allow a list of classes to be passed in.
 
               @.$el.attr 'class', classes.join ' '
 
-            @position = new GenericModel(@options.position, @options._id)
-            @position.bind 'change', @ParentDrag, @
-
-            @position_cache = {}
 
 The init method allows classes to extend the BaseObject without re-implementing this initialize function
 
             @_init()
             @init?()
 
-            @render()
             return @
 
         AbsPosition: (expected)->
@@ -141,19 +138,27 @@ space space there is around the edges of this group.
               offset_y: offset_y
 
         EnforceXOffset: (offset, pwidth)->
+            orig_offset = offset
             if offset < 10
                 offset = 10
             else if offset + @width() > pwidth - 10
                 offset = pwidth - 10 - @width()
 
+            if offset < 10
+              offset = orig_offset
+
             return offset
 
         EnforceYOffset: (offset, height)->
+            orig_offset = offset
+
             if offset < 10
                 offset = 10
             else if offset + @height() > height - 10
                 offset = height - 10 - @height()
 
+            if offset < 10
+              offset = orig_offset
             return offset
 
         Drag: (event) ->

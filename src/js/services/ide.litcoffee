@@ -166,7 +166,7 @@ contents of @current_policy
             request: 'validate'
             payload:
               text: @current_policy.documents.dsl.text
-              params: @queryparams
+              params: "path=#{@current_policy.id}"
 
           @SockJSService.send req, (result)=>
             if result.error  # Service error
