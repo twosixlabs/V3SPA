@@ -77,3 +77,7 @@ Preload all of the templates that we're going to use.
             }
     };
     `
+
+    context_js.init
+      fadeSpeed: 100
+      compress: true

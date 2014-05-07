@@ -400,6 +400,10 @@ Lobster-specific definitions for Avispa
 
             g.appendTo(@$titlebar)
 
+            context_js.attach g, [
+              {header: "My header"}
+            ]
+
             return @
 
         render: () ->

@@ -15,3 +15,4 @@
 //= require d3hive/dist/hive.js
 //= require bootstrap-growl/bootstrap-growl.js
 //= require angular-file-upload/angular-file-upload.min.js
+//= require context/context.js
