@@ -53,7 +53,7 @@ Percolate changes to the server
 
           d = $q.defer()
 
-          updates = _.omit @data, @and
+          updates = _.omit @data, if @local != true then @local else {}
           updates.id = @id
           updates._id = @data._id
 

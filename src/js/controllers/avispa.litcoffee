@@ -225,7 +225,7 @@ between lists and objects.
                   fill: '#eeeeec'
 
               port_pos = PositionManager(
-                "avispa.#{id}::#{IDEBackend.current_policy._id}",
+                "avispa.port.#{port_id}::#{IDEBackend.current_policy._id}",
                 coords,
                 ['x', 'y', 'w', 'h']
               )
@@ -263,7 +263,7 @@ on the subnodes. For now just resolve the promise
       $scope.parseDomain = (id, domain, isRoot) ->
 
           domain_pos = PositionManager(
-            "avispa.#{id}::#{IDEBackend.current_policy._id}",
+            "avispa.domain.#{id}::#{IDEBackend.current_policy._id}",
             {offset_x: 10, offset_y: 10, w: 0, h: 0},
             ['x', 'y', 'w', 'h']
           )
