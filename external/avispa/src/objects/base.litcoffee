@@ -12,15 +12,21 @@ elements.  The root is an SVG G element that is translated when dragged.
             'mousewheel'     : 'OnMouseWheel'
             'DOMMouseScroll' : 'OnMouseWheel'
 
-        highlight: ->
+        add_class: (klass)->
           classes = _.toArray @.el.classList
-          classes.push 'svg-highlight'
+          classes.push klass
           @.$el.attr 'class', _.uniq(classes).join(" ")
 
-        unhighlight: ->
+        remove_class: (klass)->
           classes = _.reject @.el.classList, (klass)->
-            klass == 'svg-highlight'
+            klass == klass
           @.$el.attr 'class', classes.join(" ")
+
+        highlight: ->
+          add_class('svg-highlight')
+
+        unhighlight: ->
+          remove_class('svg-highlight')
 
 The "Position" model is defined by the project that is importing Avispa.
 
