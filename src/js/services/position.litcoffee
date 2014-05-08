@@ -12,8 +12,6 @@
           @data = defaults
 
           @loading = false
-          #@retrieve().then =>
-          #  @loading = false
 
         bind: (event, func, _this)->
           @observers[event] ?= []
@@ -39,11 +37,11 @@
               changed = true
 
               # if it's a local only, don't mark changed.
-              if not _.contains @local, k
+              if @local != true and not _.contains @local, k
                 nonlocal_changed = true
 
           if changed
-            if nonlocal_changed and not @loading
+            if nonlocal_changed and not @d
               @percolate()
 
             @notify('change')
@@ -55,7 +53,7 @@ Percolate changes to the server
 
           d = $q.defer()
 
-          updates = _.omit @data, @local
+          updates = _.omit @data, @and
           updates.id = @id
           updates._id = @data._id
 
@@ -74,7 +72,7 @@ Percolate changes to the server
 
         retrieve: ()=>
           if @d # currently loading
-            return
+            return @d.promise
 
           @d = $q.defer()
 
@@ -98,7 +96,7 @@ Percolate changes to the server
                   remote_update: true
                   data: @
                 @d = null
-              else
+              else if @local != true
                 # the defaults were better, send them to the server
                 # use _percolate because we want to send immediately
                 # and get the object id back so we can reference it properly.

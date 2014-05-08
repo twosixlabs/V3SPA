@@ -37,8 +37,7 @@ Base class for "link" objects
             @left  = @options.left
             @right = @options.right
 
-            @arc = new GenericModel
-                arc: 10
+            @arc = @options.position
 
             @arc.bind 'change', @render, @
 

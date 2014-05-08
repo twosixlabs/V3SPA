@@ -17,7 +17,6 @@ The main controller. avispa is a subcontroller.
       $scope.blank_session = new ace.EditSession "", "ace/mode/text"
 
       IDEBackend.add_hook 'policy_load', (info)->
-        $timeout ->
           $scope.policy = IDEBackend.current_policy
 
           $scope.editorSessions = {}
@@ -34,7 +33,6 @@ The main controller. avispa is a subcontroller.
 
               $scope.editorSessions[nm] = 
                 session: session
-
 
       $scope.visualizer_type = 'avispa'
       $timeout ->
@@ -97,11 +95,8 @@ This controls our editor visibility.
           $scope.editorSessions = {}
 
         IDEBackend.add_hook 'doc_changed', (doc, contents)->
-          $timeout(
-            ->
-              $scope.editorSessions[doc].session.setValue contents
-          , 2)
-
+            $timeout ->
+                $scope.editorSessions[doc].session.setValue contents
 
         $scope.editor_markers = []
 

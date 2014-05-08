@@ -115,11 +115,20 @@ ID's MUST be fully qualified, or Avispa renders horribly wrong.
           return port
 
       $scope.createLink = (dir, left, right, data) ->
+
+          link_pos = PositionManager(
+              "avispa.link:#{data.left}-#{data.right}:" + 
+              "#{IDEBackend.current_policy._id}"
+              {arc: 10},
+              true
+          )
+
           link = new Avispa.Link
               direction: dir
               left: left
               right: right
               data: data
+              position: link_pos
 
           IDEBackend.add_selection_range_object 'dsl', data.srcloc.start.line, link
           $scope.avispa.$links.append link.$el
@@ -259,7 +268,11 @@ on the subnodes. For now just resolve the promise
             ['x', 'y', 'w', 'h']
           )
 
-          domain.collapsed = if _.has domain, 'subdomains' then false else true
+          if id of $scope.policy_data.domains
+            domain = $scope.policy_data.domains[id]
+            domain.collapsed = false
+          else
+            domain.collapsed = true
 
           domain_obj = $scope.createDomain id, $scope.parent, domain, domain_pos
 
@@ -344,6 +357,7 @@ Otherwise it's 1.1 * ceil(sqrt(subelement_count)). If there are no
       $scope.parseConns = (connections)->
 
           for connection in connections
+
               $scope.createLink connection.connection,
                                 $scope.objects.ports[connection.left],
                                 $scope.objects.ports[connection.right],
@@ -380,7 +394,7 @@ Lobster-specific definitions for Avispa
             g = $SVG('g')
 
             $SVG('rect')
-                .attr('width',  @position.get('w'))
+                .attr('width',  '100%')
                 .attr('height', '25px')
                 .attr('class', 'domainTitle')
                 .appendTo(g)
@@ -400,10 +414,6 @@ Lobster-specific definitions for Avispa
 
             g.appendTo(@$titlebar)
 
-            context_js.attach g, [
-              {header: "My header"}
-            ]
-
             return @
 
         render: () ->
@@ -417,6 +427,10 @@ Lobster-specific definitions for Avispa
             @$titlebar
                 .attr('x', pos.x)
                 .attr('y', pos.y)
+                .attr('width',  @position.get('w'))
+
+            @$icon
+                .attr('x', @position.get('w') - 21)
 
             if @options.data.collapsed
               @$icon.attr('class', 'expandicon')
@@ -426,6 +440,6 @@ Lobster-specific definitions for Avispa
             return @
 
         Expand: (event)->
+          context.ide_backend.expand_graph @AncestorList()
 
-          console.log event
           cancelEvent(event)

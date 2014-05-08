@@ -18,6 +18,8 @@ errors, and generally being awesome.
             _id: null
             valid: false
 
+          @graph_expansion = {}
+
           @hooks =
             policy_load: []
             doc_changed: []
@@ -28,7 +30,6 @@ errors, and generally being awesome.
 
           @validate_dsl = _.throttle @_validate_dsl, 1000
 
-          @queryparams = null
 
         isCurrent: (id)=>
           id? and id == @current_policy._id
@@ -76,6 +77,8 @@ Clear the current policy
               _id: null
               type: null
               valid: false
+
+            @graph_expansion = {}
 
             for hook in @hooks.policy_load
               hook(@current_policy)
@@ -155,6 +158,39 @@ about highlighting that should be performed.
           _.each @hooks.validation, (hook)->
             hook([])
 
+Extend the set of paths that we show.
+
+        expand_graph: (ancestor_list)=>
+
+          curr = @graph_expansion
+          for elem in ancestor_list
+              if elem not of curr
+                  curr[elem] = {}
+
+              curr = curr[elem]
+
+          @_validate_dsl()
+
+Compose the graph expansion dictionary as a
+set of paths.
+
+        write_filter_param: (paths)->
+          params = ["path="]
+
+          recurse = (current, paths, params)->
+            unless current == ""
+              current += "."
+            _.each paths, (obj, key)->
+              if _.isEmpty obj
+                params.push "path=#{current}#{key}"
+              else
+                recurse("#{current}#{key}", obj, params)
+
+          recurse("", paths, params)
+
+          return params
+
+
 Send a request to the server to validate the current
 contents of @current_policy
 
@@ -166,7 +202,7 @@ contents of @current_policy
             request: 'validate'
             payload:
               text: @current_policy.documents.dsl.text
-              params: "path=#{@current_policy.id}"
+              params: @write_filter_param(@graph_expansion).join("&")
 
           @SockJSService.send req, (result)=>
             if result.error  # Service error

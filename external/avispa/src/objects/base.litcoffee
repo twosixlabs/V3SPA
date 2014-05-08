@@ -62,6 +62,16 @@ The init method allows classes to extend the BaseObject without re-implementing 
 
             return @
 
+        AncestorList: ->
+
+          if @parent
+            list = @parent.AncestorList()
+            list.push @options.data.name
+            return list
+          else
+            return [@options.data.name]
+
+
         AbsPosition: (expected)->
 
           if @parent
