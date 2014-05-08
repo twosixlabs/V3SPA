@@ -60,10 +60,11 @@ when the domain data has actually changed to prevent flickering.
 
 Force a redraw on all the children
 
-            for id of data.result.domains[data.result.root].subdomains
-              do (id)->
-                _.each $scope.objects.domains[id].children, (child)->
-                  child.ParentDrag()
+            #for id of data.result.domains[data.result.root].subdomains
+            #  do (id)->
+            #    _.each $scope.objects.domains[id].children, (child)->
+            #      child.ParentDrag()
+
 
             $scope.parseConns(data.result.connections)
 
@@ -116,22 +117,34 @@ ID's MUST be fully qualified, or Avispa renders horribly wrong.
 
       $scope.createLink = (dir, left, right, data) ->
 
-          link_pos = PositionManager(
-              "avispa.link:#{data.left}-#{data.right}:" + 
-              "#{IDEBackend.current_policy._id}"
-              {arc: 10},
-              true
-          )
+Sometimes the endpoints of links don't exist because they're collapsed.
+When this happens, don't actually make the link. Instead, label
+the endpoint that does exist so that it can obviously be expanded
 
-          link = new Avispa.Link
-              direction: dir
-              left: left
-              right: right
-              data: data
-              position: link_pos
+          if not right 
+            left.add_class 'expandable'
 
-          IDEBackend.add_selection_range_object 'dsl', data.srcloc.start.line, link
-          $scope.avispa.$links.append link.$el
+          else if not left
+            right.add_class 'expandable'
+
+          else
+
+            link_pos = PositionManager(
+                "avispa.link:#{data.left}-#{data.right}:" + 
+                "#{IDEBackend.current_policy._id}"
+                {arc: 10},
+                true
+            )
+
+            link = new Avispa.Link
+                direction: dir
+                left: left
+                right: right
+                data: data
+                position: link_pos
+
+            IDEBackend.add_selection_range_object 'dsl', data.srcloc.start.line, link
+            $scope.avispa.$links.append link.$el
 
 Use D3's force-direction to layout a set of objects within the bounds.
 Bounds is expected to be an object that contains 'w' and 'h' values for
