@@ -222,7 +222,6 @@ between lists and objects.
                   offset_x: 0
                   offset_y: 0
                   radius: 30
-                  fill: '#eeeeec'
 
               port_pos = PositionManager(
                 "avispa.port.#{port_id}::#{IDEBackend.current_policy._id}",
@@ -287,16 +286,16 @@ on the subnodes. For now just resolve the promise
 
               subdomain_defers.push subdomain
 
+          $scope.parent.unshift domain_obj
           _.each domain.ports, (port_id)->
               port = $scope.policy_data.ports[port_id]
               coords =
                   offset_x: 0
                   offset_y: 0
                   radius: 30
-                  fill: '#eeeeec'
 
               port_pos = PositionManager(
-                "avispa.#{id}::#{IDEBackend.current_policy._id}",
+                "avispa.port.#{port_id}::#{IDEBackend.current_policy._id}",
                 coords,
                 ['x', 'y', 'w', 'h']
               )
@@ -305,6 +304,8 @@ on the subnodes. For now just resolve the promise
               port_obj = $scope.createPort port_id,  $scope.parent, port, port_pos
 
               domain_objects.push port_obj
+
+          $scope.parent.shift()
 
 This method returns a promise that will be resolved when all subdomains
 have finished parsing *and* checking their server position values.
@@ -329,15 +330,18 @@ Otherwise it's 1.1 * ceil(sqrt(subelement_count)). If there are no
                     w: 100
                     h: 25
               else 
+                height
                 if domain_objects.length == 0
-                  size = 1
+                  width = height = 200
                 else
-                  size = Math.ceil(Math.sqrt(domain_objects.length)) + 1
-                  size *= 1.1
+                  sum = (memo, next)->
+                      return [memo[0] + next.width(), memo[1] + next.height()]
+
+                  [width, height] = _.reduce domain_objects, sum, [0, 0]
 
                 domain_obj.position.set
-                    w: 200 * size
-                    h: 200 * size
+                    w: 2 * width
+                    h: 2 * height + 25
 
               if not domain_obj.position.get 'fixed'
                 domain_obj.position.set

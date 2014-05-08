@@ -170,8 +170,8 @@ space space there is around the edges of this group.
         EnforceYOffset: (offset, height)->
             orig_offset = offset
 
-            if offset < 10
-                offset = 10
+            if offset < 25
+                offset = 25
             else if offset + @height() > height - 10
                 offset = height - 10 - @height()
 

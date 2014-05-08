@@ -18,10 +18,10 @@ Base class for "node" objects
             return
 
         width: ->
-          return @position.get('radius')
+          return @position.get('radius') * 2
 
         height: ->
-          return @position.get('radius')
+          return @position.get('radius') * 2
 
         render: () ->
             # Calculate our x,y based on offsets
@@ -57,18 +57,22 @@ Nodes are circles, and need to offset from the center
 of the circle, making calculations different.
 
         EnforceXOffset: (offset, pwidth)->
-            if offset < @width()
-                offset = @width()
-            else if offset + @width() > pwidth
-                offset = pwidth - @width()
+            d = @width()
+            r = d / 2
+            if offset < r
+                offset = r
+            else if offset + r > pwidth
+                offset = pwidth - r
 
             return offset
 
         EnforceYOffset: (offset, pheight)->
-            if offset < @height()
-                offset = @height()
-            else if offset + @height() > pheight
-                offset = pheight - @height()
+            d = @height()
+            r = d / 2
+            if offset < 25
+                offset = 25
+            else if offset + r > pheight
+                offset = pheight - r
 
             return offset
 
