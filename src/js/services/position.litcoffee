@@ -25,22 +25,22 @@
         get: (key)->
           return @data[key]
 
-        set: (obj)->
-          @update(obj)
+        set: (obj, propagate=true)->
+          @update(obj, propagate)
 
-        update: (data)=>
-          changed = false
+        update: (data, propagate=true)=>
+          changed = []
           @data ?= {}
           for k, v of data
             if @data[k] != v
               @data[k] = v
-              changed = true
+              changed.push k
 
               # if it's a local only, don't mark changed.
               if @local != true and not _.contains @local, k
                 nonlocal_changed = true
 
-          if changed
+          if changed.length > 0 and propagate
             if nonlocal_changed and not @d
               @percolate()
 

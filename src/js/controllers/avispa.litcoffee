@@ -267,8 +267,9 @@ Since it's recursive, we check it in each method.
 Now would be an opportune time to do layout
 on the subnodes. For now just resolve the promise
 
+
               _.each domain_objects, (obj)->
-                obj.render()
+                obj.ParentDrag()
 
               parser_deferral.resolve true
 
@@ -341,9 +342,7 @@ Set the size for the group. If there are no subelements, its size 1.
 Otherwise it's 1.1 * ceil(sqrt(subelement_count)). If there are no
 
               if domain_obj.options.data.collapsed
-                domain_obj.position.set
-                    w: 100
-                    h: 25
+                domain_obj.position.set {w: 100, h: 25}, false
               else 
                 height
                 if domain_objects.length == 0
@@ -354,14 +353,19 @@ Otherwise it's 1.1 * ceil(sqrt(subelement_count)). If there are no
 
                   [width, height] = _.reduce domain_objects, sum, [0, 0]
 
-                domain_obj.position.set
+                bounds = 
                     w: 2 * width
                     h: 2 * height + 25
 
-              if not domain_obj.position.get 'fixed'
+                domain_obj.position.set bounds, false
                 domain_obj.position.set
+
+              if not domain_obj.position.get 'fixed'
+                position = 
                   offset_x: 10
                   offset_y: 10
+
+                domain_obj.position.set position, false
 
   We've calculated our size. Now would be an opportune time to do layout
   on the subnodes. For now just resolve the promise
@@ -390,7 +394,11 @@ Actually load the thing the first time.
 
 Lobster-specific definitions for Avispa
 
-    Port = Avispa.Node
+    Port = Avispa.Node.extend
+
+       OnRightClick: (event)->
+         console.log "Right click!"
+         cancelEvent(event)
 
     Domain = Avispa.Group.extend
 

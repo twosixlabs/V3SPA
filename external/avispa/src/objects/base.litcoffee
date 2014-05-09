@@ -45,7 +45,7 @@ to 'bind', 'set' and 'get'.
 
             @parent  = @options.parent
             @position = @options.position
-            @position.bind 'change', @ParentDrag, @
+            @position.bind 'change', @render, @
 
 If we have a parent, keep track of our offset from the parent
 
