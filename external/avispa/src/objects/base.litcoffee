@@ -120,10 +120,10 @@ The init method allows classes to extend the BaseObject without re-implementing 
 
             pos = @AbsPosition()
 
-            @clickOffsetX = (event.clientX / context.scale) - pos.x
-            @clickOffsetY = (event.clientY / context.scale) - pos.y
+            @clickOffsetX = (event.clientX / Avispa.context.scale) - pos.x
+            @clickOffsetY = (event.clientY / Avispa.context.scale) - pos.y
 
-            context.dragItem = @
+            Avispa.context.dragItem = @
 
             return cancelEvent(event)
 
@@ -181,8 +181,8 @@ space space there is around the edges of this group.
 
         Drag: (event) ->
             new_positions =
-                x: (event.clientX / context.scale) - @x1
-                y: (event.clientY / context.scale) - @y1
+                x: (event.clientX / Avispa.context.scale) - @x1
+                y: (event.clientY / Avispa.context.scale) - @y1
 
             @position.set @EnforceBoundingBox(new_positions)
 

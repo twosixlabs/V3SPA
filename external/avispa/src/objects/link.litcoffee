@@ -96,7 +96,7 @@ Bind to the position of the left and right sides of the connection
 
         Drag: (event) ->
 
-            [x,y] = context.Point(event)
+            [x,y] = Avispa.context.Point(event)
 
             from = @left.AbsPosition()
             to = @right.AbsPosition()
@@ -117,7 +117,7 @@ Bind to the position of the left and right sides of the connection
         OnMouseDown: (event) ->
             @jitter = 0
 
-            context.dragItem = @
+            Avispa.context.dragItem = @
             @oarc = @arc.get('arc')
             @od = null
 
@@ -130,18 +130,18 @@ Bind to the position of the left and right sides of the connection
             return
 
         OnMouseEnter: () ->
-            if not context.dragItem?
+            if not Avispa.context.dragItem?
                 @path.css('stroke-width', '6px')
                 @path.css('stroke-opacity', '0.8')
 
-                context.ide_backend.highlight(@options.data)
+                Avispa.context.ide_backend.highlight(@options.data)
             return
 
         OnMouseLeave: () ->
-            if not context.dragItem?
+            if not Avispa.context.dragItem?
                 @path.css('stroke-width', '3px')
                 @path.css('stroke-opacity', '0.5')
-                context.ide_backend.unhighlight()
+                Avispa.context.ide_backend.unhighlight()
             return
 
         LeftClick: (event) ->

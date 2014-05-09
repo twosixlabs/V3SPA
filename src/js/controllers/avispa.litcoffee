@@ -5,6 +5,7 @@
 
       $scope.domain_data = null
       $scope.objects ?=
+          ports_by_path: {}
           ports: {}
           domains: {}
           connections: {}
@@ -21,6 +22,7 @@ Clean up the Avispa view
 
       cleanup = ->
           $scope.objects =
+              ports_by_path: {}
               ports: {}
               domains: {}
               connections: {}
@@ -111,6 +113,7 @@ ID's MUST be fully qualified, or Avispa renders horribly wrong.
               data: obj
 
           $scope.objects.ports[id] = port
+          $scope.objects.ports_by_path[obj.path] = port
 
           IDEBackend.add_selection_range_object 'dsl', obj.srcloc.start.line, port
           $scope.avispa.$objects.append port.$el
@@ -219,6 +222,7 @@ between lists and objects.
           return layout_model
 
       $scope.parseRootDomain = (id, domain) ->
+          context.destroy('.avispa .node.expandable')
 
           position_defers = []
           domain_objects = []
@@ -270,6 +274,16 @@ on the subnodes. For now just resolve the promise
 
               _.each domain_objects, (obj)->
                 obj.ParentDrag()
+
+              context.attach('.avispa .node.expandable',[
+                {
+                  text: "Expand Collapsed Links",
+                  action: (e, target)->
+                    clicked = $scope.objects.port_by_path[target]
+                    e.preventDefault()
+                    console.log @
+                }
+              ])
 
               parser_deferral.resolve true
 
@@ -394,11 +408,11 @@ Actually load the thing the first time.
 
 Lobster-specific definitions for Avispa
 
+
     Port = Avispa.Node.extend
 
        OnRightClick: (event)->
-         console.log "Right click!"
-         cancelEvent(event)
+         #console.log "Right click!"
 
     Domain = Avispa.Group.extend
 
@@ -467,6 +481,6 @@ Lobster-specific definitions for Avispa
             return @
 
         Expand: (event)->
-          context.ide_backend.expand_graph @AncestorList()
+          Avispa.context.ide_backend.expand_graph @AncestorList()
 
           cancelEvent(event)

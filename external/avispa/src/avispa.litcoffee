@@ -1,6 +1,4 @@
 
-    context = null
-
 Expose a global view class so that consumers of the API can instantiate a view.
 
     window.Avispa = Backbone.View.extend
@@ -18,7 +16,7 @@ Expose a global view class so that consumers of the API can instantiate a view.
         secondstage: () ->
 
         initialize: (options) ->
-            context = @
+            Avispa.context = @
 
             _.bindAll @, 'render',
                 'OnMouseDown', 'OnMouseMove', 'OnMouseUp', 'OnMouseWheel', 'OnContextMenu'
@@ -36,7 +34,7 @@ of the Avispa code can access it.
 
             injector = angular.element('body').injector()
             IDEBackend = injector.get('IDEBackend')
-            context.ide_backend = IDEBackend
+            Avispa.context.ide_backend = IDEBackend
 
 If we have svgPanZoom, use it to pan and zoom around.
 
@@ -57,7 +55,7 @@ no reason.
 
               if options.position?
                 svg_pan_opts.onZoom = (scale, transform)->
-                  context.scale = scale
+                  Avispa.context.scale = scale
                   options.position.update transform
 
                 svg_pan_opts.onPanComplete = (coords, transform) ->
@@ -67,7 +65,7 @@ no reason.
 
                 options.position.bind 'change', ->
                   g = svgPanZoom.getSVGViewport($("#surface svg")[0])
-                  context.scale = options.position.data.a
+                  Avispa.context.scale = options.position.data.a
                   svgPanZoom.set_transform(g, options.position.data)
 
                 options.position.notify 'change'
@@ -205,6 +203,9 @@ If there is no svgPanZoom, then use the one Matt put together
             return cancelEvent(event)
 
         OnContextMenu: (event) ->
+
+
+    Avispa.context = null
 
     #= include util.litcoffee
     #= require templates.litcoffee

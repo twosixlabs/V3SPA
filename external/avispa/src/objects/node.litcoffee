@@ -10,6 +10,8 @@ Base class for "node" objects
                 .css('fill', @position.get('fill'))
                 .appendTo(@$el)
 
+            @$el.attr('id', @options._id)
+
             @$label = $SVG('text')
                 .attr('dy', '0.5em')
                 .text(@options.label)
@@ -39,17 +41,17 @@ Base class for "node" objects
             return @
 
         OnMouseEnter: (event) ->
-            if not context.dragItem?
+            if not Avispa.context.dragItem?
                 @$circle.attr('class', 'hover')
 
-                context.ide_backend.highlight(@options.data)
+                Avispa.context.ide_backend.highlight(@options.data)
 
             return cancelEvent(event)
 
         OnMouseLeave: (event) ->
-            if not context.dragItem?
+            if not Avispa.context.dragItem?
                 @$circle.removeAttr('class')
-                context.ide_backend.unhighlight()
+                Avispa.context.ide_backend.unhighlight()
 
             return cancelEvent(event)
 
@@ -77,8 +79,8 @@ of the circle, making calculations different.
             return offset
 
         Drag: (event) ->
-            new_x = (event.clientX / context.scale) - @clickOffsetX
-            new_y = (event.clientY / context.scale) - @clickOffsetY
+            new_x = (event.clientX / Avispa.context.scale) - @clickOffsetX
+            new_y = (event.clientY / Avispa.context.scale) - @clickOffsetY
 
             new_positions =
               x: new_x

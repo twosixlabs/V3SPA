@@ -22,30 +22,30 @@ Base class for "group" objects
             return @
 
         OnMouseEnter: (event) ->
-            if context.hovering? and @options._id != context.hovering.options._id
+            if Avispa.context.hovering? and @options._id != Avispa.context.hovering.options._id
               if not context.dragItem?
-                  context.hovering.$rect.removeAttr('class')
-                  context.ide_backend.unhighlight()
+                  Avispa.context.hovering.$rect.removeAttr('class')
+                  Avispa.context.ide_backend.unhighlight()
 
-            context.hovering = @
+            Avispa.context.hovering = @
 
-            if not context.dragItem?
+            if not Avispa.context.dragItem?
                 @$rect.attr('class', 'hover')
 
-                context.ide_backend.highlight(@options.data)
+                Avispa.context.ide_backend.highlight(@options.data)
 
             return #cancelEvent(event)
 
         OnMouseLeave: (event) ->
-            if not context.dragItem?
+            if not Avispa.context.dragItem?
                 @$rect.removeAttr('class')
-                context.ide_backend.unhighlight()
+                Avispa.context.ide_backend.unhighlight()
             return cancelEvent(event)
 
         Drag: (event) ->
             new_positions =
-              x: (event.clientX / context.scale) - @clickOffsetX
-              y: (event.clientY / context.scale) - @clickOffsetY
+              x: (event.clientX / Avispa.context.scale) - @clickOffsetX
+              y: (event.clientY / Avispa.context.scale) - @clickOffsetY
 
             @position.set @EnforceBoundingBox(new_positions)
 
