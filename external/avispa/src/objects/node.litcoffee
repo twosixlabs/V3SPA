@@ -69,8 +69,8 @@ of the circle, making calculations different.
         EnforceYOffset: (offset, pheight)->
             d = @height()
             r = d / 2
-            if offset < 25
-                offset = 25
+            if offset < 25 + r
+                offset = 25 + r
             else if offset + r > pheight
                 offset = pheight - r
 
