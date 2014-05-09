@@ -47,8 +47,10 @@ when the domain data has actually changed to prevent flickering.
             cleanup()    
 
             viewport_pos = PositionManager(
-                "avispa.viewport::#{IDEBackend.current_policy._id}"
+                "avispa.viewport::#{IDEBackend.current_policy._id}",
+                {a: 1, b: 0, c: 0, d: 1, e: 0, f: 0}
             )
+
             viewport_pos.retrieve().then ->
                 $scope.avispa = new Avispa
                   el: $('#surface svg.avispa')
