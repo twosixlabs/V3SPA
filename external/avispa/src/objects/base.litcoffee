@@ -23,10 +23,10 @@ elements.  The root is an SVG G element that is translated when dragged.
           @.$el.attr 'class', classes.join(" ")
 
         highlight: ->
-          add_class('svg-highlight')
+          @add_class('svg-highlight')
 
         unhighlight: ->
-          remove_class('svg-highlight')
+          @remove_class('svg-highlight')
 
 The "Position" model is defined by the project that is importing Avispa.
 
