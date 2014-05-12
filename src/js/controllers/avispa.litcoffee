@@ -440,17 +440,17 @@ Lobster-specific definitions for Avispa
                 .attr('class', 'domainTitle')
                 .appendTo(g)
 
+            @$label = $SVG('text')
+                .attr('dx', '0.5em')
+                .attr('dy', '1.5em')
+                .text(@options.name or @options.id)
+                .appendTo(g)
+
             @$icon = $SVG('rect')
                 .attr('x', @position.get('w') - 21)
                 .attr('y', 5)
                 .attr('width', '20')
                 .attr('height', '20')
-                .appendTo(g)
-
-            @$label = $SVG('text')
-                .attr('dx', '0.5em')
-                .attr('dy', '1.5em')
-                .text(@options.name or @options.id)
                 .appendTo(g)
 
             g.appendTo(@$titlebar)
