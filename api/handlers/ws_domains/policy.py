@@ -110,7 +110,9 @@ class Policy(restful.ResourceDomain):
         refpol = refpolicy.RefPolicy.Read(params['refpolicy_id'])
         module = refpol['modules'][params['id']]
 
+        logger.warning("Looking for policy {0}".format(params['id']))
         dynamic_policy = cls.Read(module['policy_id'])
+        logger.warning("Found {0}".format(dynamic_policy))
 
         # If the dynamic_policy is none, that means that it's a module
         # belonging to the reference policy, but hasn't been edited before.
@@ -137,6 +139,7 @@ class Policy(restful.ResourceDomain):
 
         # save the policy_id
         refpol['modules'][params['id']]['policy_id'] = dynamic_policy._id
+        refpol.Insert()
 
         response['payload'] = dynamic_policy
         return response
