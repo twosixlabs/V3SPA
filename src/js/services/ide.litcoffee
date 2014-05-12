@@ -242,6 +242,8 @@ Load a policy from the server
         load_policy: (refpolicy_id, module_name)=>
           deferred = @$q.defer()
 
+          @graph_expansion = {}
+
           req =
             domain: 'policy'
             request: 'get'
@@ -274,7 +276,7 @@ Load a policy from the server
               message: "#{@current_policy.id}"
 
             # Validate the dsl that was returned immediately
-            @validate_dsl()
+            #@validate_dsl()
 
             deferred.resolve(@current_policy)
 

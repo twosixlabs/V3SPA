@@ -64,11 +64,6 @@ when the domain data has actually changed to prevent flickering.
 
 Force a redraw on all the children
 
-            #for id of data.result.domains[data.result.root].subdomains
-            #  do (id)->
-            #    _.each $scope.objects.domains[id].children, (child)->
-            #      child.ParentDrag()
-
 
             $scope.parseConns(data.result.connections)
 
@@ -128,6 +123,11 @@ the endpoint that does exist so that it can obviously be expanded
 
           if not right 
             left.add_class 'expandable'
+            left.$el/cont
+            #clicked = $scope.objects.ports_by_path[target.id]
+            #missing_conns = _.omit $scope.policy_data.connections, (c)->
+            #  c.left of $scope.objects.ports and conn.right of $scope.objects.ports
+
 
           else if not left
             right.add_class 'expandable'
@@ -165,51 +165,16 @@ between lists and objects.
           _.each objects, (val, key)->
               key = val if type == 'array'
               layout_model.push
-                  x: 0
-                  y: 0
-                  px: 0
-                  py: 0
+                  x: val.position.get('offset_x')
+                  y: val.position.get('offset_y')
+                  fixed: val.position.get('fixed')
                   key: key
 
-          collide = (node)->
-            [nx1, nx2, ny1, ny2] = calc_bounds(node)
-
-            return (quad, x1, y1, x2, y2)->
-              if quad.point and (quad.point != node)
-                x = node.x - quad.point.x
-                y = node.y - quad.point.y
-                l = Math.sqrt(x * x + y * y)
-                r = (nx2 - nx1)
-
-                if l < r
-                  l = (l - r) / l * .5
-                  x *= l
-                  y *= l
-                  node.x -= x
-                  node.y -= y
-                  quad.point.x += x
-                  quad.point.y += y
-              return x1 > nx2 || x2 < nx1 || y1 > ny2 || y2 < ny1
-
-          force = d3.layout.force().nodes(layout_model)
-                      .size([bounds.w, bounds.h])
-                      .gravity(0.05)
-                      .charge(-1 * bounds.w)
-                      .on('tick', ->
-                          i = 0
-
-                          for port in layout_model
-                            q.visit(collide(port))
-
-                            if port.x > bounds.w
-                              port.x = bounds.w
-                            else if port.x < 0
-                              port.x = 0
-                            if port.y > bounds.h
-                              port.y = bounds.h
-                            else if port.y < 0
-                              port.y = 0
-                      )
+          force = d3.layout.force()
+          force = force.nodes(layout_model)
+          force = force.size([bounds.w, bounds.h])
+          force = force.gravity(0.05)
+          force = force.charge(-100)
 
           force.start()
           ctr = 0
@@ -222,20 +187,29 @@ between lists and objects.
           return layout_model
 
       $scope.parseRootDomain = (id, domain) ->
-          context.destroy('.avispa .node.expandable')
+
+          root = new Avispa.BaseObject
+            parent: null
+            position: PositionManager(
+                "avispa.root::#{IDEBackend.current_policy._id}",
+                {offset_x: 0, offset_y: 0},
+                ['x', 'y', 'w', 'h']
+              )          
+            fake_container: true
+
 
           position_defers = []
           domain_objects = []
           subdomain_defers = []
 
           _.each domain.subdomains, (subd, id)->
-              $scope.parent.unshift null
+              $scope.parent.unshift root
               subdomain = $scope.parseDomain id, subd
               $scope.parent.shift()
 
               subdomain_defers.push subdomain
 
-          $scope.parent.unshift null
+          $scope.parent.unshift root
           _.each domain.ports, (port_id)->
               port = $scope.policy_data.ports[port_id]
               coords =
@@ -253,6 +227,11 @@ between lists and objects.
               port_obj = $scope.createPort port_id,  $scope.parent, port, port_pos
 
               domain_objects.push port_obj
+
+
+          #_.each root.children, (child)->
+          #  child.ParentDrag()
+
           $scope.parent.shift()
 
 This method returns a promise that will be resolved when all subdomains
@@ -268,24 +247,22 @@ Since it's recursive, we check it in each method.
                   posobj.data.data.fixed = true
 
             $q.all(subdomain_defers).then (subdoms)->
-              domain_objects = _.extend domain_objects, subdoms
+              domain_objects = _.union domain_objects, subdoms
 
 Now would be an opportune time to do layout
 on the subnodes. For now just resolve the promise
 
 
+              if domain_objects.length > 1
+                layout = $scope.layout_objects domain_objects, {w: 1, h: 1}
+                _.each layout, (model)->
+                  pos =
+                    offset_x: model.x
+                    offset_y: model.y
+                  domain_objects[model.index].position.set pos, true
+
               _.each domain_objects, (obj)->
                 obj.ParentDrag()
-
-              context.attach('.avispa .node.expandable',[
-                {
-                  text: "Expand Collapsed Links",
-                  action: (e, target)->
-                    clicked = $scope.objects.port_by_path[target]
-                    e.preventDefault()
-                    console.log @
-                }
-              ])
 
               parser_deferral.resolve true
 
@@ -298,6 +275,8 @@ on the subnodes. For now just resolve the promise
             {offset_x: 10, offset_y: 10, w: 0, h: 0},
             ['x', 'y', 'w', 'h']
           )
+
+          console.log "Created PositionManager: avispa.domain.#{id}::#{IDEBackend.current_policy._id}"
 
           if id of $scope.policy_data.domains
             domain = $scope.policy_data.domains[id]
@@ -336,8 +315,11 @@ on the subnodes. For now just resolve the promise
               port_obj = $scope.createPort port_id,  $scope.parent, port, port_pos
 
               domain_objects.push port_obj
+              console.log "After port push: ", domain_objects
 
           $scope.parent.shift()
+
+          console.log "Domain objects: ", domain_objects
 
 This method returns a promise that will be resolved when all subdomains
 have finished parsing *and* checking their server position values.
@@ -352,42 +334,59 @@ Since it's recursive, we check it in each method.
                   posobj.data.data.fixed = true
 
             $q.all(subdomain_defers).then (subdoms)->
-              domain_objects = _.extend domain_objects, subdoms
+              if domain_objects.length > 0 
+                console.log domain_objects
+              domain_objects = _.union domain_objects, subdoms
+
+              console.log "Domain objects after deferral : ", domain_objects
 
 Set the size for the group. If there are no subelements, its size 1.
 Otherwise it's 1.1 * ceil(sqrt(subelement_count)). If there are no
 
               if domain_obj.options.data.collapsed
-                domain_obj.position.set {w: 100, h: 25}, false
+                bounds = 
+                    w: Math.max(100, 10 * domain_obj.options.name.length)
+                    h: 25
               else 
-                height
                 if domain_objects.length == 0
                   width = height = 200
+
                 else
+                  area_sum = (memo, next)->
+                    return memo + (next.width() * next.height())
                   sum = (memo, next)->
                       return [memo[0] + next.width(), memo[1] + next.height()]
 
                   [width, height] = _.reduce domain_objects, sum, [0, 0]
+                  area = _.reduce domain_objects, area_sum, 0
+
+                  if domain_objects.length > 5
+
+                    width = Math.sqrt(area)
+                    height = Math.sqrt(area)
 
                 bounds = 
-                    w: 2 * width
-                    h: 2 * height + 25
+                    w:  width * 1.5
+                    h:  (height * 1.5) + 25
 
-                domain_obj.position.set bounds, false
-                domain_obj.position.set
+              domain_obj.position.set bounds, false
 
-              if not domain_obj.position.get 'fixed'
-                position = 
-                  offset_x: 10
-                  offset_y: 10
 
-                domain_obj.position.set position, false
+              if domain_objects.length > 1
+                layout = $scope.layout_objects domain_objects, bounds
+                _.each layout, (model)->
+                  pos =
+                    offset_x: model.x
+                    offset_y: model.y
+                  domain_objects[model.index].position.set pos
+
+              domain_obj.ParentDrag()
 
   We've calculated our size. Now would be an opportune time to do layout
   on the subnodes. For now just resolve the promise
 
-              _.each domain_objects, (obj)->
-                obj.render()
+              #_.each domain_objects, (obj)->
+              #  obj.render()
 
               parser_deferral.resolve(domain_obj)
 
@@ -395,7 +394,7 @@ Otherwise it's 1.1 * ceil(sqrt(subelement_count)). If there are no
 
       $scope.parseConns = (connections)->
 
-          for connection in connections
+          _.each connections, (connection)->
 
               $scope.createLink connection.connection,
                                 $scope.objects.ports[connection.left],

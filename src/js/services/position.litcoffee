@@ -62,6 +62,8 @@ Percolate changes to the server
             request: 'update'
             payload: updates
 
+          console.log "#{@id} sent position"
+
           SockJSService.send req, (result)=>
             if result.error 
               d.reject result.payload
@@ -87,8 +89,8 @@ Percolate changes to the server
               @d.reject result.payload
               @d = null
             else
-              console.log "#{@id} retrieved position from server"
               if result.payload? and not _.isEmpty(result.payload)
+                console.log "#{@id} retrieved new position from server", result.payload
                 # The server updated the location. Update the data
                 # and notify anyone who might care.
                 _.extend @data, result.payload
@@ -97,6 +99,7 @@ Percolate changes to the server
                   data: @
                 @d = null
               else if @local != true
+                console.log "#{@id} retrieved position but will use default"
                 # the defaults were better, send them to the server
                 # use _percolate because we want to send immediately
                 # and get the object id back so we can reference it properly.

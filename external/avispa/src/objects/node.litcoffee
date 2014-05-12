@@ -55,6 +55,14 @@ Base class for "node" objects
 
             return cancelEvent(event)
 
+        LocalBounds: (x, y)->
+          ret = 
+            x1 : x - @width() / 2
+            x2 : x + @width() / 2
+            y1 : y - @height() / 2
+            y2 : y + @height() / 2
+
+
 Nodes are circles, and need to offset from the center
 of the circle, making calculations different.
 

@@ -78,7 +78,3 @@ Preload all of the templates that we're going to use.
     };
     `
 
-    context.init
-      fadeSpeed: 100
-      compress: true
-      preventDoubleContext: false

@@ -18,8 +18,11 @@ elements.  The root is an SVG G element that is translated when dragged.
           @.$el.attr 'class', _.uniq(classes).join(" ")
 
         remove_class: (klass)->
-          classes = _.reject @.el.classList, (klass)->
-            klass == klass
+          classes = _.toArray @.el.classList
+          console.log classes
+          classes = _.reject classes, (cls)->
+            cls == klass
+          console.log classes
           @.$el.attr 'class', classes.join(" ")
 
         highlight: ->
@@ -44,8 +47,9 @@ Expect a position to be passed in. The position object should respond
 to 'bind', 'set' and 'get'.
 
             @parent  = @options.parent
-            @position = @options.position
-            @position.bind 'change', @render, @
+            if @options.position
+              @position = @options.position
+              @position.bind 'change', @render, @
 
 If we have a parent, keep track of our offset from the parent
 
@@ -63,7 +67,7 @@ Allow a list of classes to be passed in.
 
 The init method allows classes to extend the BaseObject without re-implementing this initialize function
 
-            @_init()
+            @_init?()
             @init?()
 
             return @
@@ -74,6 +78,8 @@ The init method allows classes to extend the BaseObject without re-implementing 
             list = @parent.AncestorList()
             list.push @options.data.name
             return list
+          else if @options.fake_container
+            return []
           else
             return [@options.data.name]
 
@@ -143,12 +149,12 @@ for the provided child
 
 Return the bounds of this object
 
-        LocalBounds: ()->
+        LocalBounds: (x, y)->
           ret = 
-            x1 : @position.get('offset_x')
-            x2 : @position.get('offset_x') + @width()
-            y1 : @position.get('offset_y')
-            y2 : @position.get('offset_y') + @height()
+            x1 : x
+            x2 : x + @width()
+            y1 : y
+            y2 : y + @height()
 
         EnforceBoundingBox: (coords)->
 
@@ -179,33 +185,34 @@ move us into the bounding box of the peer
                 qtree = @parent.QuadTree(@)
                 qtree.visit (quad, x1, y1, x2, y2)=>
                   return unless quad.point?
-                  nx1 = offset.x
-                  nx2 = offset.x + width
-                  ny1 = offset.y
-                  ny2 = offset.y  + height
+                  n = @LocalBounds(offset.x, offset.y)
 
-                  quad_bounds = quad.point.LocalBounds()
+                  quad_bounds = quad.point.LocalBounds(
+                    quad.point.position.get('offset_x'),
+                    quad.point.position.get('offset_y'))
 
                   x_overlap = y_overlap = false
-                  if ((nx1 < quad_bounds.x2 and nx2 > quad_bounds.x2))
-                    x_overlap = Math.abs(nx1 - quad_bounds.x2)
-                  else if (nx2 > quad_bounds.x1 and nx1 < quad_bounds.x1)
-                    x_overlap = Math.abs nx2 - quad_bounds.x1
-                  else if nx1 > quad_bounds.x1 and nx2 < quad_bounds.x2
+                  if ((n.x1 < quad_bounds.x2 and n.x2 > quad_bounds.x2))
+                    x_overlap = Math.abs(n.x1 - quad_bounds.x2)
+                  else if (n.x2 > quad_bounds.x1 and n.x1 < quad_bounds.x1)
+                    x_overlap = Math.abs n.x2 - quad_bounds.x1
+                  else if n.x1 >= quad_bounds.x1 and n.x2 <= quad_bounds.x2
                     x_overlap = Math.min(
-                      Math.abs(nx2 - quad_bounds.x1),
-                      Math.abs(nx1 - quad_bounds.x2)
+                      Math.abs(n.x2 - quad_bounds.x1),
+                      Math.abs(n.x1 - quad_bounds.x2)
                     )
 
-                  if ((ny1 < quad_bounds.y2 and ny2 > quad_bounds.y2))
-                    y_overlap = Math.abs ny1 - quad_bounds.y2
-                  else if (ny2 > quad_bounds.y1 and ny1 < quad_bounds.y1)
-                    y_overlap = Math.abs ny2 - quad_bounds.y1
-                  else if ny1 > quad_bounds.y1 and ny2 < quad_bounds.y2
+                  if ((n.y1 < quad_bounds.y2 and n.y2 > quad_bounds.y2))
+                    y_overlap = Math.abs n.y1 - quad_bounds.y2
+                  else if (n.y2 > quad_bounds.y1 and n.y1 < quad_bounds.y1)
+                    y_overlap = Math.abs n.y2 - quad_bounds.y1
+                  else if n.y1 >= quad_bounds.y1 and n.y2 <= quad_bounds.y2
                     y_overlap = Math.min(
-                      Math.abs(ny2 - quad_bounds.y1),
-                      Math.abs(ny1 - quad_bounds.y2)
+                      Math.abs(n.y2 - quad_bounds.y1),
+                      Math.abs(n.y1 - quad_bounds.y2)
                     )
+
+                  #console.log "xOver: #{x_overlap}, yOver: #{y_overlap}"
 
                   if x_overlap and y_overlap
                     if shift_x == 0 and shift_y == 0
@@ -217,13 +224,13 @@ move us into the bounding box of the peer
                         ->(offset.y = quad_bounds.y2)
                       ])()
 
-                    if x_overlap < y_overlap
+                    else if x_overlap < y_overlap
                       if shift_x > 0
                         offset.x = quad_bounds.x1 - width
                       else if shift_x < 0
                         offset.x = quad_bounds.x2
 
-                    if y_overlap < x_overlap
+                    else
                       if shift_y < 0
                         offset.y = quad_bounds.y2
                       else if shift_y > 0
@@ -231,15 +238,16 @@ move us into the bounding box of the peer
 
                   return x_overlap and y_overlap
 
-                ppos_abs = @parent.AbsPosition()
-                ppos =
-                  x: ppos_abs.x
-                  y: ppos_abs.y
-                  w: @parent.width()
-                  h: @parent.height()
+                unless @parent.options.fake_container
+                  ppos_abs = @parent.AbsPosition()
+                  ppos =
+                    x: ppos_abs.x
+                    y: ppos_abs.y
+                    w: @parent.width()
+                    h: @parent.height()
 
-                offset.x = @EnforceXOffset(offset.x, ppos.w)
-                offset.y = @EnforceYOffset(offset.y, ppos.h)
+                  offset.x = @EnforceXOffset(offset.x, ppos.w)
+                  offset.y = @EnforceYOffset(offset.y, ppos.h)
 
             ret =
               offset_x: offset.x
