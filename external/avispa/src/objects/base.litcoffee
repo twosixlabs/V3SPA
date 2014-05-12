@@ -127,6 +127,29 @@ The init method allows classes to extend the BaseObject without re-implementing 
 
             return cancelEvent(event)
 
+        QuadTreeFactory: d3.geom.quadtree().x( (d)->
+                  d.position.get('offset_x') + d.width() / 2
+              ).y( (d)->
+                  d.position.get('offset_y') + d.height() / 2
+              )
+
+Get the quadtree corresponding to the child nodes of this node, except
+for the provided child
+
+        QuadTree: (exclude)->
+          nodes = _.reject @children, (child)-> 
+            child.options._id == exclude.options._id
+          qtree = @QuadTreeFactory(nodes)
+
+Return the bounds of this object
+
+        LocalBounds: ()->
+          ret = 
+            x1 : @position.get('offset_x')
+            x2 : @position.get('offset_x') + @width()
+            y1 : @position.get('offset_y')
+            y2 : @position.get('offset_y') + @height()
+
         EnforceBoundingBox: (coords)->
 
 If we have a parent element, we want to make sure that our box is at least
@@ -134,13 +157,80 @@ If we have a parent element, we want to make sure that our box is at least
 space space there is around the edges of this group.
 
             currpos = @AbsPosition()
+            width =  @width()
+            height =  @height()
 
             shift_x = coords.x - currpos.x
             shift_y = coords.y - currpos.y
-            offset_x = @position.get('offset_x') + shift_x
-            offset_y = @position.get('offset_y') + shift_y
+            prev = 
+              x : @position.get('offset_x')
+              y : @position.get('offset_y')
+
+            offset=
+              x : @position.get('offset_x') + shift_x
+              y : @position.get('offset_y') + shift_y
 
             if @parent
+
+We build a qtree containing all the parents children except this one.
+We traverse the quadtree, and make sure that this movement won't
+move us into the bounding box of the peer
+
+                qtree = @parent.QuadTree(@)
+                qtree.visit (quad, x1, y1, x2, y2)=>
+                  return unless quad.point?
+                  nx1 = offset.x
+                  nx2 = offset.x + width
+                  ny1 = offset.y
+                  ny2 = offset.y  + height
+
+                  quad_bounds = quad.point.LocalBounds()
+
+                  x_overlap = y_overlap = false
+                  if ((nx1 < quad_bounds.x2 and nx2 > quad_bounds.x2))
+                    x_overlap = Math.abs(nx1 - quad_bounds.x2)
+                  else if (nx2 > quad_bounds.x1 and nx1 < quad_bounds.x1)
+                    x_overlap = Math.abs nx2 - quad_bounds.x1
+                  else if nx1 > quad_bounds.x1 and nx2 < quad_bounds.x2
+                    x_overlap = Math.min(
+                      Math.abs(nx2 - quad_bounds.x1),
+                      Math.abs(nx1 - quad_bounds.x2)
+                    )
+
+                  if ((ny1 < quad_bounds.y2 and ny2 > quad_bounds.y2))
+                    y_overlap = Math.abs ny1 - quad_bounds.y2
+                  else if (ny2 > quad_bounds.y1 and ny1 < quad_bounds.y1)
+                    y_overlap = Math.abs ny2 - quad_bounds.y1
+                  else if ny1 > quad_bounds.y1 and ny2 < quad_bounds.y2
+                    y_overlap = Math.min(
+                      Math.abs(ny2 - quad_bounds.y1),
+                      Math.abs(ny1 - quad_bounds.y2)
+                    )
+
+                  if x_overlap and y_overlap
+                    if shift_x == 0 and shift_y == 0
+                      # We're not moving, so they're just on top of eachother
+                      _.sample([
+                        ->(offset.x = quad_bounds.x1 - width),
+                        ->(offset.x = quad_bounds.x2),
+                        ->(offset.y = quad_bounds.y1 - height),
+                        ->(offset.y = quad_bounds.y2)
+                      ])()
+
+                    if x_overlap < y_overlap
+                      if shift_x > 0
+                        offset.x = quad_bounds.x1 - width
+                      else if shift_x < 0
+                        offset.x = quad_bounds.x2
+
+                    if y_overlap < x_overlap
+                      if shift_y < 0
+                        offset.y = quad_bounds.y2
+                      else if shift_y > 0
+                        offset.y = quad_bounds.y1 - height
+
+                  return x_overlap and y_overlap
+
                 ppos_abs = @parent.AbsPosition()
                 ppos =
                   x: ppos_abs.x
@@ -148,12 +238,12 @@ space space there is around the edges of this group.
                   w: @parent.width()
                   h: @parent.height()
 
-                offset_x = @EnforceXOffset(offset_x, ppos.w)
-                offset_y = @EnforceYOffset(offset_y, ppos.h)
+                offset.x = @EnforceXOffset(offset.x, ppos.w)
+                offset.y = @EnforceYOffset(offset.y, ppos.h)
 
             ret =
-              offset_x: offset_x
-              offset_y: offset_y
+              offset_x: offset.x
+              offset_y: offset.y
 
         EnforceXOffset: (offset, pwidth)->
             orig_offset = offset

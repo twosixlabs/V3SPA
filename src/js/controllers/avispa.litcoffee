@@ -235,6 +235,7 @@ between lists and objects.
 
               subdomain_defers.push subdomain
 
+          $scope.parent.unshift null
           _.each domain.ports, (port_id)->
               port = $scope.policy_data.ports[port_id]
               coords =
@@ -252,6 +253,7 @@ between lists and objects.
               port_obj = $scope.createPort port_id,  $scope.parent, port, port_pos
 
               domain_objects.push port_obj
+          $scope.parent.shift()
 
 This method returns a promise that will be resolved when all subdomains
 have finished parsing *and* checking their server position values.
