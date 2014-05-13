@@ -100,7 +100,7 @@ ID's MUST be fully qualified, or Avispa renders horribly wrong.
               if e.target.id == 'query_reachability'
                 $scope.reachability_query(domain)
               else if e.target.id == 'display_reachability'
-                $scope.highlight_reachability
+                $scope.highlight_reachability domain
 
 
           if obj.path # this means it's not collapsed.
@@ -127,7 +127,7 @@ ID's MUST be fully qualified, or Avispa renders horribly wrong.
 
           return port
 
-      $scope.createLink = (dir, left, right, data) ->
+      $scope.createLink = (dir, left, right, data, id) ->
 
 Sometimes the endpoints of links don't exist because they're collapsed.
 When this happens, don't actually make the link. Instead, label
@@ -182,6 +182,7 @@ the endpoint that does exist so that it can obviously be expanded
                 data: data
                 position: link_pos
 
+            $scope.objects.connections[id] = link
             IDEBackend.add_selection_range_object 'dsl', data.srcloc.start.line, link
             $scope.avispa.$links.append link.$el
 
@@ -429,12 +430,13 @@ Otherwise it's 1.1 * ceil(sqrt(subelement_count)). If there are no
 
       $scope.parseConns = (connections)->
 
-          _.each connections, (connection)->
+          _.each connections, (connection, conn_id)->
 
               $scope.createLink connection.connection,
                                 $scope.objects.ports[connection.left],
                                 $scope.objects.ports[connection.right],
-                                connection
+                                connection,
+                                conn_id
 
 Actually load the thing the first time.
 
@@ -455,6 +457,23 @@ Run a reachability query
 
           IDEBackend.expand_graph hidden_domains
 
+Highlight all the domains reachable from a given domain. This
+assumes they've all been expanded.
+
+      $scope.highlight_reachability = (domain)->
+
+        query = IDEBackend.perform_path_query domain.options.numeric_id
+
+        query.then (data)->
+          result = JSON.parse data
+          ctr = 0
+          _.each result.result, (paths, dom_id)->
+
+            _.each paths, (path)->
+              _.each path, (conn)->
+                $scope.objects.connections[conn].highlight_reachable ctr
+
+            $scope.objects.domains[dom_id].highlight_reachable ctr
 
 
 

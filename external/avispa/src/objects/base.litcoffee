@@ -25,6 +25,14 @@ elements.  The root is an SVG G element that is translated when dragged.
           console.log classes
           @.$el.attr 'class', classes.join(" ")
 
+        highlight_reachable: (count)->
+          @add_class("svg-highlight-reach-#{count}")
+
+          remove = =>
+            @remove_class "svg-highlight-reach-#{count}"
+
+          setTimeout remove, 10000
+
         highlight: ->
           @add_class('svg-highlight')
 

@@ -14,15 +14,32 @@ Base class for "link" objects
             'mouseleave'  : 'OnMouseLeave'
             'contextmenu' : 'OnRightClick'
 
-        highlight: ->
+        add_class: (klass)->
           classes = _.toArray @.el.classList
-          classes.push 'svg-highlight'
+          classes.push klass
           @.$el.attr 'class', _.uniq(classes).join(" ")
 
-        unhighlight: ->
-          classes = _.reject @.el.classList, (klass)->
-            klass == 'svg-highlight'
+        remove_class: (klass)->
+          classes = _.toArray @.el.classList
+          console.log classes
+          classes = _.reject classes, (cls)->
+            cls == klass
+          console.log classes
           @.$el.attr 'class', classes.join(" ")
+
+        highlight_reachable: (count)->
+          @add_class("svg-highlight-reach-#{count}")
+
+          remove = =>
+            @remove_class "svg-highlight-reach-#{count}"
+
+          setTimeout remove, 10000
+
+        highlight: ->
+          @add_class('svg-highlight')
+
+        unhighlight: ->
+          @remove_class('svg-highlight')
 
         initialize: (@options) ->
             @path = $SVG('path')
