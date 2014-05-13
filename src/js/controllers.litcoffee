@@ -138,7 +138,7 @@ This controls our editor visibility.
 
           ace_range = ace.require("ace/range")
 
-          _.filter $scope.editor_markers, (elem)->
+          $scope.editor_markers = _.filter $scope.editor_markers, (elem)->
             $scope.editor.getSession().removeMarker(elem)
             return false
 
