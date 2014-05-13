@@ -165,6 +165,8 @@ This controls our editor visibility.
                 "text"
               )
 
+              $scope.editor.scrollToLine hl.range.start.line - 1
+
               $scope.editor_markers.push marker
 
 Watch the view control and switch the editor session

@@ -390,8 +390,8 @@ Otherwise it's 1.1 * ceil(sqrt(subelement_count)). If there are no
                     height = Math.sqrt(area)
 
                 bounds = 
-                    w:  width * 1.5
-                    h:  (height * 1.5) + 25
+                    w:  width * 2
+                    h:  (height * 2) + 25
 
               domain_obj.position.set bounds, false
 
