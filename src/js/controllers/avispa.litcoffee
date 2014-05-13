@@ -81,6 +81,7 @@ ID's MUST be fully qualified, or Avispa renders horribly wrong.
         else
           return id
 
+
       $scope.createDomain = (id, parents, obj, coords) ->
           domain = new Domain
               _id: if obj?.path then obj.path else id
@@ -89,8 +90,18 @@ ID's MUST be fully qualified, or Avispa renders horribly wrong.
               position: coords
               data: if obj? then obj else null
               klasses: ['filtered'] unless obj?
+              numeric_id: id
 
           $scope.objects.domains[id] = domain
+
+          domain.$el.contextmenu
+            target: '#domain-context-menu'
+            onItem: (domain_el, e)->
+              if e.target.id == 'query_reachability'
+                $scope.reachability_query(domain)
+              else if e.target.id == 'display_reachability'
+                $scope.highlight_reachability
+
 
           if obj.path # this means it's not collapsed.
             IDEBackend.add_selection_range_object 'dsl', obj.srcloc.start.line, domain
@@ -145,7 +156,7 @@ the endpoint that does exist so that it can obviously be expanded
           if not right 
             left.add_class 'expandable'
             left.$el.contextmenu
-              target: '#context-menu'
+              target: '#node-context-menu'
               onItem: handle_expand_links(left)
 
 
@@ -430,6 +441,22 @@ Actually load the thing the first time.
       start_data = IDEBackend.get_json()
       if start_data
           update_view(start_data)
+
+Run a reachability query
+
+      $scope.reachability_query = (domain)->
+        query = IDEBackend.perform_path_query domain.options.numeric_id
+
+        query.then (data)->
+          result = JSON.parse data
+          hidden_domains = _.map result.result, (paths, dom_id)->
+            $scope.objects.domains[dom_id]?.AncestorList()
+
+
+          IDEBackend.expand_graph hidden_domains
+
+
+
 
 Lobster-specific definitions for Avispa
 

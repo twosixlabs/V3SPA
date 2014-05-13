@@ -112,9 +112,6 @@
                       </div>
                     </div>
                   </div>
-                  <div class='row'>
-                    <input type='text' ng-model='qparams'/>
-                  </div>
                   <div class='editor'>
                     <div ng-show='policy.id'>
                       <tabset id='editor_tabs'>
@@ -198,10 +195,20 @@
         </div>
       </div>
     </div>
-    <div id='context-menu'>
+    <div id='node-context-menu'>
       <ul role='menu' class='dropdown-menu'>
         <li>
           <a id='context-expand-links' tabindex='-1'>Expand Hidden Connections</a>
+        </li>
+      </ul>
+    </div>
+    <div id='domain-context-menu'>
+      <ul role='menu' class='dropdown-menu'>
+        <li>
+          <a id='query_reachability' tabindex='-1'>Expand Reachable Domains</a>
+        </li>
+        <li>
+          <a id='display_reachability' tabindex='-1'>Highlight Reachable Domains</a>
         </li>
       </ul>
     </div>

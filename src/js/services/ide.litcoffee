@@ -364,3 +364,24 @@ format of the JSON changes (as it likely will).
 
           return info
 
+Perform a path query originating from the domain with ID
+`domain_id`. Return a promise which will be resolved
+with the results.
+
+        perform_path_query: (domain_id)->
+          deferred = @$q.defer()
+
+          req =
+            domain: 'lobster'
+            request: 'query_reachability'
+            payload:
+              id: domain_id
+              text: @current_policy.documents.dsl.text
+
+          @SockJSService.send req, (data)->
+            if data.error?
+              deferred.reject(data.payload)
+            else
+              deferred.resolve(data.payload)
+
+          return deferred.promise

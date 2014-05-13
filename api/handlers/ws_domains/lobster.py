@@ -6,6 +6,7 @@ from tornado import httpclient
 
 __MIN_LSR_VERSION__ = 2
 
+
 class LobsterDomain(object):
 
     """Docstring for LobsterDomain """
@@ -28,8 +29,8 @@ class LobsterDomain(object):
             self._lobster_version = resp['version']
 
             if self._lobster_version < __MIN_LSR_VERSION__:
-              logging.critical("Required lobster version {0} but server speaks {1}"
-                               .format(__MIN_LSR_VERSION__, self._lobster_version))
+                logging.critical("Required lobster version {0} but server speaks {1}"
+                                 .format(__MIN_LSR_VERSION__, self._lobster_version))
 
             logging.info("Connected to lobster backend server v{0}"
                          .format(self._lobster_version))
@@ -42,7 +43,7 @@ class LobsterDomain(object):
                 pass
 
     @staticmethod
-    def _make_request(method, path, payload, timeout=10.0):
+    def _make_request(method, path, payload, timeout=30.0):
         http_client = httpclient.HTTPClient()
         backend_uri = "http://{0}{1}".format(
             api.config.get('lobster_backend', 'uri'),
@@ -65,13 +66,25 @@ class LobsterDomain(object):
                 else:
                     raise Exception("backend:lobster - Unspecified Error")
         else:
-          return output
+            return output
+
+    def query_reachability(self, msg):
+        """ Run a reachability test from a given domain """
+        output = self._make_request(
+            'POST', '/paths?id={0}'.format(msg['payload']['id']),
+            msg['payload']['text'])
+
+        return {
+            'label': msg['response_id'],
+            'payload': output.body
+        }
 
     def validate(self, msg):
         """ Validate a Lobster file received from the IDE
         """
 
-        output = self._make_request('POST', '/parse?{0}'.format(msg['payload']['params']),
+        output = self._make_request(
+            'POST', '/parse?{0}'.format(msg['payload']['params']),
             msg['payload']['text'])
 
         return {
@@ -95,15 +108,17 @@ class LobsterDomain(object):
             }
         """
         output = self._make_request('POST', '/import/selinux',
-            params if isinstance(params, basestring) else api.db.json.dumps(params))
+                                    params if isinstance(params, basestring) else api.db.json.dumps(params))
 
         return api.db.json.loads(output.body)
 
     def handle(self, msg):
         if msg['request'] == 'validate':
             return self.validate(msg)
+        elif msg['request'] == 'query_reachability':
+            return self.query_reachability(msg)
         else:
-            raise
+            raise Exception("Invalid message type for 'lobster' domain")
 
 
 def __instantiate__():
