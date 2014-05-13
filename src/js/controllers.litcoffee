@@ -125,16 +125,17 @@ This controls our editor visibility.
               type: 'error'
 
             ret = 
-              row: lastRow
+              row: pos.start.line
               column: pos.start.col
               type: 'error'
               text: "#{err.filename}: #{err.message}"
 
           $timeout ->
             session = $scope.editorSessions.dsl.session
-            session.setAnnotations _.map(annotations?.errors, (e)->
+            formatted_annotations = _.map(annotations?.errors, (e)->
               format_error(e)
-            )
+            )                       
+            session.setAnnotations formatted_annotations
 
           ace_range = ace.require("ace/range")
 
