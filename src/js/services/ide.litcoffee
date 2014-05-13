@@ -355,19 +355,8 @@ format of the JSON changes (as it likely will).
 
         _parseDomainSourcePosition: (object)->
 
-          annotation = _.find object.domainAnnotations, (elem)->
-            elem.name == 'SourcePos'
-
-          return unless annotation?
-
           info =
-            range:
-              start:
-                row: annotation.args[1] - 1
-                column: annotation.args[2] - 1
-              end:
-                row: annotation.args[1] - 1
-                column: "class #{object.class}".length
+            range: object.srcloc
             description: "unknown"
             type: "source_domain"
             apply_to: 'dsl'
