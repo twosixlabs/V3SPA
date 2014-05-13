@@ -23,7 +23,7 @@ Base class for "group" objects
 
         OnMouseEnter: (event) ->
             if Avispa.context.hovering? and @options._id != Avispa.context.hovering.options._id
-              if not context.dragItem?
+              if not Avispa.context.dragItem?
                   Avispa.context.hovering.$rect.removeAttr('class')
                   Avispa.context.ide_backend.unhighlight()
 
