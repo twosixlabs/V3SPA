@@ -355,6 +355,7 @@ format of the JSON changes (as it likely will).
 
         _parseDomainSourcePosition: (object)->
 
+          return unless object.srcloc?
           info =
             range: object.srcloc
             description: "unknown"
