@@ -100,6 +100,7 @@ ID's MUST be fully qualified, or Avispa renders horribly wrong.
           return domain
 
       $scope.createPort = (id, parents, obj, coords) ->
+          obj.numeric_id = id
           port = new Port
               _id: obj.path
               parent: parents[0]
@@ -121,16 +122,38 @@ Sometimes the endpoints of links don't exist because they're collapsed.
 When this happens, don't actually make the link. Instead, label
 the endpoint that does exist so that it can obviously be expanded
 
+          handle_expand_links = (conn)->
+            (node, e)->
+              console.log e
+
+              if e.target.id == 'context-expand-links'
+                clicked = $scope.objects.ports_by_path[node.attr('id')]
+
+                missing_domains = _.map $scope.policy_data.connections, (c)->
+                  if clicked.options.data.numeric_id not in [c.right, c.left]
+                    return false
+
+                  if c.left not of $scope.objects.ports and c.right
+                    return $scope.objects.domains[c.left_dom].AncestorList()
+                  else if c.right not of $scope.objects.ports
+                    return $scope.objects.domains[c.right_dom].AncestorList()
+                  else 
+                    return false
+
+                IDEBackend.expand_graph( _.filter(missing_domains, (d)->d))
+
           if not right 
             left.add_class 'expandable'
-            left.$el/cont
-            #clicked = $scope.objects.ports_by_path[target.id]
-            #missing_conns = _.omit $scope.policy_data.connections, (c)->
-            #  c.left of $scope.objects.ports and conn.right of $scope.objects.ports
+            left.$el.contextmenu
+              target: '#context-menu'
+              onItem: handle_expand_links(left)
 
 
           else if not left
             right.add_class 'expandable'
+            right.$el.contextmenu
+              target: '#context-menu'
+              onItem: handle_expand_links(right)
 
           else
 
@@ -150,6 +173,7 @@ the endpoint that does exist so that it can obviously be expanded
 
             IDEBackend.add_selection_range_object 'dsl', data.srcloc.start.line, link
             $scope.avispa.$links.append link.$el
+
 
 Use D3's force-direction to layout a set of objects within the bounds.
 Bounds is expected to be an object that contains 'w' and 'h' values for
@@ -482,6 +506,6 @@ Lobster-specific definitions for Avispa
             return @
 
         Expand: (event)->
-          Avispa.context.ide_backend.expand_graph @AncestorList()
+          Avispa.context.ide_backend.expand_graph [@AncestorList()]
 
           cancelEvent(event)

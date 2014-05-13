@@ -160,14 +160,15 @@ about highlighting that should be performed.
 
 Extend the set of paths that we show.
 
-        expand_graph: (ancestor_list)=>
+        expand_graph: (ancestor_lists)=>
 
-          curr = @graph_expansion
-          for elem in ancestor_list
-              if elem not of curr
-                  curr[elem] = {}
+          _.each ancestor_lists, (ancestor_list)=>
+            curr = @graph_expansion
+            for elem in ancestor_list
+                if elem not of curr
+                    curr[elem] = {}
 
-              curr = curr[elem]
+                curr = curr[elem]
 
           @_validate_dsl()
 
