@@ -471,9 +471,9 @@ assumes they've all been expanded.
 
             _.each paths, (path)->
               _.each path, (conn)->
-                $scope.objects.connections[conn].highlight_reachable ctr
+                $scope.objects.connections[conn].highlight_reachable 0
 
-            $scope.objects.domains[dom_id].highlight_reachable ctr
+            $scope.objects.domains[dom_id].highlight_reachable 0
 
 
 
