@@ -135,7 +135,6 @@ the endpoint that does exist so that it can obviously be expanded
 
           handle_expand_links = (conn)->
             (node, e)->
-              console.log e
 
               if e.target.id == 'context-expand-links'
                 clicked = $scope.objects.ports_by_path[node.attr('id')]
@@ -163,7 +162,7 @@ the endpoint that does exist so that it can obviously be expanded
           else if not left
             right.add_class 'expandable'
             right.$el.contextmenu
-              target: '#context-menu'
+              target: '#node-context-menu'
               onItem: handle_expand_links(right)
 
           else
@@ -285,9 +284,8 @@ Since it's recursive, we check it in each method.
             $q.all(subdomain_defers).then (subdoms)->
               domain_objects = _.union domain_objects, subdoms
 
-Now would be an opportune time to do layout
-on the subnodes. For now just resolve the promise
-
+Now would be an opportune time to do layout on the subnodes. For now just
+resolve the promise
 
               if domain_objects.length > 1
                 layout = $scope.layout_objects domain_objects, {w: 1, h: 1}
@@ -351,17 +349,15 @@ on the subnodes. For now just resolve the promise
               port_obj = $scope.createPort port_id,  $scope.parent, port, port_pos
 
               domain_objects.push port_obj
-              console.log "After port push: ", domain_objects
 
           $scope.parent.shift()
 
-          console.log "Domain objects: ", domain_objects
 
 This method returns a promise that will be resolved when all subdomains
 have finished parsing *and* checking their server position values.
 Since it's recursive, we check it in each method.
 
-          parser_deferral = $q.defer() 
+          parser_deferral = $q.defer()
 
           $q.all(position_defers).then (deferrals)->
             for posobj in deferrals
@@ -370,20 +366,17 @@ Since it's recursive, we check it in each method.
                   posobj.data.data.fixed = true
 
             $q.all(subdomain_defers).then (subdoms)->
-              if domain_objects.length > 0 
-                console.log domain_objects
-              domain_objects = _.union domain_objects, subdoms
-
-              console.log "Domain objects after deferral : ", domain_objects
+              if domain_objects.length > 0
+                domain_objects = _.union domain_objects, subdoms
 
 Set the size for the group. If there are no subelements, its size 1.
 Otherwise it's 1.1 * ceil(sqrt(subelement_count)). If there are no
 
               if domain_obj.options.data.collapsed
-                bounds = 
+                bounds =
                     w: Math.max(100, 10 * domain_obj.options.name.length)
                     h: 25
-              else 
+              else
                 if domain_objects.length == 0
                   width = height = 200
 
@@ -391,7 +384,7 @@ Otherwise it's 1.1 * ceil(sqrt(subelement_count)). If there are no
                   area_sum = (memo, next)->
                     return memo + (next.width() * next.height())
                   sum = (memo, next)->
-                      return [memo[0] + next.width(), memo[1] + next.height()]
+                    return [memo[0] + next.width(), memo[1] + next.height()]
 
                   [width, height] = _.reduce domain_objects, sum, [0, 0]
                   area = _.reduce domain_objects, area_sum, 0
