@@ -444,9 +444,12 @@ Run a reachability query
 
         query.then (data)->
           result = JSON.parse data
-          hidden_domains = _.map result.result, (paths, dom_id)->
-            $scope.objects.domains[dom_id]?.AncestorList()
+          filtermap = (memo, paths, dom_id)->
+            if $scope.objects.domains[dom_id]?
+              memo.push $scope.objects.domains[dom_id].AncestorList()
+            return memo
 
+          hidden_domains = _.reduce(result.result, filtermap, [])
 
           IDEBackend.expand_graph hidden_domains
 
