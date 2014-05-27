@@ -21,10 +21,8 @@ Base class for "link" objects
 
         remove_class: (klass)->
           classes = _.toArray @.el.classList
-          console.log classes
           classes = _.reject classes, (cls)->
             cls == klass
-          console.log classes
           @.$el.attr 'class', classes.join(" ")
 
         highlight_reachable: (count)->

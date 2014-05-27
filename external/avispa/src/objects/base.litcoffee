@@ -19,10 +19,8 @@ elements.  The root is an SVG G element that is translated when dragged.
 
         remove_class: (klass)->
           classes = _.toArray @.el.classList
-          console.log classes
           classes = _.reject classes, (cls)->
             cls == klass
-          console.log classes
           @.$el.attr 'class', classes.join(" ")
 
         highlight_reachable: (count)->
