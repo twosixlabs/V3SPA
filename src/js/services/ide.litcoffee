@@ -204,6 +204,8 @@ contents of @current_policy
             payload:
               text: @current_policy.documents.dsl.text
               params: @write_filter_param(@graph_expansion).join("&")
+              hide_unused_ports: true
+
 
           @SockJSService.send req, (result)=>
             if result.error  # Service error

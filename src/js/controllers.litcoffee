@@ -8,7 +8,9 @@ The main controller. avispa is a subcontroller.
 
       $scope._ = _
 
-      $scope.qparams = null
+      $scope.visibility = 
+        unused_ports = false
+
       $scope.$watch 'qparams', (newv)->
           IDEBackend.queryparams = newv
 
