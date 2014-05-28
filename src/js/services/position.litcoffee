@@ -26,6 +26,7 @@
           return @data[key]
 
         set: (obj, propagate=true)->
+          console.log "Position #{@id} set", obj
           @update(obj, propagate)
 
         update: (data, propagate=true)=>
@@ -61,8 +62,6 @@ Percolate changes to the server
             domain: 'location'
             request: 'update'
             payload: updates
-
-          console.log "#{@id} sent position"
 
           SockJSService.send req, (result)=>
             if result.error 

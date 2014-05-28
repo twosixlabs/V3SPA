@@ -295,8 +295,10 @@ resolve the promise
                     offset_y: model.y
                   domain_objects[model.index].position.set pos, true
 
-              _.each domain_objects, (obj)->
-                obj.ParentDrag()
+              #_.each domain_objects, (obj)->
+              #  obj.ParentDrag()
+
+              root.ParentDrag()
 
               parser_deferral.resolve true
 

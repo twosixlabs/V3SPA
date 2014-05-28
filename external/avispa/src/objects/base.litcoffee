@@ -266,7 +266,6 @@ move us into the bounding box of the peer
                     w: @parent.width()
                     h: @parent.height()
 
-                  console.log "Parent: #{ppos.x}, #{ppos.y}"
                   offset.x = @EnforceXOffset(offset.x, 0, 'left')
                   offset.x = @EnforceXOffset(offset.x, ppos.w, 'right')
                   offset.y = @EnforceYOffset(offset.y, 25, 'top')
