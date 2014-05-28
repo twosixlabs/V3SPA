@@ -140,9 +140,9 @@ The init method allows classes to extend the BaseObject without re-implementing 
             return cancelEvent(event)
 
         QuadTreeFactory: d3.geom.quadtree().x( (d)->
-                  d.position.get('offset_x') + d.width() / 2
+                  d.CenterX()
               ).y( (d)->
-                  d.position.get('offset_y') + d.height() / 2
+                  d.CenterY()
               )
 
 Get the quadtree corresponding to the child nodes of this node, except
@@ -152,6 +152,15 @@ for the provided child
           nodes = _.reject @children, (child)-> 
             child.options._id == exclude.options._id
           qtree = @QuadTreeFactory(nodes)
+
+
+Retrieve the center point coordinates for this node.
+
+        CenterX: ->
+          return @position.get('offset_x') + @width() / 2
+
+        CenterY: ->
+          return @position.get('offset_y') + @height() / 2
 
 Return the bounds of this object
 
@@ -183,6 +192,7 @@ space space there is around the edges of this group.
               y : @position.get('offset_y') + shift_y
 
             if @parent
+                ppos_abs = @parent.AbsPosition()
 
 We build a qtree containing all the parents children except this one.
 We traverse the quadtree, and make sure that this movement won't
@@ -223,64 +233,69 @@ move us into the bounding box of the peer
                   if x_overlap and y_overlap
                     if shift_x == 0 and shift_y == 0
                       # We're not moving, so they're just on top of eachother
-                      _.sample([
-                        ->(offset.x = quad_bounds.x1 - width),
-                        ->(offset.x = quad_bounds.x2),
-                        ->(offset.y = quad_bounds.y1 - height),
-                        ->(offset.y = quad_bounds.y2)
-                      ])()
 
-                    else if x_overlap < y_overlap
+                      unless @parent.options.fake_container
+                        offset.x = _.random(10, @parent.width()-@width())
+                        offset.y = _.random(10, @parent.height()-@height())
+                      else
+                        _.sample([
+                          ->(offset.x = quad_bounds.x1 - width),
+                          ->(offset.x = quad_bounds.x2),
+                          ->(offset.y = quad_bounds.y1 - height),
+                          ->(offset.y = quad_bounds.y2)
+                        ])()
+
+                    else if x_overlap < y_overlap or shift_y == 0
                       if shift_x > 0
-                        offset.x = quad_bounds.x1 - width
+                        offset.x = @EnforceXOffset offset.x, quad_bounds.x1, 'right'
                       else if shift_x < 0
-                        offset.x = quad_bounds.x2
+                        offset.x = @EnforceXOffset offset.x, quad_bounds.x2, 'left'
 
                     else
                       if shift_y < 0
-                        offset.y = quad_bounds.y2
+                        offset.y = @EnforceYOffset offset.y, quad_bounds.y2, 'top'
                       else if shift_y > 0
-                        offset.y = quad_bounds.y1 - height
+                        offset.y = @EnforceYOffset offset.y, quad_bounds.y1, 'bottom'
 
                   return x_overlap and y_overlap
 
                 unless @parent.options.fake_container
-                  ppos_abs = @parent.AbsPosition()
                   ppos =
                     x: ppos_abs.x
                     y: ppos_abs.y
                     w: @parent.width()
                     h: @parent.height()
 
-                  offset.x = @EnforceXOffset(offset.x, ppos.w)
-                  offset.y = @EnforceYOffset(offset.y, ppos.h)
+                  offset.x = @EnforceXOffset(offset.x, 0, 'left')
+                  offset.x = @EnforceXOffset(offset.x, ppos.w, 'right')
+                  offset.y = @EnforceYOffset(offset.y, 25, 'top')
+                  offset.y = @EnforceYOffset(offset.y, ppos.h, 'bottom')
 
             ret =
               offset_x: offset.x
               offset_y: offset.y
 
-        EnforceXOffset: (offset, pwidth)->
-            orig_offset = offset
-            if offset < 10
-                offset = 10
-            else if offset + @width() > pwidth - 10
-                offset = pwidth - 10 - @width()
-
-            if offset < 10
-              offset = orig_offset
+        EnforceXOffset: (pos, bound, side)->
+            orig_offset = pos
+            if side == 'left' and pos - bound < 0
+              offset = pos + (bound - pos)
+            else if side == 'right' and pos + @width() > bound
+              offset = pos + (bound - @width()) - pos
+            else
+              offset = pos
 
             return offset
 
-        EnforceYOffset: (offset, height)->
+        EnforceYOffset: (pos, bound, side)->
             orig_offset = offset
 
-            if offset < 25
-                offset = 25
-            else if offset + @height() > height - 10
-                offset = height - 10 - @height()
+            if side == 'top' and pos - bound < 0
+              offset = pos + (bound - pos)
+            else if side == 'bottom' and pos + @height() > bound
+              offset = pos + bound - @height() - pos
+            else 
+              offset = pos
 
-            if offset < 10
-              offset = orig_offset
             return offset
 
         Drag: (event) ->

@@ -63,26 +63,40 @@ Base class for "node" objects
             y2 : y + @height() / 2
 
 
+        CenterX: ->
+          @position.get('offset_x')
+
+        CenterY: ->
+          @position.get('offset_y')
+
 Nodes are circles, and need to offset from the center
 of the circle, making calculations different.
 
-        EnforceXOffset: (offset, pwidth)->
+        EnforceXOffset: (pos, bound, side)->
             d = @width()
             r = d / 2
-            if offset < r
-                offset = r
-            else if offset + r > pwidth
-                offset = pwidth - r
+            if side == 'left' and pos < bound + r
+              offset = (bound + r)
+            else if side == 'right' and pos > bound - r
+              offset = (bound - r)
+            else
+              offset = pos
+            #if offset < r
+            #    offset = r
+            #else if offset + r > pwidth
+            #    offset = pwidth - r
 
             return offset
 
-        EnforceYOffset: (offset, pheight)->
+        EnforceYOffset: (pos, bound, side)->
             d = @height()
             r = d / 2
-            if offset < 25 + r
-                offset = 25 + r
-            else if offset + r > pheight
-                offset = pheight - r
+            if side == 'top' and pos < bound + r
+              offset = (bound + r)
+            else if side == 'bottom' and pos > bound - r
+              offset = (bound - r)
+            else
+              offset = pos
 
             return offset
 
