@@ -83,14 +83,43 @@ class LobsterDomain(object):
         """ Validate a Lobster file received from the IDE
         """
 
+        logger.info("WS:validate?%s" % "&".join(
+          ["{0}={1}".format(x, y) for x, y in msg['payload'].iteritems() if x != 'text']))
+
         output = self._make_request(
             'POST', '/parse?{0}'.format(msg['payload']['params']),
             msg['payload']['text'])
 
+        jsondata = api.db.json.loads(output.body)
+        if msg['payload']['hide_unused_ports'] is True:
+          jsondata = self._filter_unused_ports(jsondata)
+
         return {
             'label': msg['response_id'],
-            'payload': output.body
+            'payload': api.db.json.dumps(jsondata)
         }
+
+    def _filter_unused_ports(self, data):
+        """ Filter out all of the ports which do not have a connection.
+        This includes their references inside domains, as well as their
+        presence in the port list. """
+        if 'errors' in data and len(data['errors']) > 0:
+          return data
+
+        connected_ports = set()
+        for ident, conn in data['result']['connections'].iteritems():
+          connected_ports.add(conn['right'])
+          connected_ports.add(conn['left'])
+
+        for port in data['result']['ports'].keys():
+          if port not in connected_ports:
+            del data['result']['ports'][port]
+
+        for domkey, domain in data['result']['domains'].iteritems():
+          domain['ports'][:] = [p for p in domain['ports']
+                                if p in connected_ports]
+
+        return data
 
     def translate_selinux(self, params):
         """ Given a set of parameters of the form, return the

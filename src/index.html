@@ -112,6 +112,22 @@
                       </div>
                     </div>
                   </div>
+                  <div class='row'>
+                    <div class='form-group'>
+                      <label class='control-label pad-right'>Visibility</label>
+                      <button type='button' 
+                              class='btn btn-xs btn-default' ng-model='visibility.unused_ports'
+                              btn-checkbox btn-checkbox-false='false' btn-checkbox-true='true'>
+                        Unused Ports
+                        <span style='vertical-align:middle'>
+                        <span ng-hide='visibility.unused_ports' 
+                              class='glyphicon glyphicon-eye-close'></span>
+                        <span ng-show='visibility.unused_ports' 
+                              class='glyphicon glyphicon-eye-open'></span>
+                        </span>
+                      </button>
+                    </div>
+                  </div>
                   <div class='editor'>
                     <div ng-show='policy.id'>
                       <tabset id='editor_tabs'>

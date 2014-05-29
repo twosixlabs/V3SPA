@@ -27,9 +27,9 @@ errors, and generally being awesome.
             validation: []
 
           @selection_ranges = {}
+          @visibility = {}
 
           @validate_dsl = _.throttle @_validate_dsl, 1000
-
 
         isCurrent: (id)=>
           id? and id == @current_policy._id
@@ -191,6 +191,16 @@ set of paths.
 
           return params
 
+Set the visibility of a given key. If we have a policy loaded, then
+trigger revalidation.
+
+        set_visibility: (key, visible)->
+          if @visibility[key] != visible
+            console.log "Visibility '#{key}': #{visible}"
+            @visibility[key] = visible
+
+            unless @current_policy.id == null
+              @validate_dsl()
 
 Send a request to the server to validate the current
 contents of @current_policy
@@ -204,6 +214,7 @@ contents of @current_policy
             payload:
               text: @current_policy.documents.dsl.text
               params: @write_filter_param(@graph_expansion).join("&")
+              hide_unused_ports: if @visibility.unused_ports then false else true
 
           @SockJSService.send req, (result)=>
             if result.error  # Service error
