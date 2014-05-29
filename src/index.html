@@ -117,12 +117,12 @@
                       <label class='control-label pad-right'>Visibility</label>
                       <button type='button' 
                               class='btn btn-xs btn-default' ng-model='visibility.unused_ports'
-                              btn-checkbox btn-checkbox-false='true' btn-checkbox-true='false'>
+                              btn-checkbox btn-checkbox-false='false' btn-checkbox-true='true'>
                         Unused Ports
                         <span style='vertical-align:middle'>
-                        <span ng-show='visibility.unused_ports' 
-                              class='glyphicon glyphicon-remove'></span>
                         <span ng-hide='visibility.unused_ports' 
+                              class='glyphicon glyphicon-remove'></span>
+                        <span ng-show='visibility.unused_ports' 
                               class='glyphicon glyphicon-ok'></span>
                         </span>
                       </button>

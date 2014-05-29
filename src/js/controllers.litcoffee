@@ -11,8 +11,8 @@ The main controller. avispa is a subcontroller.
       $scope.visibility = 
         unused_ports = false
 
-      $scope.$watch 'qparams', (newv)->
-          IDEBackend.queryparams = newv
+      $scope.$watch 'visibility.unused_ports', (newv)->
+          IDEBackend.set_visibility 'unused_ports', newv
 
       $scope.policy = IDEBackend.current_policy
 
