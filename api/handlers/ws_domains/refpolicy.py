@@ -61,7 +61,6 @@ class RefPolicy(restful.ResourceDomain):
 
     @classmethod
     def do_update(cls, params, response):
-      import pdb; pdb.set_trace()
       if '_id' in params and params['_id'] is not None:
           newobject = cls.Read(params['_id'])
           response['payload'] = newobject.Update(params)
