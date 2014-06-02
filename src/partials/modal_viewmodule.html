@@ -1,0 +1,47 @@
+<div class='modal-header'>
+  <h4 class='modal-title'>Source files for {{module_name.id}}</h4>
+</div>
+<div class='modal-body'>
+  <div class='row'>
+    <div class='col-md-4'>
+      <div class='panel panel-default'>
+        <div class='panel-heading'>
+          <h1 class='panel-title'>Type Enforcement</h1>
+        </div>
+        <div class='panel-body'>
+          <pre class='pre-scrollable'>
+{{documents.te.text}}
+          </pre>
+        </div>
+      </div>
+
+    </div>
+    <div class='col-md-4'>
+      <div class='panel panel-default'>
+        <div class='panel-heading'>
+          <h1 class='panel-title'>File Context</h1>
+        </div>
+        <div class='panel-body'>
+          <pre class='pre-scrollable'>
+{{documents.fc.text}}
+          </pre>
+        </div>
+      </div>
+
+    </div>
+
+    <div class='col-md-4'>
+      <div class='panel panel-default'>
+        <div class='panel-heading'>
+          <h1 class='panel-title'>Interface</h1>
+        </div>
+        <div class='panel-body'>
+          <pre class='pre-scrollable'>
+{{documents.if.text}}
+          </pre>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

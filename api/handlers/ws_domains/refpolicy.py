@@ -61,7 +61,6 @@ class RefPolicy(restful.ResourceDomain):
 
     @classmethod
     def do_update(cls, params, response):
-      import pdb; pdb.set_trace()
       if '_id' in params and params['_id'] is not None:
           newobject = cls.Read(params['_id'])
           response['payload'] = newobject.Update(params)
@@ -103,6 +102,18 @@ class RefPolicy(restful.ResourceDomain):
             refpol.Insert()
 
         response['payload'] = refpol
+        return response
+
+    @classmethod
+    def do_fetch_module_source(cls, params, response):
+        refpol_id = api.db.idtype(params['refpolicy'])
+
+        refpolicy = RefPolicy.Read(refpol_id)
+
+        response['payload'] = read_module_files(
+            refpolicy.modules[params['module']],
+            editable=False)
+
         return response
 
     @classmethod

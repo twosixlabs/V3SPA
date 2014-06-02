@@ -1,5 +1,11 @@
     vespaControllers = angular.module('vespaControllers') 
 
+    vespaControllers.controller 'modal.view_module', (
+        $scope, $modalInstance, documents, module) ->
+
+            $scope.module_name = module
+            $scope.documents = documents
+
     vespaControllers.controller 'modal.policy_load', (
         $scope, $modalInstance, RefPolicy, $fileUploader) ->
 

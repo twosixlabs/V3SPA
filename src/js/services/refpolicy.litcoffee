@@ -22,6 +22,29 @@
 
           return @_deferred_load.promise
 
+        fetch_module_files: (module_id)=>
+          unless @current?
+            @VespaLogger.log 'refpolicy', 'error',
+              "Cannot view module files without loading policy"
+            return
+
+          deferred = @$q.defer()
+
+          req = 
+            domain: 'refpolicy'
+            request: 'fetch_module_source'
+            payload: 
+                refpolicy: @current._id
+                module: module_id
+
+          @SockJSService.send req, (data)=>
+            if data.error?
+              deferred.reject(data)
+            else
+              deferred.resolve(data.payload)
+
+          return deferred.promise
+
         load: (id)=>
           if @current?.id == id
             return

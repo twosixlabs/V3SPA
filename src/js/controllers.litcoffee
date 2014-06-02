@@ -11,6 +11,32 @@ The main controller. avispa is a subcontroller.
       $scope.visibility = 
         unused_ports = false
 
+      $scope.$watch 'raw_view_selection', (newv)->
+        if newv
+          $modal.open
+            templateUrl: 'moduleViewModal.html'
+            controller: 'modal.view_module'
+            windowClass: 'super-large-modal'
+            resolve:
+              documents: ->
+                RefPolicy.fetch_module_files(newv.id)
+              module: ->
+                newv
+            size: 'lg'
+        console.log newv
+
+      $scope.raw_module_select2 =
+        data: ->
+            unless $scope.policy?.modules
+              retval =
+                results: []
+            else 
+              retval = 
+                  results: _.map $scope.policy.modules, (v, k)->
+                      ret = 
+                        text: k
+                        id: k
+
       $scope.$watch 'visibility.unused_ports', (newv)->
           IDEBackend.set_visibility 'unused_ports', newv
 
