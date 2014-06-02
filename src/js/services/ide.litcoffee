@@ -102,7 +102,7 @@ Create a new policy, but don't save it or anything
             id: null
             _id: null
             type: null
-            valid: false
+            valid: true
 
           for arg, val of args
               @current_policy[arg] = val
@@ -239,19 +239,35 @@ contents of @current_policy
               _.each @hooks.json_changed, (hook)=>
                 hook(@current_policy.json)
 
-              if @current_policy.json.errors.length > 0
-                @current_policy.valid = false
-
-              else
-                @current_policy.valid = true
-
               deferred.resolve()
 
           return deferred.promise
 
-Load a policy from the server
+        load_local_policy: (refpolicy)=>
 
-        load_policy: (refpolicy_id, module_name)=>
+            @graph_expansion = {}
+
+            @current_policy = refpolicy
+            @current_policy.valid = true
+
+            for hook in @hooks.policy_load
+              hook(@current_policy)
+
+            for hook in @hooks.doc_changed
+              for docname, doc of @current_policy.documents
+                hook(docname, doc.text)
+
+            $.growl
+              title: "Loaded"
+              message: "#{@current_policy.id}"
+
+            # Validate the dsl that was returned immediately
+            #@validate_dsl()
+
+Load a policy module from the server (deprecated)
+
+        load_policy_module: (refpolicy_id, module_name)=>
+          console.log "This function is deprcated..."
           deferred = @$q.defer()
 
           @graph_expansion = {}
@@ -301,7 +317,7 @@ Save a modified policy to the server
           deferred = @$q.defer()
 
           req =
-            domain: 'policy'
+            domain: 'refpolicy'
             request: 'update'
             payload: @current_policy
 

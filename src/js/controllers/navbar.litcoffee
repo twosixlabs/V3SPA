@@ -1,6 +1,6 @@
     vespaControllers = angular.module('vespaControllers') 
 
-    vespaControllers.controller 'navCtrl', ($scope, RefPolicy, VespaLogger, SockJSService, $modal)->
+    vespaControllers.controller 'navCtrl', ($scope, RefPolicy, VespaLogger, SockJSService, $modal, IDEBackend)->
 
         policy = RefPolicy.promise()
         policy.then (policy)->
@@ -14,6 +14,7 @@
           instance.result.then (policy)->
               RefPolicy.load(policy.id).then (policy)->
                 $scope.refpolicy = policy
+                IDEBackend.load_local_policy policy
 
 
         $scope.status = SockJSService.status

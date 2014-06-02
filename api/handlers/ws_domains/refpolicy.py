@@ -6,6 +6,7 @@ import os
 import re
 
 import restful
+import api.handlers.ws_domains as ws_domains
 import api
 
 
@@ -57,6 +58,52 @@ def read_module_files(module_data, **addl_props):
 
 class RefPolicy(restful.ResourceDomain):
     TABLE = 'refpolicy'
+
+    @classmethod
+    def do_update(cls, params, response):
+      import pdb; pdb.set_trace()
+      if '_id' in params and params['_id'] is not None:
+          newobject = cls.Read(params['_id'])
+          response['payload'] = newobject.Update(params)
+      else:
+          newobject = cls(params)
+          response['payload'] = newobject.Insert()
+
+      return response
+
+    @classmethod
+    def do_get(cls, refpol_id, response):
+        refpol_id = api.db.idtype(refpol_id)
+
+        refpol = RefPolicy.Read(refpol_id)
+
+        if refpol.documents is None or 'dsl' not in refpol.documents:
+            dsl = ws_domains.call(
+                'lobster',
+                'translate_selinux',
+                {
+                    'refpolicy': refpol.id,
+                    'modules': []
+                }
+            )
+
+            if len(dsl['errors']) > 0:
+              raise Exception("Failed to translate DSL: {0}"
+                              .format("\n".join(
+                                  ("{0}".format(x) for x in dsl['errors']))))
+
+            if 'documents' not in refpol:
+              refpol['documents'] = {}
+
+            refpol['documents']['dsl'] = {
+                'text': dsl['result'],
+                'mode': 'lobster'
+            }
+
+            refpol.Insert()
+
+        response['payload'] = refpol
+        return response
 
     @classmethod
     def do_upload_chunk(cls, params, response):

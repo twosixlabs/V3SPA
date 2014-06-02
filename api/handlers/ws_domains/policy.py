@@ -104,6 +104,7 @@ class Policy(restful.ResourceDomain):
     @classmethod
     def do_get(cls, params, response):
 
+        import pdb; pdb.set_trace()
         if 'refpolicy_id' in params:
             params['refpolicy_id'] = api.db.idtype(params['refpolicy_id'])
 

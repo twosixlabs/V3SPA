@@ -239,11 +239,11 @@ not been loaded.
 
       ensure_refpolicy = (open_modal)->
         if RefPolicy.loading?
-          RefPolicy.loading.then ->
-            open_modal()
+          RefPolicy.loading.then (policy)->
+            open_modal(policy)
 
         else if RefPolicy.current?
-          open_modal()
+          open_modal(RefPolicy.current)
 
         else
           # Load a reference policy
@@ -252,19 +252,21 @@ not been loaded.
               controller: 'modal.refpolicy'
 
           instance.result.then (policy)->
-              RefPolicy.load(policy.id).then (policy)->
+              RefPolicy.load(policy.id).then (refpol)->
                 # When the refpolicy has actually been loaded,
                 # open the upload modal.
-                open_modal()
+                open_modal(refpol)
 
 Create a modal for opening a policy
 
       $scope.open_policy = ->
 
-        ensure_refpolicy ->
-          instance = $modal.open
-            templateUrl: 'policyOpenModal.html'
-            controller:  'modal.policy_open'
+        ensure_refpolicy (refpol)->
+          IDEBackend.load_local_policy refpol
+
+        #instance = $modal.open
+        #  templateUrl: 'policyOpenModal.html'
+        #  controller:  'modal.policy_open'
 
 Modal dialog for new policy
 
