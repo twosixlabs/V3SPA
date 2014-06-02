@@ -74,31 +74,21 @@
                     </div>
                     <div class='clearfix'></div>
                     <div class='row'>
-                      <div class='col-md-12'>
-                        <div class='btn-group btn-group-sm'>
-                          <!--<div class='btn-group btn-group-sm'>-->
-                            <!--<button class='btn btn-default btn-sm dropdown-toggle' data-toggle='dropdown'>-->
-                              <!--Policy <span class='caret'></span>-->
-                            <!--</button>-->
-                            <!--<ul role='menu' class='dropdown-menu'>-->
-                              <!--<li>-->
-                              <!--<a ng-click='new_policy()'>New </a>-->
-                              <!--</li>-->
-                              <!--<li>-->
-                              <!--<a ng-click='upload_policy()'>Upload </a>-->
-                              <!--</li>-->
-                              <!--<li>-->
-                              <!--<a ng-click='open_policy()'>Open</a>-->
-                              <!--</li>-->
-                            <!--</ul>-->
-                          <!--</div>-->
+                      <div class='col-md-8'>
+                        <div class='input-group'>
                           <button class='btn btn-default btn-sm' 
                             ng-class="{active: loading}"
                             ng-click='save_policy()'
                             ng-disabled='policy.id == null'>Save
                           </button>
+                          <input class='form-control' id='moduleSelect'
+                                 ui-select2='raw_module_select2'
+                                 ng-model='raw_view_selection' type='hidden'
+                                 placeholder='View module files'
+                                 ng-disabled='policy.modules == null' />
                         </div>
                       </div>
+                      <div class='col-md-4'></div>
                     </div>
                   </div>
                   <div class='horizontal-pad'></div>

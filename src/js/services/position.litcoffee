@@ -26,7 +26,6 @@
           return @data[key]
 
         set: (obj, propagate=true)->
-          console.log "Position #{@id} set", obj
           @update(obj, propagate)
 
         update: (data, propagate=true)=>

@@ -105,6 +105,18 @@ class RefPolicy(restful.ResourceDomain):
         return response
 
     @classmethod
+    def do_fetch_module_source(cls, params, response):
+        refpol_id = api.db.idtype(params['refpolicy'])
+
+        refpolicy = RefPolicy.Read(refpol_id)
+
+        response['payload'] = read_module_files(
+            refpolicy.modules[params['module']],
+            editable=False)
+
+        return response
+
+    @classmethod
     def do_upload_chunk(cls, params, response):
         # Make sure the directory exists
         try:

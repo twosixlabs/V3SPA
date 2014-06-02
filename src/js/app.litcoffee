@@ -40,6 +40,8 @@ Preload all of the templates that we're going to use.
                          $http.get('partials/modal_open.html'))
       $templateCache.put('refpolicyModal.html',
                          $http.get('partials/modal_refpolicy.html'))
+      $templateCache.put('moduleViewModal.html',
+                         $http.get('partials/modal_viewmodule.html'))
 
 
     v3spa.filter 'filepath', ->
