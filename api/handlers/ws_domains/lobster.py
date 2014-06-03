@@ -79,6 +79,18 @@ class LobsterDomain(object):
             'payload': output.body
         }
 
+    def export_selinux(self, msg):
+      """ Request that the server export the POSTed
+      lobster file as an SELinux policy.
+      """
+
+      output = self._make_request(
+          'POST', '/export/selinux', msg)
+
+      jsondata = api.db.json.loads(output.body)
+
+      return jsondata['result']
+
     def validate(self, msg):
         """ Validate a Lobster file received from the IDE
         """

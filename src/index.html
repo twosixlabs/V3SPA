@@ -80,11 +80,12 @@
                           ng-click='save_policy()'
                           ng-disabled='policy.id == null'>Save
                         </button>
-                        <button class='btn btn-default btn-sm' 
+                        <a class='btn btn-default btn-sm' 
                           ng-class="{active: loading}"
-                          ng-click='export_policy()'
+                          download="{{policy.id}}.txt"
+                          href="/download/refpolicy?id={{policy._id}}"
                           ng-disabled='policy.id == null'>Export
-                        </button>
+                        </a>
                         <input id='moduleSelect'
                         ui-select2='raw_module_select2'
                         ng-model='raw_view_selection' type='hidden'
@@ -144,6 +145,7 @@
             </div>
           </div>
         </div>
+      </div>
         <div ng-class="{'col-md-12': editorSize == 0,
                         'col-md-8': editorSize == 1,
                         'col-md-4': editorSize == 2}">
