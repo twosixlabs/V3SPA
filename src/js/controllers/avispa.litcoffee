@@ -400,7 +400,7 @@ Otherwise it's 1.1 * ceil(sqrt(subelement_count)). If there are no
                     w:  width * 2
                     h:  (height * 2) + 25
 
-              domain_obj.position.set bounds, false
+              domain_obj.position.set bounds, true
 
 
               if domain_objects.length > 1
