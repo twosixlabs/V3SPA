@@ -1,11 +1,12 @@
 
 import json
-import UserDict
+import collections
 import logging
 
 import api
 
-__all__ = ['initialize', 'Entries', 'Entry']
+__all__ = ['initialize', 'Entry']
+
 
 def initialize():
     engine = api.config.get('storage', 'engine')
@@ -29,49 +30,23 @@ def initialize():
     logging.info('Storage engine: %s', engine)
 
 
-class Entries:
-    def __init__(self, entries):
-        self.entries = entries
-
-    @classmethod
-    def Read(cls, params=None, sort=None):
-        return cls(api.db.Find(cls.ENTRY.TABLE, params, sort))
-
-    def Delete(self):
-        for entry in self.entries:
-            self.ENTRY(entry).Delete()
-        pass
-
-    @classmethod
-    def Count(cls):
-        return api.db.Count(cls.ENTRY.TABLE)
-
-    def __len__(self):
-        return len(self.entries)
-
-    def __iter__(self):
-        for entry in self.entries:
-            yield self.ENTRY(entry)
-
-    def __getitem__(self, idx):
-        return self.entries.__getitem__(idx)
-
-    @property
-    def json(self):
-        return json.dumps(self.entries, indent=2)
-
-
-class Entry(UserDict.DictMixin):
+class Entry(collections.MutableMapping):
     def __init__(self, entry):
-        self.id     = entry['id']
-        self.entry = dict(entry)
+        self.id = entry['id']
+        self.entry = dict(entry.items())
         self.Init()
 
     def Init(self):
         pass
 
+    def __len__(self):
+      return len(self.entry)
+
+    def __iter__(self):
+      return self.entry.__iter__()
+
     @classmethod
-    def Find(cls, criteria, selection):
+    def Find(cls, criteria, selection=None):
         result = api.db.Find(cls.TABLE, criteria, selection)
         if result is None:
           return []
@@ -106,12 +81,22 @@ class Entry(UserDict.DictMixin):
         return self
 
     def Delete(self):
-        api.db.Remove(self.TABLE, self.id)
+        try:
+          api.db.Remove(self.TABLE, self['_id'])
+        except KeyError:  # It wasn't in the database anyway
+          pass
         return True
 
     @property
     def json(self):
         return api.db.json.dumps(dict(self.entry), indent=2)
+
+    def __getattr__(self, attr):
+      try:
+        val = self.entry.get(attr)
+        return val
+      except AttributeError:
+        return object.__getattribute__(self, attr)
 
     def __getitem__(self, key):
         return self.entry.__getitem__(key)

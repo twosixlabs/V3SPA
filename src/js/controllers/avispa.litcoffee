@@ -1,14 +1,18 @@
     vespaControllers = angular.module('vespaControllers')
 
     vespaControllers.controller 'avispaCtrl', ($scope, VespaLogger,
-        IDEBackend, $timeout) ->
+        IDEBackend, $timeout, PositionManager, $q) ->
 
       $scope.domain_data = null
-      $scope.objects ?= {}
+      $scope.objects ?=
+          ports_by_path: {}
+          ports: {}
+          domains: {}
+          connections: {}
       $scope.parent ?= [null]
 
       $scope.avispa = new Avispa
-        el: $('#surface svg')
+        el: $('#surface svg.avispa')
 
       $('#surface').append $scope.avispa.$el
 
@@ -17,37 +21,51 @@ Manage the position of items within this view.
 Clean up the Avispa view
 
       cleanup = ->
-          $scope.objects = {}
+          $scope.objects =
+              ports_by_path: {}
+              ports: {}
+              domains: {}
+              connections: {}
           $scope.parent = [null]
 
-          $('#surface svg .objects')[0].innerHTML = ''
-          $('#surface svg .links')[0].innerHTML = ''
-          $('#surface svg .labels')[0].innerHTML = ''
-          $('#surface svg .groups')[0].innerHTML = ''
+          $('#surface svg.avispa .objects')[0].innerHTML = ''
+          $('#surface svg.avispa .links')[0].innerHTML = ''
+          $('#surface svg.avispa .labels')[0].innerHTML = ''
+          $('#surface svg.avispa .groups')[0].innerHTML = ''
 
 
 A general update function for the Avispa view. This only refreshes
 when the domain data has actually changed to prevent flickering.
 
       update_view = (data)->
-
-        if data.domain 
-          #pos = PositionManager(
-          #  "avispa.#{identifier}::#{IDEBackend.current_policy._id}",
-          #  vals
-          #)
-          if not _.isEqual(data.domain, $scope.domain_data)
-            $scope.domain_data = data.domain
-
+        if _.size(data.errors) > 0
+            $scope.policy_data = null
             cleanup()
-            $scope.avispa = new Avispa
-              el: $('#surface svg')
-
-            $scope.parseDomain(data.domain)
 
         else
-            $scope.domain_data = null
-            cleanup()
+          if not _.isEqual(data.result, $scope.policy_data)
+            $scope.policy_data = data.result
+
+            cleanup()    
+
+            viewport_pos = PositionManager(
+                "avispa.viewport::#{IDEBackend.current_policy._id}",
+                {a: 1, b: 0, c: 0, d: 1, e: 0, f: 0}
+            )
+
+            viewport_pos.retrieve().then ->
+                $scope.avispa = new Avispa
+                  el: $('#surface svg.avispa')
+                  position: viewport_pos
+
+            root_id = data.result.root
+
+            $scope.parseRootDomain root_id, data.result.domains[root_id]
+
+Force a redraw on all the children
+
+
+            $scope.parseConns(data.result.connections)
 
 
       IDEBackend.add_hook "json_changed", update_view
@@ -63,93 +81,357 @@ ID's MUST be fully qualified, or Avispa renders horribly wrong.
         else
           return id
 
+
       $scope.createDomain = (id, parents, obj, coords) ->
-          uid = fqid(id, parents[0])
           domain = new Domain
-              _id: uid
+              _id: if obj?.path then obj.path else id
               parent: parents[0]
-              name: obj.name
+              name: if obj?.name then obj.name else "[#{id}]"
               position: coords
-              data: obj
+              data: if obj? then obj else null
+              klasses: ['filtered'] unless obj?
+              numeric_id: id
 
-          $scope.objects[uid] = domain
+          $scope.objects.domains[id] = domain
 
-          #if parent
-          #then parent.$el.append domain.$el
-          #else vespa.avispa.$objects.append domain.$el
+          domain.$el.contextmenu
+            target: '#domain-context-menu'
+            onItem: (domain_el, e)->
+              if e.target.id == 'query_reachability'
+                $scope.reachability_query(domain)
+              else if e.target.id == 'display_reachability'
+                $scope.highlight_reachability domain
+
+
+          if obj.path # this means it's not collapsed.
+            IDEBackend.add_selection_range_object 'dsl', obj.srcloc.start.line, domain
+
           $scope.avispa.$groups.append domain.$el
 
+          return domain
+
       $scope.createPort = (id, parents, obj, coords) ->
-          uid = fqid(id, parents[0])
+          obj.numeric_id = id
           port = new Port
-              _id: uid
+              _id: obj.path
               parent: parents[0]
-              label: id
+              label: obj.name
               position: coords
               data: obj
 
-          $scope.objects[uid] = port
+          $scope.objects.ports[id] = port
+          $scope.objects.ports_by_path[obj.path] = port
 
-          #parent.$el.append port.$el
+          IDEBackend.add_selection_range_object 'dsl', obj.srcloc.start.line, port
           $scope.avispa.$objects.append port.$el
 
-      $scope.createLink = (dir, left, right, data) ->
-          link = new Avispa.Link
-              direction: dir
-              left: left
-              right: right
-              data: data
+          return port
 
-          $scope.avispa.$links.append link.$el
+      $scope.createLink = (dir, left, right, data, id) ->
 
-      $scope.parseDomain = (domain) ->
-          domains = x: 10
-          bounds = x: 40, y: 40
+Sometimes the endpoints of links don't exist because they're collapsed.
+When this happens, don't actually make the link. Instead, label
+the endpoint that does exist so that it can obviously be expanded
 
-          for id, subdomain of domain.subdomains
-            do (id, subdomain)->
-              coords =
-                  x: domains.x
-                  y: 100
-                  w: 220 * Object.keys(subdomain.subdomains).length || 200
-                  h: 220 * Object.keys(subdomain.subdomains).length || 200
+          handle_expand_links = (conn)->
+            (node, e)->
 
-              $scope.createDomain subdomain.name, $scope.parent, subdomain, coords
+              if e.target.id == 'context-expand-links'
+                clicked = $scope.objects.ports_by_path[node.attr('id')]
 
-              subdomain_id = fqid subdomain.name, $scope.parent[0]
-              $scope.parent.unshift $scope.objects[subdomain_id]
-              $scope.parseDomain(subdomain)
+                missing_domains = _.map $scope.policy_data.connections, (c)->
+                  if clicked.options.data.numeric_id not in [c.right, c.left]
+                    return false
+
+                  if c.left not of $scope.objects.ports and c.right
+                    return $scope.objects.domains[c.left_dom].AncestorList()
+                  else if c.right not of $scope.objects.ports
+                    return $scope.objects.domains[c.right_dom].AncestorList()
+                  else 
+                    return false
+
+                IDEBackend.expand_graph( _.filter(missing_domains, (d)->d))
+
+          if not right 
+            left.add_class 'expandable'
+            left.$el.contextmenu
+              target: '#node-context-menu'
+              onItem: handle_expand_links(left)
+
+
+          else if not left
+            right.add_class 'expandable'
+            right.$el.contextmenu
+              target: '#node-context-menu'
+              onItem: handle_expand_links(right)
+
+          else
+
+            link_pos = PositionManager(
+                "avispa.link:#{data.left}-#{data.right}:" + 
+                "#{IDEBackend.current_policy._id}"
+                {arc: 10},
+                true
+            )
+
+            link = new Avispa.Link
+                direction: dir
+                left: left
+                right: right
+                data: data
+                position: link_pos
+
+            $scope.objects.connections[id] = link
+            IDEBackend.add_selection_range_object 'dsl', data.srcloc.start.line, link
+            $scope.avispa.$links.append link.$el
+
+
+Use D3's force-direction to layout a set of objects within the bounds.
+Bounds is expected to be an object that contains 'w' and 'h' values for
+width and height respectively
+
+`keyfunc` is a method which returns the descriptive key, when given
+the first two arguments of the \_.each callback. This allows disambiguation
+between lists and objects.
+
+      $scope.layout_objects = (objects, bounds, type='object', calc_bounds)->
+
+          layout_model = []
+          _.each objects, (val, key)->
+              key = val if type == 'array'
+              layout_model.push
+                  x: val.position.get('offset_x')
+                  y: val.position.get('offset_y')
+                  fixed: val.position.get('fixed')
+                  key: key
+
+          force = d3.layout.force()
+          force = force.nodes(layout_model)
+          force = force.size([bounds.w, bounds.h])
+          force = force.gravity(0.05)
+          force = force.charge(-100)
+
+          force.start()
+          ctr = 0
+          while force.alpha() > 0.01
+            force.tick()
+            ctr++
+          console.log "Force ticked #{ctr} times"
+          force.stop()
+
+          return layout_model
+
+      $scope.parseRootDomain = (id, domain) ->
+
+          root = new Avispa.BaseObject
+            parent: null
+            position: PositionManager(
+                "avispa.root::#{IDEBackend.current_policy._id}",
+                {offset_x: 0, offset_y: 0},
+                ['x', 'y', 'w', 'h']
+              )          
+            fake_container: true
+
+
+          position_defers = []
+          domain_objects = []
+          subdomain_defers = []
+
+          _.each domain.subdomains, (subd, id)->
+              $scope.parent.unshift root
+              subdomain = $scope.parseDomain id, subd
               $scope.parent.shift()
 
-              domains.x += 210
+              subdomain_defers.push subdomain
 
-          for id, port of domain.ports
+          $scope.parent.unshift root
+          _.each domain.ports, (port_id)->
+              port = $scope.policy_data.ports[port_id]
               coords =
-                  x: bounds.x
-                  y: bounds.y
+                  offset_x: 0
+                  offset_y: 0
                   radius: 30
-                  fill: '#eeeeec'
 
-              $scope.createPort id,  $scope.parent, port, coords
+              port_pos = PositionManager(
+                "avispa.port.#{port_id}::#{IDEBackend.current_policy._id}",
+                coords,
+                ['x', 'y', 'w', 'h']
+              )
+              position_defers.push port_pos.retrieve()
 
-              bounds.x += 70
+              port_obj = $scope.createPort port_id,  $scope.parent, port, port_pos
 
-Get the object id of the port which this connection is connected
-to. This can either be a FQN (<domain>.<port>) or a local port name,
-(just <port>).
+              domain_objects.push port_obj
 
-          get_port_id = (parent, connection)->
-            parent_fqid = fqid("", $scope.parent[0])
-            if connection.domain?
-              return parent_fqid + "#{parent.subdomains[connection.domain].name}.#{connection.port}"
-            else
-              return parent_fqid + "#{connection.port}"
 
-          for idx, connection of domain.connections
+          #_.each root.children, (child)->
+          #  child.ParentDrag()
+
+          $scope.parent.shift()
+
+This method returns a promise that will be resolved when all subdomains
+have finished parsing *and* checking their server position values.
+Since it's recursive, we check it in each method.
+
+          parser_deferral = $q.defer() 
+
+          $q.all(position_defers).then (deferrals)->
+            for posobj in deferrals
+              do (posobj)->
+                if posobj.remote_update
+                  posobj.data.data.fixed = true
+
+            $q.all(subdomain_defers).then (subdoms)->
+              domain_objects = _.union domain_objects, subdoms
+
+Now would be an opportune time to do layout on the subnodes. For now just
+resolve the promise
+
+              if domain_objects.length > 1
+                layout = $scope.layout_objects domain_objects, {w: 1, h: 1}
+                _.each layout, (model)->
+                  pos =
+                    offset_x: model.x
+                    offset_y: model.y
+                  domain_objects[model.index].position.set pos, true
+
+              #_.each domain_objects, (obj)->
+              #  obj.ParentDrag()
+
+              root.ParentDrag()
+
+              parser_deferral.resolve true
+
+          return parser_deferral.promise
+
+      $scope.parseDomain = (id, domain, isRoot) ->
+
+          domain_pos = PositionManager(
+            "avispa.domain.#{id}::#{IDEBackend.current_policy._id}",
+            {offset_x: 10, offset_y: 10, w: 0, h: 0},
+            ['x', 'y', 'w', 'h']
+          )
+
+          console.log "Created PositionManager: avispa.domain.#{id}::#{IDEBackend.current_policy._id}"
+
+          if id of $scope.policy_data.domains
+            domain = $scope.policy_data.domains[id]
+            domain.collapsed = false
+          else
+            domain.collapsed = true
+
+          domain_obj = $scope.createDomain id, $scope.parent, domain, domain_pos
+
+          position_defers = [domain_pos.retrieve()]
+          domain_objects = []
+          subdomain_defers = []
+
+          _.each domain.subdomains, (subd, id)->
+              $scope.parent.unshift domain_obj
+              subdomain = $scope.parseDomain id, subd
+              $scope.parent.shift()
+
+              subdomain_defers.push subdomain
+
+          $scope.parent.unshift domain_obj
+          _.each domain.ports, (port_id)->
+              port = $scope.policy_data.ports[port_id]
+              coords =
+                  offset_x: 0
+                  offset_y: 0
+                  radius: 30
+
+              port_pos = PositionManager(
+                "avispa.port.#{port_id}::#{IDEBackend.current_policy._id}",
+                coords,
+                ['x', 'y', 'w', 'h']
+              )
+              position_defers.push port_pos.retrieve()
+
+              port_obj = $scope.createPort port_id,  $scope.parent, port, port_pos
+
+              domain_objects.push port_obj
+
+          $scope.parent.shift()
+
+
+This method returns a promise that will be resolved when all subdomains
+have finished parsing *and* checking their server position values.
+Since it's recursive, we check it in each method.
+
+          parser_deferral = $q.defer()
+
+          $q.all(position_defers).then (deferrals)->
+            for posobj in deferrals
+              do (posobj)->
+                if posobj.remote_update
+                  posobj.data.data.fixed = true
+
+            $q.all(subdomain_defers).then (subdoms)->
+              if domain_objects.length > 0
+                domain_objects = _.union domain_objects, subdoms
+
+Set the size for the group. If there are no subelements, its size 1.
+Otherwise it's 1.1 * ceil(sqrt(subelement_count)). If there are no
+
+              if domain_obj.options.data.collapsed
+                bounds =
+                    w: Math.max(100, 10 * domain_obj.options.name.length)
+                    h: 25
+              else
+                if domain_objects.length == 0
+                  width = height = 200
+
+                else
+                  area_sum = (memo, next)->
+                    return memo + (next.width() * next.height())
+                  sum = (memo, next)->
+                    return [memo[0] + next.width(), memo[1] + next.height()]
+
+                  [width, height] = _.reduce domain_objects, sum, [0, 0]
+                  area = _.reduce domain_objects, area_sum, 0
+
+                  if domain_objects.length > 5
+
+                    width = Math.sqrt(area)
+                    height = Math.sqrt(area)
+
+                bounds = 
+                    w:  width * 2
+                    h:  (height * 2) + 25
+
+              domain_obj.position.set bounds, true
+
+
+              if domain_objects.length > 1
+                layout = $scope.layout_objects domain_objects, bounds
+                _.each layout, (model)->
+                  pos =
+                    offset_x: model.x
+                    offset_y: model.y
+                  domain_objects[model.index].position.set pos
+
+              domain_obj.ParentDrag()
+
+  We've calculated our size. Now would be an opportune time to do layout
+  on the subnodes. For now just resolve the promise
+
+              #_.each domain_objects, (obj)->
+              #  obj.render()
+
+              parser_deferral.resolve(domain_obj)
+
+          return parser_deferral.promise
+
+      $scope.parseConns = (connections)->
+
+          _.each connections, (connection, conn_id)->
+
               $scope.createLink connection.connection,
-                  $scope.objects[get_port_id(domain,connection.left)],
-                  $scope.objects[get_port_id(domain,connection.right)],
-                  connection
+                                $scope.objects.ports[connection.left],
+                                $scope.objects.ports[connection.right],
+                                connection,
+                                conn_id
 
 Actually load the thing the first time.
 
@@ -157,80 +439,117 @@ Actually load the thing the first time.
       if start_data
           update_view(start_data)
 
+Run a reachability query
+
+      $scope.reachability_query = (domain)->
+        query = IDEBackend.perform_path_query domain.options.numeric_id
+
+        query.then (data)->
+          result = JSON.parse data
+          filtermap = (memo, paths, dom_id)->
+            if $scope.objects.domains[dom_id]?
+              memo.push $scope.objects.domains[dom_id].AncestorList()
+            return memo
+
+          hidden_domains = _.reduce(result.result, filtermap, [])
+
+          IDEBackend.expand_graph hidden_domains
+
+Highlight all the domains reachable from a given domain. This
+assumes they've all been expanded.
+
+      $scope.highlight_reachability = (domain)->
+
+        query = IDEBackend.perform_path_query domain.options.numeric_id
+
+        query.then (data)->
+          result = JSON.parse data
+          ctr = 0
+          _.each result.result, (paths, dom_id)->
+
+            _.each paths, (path)->
+              _.each path, (conn)->
+                $scope.objects.connections[conn].highlight_reachable 0
+
+            $scope.objects.domains[dom_id].highlight_reachable 0
+
+
+
 Lobster-specific definitions for Avispa
 
-    class GenericModel
-      constructor: (vals, identifier)->
-        @observers = {}
 
-If we have an identifier, then instantiate a PositionManager
-and use it's data variable as the data variable. Otherwise just
-store it locally.
+    Port = Avispa.Node.extend
 
-        if identifier?
-We are outside of Angular, so we need to retrieve the services
-from the injector
-
-          injector = angular.element('body').injector()
-          PositionManager = injector.get('PositionManager')
-          IDEBackend = injector.get('IDEBackend')
-
-          @posMgr = PositionManager(
-            "avispa.#{identifier}::#{IDEBackend.current_policy._id}",
-            vals
-          )
-          @data = @posMgr.data
-
-          @posMgr.on_change =>
-            @notify ['change']
-
-        else
-          @data = vals
-
-      bind: (event, func, _this)->
-        @observers[event] ?= []
-        @observers[event].push([ _this, func ])
-
-      notify: (event)->
-        for observer in @observers[event]
-          do (observer)=>
-            observer[1].apply observer[0], [@]
-
-      get: (key)->
-        return @data[key]
-
-      set: (obj)->
-        @_set(obj)
-
-      _set: (obj)->
-        if @posMgr?
-          @posMgr.update(obj)
-        else
-          for k, v of obj
-            @data[k] = v
-
-        @notify(['change'])
-
-    Port = Avispa.Node
+       OnRightClick: (event)->
+         #console.log "Right click!"
 
     Domain = Avispa.Group.extend
 
+        events:
+          'mousedown'   : 'OnMouseDown'
+          'mouseenter'  : 'OnMouseEnter'
+          'mouseleave'  : 'OnMouseLeave'
+          'mousedown .expandicon': 'Expand'
+
         init: () ->
+
+            @$titlebar = $SVG('svg')
+                .attr('width',  @position.get('w'))
+                .attr('height', '25px')
+                .attr('class', 'domainTitle')
+                .attr('x', @position.get('x'))
+                .attr('y', @position.get('y'))
+                .appendTo(@$el)
+
+            g = $SVG('g')
+
+            $SVG('rect')
+                .attr('width',  '100%')
+                .attr('height', '25px')
+                .attr('class', 'domainTitle')
+                .appendTo(g)
 
             @$label = $SVG('text')
                 .attr('dx', '0.5em')
                 .attr('dy', '1.5em')
-                .text(@options.name)
-                .appendTo(@$el)
+                .text(@options.name or @options.id)
+                .appendTo(g)
+
+            @$icon = $SVG('rect')
+                .attr('x', @position.get('w') - 21)
+                .attr('y', 5)
+                .attr('width', '20')
+                .attr('height', '20')
+                .appendTo(g)
+
+            g.appendTo(@$titlebar)
 
             return @
 
         render: () ->
+            pos = @AbsPosition()
             @$rect
-                .attr('x', @position.get('x'))
-                .attr('y', @position.get('y'))
-            @$label
-                .attr('x', @position.get('x'))
-                .attr('y', @position.get('y'))
+                .attr('x', pos.x)
+                .attr('y', pos.y)
+                .attr('width',  @position.get('w'))
+                .attr('height', @position.get('h'))
+
+            @$titlebar
+                .attr('x', pos.x)
+                .attr('y', pos.y)
+                .attr('width',  @position.get('w'))
+
+            @$icon
+                .attr('x', @position.get('w') - 21)
+
+            if @options.data.collapsed
+              @$icon.attr('class', 'expandicon')
+            else
+              @$icon.attr('width', '0').attr('height', '0')
+
             return @
 
+        Expand: (event)->
+          Avispa.context.ide_backend.expand_graph [@AncestorList()]
+
+          cancelEvent(event)

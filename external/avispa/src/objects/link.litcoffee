@@ -14,6 +14,31 @@ Base class for "link" objects
             'mouseleave'  : 'OnMouseLeave'
             'contextmenu' : 'OnRightClick'
 
+        add_class: (klass)->
+          classes = _.toArray @.el.classList
+          classes.push klass
+          @.$el.attr 'class', _.uniq(classes).join(" ")
+
+        remove_class: (klass)->
+          classes = _.toArray @.el.classList
+          classes = _.reject classes, (cls)->
+            cls == klass
+          @.$el.attr 'class', classes.join(" ")
+
+        highlight_reachable: (count)->
+          @add_class("svg-highlight-reach-#{count}")
+
+          remove = =>
+            @remove_class "svg-highlight-reach-#{count}"
+
+          setTimeout remove, 10000
+
+        highlight: ->
+          @add_class('svg-highlight')
+
+        unhighlight: ->
+          @remove_class('svg-highlight')
+
         initialize: (@options) ->
             @path = $SVG('path')
                 .css('marker-end', 'url(#Arrow)')
@@ -27,8 +52,7 @@ Base class for "link" objects
             @left  = @options.left
             @right = @options.right
 
-            @arc = new GenericModel
-                arc: 10
+            @arc = @options.position
 
             @arc.bind 'change', @render, @
 
@@ -49,26 +73,24 @@ Bind to the position of the left and right sides of the connection
             return @ if not @arc
 
             arc = @arc.get('arc')
-            lx = @left.position.get('x')
-            ly = @left.position.get('y')
-            rx = @right.position.get('x')
-            ry = @right.position.get('y')
+            lpos = @left.AbsPosition()
+            rpos = @right.AbsPosition()
 
             # calculate the angle between 2 nodes
-            ang = Math.atan2(rx - lx, ry - ly)
+            ang = Math.atan2(rpos.x - lpos.x, rpos.y - lpos.y)
 
             # bound the offset to about half the circle
             offset = Math.max(-1.5, Math.min(1.5, arc / 100))
 
             # draw to the edge of the node
-            lx +=  30 * Math.sin(ang + offset)
-            ly +=  30 * Math.cos(ang + offset)
-            rx += -33 * Math.sin(ang - offset)
-            ry += -33 * Math.cos(ang - offset)
+            lpos.x +=  30 * Math.sin(ang + offset)
+            lpos.y +=  30 * Math.cos(ang + offset)
+            rpos.x += -33 * Math.sin(ang - offset)
+            rpos.y += -33 * Math.cos(ang - offset)
 
             # calculate the the position for the quadratic bezier curve
-            xc = ((lx + rx) >> 1) + arc * Math.cos(ang)
-            yc = ((ly + ry) >> 1) - arc * Math.sin(ang)
+            xc = ((lpos.x + rpos.x) >> 1) + arc * Math.cos(ang)
+            yc = ((lpos.y + rpos.y) >> 1) - arc * Math.sin(ang)
 
             mx = xc - (arc>>1) * Math.cos(ang)
             my = yc + (arc>>1) * Math.sin(ang)
@@ -78,7 +100,7 @@ Bind to the position of the left and right sides of the connection
             then rot -= 90
             else rot += 90
 
-            @path.attr('d', "M #{lx} #{ly} Q #{xc} #{yc} #{rx} #{ry}")
+            @path.attr('d', "M #{lpos.x} #{lpos.y} Q #{xc} #{yc} #{rpos.x} #{rpos.y}")
             #@label.attr('x', mx).attr('y', my).attr('transform', "rotate(#{rot}, #{mx} #{my})")
 
             return @
@@ -88,14 +110,13 @@ Bind to the position of the left and right sides of the connection
         #
 
         Drag: (event) ->
-            [x,y] = context.Point(event)
 
-            from_x = @left.position.get('x')
-            from_y = @left.position.get('y')
-            to_x   = @right.position.get('x')
-            to_y   = @right.position.get('y')
+            [x,y] = Avispa.context.Point(event)
 
-            d = (to_x - from_x) * (y - from_y) - (to_y - from_y) * (x - from_x)
+            from = @left.AbsPosition()
+            to = @right.AbsPosition()
+
+            d = (to.x - from.x) * (y - from.y) - (to.y - from.y) * (x - from.x)
 
             if d
                 d = Math.pow(Math.abs(d), 0.5) * if d > 0 then -1 else 1
@@ -111,7 +132,7 @@ Bind to the position of the left and right sides of the connection
         OnMouseDown: (event) ->
             @jitter = 0
 
-            context.dragItem = @
+            Avispa.context.dragItem = @
             @oarc = @arc.get('arc')
             @od = null
 
@@ -124,13 +145,18 @@ Bind to the position of the left and right sides of the connection
             return
 
         OnMouseEnter: () ->
-            if not context.dragItem?
+            if not Avispa.context.dragItem?
                 @path.css('stroke-width', '6px')
+                @path.css('stroke-opacity', '0.8')
+
+                Avispa.context.ide_backend.highlight(@options.data)
             return
 
         OnMouseLeave: () ->
-            if not context.dragItem?
+            if not Avispa.context.dragItem?
                 @path.css('stroke-width', '3px')
+                @path.css('stroke-opacity', '0.5')
+                Avispa.context.ide_backend.unhighlight()
             return
 
         LeftClick: (event) ->

@@ -5,8 +5,10 @@ from tornado import gen
 import logging
 logger = logging.getLogger(__name__)
 
+
 class Database(object):
 
+  idtype = bson.json_util.ObjectId
   json = bson.json_util
 
   def __init__(self):
@@ -20,6 +22,9 @@ class Database(object):
     self.db = self._client[db_name]
 
   def Find(self, collection, criteria, projection, **opts):
+    if '_id' in criteria:
+      criteria['_id'] = Database.json.ObjectId(criteria['_id'])
+
     cursor = self.db[collection].find(criteria, projection)
     results = list(cursor.limit(100))
     return results

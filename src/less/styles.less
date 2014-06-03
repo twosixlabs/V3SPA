@@ -9,13 +9,17 @@
   border: 1px solid #ccc;
 }
 
-.row.main{
+.visualizer{
   overflow: hidden;
 
   [class*="col-"]{
     margin-bottom: -99999px;
     padding-bottom: 99999px;
     }
+}
+
+.faded-overlay {
+  z-index: 1;
 }
 
 .container-full {
@@ -25,12 +29,80 @@
 
 .navbar {
   margin-bottom: 0;
+
+  .navbar-brand {
+    margin-right: 5px;
+    padding-right: 5px;
+    border-right: 2px solid @navbar-default-border;
+    }
 }
 
-/* This is necessary to make the editor appear. Actual height is dynamic */
-.ace_editor {
+.editor {
+
+  .nav-tabs {
+    border-bottom: 1px solid @editor-tabs-border-color;
+    font-size: @font-size-small;
+
+    > li {
+      float: left;
+      // Make the list-items overlay the bottom border
+      margin-bottom: -1px;
+      margin-right: -10px;
+
+      // Actual tabs (as links)
+      > a {
+        margin-right: 2px;
+        line-height: @line-height-base;
+        border: 1px solid @editor-tabs-border-color;
+        border-radius: @editor-tabs-radius @editor-tabs-radius 0 0;
+        padding: 5px 20px;
+        background-color: @editor-tabs-bg-color;
+
+        &:hover {
+          border-color: @editor-tabs-link-hover-border-color @editor-tabs-link-hover-border-color @editor-tabs-border-color;
+          background-color: @editor-tabs-active-link-hover-bg;
+        }
+      }
+
+      // Active state, and it's :hover to override normal :hover
+      &.active > a {
+        &,
+        &:hover,
+        &:focus {
+          color: @editor-tabs-active-link-hover-color;
+          background-color: @editor-tabs-active-link-hover-bg;
+          border: 1px solid @editor-tabs-active-link-hover-border-color;
+          border-bottom-color: transparent;
+          cursor: default;
+
+          background-color: @editor-tabs-active-link-hover-bg;
+        }
+      }
+    }
+  }
+
+    .editor-box {
+
+position: relative;
+
+          .faded-overlay {
+            z-index: 3;
+position: absolute;
+top: 0;
+left: 0;
+padding: 50px 10px;
+         background-color: rgba(230,230,230,0.7);
+height: 100%;
+width: 100%;
+       text-align: center;
+          }
+
+          .ace_editor {
 height: 400px;
-}
+        z-index: 2;
+          }
+    }
+  }
 
 .horizontal-pad {
   margin-bottom: 10px;
@@ -57,7 +129,7 @@ DIV#surface
 
     background: url('/static/img/bg.png');
 
-    svg
+    svg.avispa
     {
         width: 100%;
         height: 100%;
@@ -89,6 +161,13 @@ display: block;
   }
 
 .ace_marker-layer {
+  .error_marker {
+background: rgba(222,62,42, 0.5);
+
+position: absolute;
+          z-index: 4;
+  }
+
   .source_class_marker {
 background: rgba(171,227,236,0.5);
 
@@ -102,4 +181,162 @@ background: rgba(250, 196, 120, 0.5);
 position: absolute;
           z-index: 4;
   }
+}
+
+.drop-zone {
+  margin-top: 10px;
+  border: 2px dashed #ccc;
+}
+
+.drop-zone-success {
+  margin-top: 10px;
+  border: 2px solid @brand-success;
+}
+
+.file-drop-over {
+  border-color: @brand-success;
+}
+
+.scrollable-2 {
+  .scrollable-table(2);
+}
+
+.scrollable-3 {
+  .scrollable-table(3);
+}
+.scrollable-4 {
+  .scrollable-table(4);
+}
+
+.scrollable-5 {
+  .scrollable-table(5);
+}
+
+.scrollable-table(@cols) {
+  table {
+width: 100%;
+  }
+
+  thead, tbody, tr, td, th { display: block; }
+  tr {
+    &:after {
+      content: ' ';
+      display: block;
+      visibility: hidden;
+      clear: both;
+    }
+  }
+
+  thead th {
+    heigh: 30px;
+  }
+
+  tbody {
+    height: 150px;
+    overflow-y: auto;
+    }
+
+  thead {}
+
+  tbody td, thead th {
+    width: percentage(.98 / @cols);
+float: left;
+  }
+}
+
+.loader-bg {
+  background-image: url('../img/loading.gif');
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+g.svg-highlight {
+  circle {
+    stroke-width: 2px;
+    stroke: #000;
+  }
+
+  rect {
+    stroke-width: 2px;
+    stroke: #000;
+  }
+
+  path {
+    stroke: #000;
+    stroke-width: 3px;
+    stroke-opacity: 0.8;
+  }
+}
+
+.contextMenu() {
+  position: absolute;
+  display: none;
+}
+
+/*#node-context-menu {*/
+ /*.contextMenu();*/
+/*}*/
+
+/*#domain-context-menu {*/
+ /*.contextMenu();*/
+/*}*/
+
+g.objects {
+
+  .node {
+    circle {
+        fill: #eeeeec;
+      }
+    }
+
+  .node.expandable {
+    circle {
+      fill: url(#diagStripe);
+    }
+  }
+}
+
+g.group {
+  rect.domainTitle {
+    fill: @brand-primary;
+    fill-opacity: 0.6;
+  }
+
+  rect.expandicon {
+    fill: url(#expandIcon);
+    stroke: none;
+  }
+}
+
+g.svg-highlight-reach-0 {
+  circle {
+    stroke-width: 3px;
+    stroke: red;
+  }
+
+  rect {
+    stroke-width: 3px;
+    stroke: red;
+  }
+
+  path {
+    stroke: red;
+    stroke-width: 3px;
+    stroke-opacity: 0.8;
+  }
+}
+
+.btn:focus {
+  outline: thin dotted;;
+  }
+
+.super-large-modal {
+  .modal-dialog {
+    width: 80%;
+    }
+
+  .pre-scrollable{
+    max-height: 640px;
+    }
+
 }

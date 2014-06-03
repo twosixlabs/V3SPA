@@ -24,7 +24,7 @@
 
         log: (domain, level, message)->
           msg = 
-            timestamp: new Date().getTime()
+            timestamp: new Date()
             domain: domain
             level: level
             message: message.split('\n')
@@ -53,6 +53,9 @@
 
           @set_handlers()
 
+          @status = 
+            outstanding: 0
+
         reconnect: =>
           if @connection_info.timeout < 32000
               @connection_info.timeout = @connection_info.timeout * 2
@@ -79,18 +82,13 @@
             if msg.error
               @VespaLogger.log 'server', 'error', msg.payload
 
-              callback = @msg_callbacks[msg.label]
-              if callback?
-                @$rootScope.$apply ->
-                  callback(msg)
-                delete @msg_callbacks[msg.label]
-              return
-
 Look for a message specific callback first, then try
 general callbacks
 
             callback = @msg_callbacks[msg.label]
-            if callback
+            if callback?
+              @status.outstanding--
+              #console.log "Have #{@status.outstanding} outstanding messages"
               @$rootScope.$apply ->
                 callback(msg)
               return
@@ -100,6 +98,8 @@ general callbacks
               console.log "Have no handler for message: #{msg.label}"
               return
 
+            @status.outstanding--
+            #console.log "Have #{@status.outstanding} outstanding messages"
             @$rootScope.$apply ->
               callback(msg)
 
@@ -115,6 +115,8 @@ We generate a token and do a callback specifically on that token.
             token = @TokenService.generate()
             @msg_callbacks[token] = response
             data.response_id = token
+            @status.outstanding++
+            #console.log "Have #{@status.outstanding} outstanding messages"
 
           if @sock.readyState == 0
             console.log "Connection not yet established. Buffering message"
@@ -131,7 +133,7 @@ and upload it to the server using the websocket endpoint specified
       class Reader
           constructor: (@$q, @VespaLogger, @$timeout) ->
 
-          _read_file: (id, blob)->
+          _read_file: (id, blob, type)->
               deferred = @$q.defer()
               reader = new FileReader()
 
@@ -141,13 +143,43 @@ and upload it to the server using the websocket endpoint specified
               reader.onerror = (event)->
                 deferred.reject(event)
 
-              reader.readAsText(blob)
+              if type == 'text'
+                reader.readAsText(blob)
+              else if type == 'binary'
+                reader.readAsDataURL(blob)
+
               return deferred.promise
+
+          read_binary_chunks: (file, callback, chunk=16384)->
+            @have_error = false
+            filesize = file.size
+
+            read_chunk = (file, from)=>
+
+              if @have_error
+                console.log "Stopping FileReader because of errors"
+                return
+
+              if from + chunk > filesize
+                chunk = filesize - from
+
+              return if chunk <= 0
+
+              blob = file.slice(from, from+chunk)
+
+              promise = @_read_file(file.name, blob, 'binary')
+
+              promise.then (done)->
+                [nm, data] = done
+                callback data.split(',')[1], from, chunk, filesize
+                read_chunk(file, from + chunk)
+
+            read_chunk(file, 0)
 
           read: (fileblobs, callback)=>
 
             promises = for key, blob of fileblobs
-              @_read_file(key, blob)
+              @_read_file(key, blob, 'text')
 
             @$q.all(promises)
               .then(

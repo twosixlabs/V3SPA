@@ -3,6 +3,7 @@
     #= require directives.litcoffee
     #= require services/main.litcoffee
     #= require services/ide.litcoffee
+    #= require services/refpolicy.litcoffee
     #= require services/position.litcoffee
     #= require controllers.litcoffee
     #= require_tree controllers
@@ -27,6 +28,21 @@
           .otherwise 
             redirectTo: '/avispa'
     ])
+
+Preload all of the templates that we're going to use.
+
+    v3spa.run ($templateCache, $http)->
+      $templateCache.put('policyLoadModal.html',
+                         $http.get('partials/modal_load.html'))
+      $templateCache.put('policyNewModal.html',
+                         $http.get('partials/modal_new.html'))
+      $templateCache.put('policyOpenModal.html',
+                         $http.get('partials/modal_open.html'))
+      $templateCache.put('refpolicyModal.html',
+                         $http.get('partials/modal_refpolicy.html'))
+      $templateCache.put('moduleViewModal.html',
+                         $http.get('partials/modal_viewmodule.html'))
+
 
     v3spa.filter 'filepath', ->
       return (input)->
@@ -63,3 +79,4 @@
             }
     };
     `
+

@@ -6,17 +6,24 @@
         replace: false
         transclude: false
         scope:
-          multiplier: '@autoHeight'
+          modifier: '@autoHeight'
+          type: "@autoHeightType"
           resize_callback: '&onResize'
         controller: ($scope, $element)->
           angular.element($window).bind 'resize', ->
             $scope.$apply ->
-              $element.height "#{$window.innerHeight * $scope.multiplier}px"
+              if not $scope.type? or $scope.type == 'percentage'
+                $element.height "#{$window.innerHeight * $scope.modifier}px"
+              else if $scope.type == 'offset_bottom_px'
+                $element.height "#{$window.innerHeight - $scope.modifier}px"
 
             if $scope.resize_callback
               $scope.resize_callback()
-        link: (scope, element)->
-          element.height "#{$window.innerHeight * scope.multiplier}px"
+        link: (scope, element, attrs)->
+          if not attrs.autoHeightType? or attrs.autoHeightType == 'percentage'
+            element.height "#{$window.innerHeight * attrs.autoHeight}px"
+          else if attrs.autoHeightType == 'offset_bottom_px'
+            element.height "#{$window.innerHeight - attrs.autoHeight}px"
           scope.resize_callback()
 
       return ret
@@ -41,6 +48,42 @@
           container.appendChild(spinner.el)
 
       return ret
+
+    v3spa.directive 'fileUploadDrop', ->
+      dir = 
+        restrict: 'A'
+        scope: 
+          on_drop: '&fileUploadDrop'
+        link: (scope, elem)->
+          elem.bind 'drop', (e)->
+              dataTrans = e.dataTransfer
+              dataTrans ?= e.originalEvent.dataTransfer
+
+              e.preventDefault()
+              e.stopPropagation()
+
+              elem.removeClass('file-drop-over')
+              method = scope.on_drop()
+              method(dataTrans.files[0], elem.attr('name'))
+
+          elem.bind 'dragover', (e)->
+
+            dataTrans = event.dataTransfer
+            dataTrans ?= event.originalEvent.dataTransfer
+
+            e.preventDefault()
+            e.stopPropagation()
+
+            elem.addClass('file-drop-over')
+            dataTrans.dropEffect = 'copy'
+
+          elem.bind 'dragleave', (e)->
+            e.preventDefault()
+            e.stopPropagation()
+
+            elem.removeClass('file-drop-over')
+
+      return dir
 
     v3spa.directive 'v3spaEditor', ->
       ret = 

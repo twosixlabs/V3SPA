@@ -1,0 +1,53 @@
+<div class='modal-header'>
+  <h4 class='modal-title' id='loadPolicyModalLabel'>Upload Policy Files</h4>
+</div>
+<form name='form' no-validate>
+  <div id='policyModal' class="modal-body">
+    <div class='form-horizontal'>
+    <p>Upload SELinux policy module files. Type enforcement files are required.</p>
+      <div class='row'>
+        <div class='col-md-4'>
+          <div class='well well-sm text-muted drop-zone-success' ng-show='input.files.te != null'>
+            {{input.files.te.name}}
+            <div class='pull-right'>
+            <span ng-click='input.files.te = null' class='glyphicon glyphicon-remove'></span>
+            </div>
+          </div>
+          <div ng-hide='input.files.te != null' name='te' class='well well-sm text-muted drop-zone'
+            file-upload-drop="add_file_input">
+            Type Enforcement (*.te)
+          </div>
+        </div>
+        <div class='col-md-4'>
+          <div class='well well-sm text-muted drop-zone-success' ng-show='input.files.fc != null'>
+            {{input.files.fc.name}}
+            <div class='pull-right'>
+            <span ng-click='input.files.fc = null' class='glyphicon glyphicon-remove'></span>
+          </div>
+          </div>
+          <div ng-hide='input.files.fc != null' name='fc' class='well well-sm text-muted drop-zone'
+            file-upload-drop='add_file_input'>
+            File Context (*.fc)
+          </div>
+        </div>
+        <div class='col-md-4'>
+          <div class='well well-sm text-muted drop-zone-success' ng-show='input.files.if != null'>
+            {{input.files.if.name}}
+            <div class='pull-right'>
+            <span ng-click='input.files.if = null' class='glyphicon glyphicon-remove'></span>
+            </div>
+          </div>
+          <div ng-hide='input.files.if != null' name='if' class='well well-sm text-muted drop-zone'
+            file-upload-drop='add_file_input'>
+            Module Interfaces (*.if)
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class='modal-footer'>
+    <button type="button" class="btn btn-default" ng-click='cancel()'>Cancel</button>
+    <button type="button" ng-disabled='invalid()'
+      class="btn btn-primary" ng-click='load()'>Load</button>
+  </div>
+</form>

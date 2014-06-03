@@ -1,6 +1,4 @@
 
-    context = null
-
 Expose a global view class so that consumers of the API can instantiate a view.
 
     window.Avispa = Backbone.View.extend
@@ -18,7 +16,7 @@ Expose a global view class so that consumers of the API can instantiate a view.
         secondstage: () ->
 
         initialize: (options) ->
-            context = @
+            Avispa.context = @
 
             _.bindAll @, 'render',
                 'OnMouseDown', 'OnMouseMove', 'OnMouseUp', 'OnMouseWheel', 'OnContextMenu'
@@ -29,13 +27,14 @@ Expose a global view class so that consumers of the API can instantiate a view.
             @dragItem = null
             @arrow    = null
 
+            @OnMouseMove = _.throttle @OnMouseMove, 20
+
 This loads the IDEBackend service into the context, so that any
 of the Avispa code can access it.
 
             injector = angular.element('body').injector()
-            PositionManager = injector.get('PositionManager')
             IDEBackend = injector.get('IDEBackend')
-            context.ide_backend = IDEBackend
+            Avispa.context.ide_backend = IDEBackend
 
 If we have svgPanZoom, use it to pan and zoom around.
 
@@ -46,26 +45,33 @@ Only actually initialize the context scroller if there is a
 policy loaded. Otherwise we'll load the 'null' position for
 no reason.
 
-              if IDEBackend.current_policy._id?
+              svg_pan_opts =
+                selector: '#surface svg.avispa'
+                panEnabled: true
+                zoomEnabled: true
+                dragEnabled: false
+                minZoom: 0.1
+                maxZoom: 10
 
-                positionMgr = PositionManager(
-                  "avispa.viewport::#{IDEBackend.current_policy._id}")
+              if options.position?
+                svg_pan_opts.onZoom = (scale, transform)->
+                  Avispa.context.scale = scale
+                  options.position.update transform
 
-                svgPanZoom.init
-                    selector: '#surface svg'
-                    panEnabled: true
-                    zoomEnabled: true
-                    dragEnabled: false
-                    minZoom: 0.5
-                    maxZoom: 10
-                    onZoom: (scale, transform)->
-                      positionMgr.update transform
-                    onPanComplete: (coords, transform) ->
-                      positionMgr.update transform
+                svg_pan_opts.onPanComplete = (coords, transform) ->
+                  options.position.update transform
 
-                positionMgr.on_change ->
+                svgPanZoom.init svg_pan_opts
+
+                options.position.bind 'change', ->
                   g = svgPanZoom.getSVGViewport($("#surface svg")[0])
-                  svgPanZoom.set_transform(g, positionMgr.data)
+                  Avispa.context.scale = options.position.data.a
+                  svgPanZoom.set_transform(g, options.position.data)
+
+                options.position.notify 'change'
+
+              else
+                svgPanZoom.init svg_pan_opts
 
 If there is no svgPanZoom, then use the one Matt put together
 
@@ -153,7 +159,7 @@ If there is no svgPanZoom, then use the one Matt put together
             @$('#zoomslider').slider('option', 'value', 1)
             return
 
-        OnMouseMove: (event) ->
+        OnMouseMove: (event)->
             # drag the entire scene around
             if @offset and not @have_svg_pan_zoom
                 @Pan(event.clientX - @offset[0], event.clientY - @offset[1])
@@ -197,6 +203,9 @@ If there is no svgPanZoom, then use the one Matt put together
             return cancelEvent(event)
 
         OnContextMenu: (event) ->
+
+
+    Avispa.context = null
 
     #= include util.litcoffee
     #= require templates.litcoffee

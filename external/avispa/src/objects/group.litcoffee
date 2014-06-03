@@ -14,60 +14,43 @@ Base class for "group" objects
             return
 
         render: () ->
-            #@$el.attr('transform', "translate(#{@position.get('x')}, #{@position.get('y')})")
+
+            pos = @AbsPosition()
             @$rect
-                .attr('x', @position.get('x'))
-                .attr('y', @position.get('y'))
+                .attr('x', pos.x)
+                .attr('y', pos.y)
             return @
 
         OnMouseEnter: (event) ->
-            if not context.dragItem?
+            if Avispa.context.hovering? and @options._id != Avispa.context.hovering.options._id
+              if not Avispa.context.dragItem?
+                  Avispa.context.hovering.$rect.removeAttr('class')
+                  Avispa.context.ide_backend.unhighlight()
+
+            Avispa.context.hovering = @
+
+            if not Avispa.context.dragItem?
                 @$rect.attr('class', 'hover')
 
-                context.ide_backend.highlight(@options.data)
+                Avispa.context.ide_backend.highlight(@options.data)
 
-            return cancelEvent(event)
+            return #cancelEvent(event)
 
         OnMouseLeave: (event) ->
-            if not context.dragItem?
+            if not Avispa.context.dragItem?
                 @$rect.removeAttr('class')
-                context.ide_backend.unhighlight()
+                Avispa.context.ide_backend.unhighlight()
             return cancelEvent(event)
-
 
         Drag: (event) ->
             new_positions =
-              x: (event.clientX / context.scale) - @clickOffsetX 
-              y: (event.clientY / context.scale) - @clickOffsetY
+              x: (event.clientX / Avispa.context.scale) - @clickOffsetX
+              y: (event.clientY / Avispa.context.scale) - @clickOffsetY
 
+            @position.set @EnforceBoundingBox(new_positions)
 
-If we have a parent element, we want to make sure that our box is at least
-10 pixels inside of it at all times. We start by calculating the amount of
-space space there is around the edges of this group.
-
-            if @parent
-                ppos = 
-                  x: @parent.position.get('x')
-                  y: @parent.position.get('y')
-                  w: @parent.position.get('w')
-                  h: @parent.position.get('h')
-
-                boundsx = @parent.position.get('w') - @position.get('w') - 10
-                boundsy = @parent.position.get('h') - @position.get('h') - 10
-
-                if new_positions.x < (ppos.x + 10)
-                    new_positions.x = ppos.x + 10
-                else if new_positions.x - ppos.x > boundsx
-                    new_positions.x = ppos.x + boundsx
-
-                if new_positions.y < (ppos.y + 10)
-                    new_positions.y = ppos.y + 10
-                else if new_positions.y - ppos.y > boundsy
-                    new_positions.y = ppos.y + boundsy
-
-                new_positions.offset_x = new_positions.x - ppos.x
-                new_positions.offset_y = new_positions.y - ppos.y
-
-            @position.set new_positions
+            for child in @children
+              do (child)->
+                child.ParentDrag()
 
             return cancelEvent(event)

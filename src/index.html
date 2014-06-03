@@ -10,16 +10,26 @@
     <script src='js/vespa.js' type='text/javascript'></script>
   </head>
   <body>
-    <div role='navigation' class='navbar navbar-default navbar-static-top'>
-      <div class='navbar-header'>
-        <span class='navbar-brand'>V3SPA</span>
+    <div role='navigation' class='navbar navbar-default navbar-static-top' 
+         ng-controller='navCtrl'>
+         <div class='navbar-header' >
+           <span class='navbar-brand' ng-class="{'loader-bg': have_outstanding()}" >
+             <strong>V3SPA</strong>
+           </span>
       </div>
-      <ul class='nav navbar-nav'>
-        <li>
-        <a class='navbar-link' >Logout</a>
-        </li>
+      <p class='navbar-text'>
+      <strong>Reference Policy: </strong>
+      <span ng-hide='refpolicy.id'>
+        None
+      <a ng-hide='refpolicy.id' ng-click='load_refpolicy()'>(Load)</a>
+      </span>
+      <span ng-show='refpolicy.id'>
+        {{refpolicy.id}}
+        <a ng-click='load_refpolicy()'>(switch)</a>
+      </span>
+      </p>
       </ul>
-      <p class='navbar-right navbar-text'> &copy;2014 <b>Invincea Labs</b> </p>
+      <p class='navbar-right navbar-text small'> &copy;2014 <b>Invincea Labs</b> </p>
     </div>
     <div class='container-full' ng-controller='ideCtrl'>
       <div ng-hide='editorSize > 0' class='editor-toggle'>
@@ -49,8 +59,7 @@
                           <span class='glyphicon glyphicon-arrow-right'></span>
                         </a>
                       </div>
-                      <span class='lead'>Editor</span>
-                      <span class='text-muted'>{{policy.id}}</span>
+                      <span class='lead'>{{policy.id || "Editor"}}</span>
                       <div class='btn'
                         spinner-icon='loading'
                         opts="{
@@ -65,72 +74,82 @@
                     </div>
                     <div class='clearfix'></div>
                     <div class='row'>
-                      <div class='col-md-12'>
-                        <div class='btn-group btn-group-sm'>
-                          <div class='btn-group btn-group-sm'>
-                            <button class='btn btn-default btn-sm dropdown-toggle' data-toggle='dropdown'>
-                              File <span class='caret'></span>
-                            </button>
-                            <ul role='menu' class='dropdown-menu'>
-                              <li>
-                              <a ng-click='new_policy()'>New Blank Policy</a>
-                              </li>
-                              <li>
-                              <a ng-click='upload_policy()'>Upload Existing Policy</a>
-                              </li>
-                              <li>
-                              <a ng-click='open_policy()'>Open</a>
-                              </li>
-                            </ul>
-                          </div>
-                          <button class='btn btn-default btn-sm' 
-                            ng-class="{active: loading}"
-                            ng-click='save_policy()'
-                            ng-disabled='!policy.dsl'>Save
-                          </button>
-                        </div>
+                      <div class='col-md-8 form-horizontal'>
+                        <button class='btn btn-default btn-sm' 
+                          ng-class="{active: loading}"
+                          ng-click='save_policy()'
+                          ng-disabled='policy.id == null'>Save
+                        </button>
+                        <a class='btn btn-default btn-sm' 
+                          ng-class="{active: loading}"
+                          download="{{policy.id}}.txt"
+                          href="/download/refpolicy?id={{policy._id}}"
+                          ng-disabled='policy.id == null'>Export
+                        </a>
+                        <input id='moduleSelect'
+                        ui-select2='raw_module_select2'
+                        ng-model='raw_view_selection' type='hidden'
+                        placeholder='View module files'
+                        ng-disabled='policy.modules == null' />
                       </div>
+                      <div class='col-md-4'></div>
                     </div>
-                  </div>
                   <div class='horizontal-pad'></div>
+                  <div class='clearfix'></div>
                   <div class='row'>
-                      <div class='form-group'>
-                        <label class='control-label pad-right'>Visualizer Type</label>
-                        <div class='btn-group'>
-                          <button btn-radio="'avispa'" type='button' class='btn btn-sm btn-default' active ng-model="visualizer_type">Structured</button>
-                          <button btn-radio="'hive'" type='button' class='btn btn-sm btn-default' ng-model='visualizer_type'> Hive</button>
-                        </div>
-                      </div>
-                    <div class='col-md-12'>
-                      <div class='form-group'>
-                        <label class='control-label pad-right'>Editor View</label>
-                        <label class='radio-inline'>
-                          <input type='radio' ng-model='view' 
-                                 name='editorView' value='dsl'>
-                          Lobster
-                        </label>
-                        <label class='radio-inline'>
-                          <input type='radio' ng-model='view'
-                                 name='editorView' value='app' />
-                          Application
-                        </label>
+                    <div class='form-group'>
+                      <label class='control-label pad-right'>Visualizer Type</label>
+                      <div class='btn-group'>
+                        <button btn-radio="'avispa'" type='button' class='btn btn-sm btn-default' active ng-model="visualizer_type">Structured</button>
+                        <button btn-radio="'hive'" type='button' class='btn btn-sm btn-default' ng-model='visualizer_type'> Hive</button>
                       </div>
                     </div>
                   </div>
-                  <div ng-model="policy.dsl" 
-                    ui-ace="{ onLoad: aceLoaded }"
-                    auto-height='0.6'
-                    on-resize='$scope.editor.resize()'>
+                  <div class='row'>
+                    <div class='form-group'>
+                      <label class='control-label pad-right'>Visibility</label>
+                      <button type='button' 
+                              class='btn btn-xs btn-default' ng-model='visibility.unused_ports'
+                              btn-checkbox btn-checkbox-false='false' btn-checkbox-true='true'>
+                        Unused Ports
+                        <span style='vertical-align:middle'>
+                        <span ng-hide='visibility.unused_ports' 
+                              class='glyphicon glyphicon-eye-close'></span>
+                        <span ng-show='visibility.unused_ports' 
+                              class='glyphicon glyphicon-eye-open'></span>
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+                  <div class='editor'>
+                    <div ng-show='policy.id'>
+                      <tabset id='editor_tabs'>
+                      <tab id='tab_{{nm}}' ng-repeat='(nm, doc) in policy.documents' 
+                           heading='{{nm}}' select='setEditorTab(nm)'>
+                      </tab>
+                      </tabset>
+                    </div>
+                    <div class='editor-box'>
+                      <div ui-ace="{ onLoad: aceLoaded }"
+                        auto-height="410"
+                        auto-height-type='offset_bottom_px'
+                        on-resize='$scope.editor.resize()'>
+                      </div>
+                      <div class='faded-overlay' ng-hide='policy.id'>
+                        <p class='lead'>Open or create a policy from the 'Policy' menu above</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
+      </div>
         <div ng-class="{'col-md-12': editorSize == 0,
                         'col-md-8': editorSize == 1,
                         'col-md-4': editorSize == 2}">
-          <div id='visualizer' ng-view auto-height='0.70'>
+          <div id='visualizer' ng-view auto-height='230' auto-height-type='offset_bottom_px'>
           </div>
         </div>
       </div>
@@ -152,7 +171,7 @@
                 </thead>
                 <tbody>
                   <tr ng-repeat="error in errors | orderBy:'-timestamp'" class='small'>
-                    <td>{{error.timestamp}}</td>
+                    <td>{{error.timestamp | date:'medium'}}</td>
                     <td ng-click>
                       <span class='label' ng-class="errorClass(error, 'label-')">
                         {{error.level}}
@@ -186,102 +205,22 @@
         </div>
       </div>
     </div>
-    <script type='text/ng-template' id='policyOpenModal.html'>
-      <div class='modal-body'>
-        <h4 class='modal-title'>Open Policy</h4>
-        <div class='form-group'>
-          <input class='form-control' id='policySelect'
-          ui-select2='policySelectOpts'
-          placeholder="Select a policy"
-          ng-model='selection.value' type='hidden'/>
-          <span class='help-block'>Select a policy from the list of previously uploaded policies</span>
-        </div>
-            <button type="button" class="btn btn-default" ng-click='cancel()'>Cancel</button>
-            <button type="button" ng-disabled='form.$invalid'
-                    class="btn btn-primary" ng-click='load()'>Load</button>
-                    </div>
-      </script>
-    <script type='text/ng-template' id='policyNewModal.html'>
-      <div class='modal-header'>
-        <h4 class='modal-title'>New Policy</h4>
-      </div>
-      <div class='modal-body'>
-      <form class='form-horizontal' name='newPolicy' no-validate>
-        <div class='form-group' ng-class="{'.has-warning': newPolicy.name.$invalid}">
-          <label class='col-md-2 control-label'>Name:</label>
-          <div class='col-md-1'></div>
-          <div class='col-md-8'>
-          <input name='name' type='text' class='form-control'
-                 ng-model='policy.name' required/>
-           </div>
-           <div class='col-md-1'></div>
-        </div>
-        <div class='form-group' >
-          <label class='col-md-2 control-label'>Policy Type:</label>
-           <div class='col-md-1'></div>
-          <div class='col-md-8 btn-group btn-group-sm'>
-            <button btn-radio="'selinux'" type='button' class='btn btn-sm btn-default' ng-model='policy.type'>SELinux</button>
-            <button btn-radio="'iptables'" type='button' class='btn btn-sm btn-default' active ng-model="policy.type">IPTables</button>
-          </div>
-          <div class='col-md-1'></div>
-          </div>
-          <div class='form-group'>
-            <div class='col-md-3'></div>
-            <div class='col-md-8'>
-            <button type="button" class="btn btn-default" ng-click='cancel()'>Cancel</button>
-            <button type="button" ng-disabled='newPolicy.$invalid'
-                    class="btn btn-primary" ng-click='load()'>Create</button>
- </div>
- <div class='col-md-1'></div>
- </div>
-      </div>
-      </script>
-    <script type='text/ng-template' id='policyLoadModal.html'>
-      <div class='modal-header'>
-            <h4 class='modal-title' id='loadPolicyModalLabel'>Load Policy</h4>
-          </div>
-            <form name='form' no-validate>
-          <div id='policyModal' class="modal-body">
-          <div class='form-horizontal'>
-          <div class='form-group'>
-            <label class='control-label'>Name</label>
-            <input type='text' placeholder='Example Policy' 
-                   class='form-control' value='' name='' 
-                   ng-model='input.label' required/>
-          </div>
-            <div class='form-group'>
-            <label>Policy File</label>
-            <div class='input-group'>
-            <input type='text' class='form-control' readonly value='{{input.policy|filepath}}'/>
-            <span class='input-group-btn'>
-            <span class='btn btn-primary btn-file'>
-              Browse<input id='policyFile' type='file' ng-model='input.policy' required/>
-            </span>                       
-            </span> 
-           </div>
-            </div>
-          </div>
-            <div class='form-group' ng-class="{'.has-warning': 'form.lobsterfile.$invalid'}">
-              <label>Lobster File</label>
-            <div class='input-group'>
-            <input 
-                   type='text' class='form-control' 
-                   readonly value='{{input.lobster|filepath}}'/>
-            <span class='input-group-btn'>
-            <span class='btn btn-primary btn-file'>
-              Browse<input id='lobsterFile' type='file' 
-                     ng-model='input.lobster' required name='lobsterfile' />
-            </span>                       
-            </span> 
-           </div>
-            </div>
-          </div>
-            <div class='modal-footer'>
-            <button type="button" class="btn btn-default" ng-click='cancel()'>Cancel</button>
-            <button type="button" ng-disabled='form.$invalid'
-                    class="btn btn-primary" ng-click='load()'>Load</button>
-                    </div>
-          </form>
-    </script>
+    <div id='node-context-menu'>
+      <ul role='menu' class='dropdown-menu'>
+        <li>
+          <a id='context-expand-links' tabindex='-1'>Expand Hidden Connections</a>
+        </li>
+      </ul>
+    </div>
+    <div id='domain-context-menu'>
+      <ul role='menu' class='dropdown-menu'>
+        <li>
+          <a id='query_reachability' tabindex='-1'>Expand Reachable Domains</a>
+        </li>
+        <li>
+          <a id='display_reachability' tabindex='-1'>Highlight Reachable Domains</a>
+        </li>
+      </ul>
+    </div>
   </body>
 </html>

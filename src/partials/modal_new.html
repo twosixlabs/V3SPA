@@ -1,0 +1,33 @@
+<div class='modal-header'>
+  <h4 class='modal-title'>New Policy</h4>
+</div>
+<div class='modal-body'>
+  <form class='form-horizontal' name='newPolicy' no-validate>
+    <div class='form-group' ng-class="{'.has-warning': newPolicy.name.$invalid}">
+      <label class='col-md-2 control-label'>Name:</label>
+      <div class='col-md-1'></div>
+      <div class='col-md-8'>
+        <input name='name' type='text' class='form-control'
+        ng-model='policy.name' required/>
+      </div>
+      <div class='col-md-1'></div>
+    </div>
+    <div class='form-group' >
+      <label class='col-md-2 control-label'>Policy Type:</label>
+      <div class='col-md-1'></div>
+      <div class='col-md-8 btn-group btn-group-sm'>
+        <button btn-radio="'selinux'" type='button' class='btn btn-sm btn-default' ng-model='policy.type'>SELinux</button>
+        <button btn-radio="'iptables'" type='button' class='btn btn-sm btn-default' active ng-model="policy.type" ng-disabled='true'>IPTables</button>
+      </div>
+      <div class='col-md-1'></div>
+    </div>
+    <div class='form-group'>
+      <div class='col-md-3'></div>
+      <div class='col-md-8'>
+        <button type="button" class="btn btn-default" ng-click='cancel()'>Cancel</button>
+        <button type="button" ng-disabled='newPolicy.$invalid'
+          class="btn btn-primary" ng-click='load()'>Create</button>
+      </div>
+      <div class='col-md-1'></div>
+    </div>
+  </div>

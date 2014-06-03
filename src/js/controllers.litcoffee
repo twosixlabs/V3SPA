@@ -1,20 +1,74 @@
     vespaControllers = angular.module('vespaControllers', 
-        ['ui.ace', 'vespa.services', 'ui.bootstrap', 'ui.select2'])
+        ['ui.ace', 'vespa.services', 'ui.bootstrap', 'ui.select2',
+        'angularFileUpload', 'vespa.directives'])
 
 The main controller. avispa is a subcontroller.
 
-    vespaControllers.controller 'ideCtrl', ($scope, $rootScope, SockJSService, VespaLogger, $modal, AsyncFileReader, IDEBackend, $timeout, $location) ->
+    vespaControllers.controller 'ideCtrl', ($scope, $rootScope, SockJSService, VespaLogger, $modal, AsyncFileReader, IDEBackend, $timeout, $location, RefPolicy) ->
+
+      $scope._ = _
+
+      $scope.visibility = 
+        unused_ports = false
+
+      $scope.$watch 'raw_view_selection', (newv, oldv)->
+        if newv
+          m = $modal.open
+            templateUrl: 'moduleViewModal.html'
+            controller: 'modal.view_module'
+            windowClass: 'super-large-modal'
+            resolve:
+              documents: ->
+                RefPolicy.fetch_module_files(newv.id)
+              module: ->
+                newv
+            size: 'lg'
+
+          m.result.finally ->
+            $scope.raw_view_selection = null
+
+        console.log newv
+
+      $scope.raw_module_select2 =
+        data: ->
+            unless $scope.policy?.modules
+              retval =
+                results: []
+            else 
+              retval = 
+                  results: _.map $scope.policy.modules, (v, k)->
+                      ret = 
+                        text: k
+                        id: k
+
+      $scope.$watch 'visibility.unused_ports', (newv)->
+          IDEBackend.set_visibility 'unused_ports', newv
 
       $scope.policy = IDEBackend.current_policy
 
+      $scope.blank_session = new ace.EditSession "", "ace/mode/text"
+
       IDEBackend.add_hook 'policy_load', (info)->
-        $timeout ->
           $scope.policy = IDEBackend.current_policy
+
+          $scope.editorSessions = {}
+          for nm, doc of $scope.policy.documents
+            do (nm, doc)->
+              mode = if doc.mode then doc.mode else 'text'
+              session = new ace.EditSession doc.text, "ace/mode/#{mode}"
+
+              session.on 'change', (text)->
+                IDEBackend.update_document nm, session.getValue(), 
+
+              session.selection.on 'changeSelection', (e, sel)->
+                IDEBackend.highlight_selection nm, sel.getRange()
+
+              $scope.editorSessions[nm] = 
+                session: session
 
       $scope.visualizer_type = 'avispa'
       $timeout ->
         $scope.view = 'dsl'
-
 
 This controls our editor visibility.
 
@@ -26,7 +80,6 @@ This controls our editor visibility.
             $scope.editorSize -= 1
 
       $scope.editorSize = 1
-
 
       $scope.aceLoaded = (editor) ->
         editor.setTheme("ace/theme/solarized_light");
@@ -43,73 +96,152 @@ This controls our editor visibility.
         editor.setHighlightSelectedWord(true);
 
         $scope.editor = editor
+        editor.setSession $scope.blank_session
+        editor.setOptions
+          readOnly: true
+          highlightActiveLine: false
+          highlightGutterLine: false
 
-        lobsterSession = new ace.EditSession $scope.policy.dsl, 'ace/mode/lobster'
-        applicationSession = new ace.EditSession $scope.policy.application, 'ace/mode/text'
+        $scope.editorSessions = {}
+        for nm, doc of $scope.policy.documents
+          do (nm, doc)->
+            mode = if doc.mode then doc.mode else 'text'
+            session = new ace.EditSession doc.text, "ace/mode/#{mode}"
 
-Two way bind editor changing and model changing
+            session.on 'change', (text)->
+              IDEBackend.update_document nm, session.getValue()
 
-        lobsterSession.on 'change', (text)->
-          IDEBackend.update_dsl(lobsterSession.getValue())
+            $scope.editorSessions[nm] = 
+              session: session
 
-        IDEBackend.add_hook 'dsl_changed', (contents)->
-          $timeout ->
-            lobsterSession.setValue contents
+        IDEBackend.add_hook 'on_close', ->
+          $scope.editor.setSession $scope.blank_session
+          $scope.editor.setOptions
+              readOnly: true
+              highlightActiveLine: false
+              highlightGutterLine: false
+
+          for k of $scope.editorSessions
+            delete $scope.editorSessions[k]
+
+          $scope.editorSessions = {}
+
+        IDEBackend.add_hook 'doc_changed', (doc, contents)->
+            $timeout ->
+                $scope.editorSessions[doc].session.setValue contents
 
         $scope.editor_markers = []
 
         IDEBackend.add_hook 'validation', (annotations)->
-          format_error = (err)->
-            ret = 
-              row: err.line - 1
-              column: err.column
-              type: 'error'
-              text: err.message
+          dsl_session = $scope.editorSessions.dsl.session
 
-          lobsterSession.setAnnotations _.map(annotations?.errors, (e)->
-            format_error(e)
-          )
+          format_error = (err)->
+            pos = err.srcloc
+            unless pos.start?
+              lastRow = dsl_session.getLength()
+              while _.isEmpty(toks = dsl_session.getTokens(lastRow))
+                lastRow--
+
+              pos = 
+                start:
+                  line: lastRow + 1
+                  col: 1
+                end:
+                  line: lastRow + 1
+                  col: dsl_session.getLine(lastRow).length + 1
+
+            annotations.highlights ?= []
+            annotations.highlights.push 
+              range:  pos
+              apply_to: 'dsl'
+              type: 'error'
+
+            ret = 
+              row: pos.start.line
+              column: pos.start.col
+              type: 'error'
+              text: "#{err.filename}: #{err.message}"
+
+          $timeout ->
+            session = $scope.editorSessions.dsl.session
+            formatted_annotations = _.map(annotations?.errors, (e)->
+              format_error(e)
+            )                       
+            session.setAnnotations formatted_annotations
 
           ace_range = ace.require("ace/range")
 
-          _.filter $scope.editor_markers, (elem)->
+          $scope.editor_markers = _.filter $scope.editor_markers, (elem)->
             $scope.editor.getSession().removeMarker(elem)
             return false
 
-          # highlight for e in annotations.highlighter
-          _.each annotations.highlights, (hl)->
-            range = new ace_range.Range(
-              hl.range.start.row,
-              hl.range.start.column,
-              hl.range.end.row,
-              hl.range.end.column
-            )
+          $timeout ->
+            # highlight for e in annotations.highlighter
+            _.each annotations.highlights, (hl)->
+              return unless hl?
 
-            if hl.apply_to == 'lobster'
-              session = lobsterSession
-            else
-              session = applicationSession
+              range = new ace_range.Range(
+                hl.range.start.line - 1,
+                hl.range.start.col - 1,
+                hl.range.end.line - 1,
+                hl.range.end.col - 1
+              )
 
-            marker = session.addMarker(
-              range,
-              "#{hl.type}_marker",
-              "text"
-            )
+              session = $scope.editorSessions[hl.apply_to]?.session
 
-            $scope.editor_markers.push marker
+              if not session?  # Just bail
+                return
 
-        IDEBackend.add_hook 'app_changed', (contents)->
-          applicationSession.setValue contents
+              marker = session.addMarker(
+                range,
+                "#{hl.type}_marker",
+                "text"
+              )
+
+              $scope.editor.scrollToLine hl.range.start.line - 1
+
+              $scope.editor_markers.push marker
 
 Watch the view control and switch the editor session
 
-        $scope.$watch 'view', (value)->
-          if value == 'dsl'
-            editor.setSession(lobsterSession)
-            editor.setReadOnly(false)
-          else
-            editor.setSession(applicationSession)
-            editor.setReadOnly(true)
+        $scope.setEditorTab = (name)->
+          $timeout ->
+            sessInfo = $scope.editorSessions[name]
+
+            if sessInfo.tab? and not _.isEmpty sessInfo.tab
+              prevIndex = sessInfo.tab.css('z-index')
+
+            idx = 0
+            for nm, info of $scope.editorSessions
+              idx++
+              if not info.tab? or _.isEmpty info.tab
+                info.tab = angular.element "#editor_tabs \#tab_#{nm}"
+
+              if nm == name
+                info.tab.css 'z-index', 4
+              else
+                if prevIndex?
+                  nowindex = info.tab.css('z-index')
+                  if nowindex > prevIndex
+                    info.tab.css 'z-index', nowindex - 1
+                else
+                  info.tab.css 'z-index', _.size($scope.editorSessions) - idx
+
+
+            editor.setSession(sessInfo.session)
+
+            if $scope.policy.documents[name].editable == false
+              editor.setOptions
+                readOnly: true
+                highlightActiveLine: false
+                highlightGutterLine: false
+              editor.renderer.$cursorLayer.element.style.opacity=0
+            else
+              editor.setOptions
+                readOnly: false
+                highlightActiveLine: true
+                highlightGutterLine: true
+              editor.renderer.$cursorLayer.element.style.opacity=1
 
         $scope.$watch 'visualizer_type', (value)->
           if value == 'avispa'
@@ -129,120 +261,115 @@ Save the current file
       $scope.save_policy = ->
         IDEBackend.save_policy()
 
+This function makes sure that a Reference Policy
+has been loaded before calling the function
+`open_modal`. It does so by opening the
+reference policy load modal first if it has
+not been loaded.
+
+      ensure_refpolicy = (open_modal)->
+        if RefPolicy.loading?
+          RefPolicy.loading.then (policy)->
+            open_modal(policy)
+
+        else if RefPolicy.current?
+          open_modal(RefPolicy.current)
+
+        else
+          # Load a reference policy
+          instance = $modal.open
+              templateUrl: 'refpolicyModal.html'
+              controller: 'modal.refpolicy'
+
+          instance.result.then (policy)->
+              RefPolicy.load(policy.id).then (refpol)->
+                # When the refpolicy has actually been loaded,
+                # open the upload modal.
+                open_modal(refpol)
+
 Create a modal for opening a policy
 
       $scope.open_policy = ->
-        instance = $modal.open
-          templateUrl: 'policyOpenModal.html'
-          controller: ($scope, $modalInstance) ->
 
-            $scope.selection = 
-              value: null
+        ensure_refpolicy (refpol)->
+          IDEBackend.load_local_policy refpol
 
-            $scope.cancel = $modalInstance.dismiss
-
-            $scope.policySelectOpts = 
-              query: (query)->
-                promise = IDEBackend.list_policies()
-                promise.then(
-                  (policy_list)->
-                    dropdown = 
-                      results:  for d in policy_list
-                        id: d._id.$oid
-                        text: d.id
-                        data: d
-                        disabled: IDEBackend.isCurrent(d._id.$oid)
-
-                    query.callback(dropdown)
-                )
-
-            scope = $scope
-            $scope.load = ->
-              if not scope.selection.value?
-                $modalInstance.dismiss()
-
-              $scope.loading = true
-              promise = IDEBackend.load_policy $scope.selection.value.data._id
-
-              promise.then(
-                (data)->
-                  console.log "Loaded policy successfully"
-                  $scope.loading = false
-              ,
-                (error)->
-                  $.growl "Failed to load policy", 
-                    type: 'warning'
-                  console.log "Policy load failed: #{error}"
-                  $scope.loading = false
-              )
-
-              $modalInstance.close()
+        #instance = $modal.open
+        #  templateUrl: 'policyOpenModal.html'
+        #  controller:  'modal.policy_open'
 
 Modal dialog for new policy
 
       $scope.new_policy = ->
-        instance = $modal.open
-          templateUrl: 'policyNewModal.html'
-          controller: ($scope, $modalInstance)->
+        ensure_refpolicy ->
+          instance = $modal.open
+            templateUrl: 'policyNewModal.html'
+            controller: ($scope, $modalInstance)->
 
-            $scope.policy = 
-              type: 'selinux'
+              $scope.policy = 
+                type: 'selinux'
 
-            $scope.load = ->
-              $modalInstance.close($scope.policy)
+              $scope.load = ->
+                $modalInstance.close($scope.policy)
 
-            $scope.cancel = $modalInstance.dismiss
+              $scope.cancel = $modalInstance.dismiss
 
-        instance.result.then (policy)->
-            IDEBackend.new_policy
-              id: policy.name
-              type: policy.type
+          instance.result.then (policy)->
+              IDEBackend.new_policy
+                id: policy.name
+                type: policy.type
+                refpolicy_id: RefPolicy.current._id
 
-Create a modal for uploading policies
+
+Create a modal for uploading policies. First we check if a reference policy
+is loaded. If it is, then we open the upload modal. Otherwise we open the
+RefpolicyLoad modal first, then open the file upload modal.
 
       $scope.upload_policy = ->
-        instance = $modal.open
-          templateUrl: 'policyLoadModal.html'
-          controller: ($scope, $modalInstance) ->
 
-            $scope.input = {}
+First we define the load modal function so we can call it conditionally later
 
-            $scope.load = ->
+        ensure_refpolicy ->
 
-              inputs = 
-                label: $scope.input.label
-                policy_file: $('#policyFile')[0].files[0]
-                lobster_file:  $('#lobsterFile')[0].files[0]
-
-              $modalInstance.close(inputs)
-
-            $scope.cancel = ->
-              $modalInstance.dismiss('cancel')
+          instance = $modal.open
+            templateUrl: 'policyLoadModal.html'
+            controller: 'modal.policy_load'
 
 If we get given files, read them as text and send them over the websocket
 
-        instance.result.then(
-          (inputs)-> 
-            console.log(inputs)
+          instance.result.then(
+            (inputs)-> 
+              console.log(inputs)
 
-            filelist = 
-              application: inputs.policy_file
-              dsl: inputs.lobster_file
+              filelist = inputs.files
 
-            AsyncFileReader.read filelist, (files)->
-              req = 
-                domain: 'policy'
-                request: 'create'
-                payload: 
-                  id: inputs.label
-                  application: files.application
-                  dsl: files.dsl
+              AsyncFileReader.read filelist, (files)->
+                req = 
+                  domain: 'policy'
+                  request: 'create'
+                  payload: 
+                    refpolicy_id: RefPolicy.current._id
+                    documents: {}
+                    type: 'selinux'
 
-              SockJSService.send(req)
+                for file, text of files
+                  do (file, text)->
+                    req.payload.documents[file] = 
+                      text: text
+                      editable: false
 
-          ()->
-            console.log("Modal dismissed")
-        )
+                SockJSService.send req, (result)->
+                  if result.error
+                    $.growl {title: 'Failed to upload module', message: result.payload}, 
+                      type: 'danger'
+                    console.log result
+                  else
+                    $.growl {title: 'Uploaded new module', message: result.payload.id}, 
+                      type: 'success'
+
+            ()->
+              console.log("Modal dismissed")
+          )
 
 
 The console controller is very simple. It simply binds it's errors
