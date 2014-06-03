@@ -11,9 +11,9 @@ The main controller. avispa is a subcontroller.
       $scope.visibility = 
         unused_ports = false
 
-      $scope.$watch 'raw_view_selection', (newv)->
+      $scope.$watch 'raw_view_selection', (newv, oldv)->
         if newv
-          $modal.open
+          m = $modal.open
             templateUrl: 'moduleViewModal.html'
             controller: 'modal.view_module'
             windowClass: 'super-large-modal'
@@ -23,6 +23,10 @@ The main controller. avispa is a subcontroller.
               module: ->
                 newv
             size: 'lg'
+
+          m.result.finally ->
+            $scope.raw_view_selection = null
+
         console.log newv
 
       $scope.raw_module_select2 =

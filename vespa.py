@@ -35,6 +35,7 @@ def main():
         (r'/',             api.handlers.Index     ),
         (r'/login',        api.handlers.Login     ),
         (r'/logout',       api.handlers.Logout    ),
+        (r'/download/(.*)',     api.handlers.Download  )
         ] +  websocket_handler.urls
 
     settings = dict(

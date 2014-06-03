@@ -74,23 +74,26 @@
                     </div>
                     <div class='clearfix'></div>
                     <div class='row'>
-                      <div class='col-md-8'>
-                        <div class='input-group'>
-                          <button class='btn btn-default btn-sm' 
-                            ng-class="{active: loading}"
-                            ng-click='save_policy()'
-                            ng-disabled='policy.id == null'>Save
-                          </button>
-                          <input class='form-control' id='moduleSelect'
-                                 ui-select2='raw_module_select2'
-                                 ng-model='raw_view_selection' type='hidden'
-                                 placeholder='View module files'
-                                 ng-disabled='policy.modules == null' />
-                        </div>
+                      <div class='col-md-8 form-horizontal'>
+                        <button class='btn btn-default btn-sm' 
+                          ng-class="{active: loading}"
+                          ng-click='save_policy()'
+                          ng-disabled='policy.id == null'>Save
+                        </button>
+                        <a class='btn btn-default btn-sm' 
+                          ng-class="{active: loading}"
+                          download="{{policy.id}}.txt"
+                          href="/download/refpolicy?id={{policy._id}}"
+                          ng-disabled='policy.id == null'>Export
+                        </a>
+                        <input id='moduleSelect'
+                        ui-select2='raw_module_select2'
+                        ng-model='raw_view_selection' type='hidden'
+                        placeholder='View module files'
+                        ng-disabled='policy.modules == null' />
                       </div>
                       <div class='col-md-4'></div>
                     </div>
-                  </div>
                   <div class='horizontal-pad'></div>
                   <div class='clearfix'></div>
                   <div class='row'>
@@ -142,6 +145,7 @@
             </div>
           </div>
         </div>
+      </div>
         <div ng-class="{'col-md-12': editorSize == 0,
                         'col-md-8': editorSize == 1,
                         'col-md-4': editorSize == 2}">
