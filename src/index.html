@@ -50,77 +50,116 @@
                   <div>
                     <div class='row'>
                       <div class='col-md-12'>
-                      <div class='pull-right'>
-                        <a ng-click='resizeEditor("smaller")'>
-                          <span class='glyphicon glyphicon-arrow-left'></span>
-                        </a>
-                        <a ng-hide='editorSize > 1'
-                           ng-click="resizeEditor('larger')" >
-                          <span class='glyphicon glyphicon-arrow-right'></span>
-                        </a>
-                      </div>
-                      <span class='lead'>{{policy.id || "Editor"}}</span>
-                      <div class='btn'
-                        spinner-icon='loading'
-                        opts="{
-                        'length': 5,
-                        'width': 2,
-                        'radius': 3,
-                        'speed': 0.7
-                        }"
-                        >
-                      </div>
+                        <div class='pull-right'>
+                          <a ng-click='resizeEditor("smaller")'>
+                            <span class='glyphicon glyphicon-arrow-left'></span>
+                          </a>
+                          <a ng-hide='editorSize > 1'
+                            ng-click="resizeEditor('larger')" >
+                            <span class='glyphicon glyphicon-arrow-right'></span>
+                          </a>
+                        </div>
+                        <span class='lead'>{{policy.id || "Editor"}}</span>
+                        <div class='btn'
+                          spinner-icon='loading'
+                          opts="{
+                          'length': 5,
+                          'width': 2,
+                          'radius': 3,
+                          'speed': 0.7
+                          }"
+                          >
+                        </div>
                       </div>
                     </div>
                     <div class='clearfix'></div>
                     <div class='row'>
-                      <div class='col-md-8 form-horizontal'>
-                        <button class='btn btn-default btn-sm' 
-                          ng-class="{active: loading}"
-                          ng-click='save_policy()'
-                          ng-disabled='policy.id == null'>Save
-                        </button>
-                        <a class='btn btn-default btn-sm' 
-                          ng-class="{active: loading}"
-                          download="{{policy.id}}.txt"
-                          href="/download/refpolicy?id={{policy._id}}"
-                          ng-disabled='policy.id == null'>Export
-                        </a>
-                        <input id='moduleSelect'
-                        ui-select2='raw_module_select2'
-                        ng-model='raw_view_selection' type='hidden'
-                        placeholder='View module files'
-                        ng-disabled='policy.modules == null' />
-                      </div>
-                      <div class='col-md-4'></div>
-                    </div>
-                  <div class='horizontal-pad'></div>
-                  <div class='clearfix'></div>
-                  <div class='row'>
-                    <div class='form-group'>
-                      <label class='control-label pad-right'>Visualizer Type</label>
-                      <div class='btn-group'>
-                        <button btn-radio="'avispa'" type='button' class='btn btn-sm btn-default' active ng-model="visualizer_type">Structured</button>
-                        <button btn-radio="'hive'" type='button' class='btn btn-sm btn-default' ng-model='visualizer_type'> Hive</button>
-                      </div>
-                    </div>
-                  </div>
-                  <div class='row'>
-                    <div class='form-group'>
-                      <label class='control-label pad-right'>Visibility</label>
-                      <button type='button' 
-                              class='btn btn-xs btn-default' ng-model='visibility.unused_ports'
+                      <div class='col-md-5'>
+                        <div class='row'>
+                          <div class='col-md-12 form-horizontal'>
+                            <button class='btn btn-default btn-sm' 
+                              ng-class="{active: loading}"
+                              ng-click='save_policy()'
+                              ng-disabled='policy.id == null'>Save
+                            </button>
+                            <a class='btn btn-default btn-sm' 
+                              ng-class="{active: loading}"
+                              download="{{policy.id}}.txt"
+                              href="/download/refpolicy?id={{policy._id}}"
+                              ng-disabled='policy.id == null'>Export
+                            </a>
+                            <input id='moduleSelect'
+                            ui-select2='raw_module_select2'
+                            ng-model='raw_view_selection' type='hidden'
+                            placeholder='View module files'
+                            ng-disabled='policy.modules == null' />
+                          </div>
+                        </div>
+                        <div class='horizontal-pad'></div>
+                        <div class='clearfix'></div>
+                        <div class='row'>
+                          <div class='form-group'>
+                            <label class='control-label pad-right'>Visualizer Type</label>
+                            <div class='btn-group'>
+                              <button btn-radio="'avispa'" type='button' class='btn btn-sm btn-default' active ng-model="visualizer_type">Structured</button>
+                              <button btn-radio="'hive'" type='button' class='btn btn-sm btn-default' ng-model='visualizer_type'> Hive</button>
+                            </div>
+                          </div>
+                        </div>
+                        <div class='row'>
+                          <div class='form-group'>
+                            <label class='control-label pad-right'>Visibility</label>
+                            <button type='button' 
+                              class='btn btn-xs btn-default' ng-model='view_control.unused_ports'
                               btn-checkbox btn-checkbox-false='false' btn-checkbox-true='true'>
-                        Unused Ports
-                        <span style='vertical-align:middle'>
-                        <span ng-hide='visibility.unused_ports' 
-                              class='glyphicon glyphicon-eye-close'></span>
-                        <span ng-show='visibility.unused_ports' 
-                              class='glyphicon glyphicon-eye-open'></span>
-                        </span>
-                      </button>
+                              Unused Ports
+                              <span style='vertical-align:middle'>
+                                <span ng-hide='controlParams.unused_ports' 
+                                  class='glyphicon glyphicon-eye-close'></span>
+                                <span ng-show='controlParams.unused_ports' 
+                                  class='glyphicon glyphicon-eye-open'></span>
+                              </span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                      <div class='col-md-7'>
+                        <div class='panel panel-default'>
+                          <div class='panel-heading'>
+                            <h6 class='panel-title'>Analysis Controls</h6>
+                          </div>
+                          <ul class='list-group'>
+                            <li class='list-group-item'>
+                            <div class='form-horizontal'>
+                              <div class='form-group'>
+                                <label class='col-md-6 control-label pad-right'>
+                                  Explored Paths Limit
+                                </label>
+                                <div class='col-md-6'>
+                                  <input touch-spin='10' ng-model='analysis_ctrl.path_limit'/>
+                                </div>
+                              </div>
+                            </div>
+                            </li>
+                            <li class='list-group-item'>
+                            <div class='form-horizontal'>
+                              <div class='form-group'>
+                                <label class='col-md-6 control-label pad-right'>
+                                  Enabled Permissions
+                                </label>
+                                <div class='col-md-6'>
+                                <input class='form-control'
+                                       ng-disabled='true'
+                                       type='text'
+                                       value='tbd'/>
+</div>
+                              </div>
+                            </div>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
                     </div>
-                  </div>
                   <div class='editor'>
                     <div ng-show='policy.id'>
                       <tabset id='editor_tabs'>
@@ -149,7 +188,7 @@
         <div ng-class="{'col-md-12': editorSize == 0,
                         'col-md-8': editorSize == 1,
                         'col-md-4': editorSize == 2}">
-          <div id='visualizer' ng-view auto-height='230' auto-height-type='offset_bottom_px'>
+          <div id='visualizer' ng-view auto-height='150' auto-height-type='offset_bottom_px'>
           </div>
         </div>
       </div>

@@ -70,8 +70,10 @@ class LobsterDomain(object):
 
     def query_reachability(self, msg):
         """ Run a reachability test from a given domain """
+        logger.info("WS:query_reachability?%s" % msg['payload']['params'])
+
         output = self._make_request(
-            'POST', '/paths?id={0}'.format(msg['payload']['id']),
+            'POST', '/paths?{0}'.format(msg['payload']['params']),
             msg['payload']['text'])
 
         return {

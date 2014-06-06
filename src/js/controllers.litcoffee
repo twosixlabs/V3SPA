@@ -8,8 +8,11 @@ The main controller. avispa is a subcontroller.
 
       $scope._ = _
 
-      $scope.visibility = 
-        unused_ports = false
+      $scope.view_control = 
+        unused_ports: false
+
+      $scope.analysis_ctrl =
+        path_limit: 10
 
       $scope.$watch 'raw_view_selection', (newv, oldv)->
         if newv
@@ -41,8 +44,15 @@ The main controller. avispa is a subcontroller.
                         text: k
                         id: k
 
-      $scope.$watch 'visibility.unused_ports', (newv)->
-          IDEBackend.set_visibility 'unused_ports', newv
+      $scope.$watchCollection 'view_control', (new_collection)->
+        for k, v of new_collection
+          do (k, v)->
+            IDEBackend.set_view_control k, v
+
+      $scope.$watchCollection 'analysis_ctrl', (new_collection)->
+        for k, v of new_collection
+          do (k, v)->
+            IDEBackend.set_query_param k, v
 
       $scope.policy = IDEBackend.current_policy
 

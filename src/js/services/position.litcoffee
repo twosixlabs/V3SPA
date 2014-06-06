@@ -84,8 +84,10 @@ Percolate changes to the server
               id: @id
 
           SockJSService.send req, (result)=>
+            console.log "#{@id} got response"
             if result.error 
               @d.reject result.payload
+              console.log "#{@id} rejected"
               @d = null
             else
               if result.payload? and not _.isEmpty(result.payload)
@@ -95,6 +97,7 @@ Percolate changes to the server
                 @d.resolve
                   remote_update: true
                   data: @
+                console.log "#{@id} resolved"
                 @d = null
               else if @local != true
                 # the defaults were better, send them to the server
@@ -107,6 +110,7 @@ Percolate changes to the server
                 @d.resolve
                   remote_update: false
                   data: @
+                console.log "#{@id} resolved"
                 @d = null
 
           return @d.promise

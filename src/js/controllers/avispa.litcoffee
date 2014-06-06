@@ -150,9 +150,11 @@ the endpoint that does exist so that it can obviously be expanded
                   else 
                     return false
 
-                IDEBackend.expand_graph( _.filter(missing_domains, (d)->d))
+                IDEBackend.expand_graph_by_name( _.filter(missing_domains, (d)->d))
 
-          if not right 
+          if not left and not right
+            console.log "Wft"
+          else if not right 
             left.add_class 'expandable'
             left.$el.contextmenu
               target: '#node-context-menu'
@@ -446,14 +448,7 @@ Run a reachability query
 
         query.then (data)->
           result = JSON.parse data
-          filtermap = (memo, paths, dom_id)->
-            if $scope.objects.domains[dom_id]?
-              memo.push $scope.objects.domains[dom_id].AncestorList()
-            return memo
-
-          hidden_domains = _.reduce(result.result, filtermap, [])
-
-          IDEBackend.expand_graph hidden_domains
+          IDEBackend.expand_graph_by_id _.keys(_.omit(result.result, 'truncated'))
 
 Highlight all the domains reachable from a given domain. This
 assumes they've all been expanded.
@@ -549,7 +544,9 @@ Lobster-specific definitions for Avispa
 
             return @
 
+The handler for the little expansion icon on collapsed domains.
+
         Expand: (event)->
-          Avispa.context.ide_backend.expand_graph [@AncestorList()]
+          Avispa.context.ide_backend.expand_graph_by_name [@AncestorList()]
 
           cancelEvent(event)
