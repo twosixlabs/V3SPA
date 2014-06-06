@@ -1,10 +1,14 @@
     vespaControllers = angular.module('vespaControllers') 
 
     vespaControllers.controller 'modal.view_module', (
-        $scope, $modalInstance, documents, module) ->
+        $scope, $modalInstance, documents, module, $timeout) ->
 
             $scope.module_name = module
             $scope.documents = documents
+
+            $timeout ->
+              $("pre code").html (index, html) ->
+                html.replace(/^(.*)$/mg, "<span class=\"line\">$1</span>")
 
     vespaControllers.controller 'modal.policy_load', (
         $scope, $modalInstance, RefPolicy, $fileUploader) ->

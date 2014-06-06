@@ -337,6 +337,22 @@ g.svg-highlight-reach-0 {
 
   .pre-scrollable{
     max-height: 640px;
+    overflow-x: scroll;
     }
+
+  pre code {
+    overflow-wrap: normal;
+    white-space: pre;
+    counter-reset: line-numbering;
+  }
+
+  pre code .line::before {
+    content: counter(line-numbering);
+    counter-increment: line-numbering;
+    padding-right: 1em; /* space after numbers */
+    width: 1.5em;
+    text-align: right;
+    opacity: 0.5;
+  }
 
 }
