@@ -81,6 +81,7 @@ Clear the current policy
               valid: false
 
             @graph_expansion = {}
+            @graph_id_expansion = {}
 
             for hook in @hooks.policy_load
               hook(@current_policy)
@@ -159,6 +160,46 @@ about highlighting that should be performed.
         unhighlight: =>
           _.each @hooks.validation, (hook)->
             hook([])
+
+The locally stored set of domains that we expand can get both
+very large, and out of sync. Re-build it from the local data
+store
+
+        rebuild_expansion: =>
+          data = @current_policy.json['result']['domains']
+
+          @graph_expansion = {}
+          @graph_id_expansion = {}
+
+          ancestor_lists = []
+          for id, domain of data
+            do (id, domain)->
+              ancestor_lists.push(domain.path.split('.'))
+
+          _.each ancestor_lists, (ancestor_list)=>
+            curr = @graph_expansion
+            for elem in ancestor_list
+                if elem not of curr
+                    curr[elem] = {}
+
+                curr = curr[elem]
+
+          #q = new Queue()
+          #q.enqueue(['0', []])
+          #until q.isEmpty()
+          #  id, subpath = q.dequeue()
+          #  ancestor_lists.push domains[id].path)
+          #  for subd in domains[id].subdomains
+          #    do (subd)->
+          #      if subd in 
+          #  path = "#{subpath}.#{domains[id].name}"
+          #
+          #
+          #while not queue
+          #  next = queue.pop()
+          #for id, domain in @current_policy.json['result']['domains']:
+          #  do (id, domain_id)->
+          #    @graph_expansion = {}
 
 Extend the set of paths that we show.
 
@@ -356,6 +397,8 @@ Save a modified policy to the server
 
           return deferred.promise
 
+Set JSON
+
         list_policies: =>
           deferred = @$q.defer()
 
@@ -430,10 +473,12 @@ with the results.
               params: path_params.concat("id=#{domain_id}").join("&")
 
 
-          @SockJSService.send req, (data)->
+          @SockJSService.send req, (data)=>
             if data.error?
               deferred.reject(data.payload)
             else
-              deferred.resolve(data.payload)
+              @current_policy.json = data.payload.data
+              @rebuild_expansion()
+              deferred.resolve(data.payload.paths)
 
           return deferred.promise

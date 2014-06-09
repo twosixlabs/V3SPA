@@ -1,5 +1,6 @@
-<div id='surface'>
-  <div id='zoomslider'>
+<div id='surface' class='row' 
+    ng-class="{'col-md-12': analysisPaneVisible, 'col-md-8': analysisPaneVisible}">
+    <div id='zoomslider'>
     <svg xmlns="http://www.w3.org/2000/svg" class="avispa">
       <defs>
       <pattern id='expandIcon' width='1' height='1'>
@@ -29,4 +30,19 @@
       </g>
     </svg>
   </div>
+</div>
+<div ng-show='analysisPaneVisible' class='analysis-pane col-md-4'>
+    <div class='fullheight'>hello</div>
+    <h3>{{analysisOrigin}}</h3>
+    <ul class='list-group'>
+        <li ng-repeat='(dest, perms) in analysisData' class='list-group-item'>
+        <ul>
+            <li ng-repeat='(perm, data) in perms'>
+            <strong>{{perm}}</strong>
+
+            <span class='text-muted'>{{data.endpoint}} -- {{data.class}}</span>
+            </li>
+        </ul>
+        </li>
+    </ul>
 </div>

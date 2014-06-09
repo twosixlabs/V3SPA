@@ -12,7 +12,7 @@ The main controller. avispa is a subcontroller.
         unused_ports: false
 
       $scope.analysis_ctrl =
-        path_limit: 10
+        limit: 10
 
       $scope.$watch 'raw_view_selection', (newv, oldv)->
         if newv

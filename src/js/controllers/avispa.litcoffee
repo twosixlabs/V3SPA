@@ -446,27 +446,41 @@ Run a reachability query
       $scope.reachability_query = (domain)->
         query = IDEBackend.perform_path_query domain.options.numeric_id
 
-        query.then (data)->
-          result = JSON.parse data
-          IDEBackend.expand_graph_by_id _.keys(_.omit(result.result, 'truncated'))
+        query.then(
+          (result)->
+            console.error "Deprecated"
+            #IDEBackend.expand_graph_by_id _.keys(_.omit(result.result, 'truncated'))
+          (data)->
+            console.log "Error", data
+        )
+
 
 Highlight all the domains reachable from a given domain. This
 assumes they've all been expanded.
 
       $scope.highlight_reachability = (domain)->
 
+        $scope.analysisOrigin = domain.options._id
+
         query = IDEBackend.perform_path_query domain.options.numeric_id
 
-        query.then (data)->
-          result = JSON.parse data
-          ctr = 0
-          _.each result.result, (paths, dom_id)->
+        query.then (paths)->
 
-            _.each paths, (path)->
-              _.each path, (conn)->
-                $scope.objects.connections[conn].highlight_reachable 0
+          $scope.analysisData = paths
+          $scope.analysisPaneVisible = true
+          hide_pane = ->
+            $scope.analysisPaneVisible = false
 
-            $scope.objects.domains[dom_id].highlight_reachable 0
+          #$timeout hide_pane, 5
+
+          #ctr = 0
+          #_.each result.result, (paths, dom_id)->
+          #
+          #  _.each paths, (path)->
+          #    _.each path, (conn)->
+          #      $scope.objects.connections[conn].highlight_reachable 0
+          #
+          #  $scope.objects.domains[dom_id].highlight_reachable 0
 
 
 
