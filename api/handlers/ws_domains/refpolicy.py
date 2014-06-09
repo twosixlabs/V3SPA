@@ -2,6 +2,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 import base64
+import itertools
 import os
 import re
 
@@ -32,7 +33,7 @@ def extract_module_version(module_text):
       raise Exception(".te file had no module string")
 
 
-def read_module_files(module_data, **addl_props):
+def read_module_files(module_data, limit=None, **addl_props):
   """ Read the files belonging to a module from disk and return
   their data as a dictionary. """
 
@@ -40,18 +41,27 @@ def read_module_files(module_data, **addl_props):
 
   if 'te_file' in module_data:
     with open(module_data['te_file']) as fin:
-      files['te'] = {'text': fin.read()}
+      info = os.fstat(fin.fileno())
+      handle = itertools.islice(fin, limit)
+      files['te'] = {'text': "".join(handle)}
       files['te'].update(**addl_props)
+      files['te']['size'] = info.st_size
 
   if 'if_file' in module_data:
     with open(module_data['if_file']) as fin:
-      files['if'] = {'text': fin.read()}
+      info = os.fstat(fin.fileno())
+      handle = itertools.islice(fin, limit)
+      files['if'] = {'text': "".join(handle)}
       files['if'].update(**addl_props)
+      files['if']['size'] = info.st_size
 
   if 'fc_file' in module_data:
     with open(module_data['fc_file']) as fin:
-      files['fc'] = {'text': fin.read()}
+      info = os.fstat(fin.fileno())
+      handle = itertools.islice(fin, limit)
+      files['fc'] = {'text': "".join(handle)}
       files['fc'].update(**addl_props)
+      files['fc']['size'] = info.st_size
 
   return files
 
@@ -112,7 +122,8 @@ class RefPolicy(restful.ResourceDomain):
 
         response['payload'] = read_module_files(
             refpolicy.modules[params['module']],
-            editable=False)
+            editable=False,
+            limit=1500)
 
         return response
 
