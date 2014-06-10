@@ -33,12 +33,15 @@
 </div>
 <div ng-show='analysisPaneVisible' class='analysis-pane col-md-4 panel panel-default'>
     <div class='panel-heading'>
-        <h4 class='panel-title'>From {{analysisOrigin}}</h4>
+        <h4 class='panel-title'>From {{analysisOrigin}}
+            <i ng-click='analysisData = null' 
+                class='pull-right glyphicon glyphicon-remove'></i>
+        </h4>
     </div>
     <ul class='list-group'>
         <li ng-repeat='(dest, data) in analysisData' class='list-group-item'>
         <h5>{{data.dest}}</h5>
-        <ul id="{{dest}}" class='list-unstyled'>
+        <ul id="{{dest}}" class='list-unstyled expandable-list'>
             <li ng-repeat='(perm, data) in data.perms'>
             <a data-toggle='collapse'
                data-parent='#{{dest}}'
@@ -50,16 +53,16 @@
                 <span class='text-muted'>
                     {{data.class}}
                 </span>
-                <span ng-click='highlight(data)'>
+                <a ng-click='highlight(data)'>[highlight]</a>
             </span>
             <ul class='collapse list-unstyled' id='{{dest}}_{{perm}}'>
                 <li ng-repeat='step in data.human'>
-                <em>{{step.type}}</em>
+                <em class='text-muted'>{{step.type}}</em>
                 <span ng-show='step.name'>
                     {{step.name}}
                 </span>
                 <span ng-show='step.class'>
-                    object class {{step.class}}
+                    <em class='text-muted'>object class</em> {{step.class}}
                 </span>
 
                 </li>

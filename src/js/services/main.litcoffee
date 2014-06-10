@@ -108,6 +108,8 @@ general callbacks
 
         send: (data, response) =>
 
+          console.log "Sent ", data
+
 Sometimes we might want to handle a response specific to the requests.
 We generate a token and do a callback specifically on that token.
 

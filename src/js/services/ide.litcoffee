@@ -31,7 +31,7 @@ errors, and generally being awesome.
 
           @selection_ranges = {}
 
-          @validate_dsl = _.throttle @_validate_dsl, 1000
+          @validate_dsl = _.debounce @_validate_dsl, 500
 
         isCurrent: (id)=>
           id? and id == @current_policy._id
@@ -479,6 +479,10 @@ with the results.
             else
               @current_policy.json = data.payload.data
               @rebuild_expansion()
+
+              _.each @hooks.json_changed, (hook)=>
+                hook(@current_policy.json)
+
               deferred.resolve(data.payload.paths)
 
           return deferred.promise
