@@ -31,16 +31,39 @@
     </svg>
   </div>
 </div>
-<div ng-show='analysisPaneVisible' class='analysis-pane col-md-4'>
-    <div class='fullheight'>hello</div>
-    <h3>{{analysisOrigin}}</h3>
+<div ng-show='analysisPaneVisible' class='analysis-pane col-md-4 panel panel-default'>
+    <div class='panel-heading'>
+        <h4 class='panel-title'>From {{analysisOrigin}}</h4>
+    </div>
     <ul class='list-group'>
-        <li ng-repeat='(dest, perms) in analysisData' class='list-group-item'>
-        <ul>
-            <li ng-repeat='(perm, data) in perms'>
-            <strong>{{perm}}</strong>
+        <li ng-repeat='(dest, data) in analysisData' class='list-group-item'>
+        <h5>{{data.dest}}</h5>
+        <ul id="{{dest}}" class='list-unstyled'>
+            <li ng-repeat='(perm, data) in data.perms'>
+            <a data-toggle='collapse'
+               data-parent='#{{dest}}'
+               data-target="#{{dest}}_{{perm}}">
+                <i class='glyphicon glyphicon-plus'></i>
+            </a>
+            <span class='list-content'>
+                <strong>{{perm}}</strong>
+                <span class='text-muted'>
+                    {{data.class}}
+                </span>
+                <span ng-click='highlight(data)'>
+            </span>
+            <ul class='collapse list-unstyled' id='{{dest}}_{{perm}}'>
+                <li ng-repeat='step in data.human'>
+                <em>{{step.type}}</em>
+                <span ng-show='step.name'>
+                    {{step.name}}
+                </span>
+                <span ng-show='step.class'>
+                    object class {{step.class}}
+                </span>
 
-            <span class='text-muted'>{{data.endpoint}} -- {{data.class}}</span>
+                </li>
+            </ul>
             </li>
         </ul>
         </li>

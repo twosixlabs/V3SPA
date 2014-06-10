@@ -483,6 +483,10 @@ assumes they've all been expanded.
           #  $scope.objects.domains[dom_id].highlight_reachable 0
 
 
+      $scope.highlight = (data)->
+          _.each data.hops, (conn)->
+              $scope.objects.connections[conn].highlight_reachable 0
+
 
 Lobster-specific definitions for Avispa
 
