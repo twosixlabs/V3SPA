@@ -85,6 +85,7 @@ class LobsterDomain(object):
         new_path = []
         expanded_ids = data['domains'].keys()
         last_perm = None
+        last_object_class = None
 
         for i, hop_id in enumerate(map(str, path)):
 
@@ -101,10 +102,10 @@ class LobsterDomain(object):
                     dest_port = data['ports'][hop[fwd]]
                 except KeyError:
                     if tried_expanding is True:
-                      raise Exception("Couldn't expand the graph to link from {0}"
-                                      .format(next_domain))
+                        raise Exception("Couldn't expand the graph to link from {0}"
+                                        .format(next_domain))
                     else:
-                      tried_expanding = True
+                        tried_expanding = True
 
                     # We don't have the data locally. Figure out how to find
                     # it.
@@ -181,21 +182,28 @@ class LobsterDomain(object):
                     pdb.set_trace()
             elif (next_domain['class'] != 'Domtrans_pattern'
                   and self.get_annotation(hop, 'Perm')):
-                last_perm = [
-                    (x['args'][0], dest_port['name'])
-                    for x in self.get_annotation(hop, 'Perm')
-                    ]
+                last_perm = {'perm': [x['args'][0]
+                  for x in self.get_annotation(hop, 'Perm')
+                  ]}
                 print("which has {0} permissions ".format(last_perm))
                 new_path.append({
                     'hop': hop_id,
                     'type': 'permission',
-                    'name': last_perm,
-                    'class': dest_port['name']
+                    'name': last_perm['perm'],
+                    'data': last_perm
                 })
             else:
                 pass
                 #import pdb; pdb.set_trace()
                 #print("Don't know what this hop is: {0}".format(hop))
+
+            if last_perm and dest_port['name'] not in (
+                    'module_obj', 'module_subj',
+                    'member_obj', 'member_subj',
+                    'attribute_subj', 'attribute_obj'):
+                last_object_class = dest_port['name']
+                last_perm['class'] = last_object_class
+                print ("to '{0}' objects of ".format(last_object_class))
 
             if is_type:
                 new_path.append({
@@ -203,9 +211,12 @@ class LobsterDomain(object):
                     'type': 'type',
                     'name': next_domain['path']
                 })
-                new_path[-1]['class'] = dest_port['name']
-                print("To '{1}' objects of type '{0}'"
-                      .format(next_domain['path'], dest_port['name']))
+                if last_object_class is not None:
+                    new_path[-1]['class'] = last_object_class
+                    last_object_class = None
+
+                print("type '{0}'"
+                      .format(next_domain['path'], last_object_class))
             elif self.get_annotation(
                     next_domain, 'Attribute',
                     annotation_param='domainAnnotations'):
@@ -217,11 +228,14 @@ class LobsterDomain(object):
                 if dest_port['name'] == 'attribute_subj':
                     print("attribute {0}".format(next_domain['path']))
                 else:
-                    new_path[-1]['class'] = dest_port['name']
-                    print("To '{1}' objects of attribute type '{0}'"
-                          .format(next_domain['path'], dest_port['name']))
+                    if last_object_class is not None:
+                        new_path[-1]['class'] = last_object_class
+                        last_object_class = None
+                    #new_path[-1]['class'] = dest_port['name']
+                    print("attribute type '{0}'"
+                          .format(next_domain['path']))
             else:
-              pass
+                pass
 
             if self.get_annotation(hop, 'CondExpr'):
                 # print(
@@ -249,13 +263,13 @@ class LobsterDomain(object):
             if dest == 'truncated':
                 continue
 
-            new_paths = {}
+            new_paths = {'dest_id': dest, 'perms': {}}
             for path in paths:
                 logger.info('Gathering additional data for {0}'.format(path))
                 import urlparse
                 params = urlparse.parse_qs(msg['payload']['params'])
 
-                path_data, final_perms = self.path_walk(
+                path_data, final_perm = self.path_walk(
                     path,
                     self.last_parse_request['result'],
                     params['id'][0],
@@ -263,14 +277,15 @@ class LobsterDomain(object):
 
                 logger.info("Re-tabulated path data")
 
-                for perm, obclass in final_perms:
-                  new_paths[perm] = {
-                      'hops': path,
-                      'human': path_data,
-                      'perm': perm,
-                      'class': obclass,
-                      'endpoint': path_data[-1]['name']
-                  }
+                new_paths['dest'] = path_data[-1]['name']
+                for perm in final_perm['perm']:
+                    new_paths['perms'][perm] = {
+                        'hops': path,
+                        'human': path_data,
+                        'perm': perm,
+                        'class': final_perm['class'],
+                        'endpoint': path_data[-1]
+                    }
 
             result[dest] = new_paths
 

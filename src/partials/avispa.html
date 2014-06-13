@@ -31,16 +31,42 @@
     </svg>
   </div>
 </div>
-<div ng-show='analysisPaneVisible' class='analysis-pane col-md-4'>
-    <div class='fullheight'>hello</div>
-    <h3>{{analysisOrigin}}</h3>
+<div ng-show='analysisPaneVisible' class='analysis-pane col-md-4 panel panel-default'>
+    <div class='panel-heading'>
+        <h4 class='panel-title'>From {{analysisOrigin}}
+            <i ng-click='analysisData = null' 
+                class='pull-right glyphicon glyphicon-remove'></i>
+        </h4>
+    </div>
     <ul class='list-group'>
-        <li ng-repeat='(dest, perms) in analysisData' class='list-group-item'>
-        <ul>
-            <li ng-repeat='(perm, data) in perms'>
-            <strong>{{perm}}</strong>
+        <li ng-repeat='(dest, data) in analysisData' class='list-group-item'>
+        <h5>{{data.dest}}</h5>
+        <ul id="{{dest}}" class='list-unstyled expandable-list'>
+            <li ng-repeat='(perm, data) in data.perms'>
+            <a data-toggle='collapse'
+               data-parent='#{{dest}}'
+               data-target="#{{dest}}_{{perm}}">
+                <i class='glyphicon glyphicon-plus'></i>
+            </a>
+            <span class='list-content'>
+                <strong>{{perm}}</strong>
+                <span class='text-muted'>
+                    {{data.class}}
+                </span>
+                <a ng-click='highlight(data)'>[highlight]</a>
+            </span>
+            <ul class='collapse list-unstyled' id='{{dest}}_{{perm}}'>
+                <li ng-repeat='step in data.human'>
+                <em class='text-muted'>{{step.type}}</em>
+                <span ng-show='step.name'>
+                    {{step.name}}
+                </span>
+                <span ng-show='step.class'>
+                    <em class='text-muted'>object class</em> {{step.class}}
+                </span>
 
-            <span class='text-muted'>{{data.endpoint}} -- {{data.class}}</span>
+                </li>
+            </ul>
             </li>
         </ul>
         </li>

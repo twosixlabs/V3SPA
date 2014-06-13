@@ -22,6 +22,30 @@
   z-index: 1;
 }
 
+#overlay {
+  .loading-icon {
+    top: 45%;
+    position: relative;
+    font-size: 4em;
+    color: #fff;
+    text-align: center
+  }
+  z-index: 99999;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background: #000;
+  opacity: .3;
+  filter: alpha(opacity=30);
+  -moz-opacity: .3;
+  }
+
 .container-full {
   padding-top: 10px;
   margin: 0 15px;
@@ -319,7 +343,7 @@ g.svg-highlight-reach-0 {
 
   path {
     stroke: red;
-    stroke-width: 3px;
+    stroke-width: 8px;
     stroke-opacity: 0.8;
   }
 }
@@ -370,4 +394,11 @@ g.svg-highlight-reach-0 {
 
   margin-bottom: -99999px;
   padding-bottom: 99999px;
+
+  .expandable-list {
+    .glyphicon {
+top: 0px;
+     font-size: 0.6em;
+    }
+  }
 }

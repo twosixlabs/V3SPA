@@ -468,20 +468,13 @@ assumes they've all been expanded.
 
           $scope.analysisData = paths
           $scope.analysisPaneVisible = true
-          hide_pane = ->
+          $scope.hide_analysis_pane = ->
             $scope.analysisPaneVisible = false
+            $scope.analysisData = null
 
-          #$timeout hide_pane, 5
-
-          #ctr = 0
-          #_.each result.result, (paths, dom_id)->
-          #
-          #  _.each paths, (path)->
-          #    _.each path, (conn)->
-          #      $scope.objects.connections[conn].highlight_reachable 0
-          #
-          #  $scope.objects.domains[dom_id].highlight_reachable 0
-
+      $scope.highlight = (data)->
+          _.each data.hops, (conn)->
+              $scope.objects.connections[conn].highlight_reachable 0
 
 
 Lobster-specific definitions for Avispa

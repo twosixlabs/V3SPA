@@ -244,12 +244,13 @@
     <div id='domain-context-menu'>
       <ul role='menu' class='dropdown-menu'>
         <li>
-          <a id='query_reachability' tabindex='-1'>Expand Reachable Domains</a>
-        </li>
-        <li>
           <a id='display_reachability' tabindex='-1'>Highlight Reachable Domains</a>
         </li>
       </ul>
+    </div>
+    <div ng-controller='navCtrl' ng-show='have_outstanding()' id='overlay'>
+      <div class='loading-icon'>Loading....
+      </div>
     </div>
   </body>
 </html>
