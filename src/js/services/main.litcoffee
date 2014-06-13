@@ -29,6 +29,10 @@
             level: level
             message: message.split('\n')
 
+          if level == 'error'
+              $.growl {title: 'Error', message: message}, 
+                type: 'danger'
+
           @$timeout =>
             @messages.push(msg)
             if @messages.length > 10
