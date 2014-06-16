@@ -477,9 +477,8 @@ assumes they've all been expanded.
               $scope.objects.connections[conn.conn].highlight_reachable 0
 
       $scope.clearAnalysis = ->
-          $scope.$apply ->
-              $scope.analysisData = null
-              $scope.analysisPaneVisible = false
+          $scope.analysisData = null
+          $scope.analysisPaneVisible = false
 
 
 Lobster-specific definitions for Avispa

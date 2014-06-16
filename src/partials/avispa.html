@@ -64,7 +64,7 @@
                 </span>
                 <span ng-show="step.type == 'permission'">
                     <ul class='list-unstyled'>
-                        <li class='indent' ng-repeat='perm_info in step.name'>
+                        <li class='indent' ng-repeat='perm_info in step.name track by $index'>
                         {{perm_info[0]}}.{{perm_info[1]}}
                         </li>
                     </ul>
