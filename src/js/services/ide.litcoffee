@@ -243,12 +243,10 @@ trigger revalidation.
 
         set_query_param: (param, val)->
           if @query_params[param] != val
-            console.log "Query param '#{param}': #{val}"
             @query_params[param] = val
 
         set_view_control: (key, visible)->
           if @view_control[key] != visible
-            console.log "View Control '#{key}': #{visible}"
             @view_control[key] = visible
 
             unless @current_policy.id == null
@@ -462,8 +460,16 @@ with the results.
           deferred = @$q.defer()
 
           path_params = _.map(@query_params, (v, k)->
-            return "#{k}=#{v}"
+            if _.isArray v
+                if _.size(v) == 0
+                    return null
+                else
+                    return "#{k}=#{v.join(",")}"
+
+            else
+                return "#{k}=#{v}"
           )
+          path_params = _.reject(path_params, (v)-> v == null)
 
           req =
             domain: 'lobster'

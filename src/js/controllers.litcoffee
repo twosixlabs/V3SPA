@@ -13,6 +13,7 @@ The main controller. avispa is a subcontroller.
 
       $scope.analysis_ctrl =
         limit: 10
+        perms: []
 
       $scope.$watch 'raw_view_selection', (newv, oldv)->
         if newv
@@ -43,6 +44,29 @@ The main controller. avispa is a subcontroller.
                       ret = 
                         text: k
                         id: k
+
+      $scope.permissions_select2 = 
+          multiple: true
+          data: selinux_perms
+          simple_tags: true
+          dropdownAutoWidth: true
+          placeholder: 'Filter permissions'
+          minimumInputLength: 2
+          matcher: (term, text, option)->
+              if term.indexOf('.') > 0
+                  return text.toUpperCase().indexOf(term.toUpperCase())>=0
+              else # if there's no period in the search, just search attributes
+                  [objclass, perm] = text.split('.')
+                  return perm.toUpperCase().indexOf(term.toUpperCase())>=0
+          sortResults: (results, container)->
+              return results.sort((a,b)->
+                  if a.id < b.id
+                      return -1
+                  else if a.id > b.id
+                      return 1
+                  else 
+                      return 0
+              )
 
       $scope.$watchCollection 'view_control', (new_collection)->
         for k, v of new_collection

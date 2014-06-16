@@ -53,13 +53,20 @@
                 <span class='text-muted'>
                     {{data.class}}
                 </span>
-                <a ng-click='highlight(data)'>[highlight]</a>
+                <a style='cursor: pointer' ng-click='highlight(data)'>[highlight]</a>
             </span>
             <ul class='collapse list-unstyled' id='{{dest}}_{{perm}}'>
                 <li ng-repeat='step in data.human'>
                 <em class='text-muted'>{{step.type}}</em>
-                <span ng-show='step.name'>
+                <span ng-show="step.type != 'permission'">
                     {{step.name}}
+                </span>
+                <span ng-show="step.type == 'permission'">
+                    <ul class='list-unstyled'>
+                        <li class='indent' ng-repeat='perm_info in step.name'>
+                        {{perm_info[0]}}.{{perm_info[1]}}
+                        </li>
+                    </ul>
                 </span>
                 <span ng-show='step.class'>
                     <em class='text-muted'>object class</em> {{step.class}}

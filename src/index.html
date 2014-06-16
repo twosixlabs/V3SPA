@@ -122,10 +122,12 @@
                             <li class='list-group-item'>
                             <div class='form-horizontal'>
                               <div class='form-group'>
-                                <label class='col-md-6 control-label pad-right'>
+                                <label class='col-md-5 control-label pad-right'>
+                                  <abbr title="Hard limit on the number of returned paths">
                                   Explored Paths Limit
+                                </abbr>
                                 </label>
-                                <div class='col-md-6'>
+                                <div class='col-md-7'>
                                   <input touch-spin='3' ng-model='analysis_ctrl.limit'/>
                                 </div>
                               </div>
@@ -134,17 +136,39 @@
                             <li class='list-group-item'>
                             <div class='form-horizontal'>
                               <div class='form-group'>
-                                <label class='col-md-6 control-label pad-right'>
-                                  Enabled Permissions
+                                <label class='col-md-5 control-label pad-right'>
+                                  <abbr title="Permissions to follow from the originating domain">
+                                    Permissions
+                                  </abbr>
                                 </label>
-                                <div class='col-md-6'>
-                                <input class='form-control'
-                                       ng-disabled='true'
-                                       type='text'
-                                       value='tbd'/>
-</div>
+                                <div class='col-md-7'>
+                                  <input id='permissionSelect'
+                                  class='col-md-12'
+                                  ui-select2='permissions_select2'
+                                  ng-model='analysis_ctrl.perms' type='hidden'
+                                  placeholder='file.read'
+                                  ng-disabled='policy.modules == null' />
+                                </div>
                               </div>
                             </div>
+                            </li>
+
+                            <li class='list-group-item'>
+                            <div class='form-horizontal'>
+                              <div class='form-group'>
+                                <label class='col-md-5 control-label pad-right'>
+                                  <abbr title="Permissions that can be followed between domains when considering potential information flow">
+                                    Transitive Permissions
+                                  </abbr>
+                                </label>
+                                <div class='col-md-7'>
+                                  <input id='permissionSelect'
+                                  class='col-md-12'
+                                  ui-select2='permissions_select2'
+                                  ng-model='analysis_ctrl.trans_perms' type='hidden'
+                                  placeholder='*.execute_no_trans'
+                                  ng-disabled='policy.modules == null' />
+                                </div>
                             </li>
                           </ul>
                         </div>
