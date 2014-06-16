@@ -83,7 +83,7 @@ class LobsterDomain(object):
 
         previous_dom = None
         new_path = []
-        expanded_ids = data['domains'].keys()
+        expanded_ids = set(data['domains'].keys())
         last_perm = None
         last_object_class = None
 
@@ -107,11 +107,11 @@ class LobsterDomain(object):
                 except KeyError:
                     if tried_expanding is True:
                         raise Exception("Couldn't expand the graph to link from {0}"
-                                        .format(next_domain))
+                                        .format(hop_info[fwd]))
                     else:
                         tried_expanding = True
 
-                    expanded_ids.append(hop_info[fwd])
+                    expanded_ids.add(hop_info[fwd])
                     output = self._make_request(
                         'POST', '/parse?{0}'.format(
                             "&".join(["id={0}".format(hid)
@@ -231,7 +231,7 @@ class LobsterDomain(object):
                 new_path[-1]['condition'] = self.get_annotation(
                     hop, 'CondExpr')[0]['args']
 
-            origin = hop[fwd + "_dom"]
+            origin = hop_info[fwd]
             previous_dom = next_domain
 
         return new_path, last_perm
