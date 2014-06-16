@@ -87,18 +87,22 @@ class LobsterDomain(object):
         last_perm = None
         last_object_class = None
 
-        for i, hop_id in enumerate(map(str, path)):
+        for i, hop_info in enumerate(path):
 
-            hop = data['connections'][hop_id]
+            hop = data['connections'][hop_info['conn']]
 
-            fwd = 'right' if hop['left_dom'] == origin else 'left'
+            if hop_info['left'] == origin:
+                fwd = 'right'
+                bwd = 'left'
+            else:
+                fwd = 'left'
+                bwd = 'right'
 
             tried_expanding = False
             while True:
                 try:
-                    next_domain = data['domains'][hop[fwd + "_dom"]]
-                    from_dom = data['domains'][
-                        hop['left_dom' if fwd == 'right' else 'right_dom']]
+                    next_domain = data['domains'][hop_info[fwd]]
+                    from_dom = data['domains'][hop_info[bwd]]
                     dest_port = data['ports'][hop[fwd]]
                 except KeyError:
                     if tried_expanding is True:
@@ -107,24 +111,11 @@ class LobsterDomain(object):
                     else:
                         tried_expanding = True
 
-                    # We don't have the data locally. Figure out how to find
-                    # it.
-                    if previous_dom is not None and previous_dom['parent'] == '0':
-                        # We're at the root. Here an annotation can tell us
-                        # where the path goes.
-                        filter_key = 'Lhs' if fwd == 'left_dom' else 'Rhs'
-                        annotations = filter(lambda x: x['name'] == filter_key,
-                                             hop['annotations'])
-                    else:
-                        annotations = []
-
-                    expanded_ids.append(hop[fwd + '_dom'])
+                    expanded_ids.append(hop_info[fwd])
                     output = self._make_request(
-                        'POST', '/parse?{1}&{0}'.format(
+                        'POST', '/parse?{0}'.format(
                             "&".join(["id={0}".format(hid)
-                                     for hid in expanded_ids]),
-                            "&".join(["path={0}".format(".".join(a['args']))
-                                      for a in annotations])),
+                                     for hid in expanded_ids])),
                         lobster_data)
 
                     result = api.db.json.loads(output.body)
@@ -141,15 +132,16 @@ class LobsterDomain(object):
                 new_path.append({
                     'type': 'origin',
                     'name': from_dom['path'],
-                    'hop': hop_id
+                    'hop': hop_info['conn']
                 })
                 print("Origin: {0}".format(from_dom['path']))
-            elif (next_domain['class'] == 'Domtrans_pattern'
+
+            if (next_domain['class'] == 'Domtrans_pattern'
                     and next_domain != previous_dom):
                 attr = self.get_annotation(
                     next_domain, "Macro", annotation_param='domainAnnotations')
                 new_path.append({
-                    'hop': hop_id,
+                    'hop': hop_info['conn'],
                     'type': 'transition',
                     'name': attr[0]['args'][1]
                 })
@@ -167,14 +159,14 @@ class LobsterDomain(object):
                         dest_port['name'] == 'attribute_subj':
                     print("which is a member of")
                     new_path.append({
-                        'hop': hop_id,
+                        'hop': hop_info['conn'],
                         'type': 'member_of',
                     })
                 elif fwd_arg and fwd_arg[0]['args'][1] == 'member_obj' or \
                         dest_port['name'] == 'member_obj':
                     print("an attribute that contains")
                     new_path.append({
-                        'hop': hop_id,
+                        'hop': hop_info['conn'],
                         'type': 'attribute_contains',
                     })
                 elif dest_port['name'] == 'attribute_subj':
@@ -182,32 +174,27 @@ class LobsterDomain(object):
                     pdb.set_trace()
             elif (next_domain['class'] != 'Domtrans_pattern'
                   and self.get_annotation(hop, 'Perm')):
-                last_perm = {'perm': [x['args'][0]
-                  for x in self.get_annotation(hop, 'Perm')
-                  ]}
-                print("which has {0} permissions ".format(last_perm))
+
+                perms = [x['args']
+                         for x in self.get_annotation(hop, 'Perm')]
+
+
+                print("which has {0} permissions ".format(perms))
+
                 new_path.append({
-                    'hop': hop_id,
+                    'hop': hop_info['conn'],
                     'type': 'permission',
-                    'name': last_perm['perm'],
-                    'data': last_perm
+                    'name': perms
                 })
+
+                last_perm = new_path[-1]
+
             else:
                 pass
-                #import pdb; pdb.set_trace()
-                #print("Don't know what this hop is: {0}".format(hop))
-
-            if last_perm and dest_port['name'] not in (
-                    'module_obj', 'module_subj',
-                    'member_obj', 'member_subj',
-                    'attribute_subj', 'attribute_obj'):
-                last_object_class = dest_port['name']
-                last_perm['class'] = last_object_class
-                print ("to '{0}' objects of ".format(last_object_class))
 
             if is_type:
                 new_path.append({
-                    'hop': hop_id,
+                    'hop': hop_info['conn'],
                     'type': 'type',
                     'name': next_domain['path']
                 })
@@ -221,7 +208,7 @@ class LobsterDomain(object):
                     next_domain, 'Attribute',
                     annotation_param='domainAnnotations'):
                 new_path.append({
-                    'hop': hop_id,
+                    'hop': hop_info['conn'],
                     'type': 'attribute',
                     'name': next_domain['path']
                 })
@@ -231,7 +218,7 @@ class LobsterDomain(object):
                     if last_object_class is not None:
                         new_path[-1]['class'] = last_object_class
                         last_object_class = None
-                    #new_path[-1]['class'] = dest_port['name']
+
                     print("attribute type '{0}'"
                           .format(next_domain['path']))
             else:
@@ -278,12 +265,12 @@ class LobsterDomain(object):
                 logger.info("Re-tabulated path data")
 
                 new_paths['dest'] = path_data[-1]['name']
-                for perm in final_perm['perm']:
+                for klass, perm in final_perm['name']:
                     new_paths['perms'][perm] = {
                         'hops': path,
                         'human': path_data,
                         'perm': perm,
-                        'class': final_perm['class'],
+                        'class': klass,
                         'endpoint': path_data[-1]
                     }
 
