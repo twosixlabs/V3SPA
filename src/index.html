@@ -184,7 +184,7 @@
                     </div>
                     <div class='editor-box'>
                       <div ui-ace="{ onLoad: aceLoaded }"
-                        auto-height="410"
+                        auto-height="540"
                         auto-height-type='offset_bottom_px'
                         on-resize='$scope.editor.resize()'>
                       </div>
@@ -202,7 +202,7 @@
         <div ng-class="{'col-md-12': editorSize == 0,
                         'col-md-8': editorSize == 1,
                         'col-md-4': editorSize == 2}">
-          <div id='visualizer' ng-view auto-height='150' auto-height-type='offset_bottom_px'>
+          <div id='visualizer' ng-view auto-height='210' auto-height-type='offset_bottom_px'>
           </div>
         </div>
       </div>

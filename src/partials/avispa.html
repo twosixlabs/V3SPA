@@ -31,10 +31,11 @@
     </svg>
   </div>
 </div>
-<div ng-show='analysisPaneVisible' class='analysis-pane col-md-4 panel panel-default'>
+<div ng-show='analysisPaneVisible' class='analysis-pane col-md-4
+    panel panel-default vertical-scrollable'>
     <div class='panel-heading'>
         <h4 class='panel-title'>From {{analysisOrigin}}
-            <i ng-click='analysisData = null' 
+            <i ng-click='clearAnalysis()' 
                 class='pull-right glyphicon glyphicon-remove'></i>
         </h4>
     </div>
