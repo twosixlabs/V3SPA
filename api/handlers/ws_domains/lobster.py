@@ -225,9 +225,6 @@ class LobsterDomain(object):
                 pass
 
             if self.get_annotation(hop, 'CondExpr'):
-                # print(
-                    #"If '{0}' is set".format(
-                        # self.get_annotation(hop, 'CondExpr')[0]['args']))
                 new_path[-1]['condition'] = self.get_annotation(
                     hop, 'CondExpr')[0]['args']
 
