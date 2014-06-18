@@ -133,13 +133,17 @@
 
         startDomain = json_data.result.domains["0"];
         nodes = partition.nodes(startDomain)
+        portsById = _.indexBy(_.filter(nodes, (d)-> d.type == 'port'), 'id')
         color = d3.scale.ordinal().domain([null, 'port','domain']).range([
           '#d9d9d9', '#e5c494', '#ffd92f'
         ])
         fontsize = d3.scale.log().rangeRound([3, 16]).domain([10, layout.w]).clamp(true)
+        curve_control = d3.scale.sqrt()
+          .rangeRound([250, 1000])
+          .domain([10, layout.h])
 
         svg_container = $('svg.hiveview')[0]
-        segment = d3.select("svg.hiveview").select('g.viewer')
+        segment = d3.select("svg.hiveview").select('g.viewer').select('g#nodes')
           .selectAll('g')
           .data(nodes, (d)-> 
             return d.path)
@@ -204,7 +208,51 @@
             IDEBackend.expand_graph_by_id [d.id]
         )
 
+        link_data = _.map(json_data.result.connections, (conn, k)->
+          unless conn.left of json_data.result.ports and conn.right of json_data.result.ports
+            return null
 
+          conn.id = k
+          return conn
+        )
+        link_data = _.without(link_data, null)
+
+        links = d3.select("svg.hiveview").select('g.viewer').select('g#links')
+          .selectAll('path').data(link_data, (d)->d.id)
+
+        link_path_fn = (d)->
+            left_port = portsById[d.left]
+            right_port = portsById[d.right]
+            rm_coords = (port)->
+              [x_position(port) + port.dy, port.x + (port.dx / 2)]
+
+            lcoord = rm_coords(left_port)
+            rcoord = rm_coords(right_port)
+            vdist = Math.abs(lcoord[1] - rcoord[1])
+            hdist = Math.abs(lcoord[0] - rcoord[0])
+            top_point = if lcoord[1] > rcoord[1] then rcoord[1] else lcoord[1]
+
+            path = "M #{lcoord[0]} #{lcoord[1]}" 
+            path +=" Q #{lcoord[0] + curve_control(vdist) + hdist} #{top_point + (0.5 * vdist)}"  # control point 1
+            #path +="  #{rcoord[0] + 100} #{rcoord[1] - (0.3 * vdist)}"  # control point 2
+            path += " #{rcoord[0]} #{rcoord[1]}" # end point
+            path
+
+        links.transition()
+          .attr('d', link_path_fn)
+          .style('stroke', 'black')
+          .style('stroke-width', '5')
+          .style('fill', 'none')
+
+        links.enter()
+          .append('path')
+          .transition().delay(500)
+          .attr('d', link_path_fn)
+          .style('stroke', 'black')
+          .style('stroke-width', '5')
+          .style('fill', 'none')
+
+        links.exit().transition().remove()
 
         svgPanZoom.init
           selector: '#surface svg'
