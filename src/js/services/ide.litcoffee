@@ -81,7 +81,7 @@ Clear the current policy
               valid: false
 
             @graph_expansion = {}
-            @graph_id_expansion = {}
+            @graph_id_expansion = []
 
             for hook in @hooks.policy_load
               hook(@current_policy)
@@ -169,7 +169,7 @@ store
           data = @current_policy.json['result']['domains']
 
           @graph_expansion = {}
-          @graph_id_expansion = {}
+          @graph_id_expansion = 
 
           ancestor_lists = []
           for id, domain of data
@@ -205,6 +205,11 @@ Extend the set of paths that we show.
 
         expand_graph_by_id: (id_list)=>
           @graph_id_expansion = _.union @graph_id_expansion, id_list
+          @_validate_dsl()
+
+        contract_graph_by_id: (id_list)=>
+          @graph_id_expansion = _.without.apply(
+            _, [@graph_id_expansion].concat(id_list))
           @_validate_dsl()
 
         expand_graph_by_name: (ancestor_lists)=>
@@ -325,7 +330,7 @@ contents of @current_policy
 Load a policy module from the server (deprecated)
 
         load_policy_module: (refpolicy_id, module_name)=>
-          console.log "This function is deprcated..."
+          console.error "This function is deprcated..."
           deferred = @$q.defer()
 
           @graph_expansion = {}
