@@ -2,9 +2,9 @@
 
     vespaControllers.controller 'navCtrl', ($scope, RefPolicy, VespaLogger, SockJSService, $modal, IDEBackend)->
 
-        policy = RefPolicy.promise()
-        policy.then (policy)->
-          $scope.refpolicy = policy
+        #policy = RefPolicy.promise()
+        #policy.then (policy)->
+        #  $scope.refpolicy = policy
 
         $scope.load_refpolicy = ->
           instance = $modal.open
