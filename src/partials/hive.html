@@ -1,9 +1,58 @@
-<div id='surface'>
-  <div class='notes' id='hivetooltip'></div>
-<svg xmlns="http://www.w3.org/2000/svg" class='hiveview'>
-  <g class="viewer">
-  <g id="nodes"></g>
-  <g id="links"></g>
-  </g>
-</svg>
+<div id='surface' class='row' 
+  ng-class="{'col-md-12': analysisPaneVisible, 'col-md-8': analysisPaneVisible}">
+  <svg xmlns="http://www.w3.org/2000/svg" class='hiveview'>
+    <g class="viewer">
+    <g id="nodes"></g>
+    <g class='link' id="links"></g>
+    </g>
+  </svg>
+</div>
+<div ng-show='analysisPaneVisible' class='analysis-pane col-md-4
+    panel panel-default vertical-scrollable'>
+    <div class='panel-heading'>
+        <h4 class='panel-title'>{{analysisOrigin}}
+            <i ng-click='clearAnalysis()' 
+                class='pull-right glyphicon glyphicon-remove'></i>
+        </h4>
+    </div>
+    <ul class='list-group'>
+        <li ng-repeat='(dest, data) in analysisData' class='list-group-item'>
+        <h5>{{data.dest}}</h5>
+        <ul id="{{dest}}" class='list-unstyled expandable-list'>
+            <li ng-repeat='(perm, data) in data.perms'>
+            <a data-toggle='collapse'
+               data-parent='#{{dest}}'
+               data-target="#{{dest}}_{{perm}}">
+                <i class='glyphicon glyphicon-plus'></i>
+            </a>
+            <span class='list-content'>
+                <strong>{{perm}}</strong>
+                <span class='text-muted'>
+                    {{data.class}}
+                </span>
+                <a style='cursor: pointer' ng-click='highlight(data)'>[highlight]</a>
+            </span>
+            <ul class='collapse list-unstyled' id='{{dest}}_{{perm}}'>
+                <li ng-repeat='step in data.human'>
+                <em class='text-muted'>{{step.type}}</em>
+                <span ng-show="step.type != 'permission'">
+                    {{step.name}}
+                </span>
+                <span ng-show="step.type == 'permission'">
+                    <ul class='list-unstyled'>
+                        <li class='indent' ng-repeat='perm_info in step.name track by $index'>
+                        {{perm_info[0]}}.{{perm_info[1]}}
+                        </li>
+                    </ul>
+                </span>
+                <span ng-show='step.class'>
+                    <em class='text-muted'>object class</em> {{step.class}}
+                </span>
+
+                </li>
+            </ul>
+            </li>
+        </ul>
+        </li>
+    </ul>
 </div>

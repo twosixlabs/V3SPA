@@ -1,5 +1,56 @@
     vespaControllers = angular.module('vespaControllers') 
 
+    vespaControllers.controller 'modal.analysis_controls', (
+        $scope, $modalInstance, port_elem, port_data, IDEBackend) ->
+
+        $scope.port_data = port_data
+
+        $scope.analysis_ctrl =
+          limit: 10
+          perms: if port_data.name == 'active' then [] else _.pluck(
+            _.filter(selinux_perms, (d)->(
+              d.text.lastIndexOf("#{port_data.name}.", 0) == 0
+          )), 'text')
+          trans_perms: []
+          direction: if port_data.name == 'active' then 'forward' else 'backward'
+
+        $scope.cancel = $modalInstance.dismiss
+
+        $scope.load = ->
+
+          query = IDEBackend.perform_path_query(
+            port_data.parent.id, $scope.analysis_ctrl)
+
+          query.catch (error)->
+            console.log("ERROR", error)
+
+          query.then (paths)->
+            $modalInstance.close(paths)
+
+        $scope.permissions_select2 = 
+            multiple: true
+            data: selinux_perms
+            simple_tags: true
+            dropdownAutoWidth: true
+            placeholder: 'Filter permissions'
+            minimumInputLength: 2
+            matcher: (term, text, option)->
+                if term.indexOf('.') > 0
+                    return text.toUpperCase().indexOf(term.toUpperCase())>=0
+                else # if there's no period in the search, just search attributes
+                    [objclass, perm] = text.split('.')
+                    return perm.toUpperCase().indexOf(term.toUpperCase())>=0
+            sortResults: (results, container)->
+                return results.sort((a,b)->
+                    if a.id < b.id
+                        return -1
+                    else if a.id > b.id
+                        return 1
+                    else 
+                        return 0
+                )
+
+
     vespaControllers.controller 'modal.view_module', (
         $scope, $modalInstance, documents, module, $timeout) ->
 

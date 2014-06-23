@@ -1,5 +1,13 @@
     v3spa = angular.module 'vespa.directives', []
 
+    v3spa.filter 'join', ->
+        return (input, separator)->
+            return input.join(separator)
+
+    v3spa.filter 'pluck', ->
+        return (input, field)->
+            return _.pluck(input, field)
+
     v3spa.directive 'touchSpin', ->
       ret =
         restrict: 'A'

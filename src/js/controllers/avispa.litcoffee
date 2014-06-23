@@ -468,9 +468,6 @@ assumes they've all been expanded.
 
           $scope.analysisData = paths
           $scope.analysisPaneVisible = true
-          $scope.hide_analysis_pane = ->
-            $scope.analysisPaneVisible = false
-            $scope.analysisData = null
 
       $scope.highlight = (data)->
           _.each data.hops, (conn)->

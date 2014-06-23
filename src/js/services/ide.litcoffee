@@ -184,23 +184,6 @@ store
 
                 curr = curr[elem]
 
-          #q = new Queue()
-          #q.enqueue(['0', []])
-          #until q.isEmpty()
-          #  id, subpath = q.dequeue()
-          #  ancestor_lists.push domains[id].path)
-          #  for subd in domains[id].subdomains
-          #    do (subd)->
-          #      if subd in 
-          #  path = "#{subpath}.#{domains[id].name}"
-          #
-          #
-          #while not queue
-          #  next = queue.pop()
-          #for id, domain in @current_policy.json['result']['domains']:
-          #  do (id, domain_id)->
-          #    @graph_expansion = {}
-
 Extend the set of paths that we show.
 
         expand_graph_by_id: (id_list)=>
@@ -461,10 +444,10 @@ Perform a path query originating from the domain with ID
 `domain_id`. Return a promise which will be resolved
 with the results.
 
-        perform_path_query: (domain_id)->
+        perform_path_query: (domain_id, params)->
           deferred = @$q.defer()
 
-          path_params = _.map(@query_params, (v, k)->
+          path_params = _.map(params, (v, k)->
             if _.isArray v
                 if _.size(v) == 0
                     return null

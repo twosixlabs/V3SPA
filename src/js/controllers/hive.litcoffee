@@ -1,6 +1,69 @@
     vespaControllers = angular.module('vespaControllers')
 
-    vespaControllers.controller 'hiveCtrl', ($scope, VespaLogger, IDEBackend, PositionManager)->
+    vespaControllers.controller 'hiveCtrl', ($scope, $modal, $timeout, VespaLogger, IDEBackend, PositionManager)->
+
+      $scope.analysisPaneVisible = false
+      $scope.clearAnalysis = ->
+          $scope.analysisPaneVisible = false
+          $scope.analysisData = null
+
+      $scope.highlight = (data)->
+          _.each data.hops, (conn)->
+              conn_select = $scope.objects.connections[conn.conn]
+              conn_select.classed('svg-highlight-reach-0', true)
+
+              remove_highlight = ->
+                  conn_select.classed('svg-highlight-reach-0', false)
+
+              $timeout remove_highlight, 10000
+
+      $scope.has_context = (data)->
+
+          if data.type == 'port'
+            return not _.contains(
+              ['member_obj', 'member_subj', 'attribute_subj', 'attribute_obj', 'module_subj', 'module_obj'],
+              data.name)
+          else
+            return false
+
+
+      $scope.start_reachability_query = (port, data)->
+
+        $scope.analysisOrigin = data.parent.name
+
+        instance = $modal.open
+            templateUrl: 'analysisModal.html'
+            controller: 'modal.analysis_controls'
+            resolve:
+              port_elem: ->
+                port
+              port_data: ->
+                data
+
+        instance.result.then(
+          (paths)-> 
+            if _.isEmpty(_.omit(paths, 'truncated'))
+              $.growl(
+                title: "Info"
+                message: "Analysis returned no results."
+              ,
+                type: 'info'
+              )
+
+            else
+
+              $scope.analysisData = paths
+              $scope.analysisPaneVisible = true
+        )
+
+      $scope.create_context_menu = (port, data)->
+
+        $(port).contextmenu
+          target: '#domain-context-menu'
+          onItem: (domain_el, e)->
+            if e.target.id == 'display_reachability'
+              $scope.start_reachability_query(port, data)
+
       `
       function leafCount(domain_id, rawData) {
         var domain = rawData.domains[domain_id];
@@ -26,61 +89,16 @@
       };
 
       `
-      turtlesAllTheWayDown = (d3Selection, startDomain, rawData, depth)->(
-
-        #/* This part handles this levels display */
-        box = d3Selection.append('g')
-        box.append('rect')
-            .attr('fill', '#99ccff')
-            .attr('width', config.width)
-            .attr('height', (d)->(
-                if d.leafCount and d.leafCount > 0
-                  return (d.leafCount) * config.leafSize * 1.40
-
-                else
-                  return config.leafSize
-            ))
-
-        box.append('text')
-            .text(config.textFn)
-            .attr('font-size', '16')
-            .style('text-anchor', 'middle')
-              #//.style('dominant-baseline', 'middle')
-            .attr('x', config.width / 2)
-            .attr('y', (d)->(
-              if d.leafCount
-                (d.leafCount * config.leafSize / 2) + (config.leafSize / 2) + 5
-              else
-                return config.leafSize / 2 + 5
-            ))
-
-
-        #/* The rest of this function handles subdomains */
-        nextLevel = d3Selection.selectAll("#{config.elemType}.subdomGroup")
-            .data(_.map(startDomain.subdomains, (v, k)->
-              if k of rawData.domains
-                rawData.domains[k]
-              else
-                { dom_id: k, name: v.name}
-            ))
-
-        nextLevel
-          .enter().append(config.elemType)
-            .classed('subdomGroup', true)
-            .attr('transform', (d, i)->(
-              "translate(#{config.width * 1.25 * depth}, #{i * config.leafSize * 1.4})"
-            ))
-
-        #/* Recursively call this function for subdomains */
-        nextLevel.each (d, i)->(
-          turtlesAllTheWayDown(d3.select(@), d, rawData, depth + 1);
-        )
-      )
 
       update_listener = (json_data)->
 
         if not json_data.result?
           return
+
+        $scope.objects =
+          connections: []
+          ports: []
+          domain: []
 
         positionMgr = PositionManager("hive.viewport::#{IDEBackend.current_policy._id}")
 
@@ -137,7 +155,7 @@
         color = d3.scale.ordinal().domain([null, 'port','domain']).range([
           '#d9d9d9', '#e5c494', '#ffd92f'
         ])
-        fontsize = d3.scale.log().rangeRound([3, 16]).domain([10, layout.w]).clamp(true)
+        fontsize = d3.scale.log().rangeRound([4, 16]).domain([10, layout.w]).clamp(true)
         curve_control = d3.scale.sqrt()
           .rangeRound([250, 1000])
           .domain([10, layout.h])
@@ -149,7 +167,7 @@
             return d.path)
 
         x_position = (d)->
-          d.y + (6 * d.depth)
+          d.y + (3 * d.depth)
 
         segment.select('rect').transition()
           .attr('x', x_position)
@@ -157,7 +175,10 @@
           .attr('width', (d)->d.dy)
           .attr('height', (d)->d.dx)
           .style('fill', (d)->
-            return color(d.type)
+            if d.type == 'port' and d.name =='active'
+              return "#e6ab02"
+            else
+              return color(d.type)
           )
 
         segment.select('text').transition()
@@ -172,15 +193,23 @@
         group = segment.enter().append('g')
         group.append('rect')
           .classed('domains', (d)-> d.type == 'domain')
+          .classed('ports', (d)-> d.type == 'port')
+          .classed('contextual', (d)-> $scope.has_context(d))
           .transition().delay(500) 
           .attr('x', x_position)
           .attr('y', (d)->d.x)
           .attr('width', (d)->d.dy)
           .attr('height', (d)->d.dx)
           .style('fill', (d)->
-            return color(d.type)
+            if d.type == 'port' and d.name =='active'
+              return "#e6ab02"
+            else
+              return color(d.type)
           )
-          .style('stroke', '1px solid #ccc')
+          .each((d ,i)->(
+              if $scope.has_context(d)
+                $scope.create_context_menu(@, d)
+          ))
 
         group.append('text').transition().delay(500)
           .text((d)->d.name)
@@ -193,18 +222,34 @@
         segment.exit().remove()
 
         segment.on('mousedown', (d, i)->
-          d.clicked_at = d3.mouse(svg_container)
-          #d3.event.stopPropagation()
+          d.click_event = 
+            location: d3.mouse(svg_container)
+            event: d3.event
         )
 
         segment.on('mouseup', (d, i )->
-          if not _.isEqual( d.clicked_at, d3.mouse(svg_container))
-            d.clicked_at = null
+          unless d.click_event
+            return
+
+          if d.click_event.event.button == 2
+            return
+
+          if not _.isEqual( d.click_event.location, d3.mouse(svg_container))
+            d.click_event = null
+            return
+
+          if d.type == 'port'
             return
 
           if d.children
+            d3.select(@).select('rect').classed(
+              contractable: false
+            )
             IDEBackend.contract_graph_by_id _.pluck(d.children, 'id').concat(d.id)
           else
+            d3.select(@).select('rect').classed(
+              contractable: true
+            )
             IDEBackend.expand_graph_by_id [d.id]
         )
 
@@ -234,25 +279,25 @@
 
             path = "M #{lcoord[0]} #{lcoord[1]}" 
             path +=" Q #{lcoord[0] + curve_control(vdist) + hdist} #{top_point + (0.5 * vdist)}"  # control point 1
-            #path +="  #{rcoord[0] + 100} #{rcoord[1] - (0.3 * vdist)}"  # control point 2
             path += " #{rcoord[0]} #{rcoord[1]}" # end point
             path
 
         links.transition()
           .attr('d', link_path_fn)
-          .style('stroke', 'black')
-          .style('stroke-width', '5')
-          .style('fill', 'none')
 
         links.enter()
           .append('path')
+          .each( (d)->
+
+          )
           .transition().delay(500)
           .attr('d', link_path_fn)
-          .style('stroke', 'black')
-          .style('stroke-width', '5')
-          .style('fill', 'none')
 
         links.exit().transition().remove()
+
+        links.each (d)->(
+            $scope.objects.connections[d.id] = d3.select(@)
+        )
 
         svgPanZoom.init
           selector: '#surface svg'
@@ -278,29 +323,6 @@
         )
 
         return
-
-        rawData = json_data.result;
-        firstLevel = d3.select("svg.hiveview").append('g').classed('viewer', true)
-            .selectAll('g.subdomGroup')
-            .data(_.map(startDomain.subdomains, (v, k)->
-              if k of rawData.domains
-                rawData.domains[k]
-              else
-                { dom_id: k, name: v.name}
-            ))
-
-        firstLevel
-          .enter().append(config.elemType)
-            .classed('subdomGroup', true)
-            .attr('transform', (d, i)->(
-              "translate(#{config.width * 1.25}, #{i * config.leafSize * 1.4})"
-            ))
-
-        `
-          firstLevel.each(function(d, i){
-            turtlesAllTheWayDown(d3.select(this), d, rawData, 1);
-          });
-        `
 
       IDEBackend.add_hook 'json_changed', update_listener
       $scope.$on '$destroy', ->
