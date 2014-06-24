@@ -37,7 +37,7 @@
             resolve:
               origin_id_accessor: ->
                 (port_data)->
-                  port-data.parent.id
+                  port_data.parent.id
               port_data: ->
                 data
 
@@ -170,7 +170,15 @@
         x_position = (d)->
           d.y + (3 * d.depth)
 
-        segment.select('rect').transition()
+        set_classes = (selection)->
+          selection.classed('domains', (d)-> d.type == 'domain')
+                   .classed('ports', (d)-> d.type == 'port')
+                   .classed('contextual', (d)-> $scope.has_context(d))
+                   .classed('contractable', (d)->( d.type == 'domain' and d.children))
+
+        segment.select('rect')
+          .call(set_classes)
+          .transition()
           .attr('x', x_position)
           .attr('y', (d)->d.x)
           .attr('width', (d)->d.dy)
@@ -193,9 +201,7 @@
 
         group = segment.enter().append('g')
         group.append('rect')
-          .classed('domains', (d)-> d.type == 'domain')
-          .classed('ports', (d)-> d.type == 'port')
-          .classed('contextual', (d)-> $scope.has_context(d))
+          .call(set_classes)
           .transition().delay(500) 
           .attr('x', x_position)
           .attr('y', (d)->d.x)
