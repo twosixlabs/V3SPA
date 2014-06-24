@@ -97,6 +97,17 @@ ID's MUST be fully qualified, or Avispa renders horribly wrong.
           if obj.path # this means it's not collapsed.
             IDEBackend.add_selection_range_object 'dsl', obj.srcloc.start.line, domain
 
+          context_items = {}
+          context_items['jump-to-code'] = 
+              label: "Show Code"
+              callback: ->
+                  IDEBackend.highlight(domain.options.data)
+                  $timeout IDEBackend.unhighlight, 5000
+
+          domain.$el.contextmenu
+            target: '#avispa-context-menu'
+            items: context_items
+
           $scope.avispa.$groups.append domain.$el
 
           return domain
@@ -113,29 +124,35 @@ ID's MUST be fully qualified, or Avispa renders horribly wrong.
           $scope.objects.ports[id] = port
           $scope.objects.ports_by_path[obj.path] = port
 
-          port.$el.contextmenu
-            target: '#node-context-menu'
-            before: (e, context)->
-              invalid = ['member_obj', 'member_subj', 'attribute_subj',
-                            'attribute_obj', 'module_subj', 'module_obj']
-              port_name_parts = context.attr('id').split('.')
-              if _.contains(invalid, port_name_parts[port_name_parts.length - 1])
-                return false
-
-              if /(^|\s)expandable(\s|$)/.test(context.attr('class'))
-                $('#node-context-menu a#context-expand-links')
-                    .removeClass('disabled').removeClass('btn')
-              else
-                $('#node-context-menu a#context-expand-links')
-                    .addClass('disabled').addClass('btn')
-
-              return true
-
-            onItem: (port_elem, e)->
-              if e.target.id == 'display_reachability'
-                $scope.highlight_reachability port
-              else if e.target.id == 'context-expand-links'
+          context_items = {}
+          context_items['context-expand-links'] = 
+            label: "Expand Hidden Connections"
+            disabled: ->
+              not port.options.expandable
+            callback: ->
                 port.options.expander(port_elem, e)
+
+          context_items['display_reachability'] = 
+              label: "Analyze Reachability"
+              disabled: ->
+                invalid = ['member_obj', 'member_subj', 'attribute_subj',
+                              'attribute_obj', 'module_subj', 'module_obj']
+                if _.contains(invalid, port.options.data.name)
+                  return true
+                return false
+              callback: ->
+                  $scope.highlight_reachability port
+
+          context_items['jump-to-code'] = 
+              label: "Show Code"
+              callback: ->
+                  IDEBackend.highlight(port.options.data)
+                  $timeout IDEBackend.unhighlight, 5000
+
+          port.$el.contextmenu
+            target: '#avispa-context-menu'
+            items: context_items
+
 
           IDEBackend.add_selection_range_object 'dsl', obj.srcloc.start.line, port
           $scope.avispa.$objects.append port.$el
@@ -172,10 +189,12 @@ the endpoint that does exist so that it can obviously be expanded
             console.log "Wft"
           else if not right 
             left.add_class 'expandable'
+            left.options.expandable = true
             left.options.expander = handle_expand_links(left)
 
           else if not left
             right.add_class 'expandable'
+            right.options.expandable = true
             right.options.expander = handle_expand_links(right)
 
           else
@@ -194,9 +213,20 @@ the endpoint that does exist so that it can obviously be expanded
                 data: data
                 position: link_pos
 
-            $scope.objects.connections[id] = link
-            IDEBackend.add_selection_range_object 'dsl', data.srcloc.start.line, link
-            $scope.avispa.$links.append link.$el
+            context_items = {}
+            context_items['jump-to-code'] = 
+                label: "Show Code"
+                callback: ->
+                    IDEBackend.highlight(link.options.data)
+                    $timeout IDEBackend.unhighlight, 5000
+
+            link.$el.contextmenu
+              target: '#avispa-context-menu'
+              items: context_items
+
+              $scope.objects.connections[id] = link
+              IDEBackend.add_selection_range_object 'dsl', data.srcloc.start.line, link
+              $scope.avispa.$links.append link.$el
 
 
 Use D3's force-direction to layout a set of objects within the bounds.

@@ -59,11 +59,33 @@
 
       $scope.create_context_menu = (port, data)->
 
+        current_menu = $(port).data('context')
+        current_menu.destroy() if current_menu
+
+        items = {}
+        if data.type == 'port'
+            items['display_reachability'] = 
+                label: "Analyze Reachability"
+                callback: ->
+                    $scope.start_reachability_query(port, data)
+
+        if data.srcloc
+            items['jump-to-code'] = 
+                label: "Show Code"
+                callback: ->
+                    IDEBackend.highlight(data)
+                    $timeout IDEBackend.unhighlight, 5000
+
         $(port).contextmenu
-          target: '#domain-context-menu'
-          onItem: (domain_el, e)->
-            if e.target.id == 'display_reachability'
-              $scope.start_reachability_query(port, data)
+          target: '#hive-context-menu'
+          items: items 
+          before: (e, context)->
+            invalid = ['member_obj', 'member_subj', 'attribute_subj',
+                          'attribute_obj', 'module_subj', 'module_obj']
+            if _.contains(invalid, data.name)
+              return false
+
+            return true
 
       `
       function leafCount(domain_id, rawData) {
@@ -189,6 +211,9 @@
             else
               return color(d.type)
           )
+          .each((d ,i)->(
+              $scope.create_context_menu(@, d)
+          ))
 
         segment.select('text').transition()
           .text((d)->d.name)
@@ -214,8 +239,9 @@
               return color(d.type)
           )
           .each((d ,i)->(
-              if $scope.has_context(d)
-                $scope.create_context_menu(@, d)
+              if d.srcloc
+                console.log "Add context #{d.path} with srcloc"
+              $scope.create_context_menu(@, d,)
           ))
 
         group.append('text').transition().delay(500)
@@ -291,11 +317,14 @@
 
         links.transition()
           .attr('d', link_path_fn)
+          .each( (d)->
+              $scope.create_context_menu(@, d)
+          )
 
         links.enter()
           .append('path')
           .each( (d)->
-
+              $scope.create_context_menu(@, d)
           )
           .transition().delay(500)
           .attr('d', link_path_fn)

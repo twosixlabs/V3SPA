@@ -44,14 +44,12 @@ Base class for "node" objects
             if not Avispa.context.dragItem?
                 @$circle.attr('class', 'hover')
 
-                Avispa.context.ide_backend.highlight(@options.data)
 
             return cancelEvent(event)
 
         OnMouseLeave: (event) ->
             if not Avispa.context.dragItem?
                 @$circle.removeAttr('class')
-                Avispa.context.ide_backend.unhighlight()
 
             return cancelEvent(event)
 

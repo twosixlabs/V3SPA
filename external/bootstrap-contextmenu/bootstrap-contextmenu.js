@@ -25,6 +25,13 @@
 		this.onItem = options.onItem || this.onItem;
 		this.scopes = options.scopes || null;
 
+		if (options.items) {
+			this.items = options.items || null
+			this.onItem = $.proxy(function(domain_el, e) {
+				var item = this.items[e.target.id]
+				item.callback()
+			}, this)
+		}
 		if (options.target) {
 			this.$element.data('target', options.target);
 		}
@@ -50,6 +57,7 @@
 			if (!this.before.call(this,e,$(e.currentTarget))) return;
 
 			$menu = this.getMenu();
+			this.buildMenu($menu, e);
 			$menu.trigger(evt = $.Event('show.bs.context', relatedTarget));
 
 			tp = this.getPosition(e, $menu);
@@ -90,6 +98,7 @@
 				.off('click.context.data-api', $menu.selector);
 			// Don't propagate click event so other currently
 			// opened menus won't close.
+
 			return false;
 		}
 
@@ -113,7 +122,8 @@
 
 		,isDisabled: function() {
 			return this.$element.hasClass('.disabled') || 
-					this.$element.attr('disabled');
+					this.$element.attr('disabled') ||
+          (this.items !== null && jQuery.isEmptyObject(this.items));
 		}
 
 		,getMenu: function () {
@@ -129,6 +139,26 @@
 
 			return $menu && $menu.length ? $menu : this.$element.find(selector);
 		}
+
+    ,buildMenu: function($menu) {
+      
+      $menu.find('ul').empty()
+      if (this.items) {
+				$.each(this.items, function(k, v) {
+          var a = $('<a tabindex="-1">' + v.label + '</a>')
+          a.attr('id', k)
+          if (v.disabled && v.disabled()) {
+            a.addClass('btn').addClass('disabled');
+          }
+
+          a.appendTo('<li></li>').parent().appendTo($menu.find('ul'))
+				})
+
+        /* Set a handler to automatically remove the DOM element when
+         * the context menu closes */
+        return $menu;
+			}
+    }
 
 		,getPosition: function(e, $menu) {
 			var mouseX = e.clientX

@@ -25,16 +25,16 @@ Base class for "group" objects
             if Avispa.context.hovering? and @options._id != Avispa.context.hovering.options._id
               if not Avispa.context.dragItem?
                   Avispa.context.hovering.$rect.removeAttr('class')
-                  Avispa.context.ide_backend.unhighlight()
+                  #Avispa.context.ide_backend.unhighlight()
 
             Avispa.context.hovering = @
 
             if not Avispa.context.dragItem?
                 @$rect.attr('class', 'hover')
 
-                Avispa.context.ide_backend.highlight(@options.data)
+                #Avispa.context.ide_backend.highlight(@options.data)
 
-            return #cancelEvent(event)
+            return
 
         OnMouseLeave: (event) ->
             if not Avispa.context.dragItem?
