@@ -472,7 +472,7 @@ with the results.
               deferred.reject(data.payload)
             else
               @current_policy.json = data.payload.data
-              @rebuild_expansion()
+              #@rebuild_expansion()
 
               _.each @hooks.json_changed, (hook)=>
                 hook(@current_policy.json)

@@ -1,7 +1,7 @@
     vespaControllers = angular.module('vespaControllers') 
 
     vespaControllers.controller 'modal.analysis_controls', (
-        $scope, $modalInstance, port_elem, port_data, IDEBackend) ->
+        $scope, $modalInstance, origin_id_accessor, port_data, IDEBackend) ->
 
         $scope.port_data = port_data
 
@@ -19,7 +19,8 @@
         $scope.load = ->
 
           query = IDEBackend.perform_path_query(
-            port_data.parent.id, $scope.analysis_ctrl)
+            origin_id_accessor(port_data),
+            $scope.analysis_ctrl)
 
           query.catch (error)->
             console.log("ERROR", error)

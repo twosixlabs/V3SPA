@@ -35,8 +35,9 @@
             templateUrl: 'analysisModal.html'
             controller: 'modal.analysis_controls'
             resolve:
-              port_elem: ->
-                port
+              origin_id_accessor: ->
+                (port_data)->
+                  port-data.parent.id
               port_data: ->
                 data
 

@@ -1,7 +1,7 @@
     vespaControllers = angular.module('vespaControllers')
 
     vespaControllers.controller 'avispaCtrl', ($scope, VespaLogger,
-        IDEBackend, $timeout, PositionManager, $q) ->
+        IDEBackend, $timeout, $modal, PositionManager, $q) ->
 
       $scope.domain_data = null
       $scope.objects ?=
@@ -94,15 +94,6 @@ ID's MUST be fully qualified, or Avispa renders horribly wrong.
 
           $scope.objects.domains[id] = domain
 
-          domain.$el.contextmenu
-            target: '#domain-context-menu'
-            onItem: (domain_el, e)->
-              if e.target.id == 'query_reachability'
-                $scope.reachability_query(domain)
-              else if e.target.id == 'display_reachability'
-                $scope.highlight_reachability domain
-
-
           if obj.path # this means it's not collapsed.
             IDEBackend.add_selection_range_object 'dsl', obj.srcloc.start.line, domain
 
@@ -121,6 +112,30 @@ ID's MUST be fully qualified, or Avispa renders horribly wrong.
 
           $scope.objects.ports[id] = port
           $scope.objects.ports_by_path[obj.path] = port
+
+          port.$el.contextmenu
+            target: '#node-context-menu'
+            before: (e, context)->
+              invalid = ['member_obj', 'member_subj', 'attribute_subj',
+                            'attribute_obj', 'module_subj', 'module_obj']
+              port_name_parts = context.attr('id').split('.')
+              if _.contains(invalid, port_name_parts[port_name_parts.length - 1])
+                return false
+
+              if /(^|\s)expandable(\s|$)/.test(context.attr('class'))
+                $('#node-context-menu a#context-expand-links')
+                    .removeClass('disabled').removeClass('btn')
+              else
+                $('#node-context-menu a#context-expand-links')
+                    .addClass('disabled').addClass('btn')
+
+              return true
+
+            onItem: (port_elem, e)->
+              if e.target.id == 'display_reachability'
+                $scope.highlight_reachability port
+              else if e.target.id == 'context-expand-links'
+                port.options.expander(port_elem, e)
 
           IDEBackend.add_selection_range_object 'dsl', obj.srcloc.start.line, port
           $scope.avispa.$objects.append port.$el
@@ -150,22 +165,18 @@ the endpoint that does exist so that it can obviously be expanded
                   else 
                     return false
 
-                IDEBackend.expand_graph_by_name( _.filter(missing_domains, (d)->d))
+                IDEBackend.expand_graph_by_id(
+                  _.union(_.flatten( _.filter(missing_domains, (d)->d))))
 
           if not left and not right
             console.log "Wft"
           else if not right 
             left.add_class 'expandable'
-            left.$el.contextmenu
-              target: '#node-context-menu'
-              onItem: handle_expand_links(left)
-
+            left.options.expander = handle_expand_links(left)
 
           else if not left
             right.add_class 'expandable'
-            right.$el.contextmenu
-              target: '#node-context-menu'
-              onItem: handle_expand_links(right)
+            right.options.expander = handle_expand_links(right)
 
           else
 
@@ -462,12 +473,34 @@ assumes they've all been expanded.
 
         $scope.analysisOrigin = domain.options._id
 
-        query = IDEBackend.perform_path_query domain.options.numeric_id
+        instance = $modal.open
+            templateUrl: 'analysisModal.html'
+            controller: 'modal.analysis_controls'
+            resolve:
+              origin_id_accessor: ->
+                (data)->
+                  return data.domain
+              port_data: ->
+                ret = domain.options.data
+                ret['id'] = domain.options.numeric_id
+                return ret
 
-        query.then (paths)->
+        instance.result.then(
+          (paths)-> 
+            if _.isEmpty(_.omit(paths, 'truncated'))
+              $.growl(
+                title: "Info"
+                message: "Analysis returned no results."
+              ,
+                type: 'info'
+              )
 
-          $scope.analysisData = paths
-          $scope.analysisPaneVisible = true
+            else
+
+              $scope.analysisData = paths
+              $scope.analysisPaneVisible = true
+        )
+
 
       $scope.highlight = (data)->
           _.each data.hops, (conn)->
@@ -555,6 +588,6 @@ Lobster-specific definitions for Avispa
 The handler for the little expansion icon on collapsed domains.
 
         Expand: (event)->
-          Avispa.context.ide_backend.expand_graph_by_name [@AncestorList()]
+          Avispa.context.ide_backend.expand_graph_by_id @AncestorList()
 
           cancelEvent(event)

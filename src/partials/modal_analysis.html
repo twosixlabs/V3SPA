@@ -1,0 +1,119 @@
+<div class='modal-header'>
+    <h4 class='modal-title' id='analysisControlPane'>Analysis Controls</h4>
+</div>
+<div id='policyModal' class="modal-body">
+    <ul class='list-group'>
+        <li class='list-group-item'>
+        <div class='form-horizontal'>
+            <div class='form-group'>
+                <label class='col-md-4 control-label pad-right'>
+                    <abbr title="Search Direction">
+                        Search Direction
+                    </abbr>
+                </label>
+                <div class='col-md-8'>
+                    <div class='btn-group'>
+                        <label ng-model='analysis_ctrl.direction'
+                            class='btn btn-primary'
+                            btn-radio="'forward'">From
+                            {{port_data.parent.name}}</label>
+                        <label ng-model='analysis_ctrl.direction' 
+                            class='btn btn-primary'
+                            btn-radio="'backward'">To
+                            {{port_data.parent.name}}</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </li>
+        <li class='list-group-item'>
+        <div class='form-horizontal'>
+            <div class='form-group'>
+                <label class='col-md-4 control-label pad-right'>
+                    <abbr title="Hard limit on the number of returned paths">
+                        Explored Paths Limit
+                    </abbr>
+                </label>
+                <div class='col-md-8'>
+                    <input touch-spin='10' ng-model='analysis_ctrl.limit'/>
+                </div>
+            </div>
+        </div>
+        </li>
+        <li class='list-group-item'>
+        <div class='form-horizontal'>
+            <div class='form-group'>
+                <label class='col-md-4 control-label pad-right'>
+                    <abbr title="Permissions to follow from the originating domain">
+                        Permissions
+                    </abbr>
+                </label>
+                <div class='col-md-8'>
+                    <input id='permissionSelect'
+                    class='col-md-12'
+                    style='padding-left: 1px;'
+                    ui-select2='permissions_select2'
+                    ng-model='analysis_ctrl.perms' type='hidden'
+                    placeholder='file.read' />
+                </div>
+            </div>
+        </div>
+        </li>
+
+        <li class='list-group-item'>
+        <div class='form-horizontal'>
+            <div class='form-group'>
+                <label class='col-md-4 control-label pad-right'>
+                    <abbr title="Permissions that can be followed between domains when considering potential information flow">
+                        Transitive Permissions
+                    </abbr>
+                </label>
+                <div class='col-md-8'>
+                    <input id='permissionSelect'
+                    style='padding-left: 1px;'
+                    class='col-md-12'
+                    ui-select2='permissions_select2'
+                    ng-model='analysis_ctrl.trans_perms' type='hidden'
+                    placeholder='*.execute_no_trans' />
+                </div>
+            </div>
+        </div>
+        </li>
+        <li class='list-group-item'>
+        <p ng-show="analysis_ctrl.direction == 'forward'">
+        Search for paths from the active domain {{port_data.parent.name}}
+        to any domain via the following permissions:
+        <br/>
+        <em ng-show='analysis_ctrl.perms'>
+            {{analysis_ctrl.perms |  join:', ' }}
+        </em>
+        <em ng-hide='analysis_ctrl.perms'>
+            any permission
+        </em>
+        </p>
+        <p ng-show="analysis_ctrl.direction == 'backward'">
+        Find active domains that have the following permissions
+        to {{port_data.name}} objects of type {{port_data.parent.name}}.
+        <em ng-show='analysis_ctrl.perms'>
+            {{analysis_ctrl.perms |  join:', ' }}
+        </em>
+        <em ng-hide='analysis_ctrl.perms'>
+            any permission
+        </em>
+        </p>
+        <p ng-show='analysis_ctrl.trans_perms'>
+        Allow the path to transition between active domains via the
+        following permissions:
+        <br/>
+        <em>{{analysis_ctrl.trans_perms | join:', ' }}</em>
+        </p>
+        </li>
+    </ul>
+</div>
+<div class='modal-footer'>
+    <button type="button" class="btn btn-default" ng-click='cancel()'>Cancel</button>
+    <button type="button" ng-disabled=''
+        class="btn btn-primary" ng-click='load()'>Load</button>
+</div>
+
+
