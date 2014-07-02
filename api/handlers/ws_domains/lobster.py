@@ -29,10 +29,10 @@ class LobsterDomain(object):
             self._lobster_version = resp['version']
 
             if self._lobster_version < __MIN_LSR_VERSION__:
-                logging.critical("Required lobster version {0} but server speaks {1}"
+                logger.critical("Required lobster version {0} but server speaks {1}"
                                  .format(__MIN_LSR_VERSION__, self._lobster_version))
 
-            logging.info("Connected to lobster backend server v{0}"
+            logger.info("Connected to lobster backend server v{0}"
                          .format(self._lobster_version))
         except httpclient.HTTPError as e:
             if e.code == 599:
@@ -43,13 +43,13 @@ class LobsterDomain(object):
                 pass
 
     @staticmethod
-    def _make_request(method, path, payload, timeout=30.0):
+    def _make_request(method, path, payload, timeout=90.0):
         http_client = httpclient.HTTPClient()
         backend_uri = "http://{0}{1}".format(
             api.config.get('lobster_backend', 'uri'),
             path)
 
-        logging.debug("Fetching {0} from v3spa-server".format(backend_uri))
+        logger.info("Fetching {0} from v3spa-server".format(backend_uri))
 
         try:
             output = http_client.fetch(
@@ -60,14 +60,18 @@ class LobsterDomain(object):
             )
         except httpclient.HTTPError as e:
             if e.code == 599:
+                logger.warning("Request timed out")
                 raise Exception("backend:lobster - Unavailable")
             else:
+                logger.warning("Error during request - [{0}] {1}"
+                               .format(e.code, e.message))
                 if api.config.get('main', 'debug'):
                     raise Exception(
                         "Backend error: [{0}] {1}".format(e.code, e.message))
                 else:
                     raise Exception("backend:lobster - Unspecified Error")
         else:
+            logger.info("Request successful")
             return output
 
     @staticmethod
@@ -348,6 +352,7 @@ class LobsterDomain(object):
               ]
             }
         """
+        logger.info("Params: {0}".format(params))
         output = self._make_request('POST', '/import/selinux',
                                     params if isinstance(params, basestring) else api.db.json.dumps(params))
 

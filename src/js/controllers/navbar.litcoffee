@@ -12,9 +12,11 @@
               controller: 'modal.refpolicy'
 
           instance.result.then (policy)->
-              RefPolicy.load(policy.id).then (policy)->
-                $scope.refpolicy = policy
-                IDEBackend.load_local_policy policy
+              loader = RefPolicy.load(policy.id)
+              if loader
+                loader.then (policy)->
+                  $scope.refpolicy = policy
+                  IDEBackend.load_local_policy policy
 
 
         $scope.status = SockJSService.status

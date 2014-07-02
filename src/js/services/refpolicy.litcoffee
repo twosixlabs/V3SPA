@@ -45,7 +45,7 @@
           return deferred.promise
 
         load: (id)=>
-          if @current?.id == id
+          if @current? and @current.id == id
             return
 
           deferred = @_deferred_load || @$q.defer()

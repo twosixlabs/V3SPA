@@ -69,6 +69,8 @@ def read_module_files(module_data, limit=None, **addl_props):
 class RefPolicy(restful.ResourceDomain):
     TABLE = 'refpolicy'
 
+    __bulk_fields__ = ['documents.dsl']
+
     @classmethod
     def do_update(cls, params, response):
       if '_id' in params and params['_id'] is not None:
@@ -83,10 +85,12 @@ class RefPolicy(restful.ResourceDomain):
     @classmethod
     def do_get(cls, refpol_id, response):
         refpol_id = api.db.idtype(refpol_id)
+        logger.info("Retrieving reference policy {0}".format(refpol_id))
 
         refpol = RefPolicy.Read(refpol_id)
 
         if refpol.documents is None or 'dsl' not in refpol.documents:
+            logger.info("Missing DSL. Making service request")
             dsl = ws_domains.call(
                 'lobster',
                 'translate_selinux',
@@ -181,6 +185,7 @@ class RefPolicy(restful.ResourceDomain):
                 raise
             else:
                 metadata['valid'] = True
+
         metadata.Insert()
 
         response['payload'] = {
@@ -213,11 +218,18 @@ class RefPolicy(restful.ResourceDomain):
             modnames = set((fn.split('.')[0] for fn in filenames))
 
             for mod in modnames:
-                with open(os.path.join(dirpath, mod + ".te")) as te_file:
-                  try:
-                    modname, version = extract_module_version(te_file)
-                  except Exception:
-                    raise
+                try:
+                  logger.info("Trying to open module {0}".format(mod))
+                  te_file = open(os.path.join(dirpath, mod + ".te"))
+                  modname, version = extract_module_version(te_file)
+                except IOError as e:
+                  # This indicates that the .te file doesn't exist, which
+                  # really means its like "Changelog" or something, so ignore it.
+                  logger.warn("Failed to open type enforcement file for {0}: {1}"
+                              .format(mod, e))
+                  continue
+                except Exception:
+                  raise
 
                 if modname in modules:
                     raise Exception(
