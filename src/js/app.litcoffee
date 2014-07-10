@@ -25,8 +25,12 @@
             templateUrl: 'partials/hive.html',
             controller: 'hiveCtrl'
 
+          .when '/tl_explore',
+            templateUrl: 'partials/tl_explore.html',
+            controller: 'tlCtrl'
+
           .otherwise 
-            redirectTo: '/avispa'
+            redirectTo: '/tl_explore'
     ])
 
 Preload all of the templates that we're going to use.
