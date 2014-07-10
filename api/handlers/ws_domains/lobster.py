@@ -3,6 +3,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 from tornado import httpclient
+import hashlib
+
+import api.support.decompose
+import api.handlers.ws_domains as ws_domains
 
 __MIN_LSR_VERSION__ = 2
 
@@ -174,8 +178,9 @@ class LobsterDomain(object):
                         'type': 'attribute_contains',
                     })
                 elif dest_port['name'] == 'attribute_subj':
-                    import pdb
-                    pdb.set_trace()
+                    logger.critical("Encountered unexpected case when walking path. "
+                                   "This probably indicates a serious bug.")
+                    pass
             elif (next_domain['class'] != 'Domtrans_pattern'
                   and self.get_annotation(hop, 'Perm')):
 
@@ -241,6 +246,11 @@ class LobsterDomain(object):
         """ Run a reachability test from a given domain """
         logger.info("WS:query_reachability?%s" % msg['payload']['params'])
 
+        refpol_id = msg['payload']['policy']
+        del msg['payload']['policy']
+        refpol_id = api.db.idtype(refpol_id)
+        refpol = ws_domains.call('refpolicy', 'Read', refpol_id)
+
         output = self._make_request(
             'POST', '/paths?{0}'.format(msg['payload']['params']),
             msg['payload']['text'])
@@ -259,7 +269,7 @@ class LobsterDomain(object):
 
                 path_data, final_perm = self.path_walk(
                     path,
-                    self.last_parse_request['result'],
+                    refpol.parsed['full'],
                     params['id'][0],
                     msg['payload']['text'])
 
@@ -297,22 +307,59 @@ class LobsterDomain(object):
     def validate(self, msg):
         """ Validate a Lobster file received from the IDE
         """
+        dsl = msg['payload']['text']
+        del msg['payload']['text']
+        dsl_hash = hashlib.md5(dsl).hexdigest()
+
+        refpol_id = msg['payload']['policy']
+        del msg['payload']['policy']
+
+        refpol_id = api.db.idtype(refpol_id)
+        refpol = ws_domains.call('refpolicy', 'Read', refpol_id)
 
         logger.info("WS:validate?%s" % "&".join(
             ["{0}={1}".format(x, y) for x, y in msg['payload'].iteritems() if x != 'text']))
 
-        output = self._make_request(
-            'POST', '/parse?{0}'.format(msg['payload']['params']),
-            msg['payload']['text'])
+        # If the DSL is identical, and the parameters are identical, just return the one we already
+        # translated.
+        if (refpol.parsed
+                and refpol.documents['dsl']['digest'] == dsl_hash
+                and refpol.parsed['params'] == msg['payload']['params']):
 
-        jsondata = api.db.json.loads(output.body)
-        if msg['payload']['hide_unused_ports'] is True:
-            jsondata = self._filter_unused_ports(jsondata)
+            logger.info("Returning cached JSON")
 
-        self.last_parse_request = jsondata
+            return {
+                'label': msg['response_id'],
+                'payload': api.db.json.dumps(refpol.parsed)
+            }
+
+        else:
+
+            output = self._make_request(
+                'POST', '/parse?{0}'.format(msg['payload']['params']),
+                dsl)
+
+            jsondata = api.db.json.loads(output.body)
+            if msg['payload']['hide_unused_ports'] is True:
+                jsondata = self._filter_unused_ports(jsondata)
+
+            refpol.parsed = {
+                'parameterized': jsondata,
+                'params': msg['payload']['params']
+            }
+
+            # If this DSL is different, then we need to recalculate the 
+            # summarized version, which is parsed with paths=*
+            if 'summary' not in refpol.parsed or refpol.documents['dsl']['digest'] != dsl_hash:
+                output = self._make_request( 'POST', '/parse?path=*', dsl)
+                jsondata = api.db.json.loads(output.body)
+                refpol.parsed['summary'] = api.support.decompose.flatten_perms(jsondata['result'])
+
+            refpol.Insert()
+
         return {
             'label': msg['response_id'],
-            'payload': api.db.json.dumps(jsondata)
+            'payload': api.db.json.dumps(refpol.parsed)
         }
 
     def _filter_unused_ports(self, data):

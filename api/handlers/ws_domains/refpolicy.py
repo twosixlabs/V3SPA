@@ -5,6 +5,7 @@ import base64
 import itertools
 import os
 import re
+import hashlib
 
 import restful
 import api.handlers.ws_domains as ws_domains
@@ -69,7 +70,7 @@ def read_module_files(module_data, limit=None, **addl_props):
 class RefPolicy(restful.ResourceDomain):
     TABLE = 'refpolicy'
 
-    __bulk_fields__ = ['documents.dsl']
+    __bulk_fields__ = ['documents.dsl', 'parsed']
 
     @classmethod
     def do_update(cls, params, response):
@@ -110,9 +111,15 @@ class RefPolicy(restful.ResourceDomain):
 
             refpol['documents']['dsl'] = {
                 'text': dsl['result'],
-                'mode': 'lobster'
+                'mode': 'lobster',
+                'digest': hashlib.md5(dsl['result']).hexdigest()
             }
 
+            refpol.Insert()
+
+        elif 'digest' not in refpol.documents['dsl']:
+            refpol.documents['dsl']['digest'] = hashlib.md5(
+                refpol.documents['dsl']['text']).hexdigest()
             refpol.Insert()
 
         response['payload'] = refpol
