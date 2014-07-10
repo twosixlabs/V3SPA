@@ -115,6 +115,9 @@
 
       update_listener = (json_data)->
 
+        # Hive uses the parameterized JSON data
+        json_data = json_data.parameterized
+
         if not json_data.result?
           return
 

@@ -74,7 +74,9 @@ Clear the current policy
             @current_policy =
               documents: {}
               json:
-                errors: ["nodata"]
+                parameterized: 
+                  errors: ["nodata"]
+                summary: []
               id: null
               _id: null
               type: null
@@ -257,6 +259,7 @@ contents of @current_policy
             domain: 'lobster'
             request: 'validate'
             payload:
+              policy: @current_policy._id
               text: @current_policy.documents.dsl.text
               params: path_params.join("&")
               hide_unused_ports: if @view_control.unused_ports then false else true
@@ -463,6 +466,7 @@ with the results.
             domain: 'lobster'
             request: 'query_reachability'
             payload:
+              policy: @current_policy.id
               text: @current_policy.documents.dsl.text
               params: path_params.concat("id=#{domain_id}").join("&")
 
