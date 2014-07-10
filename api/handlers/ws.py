@@ -1,5 +1,6 @@
 import logging
 import api
+import traceback
 
 from sockjs.tornado import SockJSRouter, SockJSConnection
 import ws_domains
@@ -20,7 +21,7 @@ class WebSocket(SockJSConnection):
         except Exception as e:
           if self.session.server.app.settings['debug']:
             resp = {
-                'payload': str(e),
+                'payload': traceback.format_exc(),
                 'error': True
             }
 
