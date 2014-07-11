@@ -73,6 +73,8 @@ The main controller. avispa is a subcontroller.
               $scope.editorSessions[nm] = 
                 session: session
 
+          $scope.setEditorTab($scope.view)
+
       $scope.visualizer_type = 'tl_explore'
       $timeout ->
         $scope.view = 'dsl'
