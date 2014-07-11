@@ -451,37 +451,65 @@ top: 0px;
 
 }
 
+@activeColor: #FF8282;
+@permittedColor: #75A3FF;
+
+.node {
+  fill: #6F6F65;
+}
+
+.link {
+  fill: none;
+  stroke-opacity: 0.65;
+}
+
 svg.tl_view {
 
-  .node {
-  
+  .active {
+    stroke: @activeColor;
+    &:extend(.link);
   }
 
-  .link {
-    fill: none;
-    stroke-opacity: 0.65;
+  .active.thick {
+    stroke: darken(@activeColor, 30%);
   }
 
-  .link.active {
-    stroke: #FF8282;
+  .permitted {
+    stroke: @permittedColor;
+    &:extend(.link);
   }
 
-  .link.permitted {
-    stroke: #75A3FF;
+  .permitted.thick {
+    stroke: darken(@permittedColor, 30%);
   }
 
-  .link.permitted.active {
-    stroke: #826787;
+  .permitted.active {
+    stroke: average(@activeColor, @permittedColor);
+    &:extend(.link);
+  }
+
+  .permitted.active.thick {
+    stroke: darken(average(@activeColor, @permittedColor), 30%);
   }
 
   .type {
+    &:extend(.node);
     font-weight: bold;
-    fill: #6F6F65;
   }
 
   .permission {
+    &:extend(.node);
     font-weight: normal;
-    fill: #6F6F65;
+  }
+
+  .bold {
+    font-weight: bolder;
+    fill: black;
+  }
+
+  .thick {
+    stroke-width: 4px;
+    stroke-opacity: 1;
   }
 }
 
@@ -489,4 +517,23 @@ svg.tl_view {
   position: absolute;
   z-index: 100;
   visibility: hidden;
+  background-color: white;
+  padding: 7px;
+  border: 1px solid #ccc;
+  box-shadow: 3px 3px 5px #bbb;
+
+  max-height: 200px;
+  overflow-y: auto;
+  
+  ul.list-unstyled {
+    margin-bottom: 0px;
+  }
+}
+
+.toolbox {
+  position: absolute;
+  z-index: 10;
+  right: 15px;
+  top:  15px;
+
 }

@@ -3,6 +3,13 @@
     vespaControllers.controller 'tlCtrl', ($scope, VespaLogger,
         IDEBackend, $timeout, $modal, PositionManager, $q) ->
 
+      $scope.data = null
+      $scope.visibility =
+        active: true
+        permitted: true
+
+      $scope.$watchCollection 'visibility', (newv, oldv)->
+        $scope.update_view($scope.data)
 
       diameter = 1200
       radius = diameter / 2
@@ -11,10 +18,10 @@
       $scope.update_view = (jsondata)->
 
         # Ignore if empty
-        unless _.size(jsondata.summary)
+        unless jsondata and _.size(jsondata.summary)
           return
 
-        $scope.data = jsondata.summary
+        $scope.data = jsondata
 
         cluster = d3.layout.cluster()
             .size([360, innerRadius])
@@ -32,104 +39,250 @@
           .radius((d)-> d.y)
           .angle((d)->d.x / 180 * Math.PI)
 
-        [nodes, links] = $scope.node_hierarchy($scope.data)
+
+        # Define the nodes and links
+        [nodes, links] = $scope.node_hierarchy($scope.data.summary)
         nodes = cluster.nodes(nodes[""])
 
         node = d3.select("svg.tl_view").select('g.viewer').selectAll('.node')
+        node = node.data(nodes.filter((n)-> not n.children), (d, i)->
+          d.name
+        )
+        link = d3.select("svg.tl_view").select("g.viewer").selectAll('.link') 
+        link = link.data(bundle(_.pluck(links, 'link')), (d, i)->
+          "#{d[0].name}--#{d[d.length-1].name}"
+        )
 
-        node = node.data(nodes.filter((n)-> not n.children))
-        node.enter().append('text').call((selection)->
-            selection.classed('node', true)
-            selection.classed('type', (d)->(
-              d.type == 'source' 
-            ))
-            selection.classed('permission', (d)->(
-              d.type == 'target' 
-            ))
-            selection.attr("dy", ".31em")
-            selection.attr("transform", (d)->
+        node_selection_update = (selection)->(
+            selection.transition().attr("transform", (d)->
               "rotate(#{d.x - 90})translate(#{d.y + 8},0)#{if d.x < 180 then "" else "rotate(180)"}"
             )
             selection.style("text-anchor", (d)-> if d.x < 180 then "start" else "end")
 
-            selection.text((d)->return d.name)
         )
 
-        link = d3.select("svg.tl_view").select("g.viewer").selectAll('.link') 
-        link = link.data(bundle(_.pluck(links, 'link')))
-        #link.enter().append('path')
-        #  .each((d, i)->
-        #    key = "#{d[0].name}--#{d[d.length-1].name}"
-        #    @id = key
-        #  )
-        #  .call((selection)->(
-        #    selection.classed('link', true)
-        #    selection.classed('active', (d)-> 
-        #      'active' in _.pluck(links[@id].variants, 'type')
-        #    )
-        #    selection.classed('permitted', (d)-> 
-        #      'permitted' in _.pluck(links[@id].variants, 'type')
-        #    )
-        #    selection.attr('d', line)
-        #  )
-        #)
-
-       # tooltip = d3.select("body .popover-tooltip")
-
-        #link.on('mouseover', (d)->
-        mouseover = (d)->(
-          tooltip.style('visibility', 'visible')
-          linklist = $("<ul></ul>")
-          _.each(links[@id].variants, (variant)->
-            text = ""
-            if variant.type == 'active'
-              text = "#{variant.source.join(".")} has permission #{variant.target.join(".")}"
-            else if variant.type == 'permitted'
-              text = "#{variant.source.join(".")} permits #{variant.target.join(".")}"
-
-            if variant.via
-              text += " via attribute #{variant.via.join(".")}"
-
-            linklist.append($( "<li>#{text}<li>"))
+        link_selection_update = (selection)->(
+            selection.transition().attr('d', line)
+            selection.classed('active', (d)-> 
+                'active' in _.pluck(links[@id].variants, 'type')
+              )
+            selection.classed('permitted', (d)-> 
+                'permitted' in _.pluck(links[@id].variants, 'type')
+              )
           )
 
-          tooltip.html = linklist.prop('outerHTML')
-        )
+        # Node update
+        node.call(node_selection_update)
 
-        #link.on('mousemove', 
+        # Link update
+        link.call(link_selection_update)
+
+        node.enter().append('text').call(node_selection_update)
+            .text((d)->return d.name)
+            .attr('id', (d)->
+              "#{d.name}"
+            )
+            .classed('node', true)
+            .classed('type', (d)->(
+              d.type == 'source' 
+            ))
+            .classed('permission', (d)->(
+              d.type == 'target' 
+            ))
+            .attr("dy", ".31em")
+
+        link.enter().append('path').each((d, i)->
+            key = "#{d[0].name}--#{d[d.length-1].name}"
+            @id = key
+          )
+          .call(link_selection_update)
+          .classed('link', true)
+
+        node.exit().transition().remove()
+        link.exit().transition().style('stroke-opacity', 0).remove()
+
+        tooltip = d3.select("body .popover-tooltip")
+
+        addClass = (node, klass)->
+          node.attr('class', (idx, current)->
+            return current + " #{klass}"
+          )
+
+        removeClass = (node, klass)->
+          current = node.attr('class').split(' ')
+          node.attr('class', _.filter(current, (x)->(x != klass)).join(' '))
+
+        showTooltip = (ttip, lines, formatter)->
+          linklist = $("<ul class='list-unstyled'></ul>")
+
+          _.each(lines, (line)->
+            text = formatter(line)
+            linklist.append($.parseHTML("<li>#{text}</li>"))
+          )
+          ttip.html(linklist.prop('outerHTML'))
+          ttip.style('visibility', 'visible')
+
+
+        mouseover_link = (d)->(
+          showTooltip(tooltip, links[@id].variants, (variant)->
+            text = ""
+            if variant.type == 'active'
+              text = "#{variant.source.join(".")} <em>has permission</em> #{variant.target.join(".")}"
+            else if variant.type == 'permitted'
+              text = "#{variant.target.join(".")} <em>is permitted on </em> #{variant.source.join(".")}"
+
+            if variant.via
+              text += " <em>via attribute</em> #{variant.via.join(".")}"
+
+            return text
+          )
+
+          origin = $(document.getElementById(d[0].name))
+          end = $(document.getElementById(d[d.length-1].name))
+
+          addClass(origin, 'bold')
+          addClass(end, 'bold')
+
+          addClass($(@), 'thick')
+
+        )
+        link.on('mouseover', mouseover_link)
+
         mousemove = (d)->(
-          console.log("d3 mousemove")
           d3.event.preventDefault()
           tooltip.style('top', "#{event.pageY-10}px")
                  .style("left", "#{event.pageX+10}px")
+                 .style("bottom", null)
+                 .style("right", null)
+
           d3.event.stopPropagation()
-          )
-        #link.on('mouseout', 
-        mouseout = (d)->(
-          console.log("d3 mouseout")
-          d3.event.preventDefault()
-          return
+        )
+        link.on('mousemove', mousemove) 
+
+        mouseout_link = (d)->(
           tooltip.style('visibility', 'hidden')
+          origin = $(document.getElementById(d[0].name))
+          end = $(document.getElementById(d[d.length-1].name))
+
+          removeClass(origin, "bold")
+          removeClass(end, "bold")
+          removeClass($(@), 'thick')
+
+          d3.event.stopPropagation()
+        )
+        link.on('mouseout',  mouseout_link)
+
+
+
+        getAbsPos = (elem)->
+          pos = 
+            x: 0
+            y: 0
+
+          loop
+            pos.x += elem.getBBox().x
+            pos.y += elem.getBBox().y
+
+            elem = elem.parentElement
+            break unless elem
+
+          return pos
+
+        node.on('mouseover', (d)->
+          tooltip_data_elems =  _.map($scope.data.summary, (link)->
+            unless $scope.visibility[link.type]
+              return null
+            src_name = link.source.join('.')
+            tgt_name = link.target.join('.')
+            if src_name != d.name and tgt_name != d.name
+              return null# Not related
+
+            link_name = "#{src_name}--#{tgt_name}"
+            link_elem = $(document.getElementById(link_name))
+            addClass(link_elem, 'thick')
+
+            return links[link_name].variants
+          )
+
+          tooltip_data_elems = _.flatten(_.filter(tooltip_data_elems, (e)-> e != null))
+
+          bbox = @getBoundingClientRect()
+          offset_x = Math.abs(20 * Math.cos(d.x))
+          offset_y = Math.abs(20 * Math.sin(d.x))
+
+          if d.x > 180
+            tooltip.style("left", null)
+            tooltip.style("right", "#{window.innerWidth - bbox.left + offset_x}px")
+          else
+            tooltip.style("left", "#{bbox.right + offset_x}px")
+            tooltip.style("right", null)
+
+          if (d.x + 90) % 360 > 180
+            tooltip.style('top', "#{bbox.bottom + offset_y}px")
+            tooltip.style('bottom', null)
+          else
+            #top = bbox.top - bbox.height
+            tooltip.style('bottom', "#{window.innerHeight - bbox.top + offset_y}px")
+            tooltip.style('top', null)
+
+
+          showTooltip(tooltip, tooltip_data_elems, (variant)->
+            text = ""
+            if variant.type == 'active'
+              text = "#{variant.source.join(".")} <em>has permission</em> #{variant.target.join(".")}"
+            else if variant.type == 'permitted'
+              text = "#{variant.target.join(".")} <em>is permitted on </em> #{variant.source.join(".")}"
+
+            if variant.via
+              text += " <em>via attribute</em> #{variant.via.join(".")}"
+
+            return text                              
+          )
+          addClass($(@), 'bold')
+          d3.event.stopPropagation()
+        )
+
+        node.on('mousemove', (d)->
+          d3.event.preventDefault()
+
+          d3.event.stopPropagation()
+        )
+
+        node.on('mouseout', (d)->
+          tooltip.style('visibility', 'hidden')
+          tooltip_data_elems =  _.each($scope.data.summary, (link)->
+            unless $scope.visibility[link.type]
+              return null
+
+            src_name = link.source.join('.')
+            tgt_name = link.target.join('.')
+            if src_name != d.name and tgt_name != d.name
+              return null# Not related
+
+            link_name = "#{src_name}--#{tgt_name}"
+            link_elem = $(document.getElementById(link_name))
+            removeClass(link_elem, 'thick')
+          )
+
+          removeClass($(@), 'bold')
           d3.event.stopPropagation()
         )
 
 Set up the viewport scroll
 
-      positionMgr = PositionManager("tl.viewport::#{IDEBackend.current_policy._id}")
+        positionMgr = PositionManager("tl.viewport::#{IDEBackend.current_policy._id}")
 
-      svgPanZoom.init
-          selector: '#surface svg'
-          panEnabled: true
-          zoomEnabled: true
-          dragEnabled: false
-          minZoom: 0.5
-          maxZoom: 10
-          onZoom: (scale, transform)->
-              positionMgr.update transform
-          onPanComplete: (coords, transform) ->
-              console.log coords
-              console.log transform
-              positionMgr.update transform
+        svgPanZoom.init
+            selector: '#surface svg'
+            panEnabled: true
+            zoomEnabled: true
+            dragEnabled: false
+            minZoom: 0.5
+            maxZoom: 10
+            onZoom: (scale, transform)->
+                positionMgr.update transform
+            onPanComplete: (coords, transform) ->
+                positionMgr.update transform
 
         $scope.$watch(
           ->
@@ -177,6 +330,9 @@ Set up the viewport scroll
 
         datalinks = {}
         for link in links
+          unless $scope.visibility[link.type]
+            continue 
+
           src_node = hierarchize(link.source, 'source', map)
           target_node = hierarchize(link.target, 'target', map)
 

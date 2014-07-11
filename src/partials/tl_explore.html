@@ -1,7 +1,15 @@
 <div id='surface' class='row'>
+  <div class='toolbox panel panel-default'>
+    <div class='panel-body'>
+      <small><strong> Line Visibility: </strong></small>
+    <div class='btn-group btn-group-xs'>
+      <label ng-disabled='!data' ng-model='visibility.active' class='btn btn-default' btn-checkbox>Active Permissions</label>
+      <label ng-disabled='!data' ng-model='visibility.permitted' class='btn btn-default' btn-checkbox>Permitted on</label>
+    </div>
+  </div>
+  </div>
   <svg xmlns="http://www.w3.org/2000/svg" class='tl_view'>
     <g class="viewer">
     </g>
   </svg>
-  <!--<p>{{data | json}}</p>-->
 </div>
