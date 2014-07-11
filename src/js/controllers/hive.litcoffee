@@ -2,6 +2,7 @@
 
     vespaControllers.controller 'hiveCtrl', ($scope, $modal, $timeout, VespaLogger, IDEBackend, PositionManager)->
 
+
       $scope.analysisPaneVisible = false
       $scope.clearAnalysis = ->
           $scope.analysisPaneVisible = false
@@ -149,7 +150,7 @@
                           ret = _.union(
                             _.map(d.subdomains, (sub, id)->(
                               if id of json_data.result.domains
-                                x = json_data.result.domains[id]
+                                x = _.clone json_data.result.domains[id]
                                 x.type = 'domain'
                                 x.id = id
                                 x
@@ -163,7 +164,7 @@
                             ))
                           ,
                             _.map(d.ports, (port)->(
-                              x = json_data.result.ports[port]
+                              x = _.clone json_data.result.ports[port]
                               x.id = port
                               x.type = 'port'
                               x
@@ -175,8 +176,10 @@
                             return ret
                         ))
 
-        startDomain = json_data.result.domains["0"];
+        startDomain = _.clone(json_data.result.domains["0"])
+
         nodes = partition.nodes(startDomain)
+
         portsById = _.indexBy(_.filter(nodes, (d)-> d.type == 'port'), 'id')
         color = d3.scale.ordinal().domain([null, 'port','domain']).range([
           '#d9d9d9', '#e5c494', '#ffd92f'
@@ -370,3 +373,5 @@
       start_data = IDEBackend.get_json()
       if start_data
         update_listener(start_data)
+
+      return
