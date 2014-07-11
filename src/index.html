@@ -91,6 +91,7 @@
                           <div class='form-group'>
                             <label class='control-label pad-right'>Visualizer Type</label>
                             <div class='btn-group'>
+                              <button btn-radio="'tl_explore'" type='button' class='btn btn-sm btn-default' ng-model='visualizer_type'> Summary</button>
                               <button btn-radio="'avispa'" type='button' class='btn btn-sm btn-default' active ng-model="visualizer_type">Structured</button>
                               <button btn-radio="'hive'" type='button' class='btn btn-sm btn-default' ng-model='visualizer_type'> Hive</button>
                             </div>
@@ -210,5 +211,6 @@
       <div class='loading-icon'>Loading....
       </div>
     </div>
+    <div class='popover-tooltip'>[empty]</div>
   </body>
 </html>

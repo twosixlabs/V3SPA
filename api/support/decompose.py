@@ -22,6 +22,8 @@ def flatten_perms(input_json):
   raw_macros = {}
   raw_modules = {}
 
+  data = input_json
+
   for id, domain in data['domains'].iteritems():
     annotations = [x['name'] for x in domain['domainAnnotations']]
 
@@ -128,7 +130,7 @@ def flatten_perms(input_json):
       if obj is not None:
         build_flat_permissions(permissions, obj, connection, attr_type_mapping, type='permitted')
 
-  return permissions
+  return map(dict, permissions)
 
 def unroll_attrs_and_format_perms(perms, mapping):
   for (objclass, perm) in perms:

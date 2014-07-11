@@ -73,7 +73,7 @@ The main controller. avispa is a subcontroller.
               $scope.editorSessions[nm] = 
                 session: session
 
-      $scope.visualizer_type = 'avispa'
+      $scope.visualizer_type = 'tl_explore'
       $timeout ->
         $scope.view = 'dsl'
 
@@ -255,6 +255,8 @@ Watch the view control and switch the editor session
             $location.path('/avispa')
           else if value =='hive'
             $location.path('/hive')
+          else if value =='tl_explore'
+            $location.path('/tl_explore')
           else
             console.error("Invalid visualizer type")
 

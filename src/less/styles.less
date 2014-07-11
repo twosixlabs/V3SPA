@@ -450,3 +450,90 @@ top: 0px;
 .ports {
 
 }
+
+@activeColor: #FF8282;
+@permittedColor: #75A3FF;
+
+.node {
+  fill: #6F6F65;
+}
+
+.link {
+  fill: none;
+  stroke-opacity: 0.65;
+}
+
+svg.tl_view {
+
+  .active {
+    stroke: @activeColor;
+    &:extend(.link);
+  }
+
+  .active.thick {
+    stroke: darken(@activeColor, 30%);
+  }
+
+  .permitted {
+    stroke: @permittedColor;
+    &:extend(.link);
+  }
+
+  .permitted.thick {
+    stroke: darken(@permittedColor, 30%);
+  }
+
+  .permitted.active {
+    stroke: average(@activeColor, @permittedColor);
+    &:extend(.link);
+  }
+
+  .permitted.active.thick {
+    stroke: darken(average(@activeColor, @permittedColor), 30%);
+  }
+
+  .type {
+    &:extend(.node);
+    font-weight: bold;
+  }
+
+  .permission {
+    &:extend(.node);
+    font-weight: normal;
+  }
+
+  .bold {
+    font-weight: bolder;
+    fill: black;
+  }
+
+  .thick {
+    stroke-width: 4px;
+    stroke-opacity: 1;
+  }
+}
+
+.popover-tooltip {
+  position: absolute;
+  z-index: 100;
+  visibility: hidden;
+  background-color: white;
+  padding: 7px;
+  border: 1px solid #ccc;
+  box-shadow: 3px 3px 5px #bbb;
+
+  max-height: 200px;
+  overflow-y: auto;
+  
+  ul.list-unstyled {
+    margin-bottom: 0px;
+  }
+}
+
+.toolbox {
+  position: absolute;
+  z-index: 10;
+  right: 15px;
+  top:  15px;
+
+}
