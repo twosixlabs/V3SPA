@@ -13,7 +13,7 @@
     <div role='navigation' class='navbar navbar-default navbar-static-top' 
          ng-controller='navCtrl'>
          <div class='navbar-header' >
-           <span class='navbar-brand' ng-class="{'loader-bg': have_outstanding()}" >
+           <span class='navbar-brand' ng-class="{'loader-bg': status.outstanding}" >
              <strong>V3SPA</strong>
            </span>
       </div>
@@ -28,7 +28,6 @@
         <a ng-click='load_refpolicy()'>(switch)</a>
       </span>
       </p>
-      </ul>
       <p class='navbar-right navbar-text small'> &copy;2014 <b>Invincea Labs</b> </p>
     </div>
     <div class='container-full' ng-controller='ideCtrl'>
@@ -207,7 +206,7 @@
       <ul role='menu' class='dropdown-menu'>
       </ul>
     </div>
-    <div ng-controller='navCtrl' ng-show='have_outstanding()' id='overlay'>
+    <div ng-controller='navCtrl' ng-show='status.outstanding' id='overlay'>
       <div class='loading-icon'>Loading....
       </div>
     </div>
