@@ -270,7 +270,9 @@
 
 Set up the viewport scroll
 
-        positionMgr = PositionManager("tl.viewport::#{IDEBackend.current_policy._id}")
+        positionMgr = PositionManager("tl.viewport::#{IDEBackend.current_policy._id}",
+          {a: 0.7454701662063599, b: 0, c: 0, d: 0.7454701662063599, e: 504.606201171875, f: 546.9595947265625}
+        )
 
         svgPanZoom.init
             selector: '#surface svg'
