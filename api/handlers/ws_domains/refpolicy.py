@@ -149,6 +149,11 @@ class RefPolicy(restful.ResourceDomain):
             pass
 
         name = params['name'][:-4] if params['name'].endswith('.zip') else params['name']
+
+        name = os.path.basename(name)  # be a little safer
+        if not name:
+          raise Exception("Invalid name for policy.")
+
         metadata = cls.Read({'id': name})
 
         if metadata is None:
@@ -272,9 +277,9 @@ class RefPolicy(restful.ResourceDomain):
 
         name = self['id']
         zipped_policy = self['tmpfile']
-        policy_dir = os.path.join(
+        policy_dir = os.path.abspath(os.path.join(
             api.config.get('storage', 'bulk_storage_dir'),
-            'refpolicy')
+            'refpolicy'))
 
         if not zipfile.is_zipfile(zipped_policy):
             raise Exception("Unable to extract: file was not a ZIP archive")
@@ -292,6 +297,16 @@ class RefPolicy(restful.ResourceDomain):
                             "SELinux reference policy source. "
                             "Make sure the archive name is the same as "
                             "its top-level folder.")
+
+        # Delete the existing file first.
+        import shutil
+        try:
+          shutil.rmtree(os.path.join(policy_dir, name))
+        except OSError as e:
+          if e.errno == 2:
+            pass
+          else:
+            raise
 
         zf.extractall(policy_dir)
 
