@@ -40,13 +40,12 @@ when the domain data has actually changed to prevent flickering.
       update_view = (data)->
 
         # Avispa uses the parameterized view.
-        data = data.parameterized
-
         if _.size(data.errors) > 0
             $scope.policy_data = null
             cleanup()
 
         else
+          data = data.parameterized
           if not _.isEqual(data.result, $scope.policy_data)
             $scope.policy_data = data.result
 

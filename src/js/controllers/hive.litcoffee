@@ -119,7 +119,7 @@
         # Hive uses the parameterized JSON data
         json_data = json_data.parameterized
 
-        if not json_data.result?
+        if not json_data?
           return
 
         $scope.objects =
@@ -129,7 +129,7 @@
 
         positionMgr = PositionManager("hive.viewport::#{IDEBackend.current_policy._id}")
 
-        total_size = leafCount("0", json_data.result)
+        total_size = leafCount("0", json_data)
 
         layout =
           w: 1600
@@ -144,13 +144,13 @@
                           if d.type == 'port'
                             return 1
                           else
-                            return leafCount(d.id, json_data.result)
+                            return leafCount(d.id, json_data)
                         )
                         .children((d)->(
                           ret = _.union(
                             _.map(d.subdomains, (sub, id)->(
-                              if id of json_data.result.domains
-                                x = _.clone json_data.result.domains[id]
+                              if id of json_data.domains
+                                x = _.clone json_data.domains[id]
                                 x.type = 'domain'
                                 x.id = id
                                 x
@@ -164,7 +164,7 @@
                             ))
                           ,
                             _.map(d.ports, (port)->(
-                              x = _.clone json_data.result.ports[port]
+                              x = _.clone json_data.ports[port]
                               x.id = port
                               x.type = 'port'
                               x
@@ -176,7 +176,7 @@
                             return ret
                         ))
 
-        startDomain = _.clone(json_data.result.domains["0"])
+        startDomain = _.clone(json_data.domains["0"])
 
         nodes = partition.nodes(startDomain)
 
@@ -292,8 +292,8 @@
             IDEBackend.expand_graph_by_id [d.id]
         )
 
-        link_data = _.map(json_data.result.connections, (conn, k)->
-          unless conn.left of json_data.result.ports and conn.right of json_data.result.ports
+        link_data = _.map(json_data.connections, (conn, k)->
+          unless conn.left of json_data.ports and conn.right of json_data.ports
             return null
 
           conn.id = k

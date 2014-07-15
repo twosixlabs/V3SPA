@@ -344,7 +344,9 @@ class LobsterDomain(object):
                 jsondata = self._filter_unused_ports(jsondata)
 
             refpol.parsed = {
-                'parameterized': jsondata,
+                'version': jsondata['version'],
+                'errors': jsondata['errors'],
+                'parameterized': jsondata['result'],
                 'params': msg['payload']['params']
             }
 
@@ -353,10 +355,15 @@ class LobsterDomain(object):
             if 'summary' not in refpol.parsed or refpol.documents['dsl']['digest'] != dsl_hash:
                 output = self._make_request( 'POST', '/parse?path=*', dsl)
                 jsondata = api.db.json.loads(output.body)
-                refpol.parsed['summary'] = api.support.decompose.flatten_perms(jsondata['result'])
+                refpol.parsed['full'] = jsondata['result']
+                if jsondata['result'] is not None:
+                  refpol.parsed['summary'] = api.support.decompose.flatten_perms(jsondata['result'])
+                else:
+                  refpol.parsed['summary'] = []
 
             refpol.Insert()
 
+        del refpol.parsed['full']
         return {
             'label': msg['response_id'],
             'payload': api.db.json.dumps(refpol.parsed)
