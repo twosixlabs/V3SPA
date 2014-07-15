@@ -46,8 +46,8 @@ when the domain data has actually changed to prevent flickering.
 
         else
           data = data.parameterized
-          if not _.isEqual(data.result, $scope.policy_data)
-            $scope.policy_data = data.result
+          if not _.isEqual(data, $scope.policy_data)
+            $scope.policy_data = data
 
             cleanup()    
 
@@ -61,14 +61,14 @@ when the domain data has actually changed to prevent flickering.
                   el: $('#surface svg.avispa')
                   position: viewport_pos
 
-            root_id = data.result.root
+            root_id = data.root
 
-            $scope.parseRootDomain root_id, data.result.domains[root_id]
+            $scope.parseRootDomain root_id, data.domains[root_id]
 
 Force a redraw on all the children
 
 
-            $scope.parseConns(data.result.connections)
+            $scope.parseConns(data.connections)
 
 
       IDEBackend.add_hook "json_changed", update_view
@@ -416,6 +416,8 @@ Since it's recursive, we check it in each method.
             $q.all(subdomain_defers).then (subdoms)->
               if domain_objects.length > 0
                 domain_objects = _.union domain_objects, subdoms
+              else
+                domain_objects = subdoms
 
 Set the size for the group. If there are no subelements, its size 1.
 Otherwise it's 1.1 * ceil(sqrt(subelement_count)). If there are no
@@ -493,7 +495,6 @@ Run a reachability query
         query.then(
           (result)->
             console.error "Deprecated"
-            #IDEBackend.expand_graph_by_id _.keys(_.omit(result.result, 'truncated'))
           (data)->
             console.log "Error", data
         )
