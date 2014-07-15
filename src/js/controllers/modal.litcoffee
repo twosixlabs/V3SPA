@@ -8,7 +8,7 @@
         $scope.analysis_ctrl =
           limit: 10
           perms: if port_data.name == 'active' then [] else _.pluck(
-            _.filter(selinux_perms, (d)->(
+            _.filter(IDEBackend.current_policy.json.permset, (d)->(
               d.text.lastIndexOf("#{port_data.name}.", 0) == 0
           )), 'text')
           trans_perms: []
@@ -30,7 +30,7 @@
 
         $scope.permissions_select2 = 
             multiple: true
-            data: selinux_perms
+            data: IDEBackend.current_policy.json.permset
             simple_tags: true
             dropdownAutoWidth: true
             placeholder: 'Filter permissions'

@@ -18,12 +18,12 @@ def filter_by_annotation(l, annotation):
 def perm_set(input_json):
   perms = set()
   for perm_conn in filter_by_annotation(
-          input_json['connections'], 'Perm'):
-      for args in get_annotation_args(perm_conn, 'Perm')
-        perm = ".".join(args)
-        if perm not in perms:
-            yield perm
-        perms.add(perm)
+                  input_json['connections'].itervalues(), 'Perm'):
+      for args in get_annotation_args(perm_conn, 'Perm'):
+          perm = ".".join(args)
+          if perm not in perms:
+              yield perm
+          perms.add(perm)
 
 def flatten_perms(input_json):
 
@@ -143,8 +143,11 @@ def flatten_perms(input_json):
   return map(dict, permissions)
 
 def unroll_attrs_and_format_perms(perms, mapping):
-  for (objclass, perm) in perms:
-      yield (objclass, perm), None
+  try:
+    for (objclass, perm) in perms:
+        yield (objclass, perm), None
+  except Exception as e:
+    pass
 
 def build_flat_permissions(perm_list, source, connection, attr_mapping, **kwargs):
 

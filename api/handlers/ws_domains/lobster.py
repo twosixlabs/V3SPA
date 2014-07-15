@@ -91,13 +91,16 @@ class LobsterDomain(object):
 
         previous_dom = None
         new_path = []
-        expanded_ids = set(data['domains'].keys())
+        import urlparse
+        params = urlparse.parse_qs(data['params'])
+        jsondata = data['parameterized']
+        expanded_ids = params['id']
         last_perm = None
         last_object_class = None
 
         for i, hop_info in enumerate(path):
 
-            hop = data['connections'][hop_info['conn']]
+            hop = jsondata['connections'][hop_info['conn']]
 
             if hop_info['left'] == origin:
                 fwd = 'right'
@@ -109,9 +112,9 @@ class LobsterDomain(object):
             tried_expanding = False
             while True:
                 try:
-                    next_domain = data['domains'][hop_info[fwd]]
-                    from_dom = data['domains'][hop_info[bwd]]
-                    dest_port = data['ports'][hop[fwd]]
+                    next_domain = jsondata['domains'][hop_info[fwd]]
+                    from_dom = jsondata['domains'][hop_info[bwd]]
+                    dest_port = jsondata['ports'][hop[fwd]]
                 except KeyError:
                     if tried_expanding is True:
                         raise Exception("Couldn't expand the graph to link from {0}"
@@ -119,7 +122,7 @@ class LobsterDomain(object):
                     else:
                         tried_expanding = True
 
-                    expanded_ids.add(hop_info[fwd])
+                    expanded_ids.append(hop_info[fwd])
                     output = self._make_request(
                         'POST', '/parse?{0}'.format(
                             "&".join(["id={0}".format(hid)
@@ -127,9 +130,9 @@ class LobsterDomain(object):
                         lobster_data)
 
                     result = api.db.json.loads(output.body)
-                    data['domains'].update(result['result']['domains'])
-                    data['connections'].update(result['result']['connections'])
-                    data['ports'].update(result['result']['ports'])
+                    jsondata['domains'].update(result['result']['domains'])
+                    jsondata['connections'].update(result['result']['connections'])
+                    jsondata['ports'].update(result['result']['ports'])
                 else:
                     break
 
@@ -240,6 +243,8 @@ class LobsterDomain(object):
             origin = hop_info[fwd]
             previous_dom = next_domain
 
+        import urllib
+        data['params'] = urllib.urlencode(params, doseq=True)
         return new_path, last_perm
 
     def query_reachability(self, msg):
@@ -257,39 +262,40 @@ class LobsterDomain(object):
 
         result = api.db.json.loads(output.body)['result']
 
-        for dest, paths in result.iteritems():
-            if dest == 'truncated':
-                continue
+        if result is not None:
+          for dest, paths in result.iteritems():
+              if dest == 'truncated':
+                  continue
 
-            new_paths = {'dest_id': dest, 'perms': {}}
-            for path in paths:
-                logger.info('Gathering additional data for {0}'.format(path))
-                import urlparse
-                params = urlparse.parse_qs(msg['payload']['params'])
+              new_paths = {'dest_id': dest, 'perms': {}}
+              for path in paths:
+                  logger.info('Gathering additional data for {0}'.format(path))
+                  import urlparse
+                  params = urlparse.parse_qs(msg['payload']['params'])
 
-                path_data, final_perm = self.path_walk(
-                    path,
-                    refpol.parsed['full'],
-                    params['id'][0],
-                    msg['payload']['text'])
+                  path_data, final_perm = self.path_walk(
+                      path,
+                      refpol.parsed,
+                      params['id'][0],
+                      msg['payload']['text'])
 
-                logger.info("Re-tabulated path data")
+                  logger.info("Re-tabulated path data")
 
-                new_paths['dest'] = path_data[-1]['name']
-                for klass, perm in final_perm['name']:
-                    new_paths['perms'][perm] = {
-                        'hops': path,
-                        'human': path_data,
-                        'perm': perm,
-                        'class': klass,
-                        'endpoint': path_data[-1]
-                    }
+                  new_paths['dest'] = path_data[-1]['name']
+                  for klass, perm in final_perm['name']:
+                      new_paths['perms'][perm] = {
+                          'hops': path,
+                          'human': path_data,
+                          'perm': perm,
+                          'class': klass,
+                          'endpoint': path_data[-1]
+                      }
 
-            result[dest] = new_paths
+              result[dest] = new_paths
 
         return {
             'label': msg['response_id'],
-            'payload': {'paths': result, 'data': self.last_parse_request}
+            'payload': {'paths': result, 'data': refpol.parsed}
         }
 
     def export_selinux(self, msg):
@@ -352,17 +358,18 @@ class LobsterDomain(object):
 
             # If this DSL is different, then we need to recalculate the 
             # summarized version, which is parsed with paths=*
-            if 'summary' not in refpol.parsed or refpol.documents['dsl']['digest'] != dsl_hash:
+            if (len(jsondata['errors']) == 0
+              and 'summary' not in refpol.parsed
+              or refpol.documents['dsl']['digest'] != dsl_hash):
                 output = self._make_request( 'POST', '/parse?path=*', dsl)
                 jsondata = api.db.json.loads(output.body)
                 refpol.parsed['full'] = jsondata['result']
-                import pdb; pdb.set_trace()
                 if jsondata['result'] is not None:
                   refpol.parsed['summary'] = api.support.decompose.flatten_perms(jsondata['result'])
                   refpol.parsed['permset'] = [{'text': x, "id": x}
                                               for x
                                               in api.support.decompose.perm_set(
-                                                jsondata['result'])
+                                                jsondata['result'])]
                 else:
                   refpol.parsed['summary'] = []
                   refpol.parsed['permset'] = []

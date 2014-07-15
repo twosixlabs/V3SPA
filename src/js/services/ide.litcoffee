@@ -189,8 +189,10 @@ store
 Extend the set of paths that we show.
 
         expand_graph_by_id: (id_list)=>
-          @graph_id_expansion = _.union @graph_id_expansion, id_list
-          @_validate_dsl()
+          to_add = _.difference(id_list, @graph_id_expansion)
+          if to_add.length > 0
+            @graph_id_expansion = @graph_id_expansion.concat id_list
+            @_validate_dsl()
 
         contract_graph_by_id: (id_list)=>
           @graph_id_expansion = _.without.apply(
@@ -476,7 +478,14 @@ with the results.
               deferred.reject(data.payload)
             else
               @current_policy.json = data.payload.data
-              #@rebuild_expansion()
+
+              ids = []
+              _.each @current_policy.json.params.split('&'), (param)->
+                [name, val] = param.split('=')
+                if name == 'id'
+                  ids.push val
+
+              @expand_graph_by_id ids
 
               _.each @hooks.json_changed, (hook)=>
                 hook(@current_policy.json)
