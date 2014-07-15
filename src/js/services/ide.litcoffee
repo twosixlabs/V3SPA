@@ -371,7 +371,9 @@ Save a modified policy to the server
           req =
             domain: 'refpolicy'
             request: 'update'
-            payload: @current_policy
+            payload: 
+              _id: @current_policy._id
+              dsl: @current_policy.documents.dsl.text
 
           delete req.payload.json
 

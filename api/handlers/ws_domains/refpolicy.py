@@ -11,7 +11,6 @@ import restful
 import api.handlers.ws_domains as ws_domains
 import api
 
-
 def iter_lines(fil_or_str):
   if isinstance(fil_or_str, (basestring)):
     fil_or_str = fil_or_str.split('\n')
@@ -77,13 +76,15 @@ class RefPolicy(restful.ResourceDomain):
 
     @classmethod
     def do_update(cls, params, response):
-      if '_id' in params and params['_id'] is not None:
-          newobject = cls.Read(params['_id'])
-          response['payload'] = newobject.Update(params)
-      else:
-          newobject = cls(params)
-          response['payload'] = newobject.Insert()
 
+      newobject = cls.Read(params['_id'])
+      dsl_hash = hashlib.md5(params['dsl']).hexdigest()
+
+      if dsl_hash != newobject['documents']['dsl']['digest']:
+          newobject['documents']['dsl']['text'] = params['dsl']
+          newobject.Insert()
+
+      response['payload'] = newobject
       return response
 
     @classmethod
@@ -126,7 +127,7 @@ class RefPolicy(restful.ResourceDomain):
             refpol.Insert()
 
         response['payload'] = refpol
-        del response['payload']['parsed']['full']
+        response['payload'].get('parsed', {}).pop('full', None)
         return response
 
     @classmethod

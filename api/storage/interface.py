@@ -8,6 +8,16 @@ import api
 __all__ = ['initialize', 'Entry']
 
 
+def merge(d, u):
+    for k, v in u.iteritems():
+        if isinstance(v, collections.Mapping):
+            r = merge(d.get(k, {}), v)
+            d[k] = r
+        else:
+            d[k] = u[k]
+    return d
+
+
 def initialize():
     engine = api.config.get('storage', 'engine')
 
@@ -131,9 +141,9 @@ class Entry(collections.MutableMapping):
           entry = api.db.FindOne(cls.TABLE, params)
         return cls(entry) if entry else None
 
-    def Update(self, values=None):
+    def Update(self, values={}):
         if values:
-            self.entry.update(values)
+            merge(self.entry, values)
         # WE use Insert here because it replaces, 
         # and we're not doing anything so complicated as needed 
         # by  MongoDB's update
