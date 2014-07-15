@@ -207,7 +207,7 @@ This controls our editor visibility.
                 "text"
               )
 
-              $scope.editor.scrollToLine hl.range.start.line - 1
+              $scope.editor.scrollToLine hl.range.start.line - 10
 
               $scope.editor_markers.push marker
 
