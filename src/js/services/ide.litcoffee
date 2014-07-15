@@ -466,7 +466,7 @@ with the results.
             domain: 'lobster'
             request: 'query_reachability'
             payload:
-              policy: @current_policy.id
+              policy: @current_policy._id
               text: @current_policy.documents.dsl.text
               params: path_params.concat("id=#{domain_id}").join("&")
 
