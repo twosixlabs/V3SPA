@@ -70,7 +70,10 @@ def read_module_files(module_data, limit=None, **addl_props):
 class RefPolicy(restful.ResourceDomain):
     TABLE = 'refpolicy'
 
-    __bulk_fields__ = ['documents.dsl', 'parsed']
+    __bulk_fields__ = {
+        'documents.dsl.text': (str, str),
+        'parsed': (api.db.json.dumps, api.db.json.loads)
+        }
 
     @classmethod
     def do_update(cls, params, response):

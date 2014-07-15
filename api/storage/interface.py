@@ -53,20 +53,20 @@ def set_field(collection, field_desc, value):
 
 
 class Entry(collections.MutableMapping):
-    __bulk_fields__ = []
+    __bulk_fields__ = {}
 
     def __init__(self, entry):
         self.id = entry['id']
         self.entry = dict(entry.items())
 
-        for field_desc in self.__bulk_fields__:
+        for field_desc, (enc, dec) in self.__bulk_fields__.iteritems():
           bulk_field = get_field(self.entry, field_desc)
           if bulk_field is None:
             pass
           else:
-            blobid = bulk_field['blobid']
-            del bulk_field['blobid']
-            bulk_field['text'] = api.db.RetrieveBlobData(blobid)
+            blobid = bulk_field
+            set_field(self.entry, field_desc,
+                dec(api.db.RetrieveBlobData(blobid)))
 
         self.Init()
 
@@ -96,25 +96,26 @@ class Entry(collections.MutableMapping):
         insert_data.update(self.entry)
         stored_blobs = {}
 
-        for field_desc in self.__bulk_fields__:
+        for field_desc, (enc, dec) in self.__bulk_fields__.iteritems():
           bulk_field = get_field(insert_data, field_desc)
           if bulk_field is None:
             pass
-          elif 'text' in bulk_field:
-            blob = bulk_field.pop('text')
-            blobid = api.db.InsertBlob(blob)
+          else:
+            blob = bulk_field
+            blobid = api.db.InsertBlob(enc(blob))
             stored_blobs[field_desc] = blob
-            bulk_field['blobid'] = blobid
+            set_field(insert_data, field_desc, blobid)
 
         # Remove and replace the blobs with blobids
         # so that we can insert them in the database. 
         # Then put them back.
         api.db.Insert(self.TABLE, insert_data)
 
-        for field_desc, blob in stored_blobs.iteritems():
-          bulk_field = get_field(self.entry, field_desc)
-          bulk_field['text'] = blob
-          del bulk_field['blobid']
+        #for field_desc, blob in stored_blobs.iteritems():
+          #set_field(self.entry, field_desc, blob)
+          #bulk_field = get_field(self.entry, field_desc)
+          #bulk_field['text'] = blob
+          #del bulk_field['blobid']
 
         self.entry['_id'] = insert_data['_id']
         return self
