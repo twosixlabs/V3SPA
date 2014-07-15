@@ -15,6 +15,16 @@ def filter_by_annotation(l, annotation):
     if annotation in [annot['name'] for annot in item['annotations']]:
         yield item
 
+def perm_set(input_json):
+  perms = set()
+  for perm_conn in filter_by_annotation(
+          input_json['connections'], 'Perm'):
+      for args in get_annotation_args(perm_conn, 'Perm')
+        perm = ".".join(args)
+        if perm not in perms:
+            yield perm
+        perms.add(perm)
+
 def flatten_perms(input_json):
 
   raw_types = {}

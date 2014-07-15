@@ -343,7 +343,7 @@ class LobsterDomain(object):
             if msg['payload']['hide_unused_ports'] is True:
                 jsondata = self._filter_unused_ports(jsondata)
 
-            refpol.parsed = {
+            refpol['parsed'] = {
                 'version': jsondata['version'],
                 'errors': jsondata['errors'],
                 'parameterized': jsondata['result'],
@@ -356,10 +356,17 @@ class LobsterDomain(object):
                 output = self._make_request( 'POST', '/parse?path=*', dsl)
                 jsondata = api.db.json.loads(output.body)
                 refpol.parsed['full'] = jsondata['result']
+                import pdb; pdb.set_trace()
                 if jsondata['result'] is not None:
                   refpol.parsed['summary'] = api.support.decompose.flatten_perms(jsondata['result'])
+                  refpol.parsed['permset'] = [{'text': x, "id": x}
+                                              for x
+                                              in api.support.decompose.perm_set(
+                                                jsondata['result'])
                 else:
                   refpol.parsed['summary'] = []
+                  refpol.parsed['permset'] = []
+
 
             refpol.Insert()
 
