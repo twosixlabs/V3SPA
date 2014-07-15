@@ -126,6 +126,7 @@ class RefPolicy(restful.ResourceDomain):
             refpol.Insert()
 
         response['payload'] = refpol
+        del response['payload']['parsed']['full']
         return response
 
     @classmethod
