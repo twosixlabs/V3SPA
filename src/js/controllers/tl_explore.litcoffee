@@ -189,19 +189,17 @@
           return pos
 
         node.on('mouseover', (d)->
-          tooltip_data_elems =  _.map($scope.data.summary, (link)->
-            unless $scope.visibility[link.type]
+          tooltip_data_elems =  _.map(links, (link, link_name)->
+            unless _.any(link.variants, (x)-> $scope.visibility[x.type])
               return null
-            src_name = link.source.join('.')
-            tgt_name = link.target.join('.')
-            if src_name != d.name and tgt_name != d.name
+
+            if d.name not in [link.link.source.name, link.link.target.name]
               return null# Not related
 
-            link_name = "#{src_name}--#{tgt_name}"
             link_elem = $(document.getElementById(link_name))
             addClass(link_elem, 'thick')
 
-            return links[link_name].variants
+            return link.variants
           )
 
           tooltip_data_elems = _.flatten(_.filter(tooltip_data_elems, (e)-> e != null))
@@ -250,16 +248,13 @@
 
         node.on('mouseout', (d)->
           tooltip.style('visibility', 'hidden')
-          tooltip_data_elems =  _.each($scope.data.summary, (link)->
-            unless $scope.visibility[link.type]
+          tooltip_data_elems =  _.each(links, (link, link_name)->
+            unless _.any(link.variants, (x)-> $scope.visibility[x.type])
               return null
 
-            src_name = link.source.join('.')
-            tgt_name = link.target.join('.')
-            if src_name != d.name and tgt_name != d.name
+            if d.name not in [link.link.source.name, link.link.target.name]
               return null# Not related
 
-            link_name = "#{src_name}--#{tgt_name}"
             link_elem = $(document.getElementById(link_name))
             removeClass(link_elem, 'thick')
           )
