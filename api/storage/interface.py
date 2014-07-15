@@ -94,17 +94,28 @@ class Entry(collections.MutableMapping):
         # remove any actual bulk data and store it in the blob store
         insert_data = {}
         insert_data.update(self.entry)
+        stored_blobs = {}
+
         for field_desc in self.__bulk_fields__:
           bulk_field = get_field(insert_data, field_desc)
           if bulk_field is None:
             pass
           elif 'text' in bulk_field:
-            blob = bulk_field['text']
+            blob = bulk_field.pop('text')
             blobid = api.db.InsertBlob(blob)
-            del bulk_field['text']
+            stored_blobs[field_desc] = blob
             bulk_field['blobid'] = blobid
 
+        # Remove and replace the blobs with blobids
+        # so that we can insert them in the database. 
+        # Then put them back.
         api.db.Insert(self.TABLE, insert_data)
+
+        for field_desc, blob in stored_blobs.iteritems():
+          bulk_field = get_field(self.entry, field_desc)
+          bulk_field['text'] = blob
+          del bulk_field['blobid']
+
         self.entry['_id'] = insert_data['_id']
         return self
 
