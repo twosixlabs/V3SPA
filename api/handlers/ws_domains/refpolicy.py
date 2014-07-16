@@ -295,7 +295,7 @@ class RefPolicy(restful.ResourceDomain):
             raise api.DisplayError("Unable to extract: file corrupted")
 
         try:
-            zf.getinfo('{0}/policy/modules.conf'.format(name))
+            #zf.getinfo('{0}/policy/modules.conf'.format(name))
             zf.getinfo('{0}/policy/modules/'.format(name))
         except KeyError:
             raise api.DisplayError("File does not appear to contain "
