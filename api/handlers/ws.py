@@ -18,6 +18,16 @@ class WebSocket(SockJSConnection):
           msg_obj = api.db.json.loads(msg)
           resp = yield gen.Task(ws_domains.dispatch, msg_obj)
 
+        except api.DisplayError as e:
+            resp = {
+                'payload': str(e),
+                'error': True
+            }
+
+            if 'response_id' in msg_obj:
+              resp['label'] = msg_obj['response_id']
+
+            self.send(api.db.json.dumps(resp))
         except Exception as e:
           if self.session.server.app.settings['debug']:
             resp = {

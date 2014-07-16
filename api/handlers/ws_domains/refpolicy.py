@@ -287,18 +287,18 @@ class RefPolicy(restful.ResourceDomain):
             'refpolicy'))
 
         if not zipfile.is_zipfile(zipped_policy):
-            raise Exception("Unable to extract: file was not a ZIP archive")
+            raise api.DisplayError("Unable to extract: file was not a ZIP archive")
 
         try:
             zf = zipfile.ZipFile(zipped_policy)
         except zipfile.BadZipfile:
-            raise Exception("Unable to extract: file corrupted")
+            raise api.DisplayError("Unable to extract: file corrupted")
 
         try:
             zf.getinfo('{0}/policy/modules.conf'.format(name))
             zf.getinfo('{0}/policy/modules/'.format(name))
         except KeyError:
-            raise Exception("File does not appear to contain "
+            raise api.DisplayError("File does not appear to contain "
                             "SELinux reference policy source. "
                             "Make sure the archive name is the same as "
                             "its top-level folder.")

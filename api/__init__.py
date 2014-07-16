@@ -12,6 +12,9 @@ class error(Exception):
     def __str__(self):
         return self.str
 
+class DisplayError(Exception):
+  """ An error that should be passed straight through to the end host. """
+  pass
 
 import settings
 import storage
