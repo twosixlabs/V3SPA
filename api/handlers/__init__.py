@@ -17,7 +17,6 @@ class Index(Base):
 class Download(Base):
     @tornado.web.authenticated
     def get(self, filetype):
-      import api.handlers.ws_domains.refpolicy as refpolicy
       import api.handlers.ws_domains as ws_domains
       self.set_header('Cache-control', 'no-cache')
 
@@ -38,7 +37,7 @@ class Download(Base):
           self.set_status(404)
           self.finish("Could not find policy: {0}".format(identifier))
 
-        refpolicy = refpolicy.RefPolicy.Read(identifier)
+        refpolicy = ws_domains.call('refpolicy', 'Read', identifier)
         if not refpolicy:
           self.clear()
           self.set_status(404)
