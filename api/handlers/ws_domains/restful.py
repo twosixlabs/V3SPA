@@ -64,6 +64,7 @@ class ResourceDomain(api.storage.interface.Entry):
 
     @classmethod
     def do_delete(cls, params, response):
-        newobject = cls.Read(params['_id'])
+
+        newobject = cls.Read(params)
         response['payload'] = newobject.Delete()
         return response
