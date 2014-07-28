@@ -92,17 +92,29 @@
       function leafCount(domain_id, rawData) {
         var domain = rawData.domains[domain_id];
 
-        var memo = 0
+        var memo = {
+          count: 0,
+          depth: 1
+        }
+        var depths = [0]
 
         if (typeof domain !== 'undefined') {
-          memo = _.reduce(domain.subdomains, function(memo, v, k) {
-            return memo + leafCount(k, rawData);
-          }, 0);
+          _.each(domain.subdomains, function(v, k) {
+            var lower = leafCount(k, rawData); 
 
-          //rawData.domains[domain_id].leafCount = memo;
+            memo.count += lower.count
+            depths.push(lower.depth)
+          })
+          if (_.size(domain.subdomains) == 0 && _.size(domain.ports) > 0) {
+            depths.push(1)
+          }
         }
 
-        return memo + 1;
+        memo.depth += _.max(depths);
+        memo.count += 1;
+
+
+        return memo;
       }
 
       var config = {
@@ -129,11 +141,14 @@
 
         positionMgr = PositionManager("hive.viewport::#{IDEBackend.current_policy._id}")
 
-        total_size = leafCount("0", json_data)
+        stats = leafCount("0", json_data)
+        total_size = stats.count
+        depth = stats.depth
 
+        col_width = 200
         layout =
-          w: 1600
-          h: 1000
+          w: 1400
+          h: col_width  * (depth)
 
         partition = d3.layout.partition()
                         .size([layout.w, layout.h])
@@ -144,7 +159,8 @@
                           if d.type == 'port'
                             return 1
                           else
-                            return leafCount(d.id, json_data)
+                            stats = leafCount(d.id, json_data)
+                            return stats.count
                         )
                         .children((d)->(
                           ret = _.union(
@@ -179,12 +195,13 @@
         startDomain = _.clone(json_data.domains["0"])
 
         nodes = partition.nodes(startDomain)
+        nodes = _.filter(nodes, (d)->d.name != 'System')
 
         portsById = _.indexBy(_.filter(nodes, (d)-> d.type == 'port'), 'id')
         color = d3.scale.ordinal().domain([null, 'port','domain']).range([
           '#d9d9d9', '#e5c494', '#ffd92f'
         ])
-        fontsize = d3.scale.log().rangeRound([4, 16]).domain([10, layout.w]).clamp(true)
+        fontsize = d3.scale.log().rangeRound([6, 16]).domain([10, layout.w]).clamp(true)
         curve_control = d3.scale.sqrt()
           .rangeRound([250, 1000])
           .domain([10, layout.h])
@@ -196,7 +213,7 @@
             return d.path)
 
         x_position = (d)->
-          d.y + (3 * d.depth)
+          d.y + (3 * d.depth) - col_width
 
         set_classes = (selection)->
           selection.classed('domains', (d)-> d.type == 'domain')
