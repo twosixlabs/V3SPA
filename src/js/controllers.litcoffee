@@ -231,6 +231,8 @@ Watch the view control and switch the editor session
         $scope.setEditorTab = (name)->
           $timeout ->
             sessInfo = $scope.editorSessions[name]
+            unless sessInfo
+              return
 
             if sessInfo.tab? and not _.isEmpty sessInfo.tab
               prevIndex = sessInfo.tab.css('z-index')
@@ -307,11 +309,13 @@ not been loaded.
               templateUrl: 'refpolicyModal.html'
               controller: 'modal.refpolicy'
 
-          instance.result.then (policy)->
-              RefPolicy.load(policy.id).then (refpol)->
-                # When the refpolicy has actually been loaded,
-                # open the upload modal.
-                open_modal(refpol)
+          instance.result.then (promise)->
+              if promise
+                  promise.then (refpol)->
+                    if refpol
+                      # When the refpolicy has actually been loaded,
+                      # open the upload modal.
+                      open_modal(refpol)
 
 Create a modal for opening a policy
 

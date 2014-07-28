@@ -145,6 +145,13 @@ class Entry(collections.MutableMapping):
         return self
 
     def Delete(self):
+        data = api.db.FindOne(self.TABLE, self.entry['_id'])
+
+        for field_desc, (enc, dec) in self.__bulk_fields__.iteritems():
+          bulk_field = get_field(data, field_desc)
+          logging.info("Removing {0}".format(field_desc))
+          api.db.RemoveBlob(bulk_field)
+
         try:
           api.db.Remove(self.TABLE, self['_id'])
         except KeyError:  # It wasn't in the database anyway

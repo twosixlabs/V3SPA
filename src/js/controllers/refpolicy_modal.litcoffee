@@ -16,7 +16,7 @@
               not $scope.input.refpolicy?
 
             $scope.load = ->
-              $modalInstance.close($scope.input.refpolicy)
+              $modalInstance.close(RefPolicy.load($scope.input.refpolicy.id))
 
             $scope.cancel = ->
               $modalInstance.dismiss('cancel')
@@ -70,6 +70,11 @@
 
                     query.callback(dropdown)
                 )
+
+            $scope.deleting = false
+
+            $scope.delete = ->
+              $modalInstance.close(RefPolicy.delete($scope.input.refpolicy.id))
 
             return null
 

@@ -70,6 +70,25 @@
 
           return deferred.promise
 
+        delete: (id)->
+            deferred = @_deferred_load || @$q.defer()
+
+            req = 
+              domain: 'refpolicy'
+              request: 'delete'
+              payload: id
+
+            @SockJSService.send req, (data)=>
+              if data.error?
+                deferred.reject(null)
+              else
+                @VespaLogger.log 'policy', 'info', "Deleted Reference Policy: #{id}"
+                @IDEBackend.clear_policy()
+
+                deferred.resolve(null)
+
+            return deferred.promise
+
         current_as_select2: =>
           return null unless @current?
           ret =

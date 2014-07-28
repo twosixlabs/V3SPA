@@ -34,6 +34,10 @@ class Database(object):
   def InsertBlob(self, blob):
       return self.bulk.put(str(blob))
 
+  def RemoveBlob(self, identifier):
+      self.bulk.delete(identifier)
+      return True
+
   def Find(self, collection, criteria, projection, **opts):
     if '_id' in criteria:
       criteria['_id'] = Database.json.ObjectId(criteria['_id'])
