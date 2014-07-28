@@ -74,7 +74,7 @@ Clear the current policy
             @current_policy =
               documents: {}
               json:
-                parameterized: {}
+                parameterized: null
                 errors: ["nodata"]
                 summary: []
               id: null
