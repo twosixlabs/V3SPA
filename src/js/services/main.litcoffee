@@ -29,6 +29,10 @@
             level: level
             message: message.split('\n')
 
+          if level == 'error'
+              $.growl {title: 'Error', message: message}, 
+                type: 'danger'
+
           @$timeout =>
             @messages.push(msg)
             if @messages.length > 10
@@ -87,9 +91,9 @@ general callbacks
 
             callback = @msg_callbacks[msg.label]
             if callback?
-              @status.outstanding--
               #console.log "Have #{@status.outstanding} outstanding messages"
-              @$rootScope.$apply ->
+              @$rootScope.$apply =>
+                @status.outstanding--
                 callback(msg)
               return
 
@@ -98,15 +102,17 @@ general callbacks
               console.log "Have no handler for message: #{msg.label}"
               return
 
-            @status.outstanding--
             #console.log "Have #{@status.outstanding} outstanding messages"
-            @$rootScope.$apply ->
+            @$rootScope.$apply =>
+              @status.outstanding--
               callback(msg)
 
         on: (eventName, callback) =>
           @callbacks[eventName] = callback
 
         send: (data, response) =>
+
+          console.log "Sent ", data
 
 Sometimes we might want to handle a response specific to the requests.
 We generate a token and do a callback specifically on that token.
@@ -115,8 +121,8 @@ We generate a token and do a callback specifically on that token.
             token = @TokenService.generate()
             @msg_callbacks[token] = response
             data.response_id = token
+
             @status.outstanding++
-            #console.log "Have #{@status.outstanding} outstanding messages"
 
           if @sock.readyState == 0
             console.log "Connection not yet established. Buffering message"

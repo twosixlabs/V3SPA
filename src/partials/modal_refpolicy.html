@@ -25,8 +25,12 @@
   </span>
 </div>
 <div class='modal-footer'>
+  <button type="button" ng-show='!deleting' ng-disabled='!input.refpolicy'
+    class="btn btn-warning pull-left" ng-click='deleting = true'>Remove Policy</button>
+  <button type="button"  ng-show='deleting'
+    class="btn btn-danger pull-left" ng-click='delete()'>Confirm Removal of '{{input.refpolicy.text}}'</button>
   <button type="button" class="btn btn-default" ng-click='cancel()'>Cancel</button>
-  <button type="button" ng-disabled='invalid()'
+  <button type="button" ng-disabled='!input.refpolicy'
     class="btn btn-primary" ng-click='load()'>Load</button>
 </div>
 

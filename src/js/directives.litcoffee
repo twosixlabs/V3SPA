@@ -1,5 +1,43 @@
     v3spa = angular.module 'vespa.directives', []
 
+    v3spa.filter 'join', ->
+        return (input, separator)->
+            return input.join(separator)
+
+    v3spa.filter 'pluck', ->
+        return (input, field)->
+            return _.pluck(input, field)
+
+    v3spa.directive 'touchSpin', ->
+      ret =
+        restrict: 'A'
+        replace: 'true'
+        scope:
+          spinnerVal: '=ngModel'
+          startVal: '=touchSpin'
+        template: """
+        <div class='input-group input-group-sm bootstrap-touchspin'>
+        <span class='input-group-btn'>
+        <button ng-disabled='spinnerVal==1' ng-click='decrement()' class='btn btn-sm btn-default bootstrap-touchspin-down' type='button'>-</button>
+        </span>
+        <input class='form-control ' ng-model='spinnerVal' />
+        <span class='input-group-btn'>
+        <button ng-disabled='spinnerVal == 15' ng-click='increment()' class='btn btn-sm btn-default bootstrap-touchspin-up' type='button'>+</button>
+        </span>
+        </div>
+        """
+        controller: ($scope)->
+
+          $scope.spinnerVal = unless $scope.startVal then 0 else $scope.startVal
+
+          $scope.increment = ()->
+            if $scope.spinnerVal < 15
+              $scope.spinnerVal++
+
+          $scope.decrement = ()->
+            if $scope.spinnerVal > 1
+              $scope.spinnerVal--
+
     v3spa.directive 'autoHeight', ($window) ->
       ret =
         restrict: 'A'

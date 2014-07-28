@@ -6,11 +6,15 @@
     <div class='col-md-4'>
       <div class='panel panel-default'>
         <div class='panel-heading'>
-          <h1 class='panel-title'>Type Enforcement</h1>
+          <h1 class='panel-title'>Type Enforcement
+          <small ng-show='documents.te.text.length < documents.te.size' 
+            class='text-muted pull-right'>
+            Showing {{documents.te.text.length}}/{{documents.te.size}} bytes
+          </small>
+ </h1>
         </div>
         <div class='panel-body'>
-          <pre class='pre-scrollable'>
-{{documents.te.text}}
+          <pre class='pre-scrollable'><code>{{documents.te.text}}</code>
           </pre>
         </div>
       </div>
@@ -19,11 +23,14 @@
     <div class='col-md-4'>
       <div class='panel panel-default'>
         <div class='panel-heading'>
-          <h1 class='panel-title'>File Context</h1>
+          <h1 class='panel-title'>File Context
+          <small ng-show='documents.fc.text.length < documents.fc.size' 
+            class='text-muted pull-right'>
+            Showing {{documents.fc.text.length}}/{{documents.fc.size}} bytes</small>
+          </h1>
         </div>
         <div class='panel-body'>
-          <pre class='pre-scrollable'>
-{{documents.fc.text}}
+          <pre class='pre-scrollable'><code>{{documents.fc.text}}</code>
           </pre>
         </div>
       </div>
@@ -33,11 +40,14 @@
     <div class='col-md-4'>
       <div class='panel panel-default'>
         <div class='panel-heading'>
-          <h1 class='panel-title'>Interface</h1>
+          <h1 class='panel-title'>Interface
+          <small ng-show='documents.if.text.length < documents.if.size' 
+            class='text-muted pull-right'>
+            Showing {{documents.if.text.length}}/{{documents.if.size}} bytes</small>
+ </h1>
         </div>
         <div class='panel-body'>
-          <pre class='pre-scrollable'>
-{{documents.if.text}}
+          <pre class='pre-scrollable'><code>{{documents.if.text}}</code>
           </pre>
         </div>
       </div>

@@ -1,7 +1,7 @@
     vespaControllers = angular.module('vespaControllers')
 
     vespaControllers.controller 'avispaCtrl', ($scope, VespaLogger,
-        IDEBackend, $timeout, PositionManager, $q) ->
+        IDEBackend, $timeout, $modal, PositionManager, $q) ->
 
       $scope.domain_data = null
       $scope.objects ?=
@@ -38,13 +38,16 @@ A general update function for the Avispa view. This only refreshes
 when the domain data has actually changed to prevent flickering.
 
       update_view = (data)->
+
+        # Avispa uses the parameterized view.
         if _.size(data.errors) > 0
             $scope.policy_data = null
             cleanup()
 
         else
-          if not _.isEqual(data.result, $scope.policy_data)
-            $scope.policy_data = data.result
+          data = data.parameterized
+          if not _.isEqual(data, $scope.policy_data)
+            $scope.policy_data = data
 
             cleanup()    
 
@@ -58,14 +61,14 @@ when the domain data has actually changed to prevent flickering.
                   el: $('#surface svg.avispa')
                   position: viewport_pos
 
-            root_id = data.result.root
+            root_id = data.root
 
-            $scope.parseRootDomain root_id, data.result.domains[root_id]
+            $scope.parseRootDomain root_id, data.domains[root_id]
 
 Force a redraw on all the children
 
 
-            $scope.parseConns(data.result.connections)
+            $scope.parseConns(data.connections)
 
 
       IDEBackend.add_hook "json_changed", update_view
@@ -94,17 +97,19 @@ ID's MUST be fully qualified, or Avispa renders horribly wrong.
 
           $scope.objects.domains[id] = domain
 
-          domain.$el.contextmenu
-            target: '#domain-context-menu'
-            onItem: (domain_el, e)->
-              if e.target.id == 'query_reachability'
-                $scope.reachability_query(domain)
-              else if e.target.id == 'display_reachability'
-                $scope.highlight_reachability domain
-
-
           if obj.path # this means it's not collapsed.
             IDEBackend.add_selection_range_object 'dsl', obj.srcloc.start.line, domain
+
+          context_items = {}
+          context_items['jump-to-code'] = 
+              label: "Show Code"
+              callback: ->
+                  IDEBackend.highlight(domain.options.data)
+                  $timeout IDEBackend.unhighlight, 5000
+
+          domain.$el.contextmenu
+            target: '#avispa-context-menu'
+            items: context_items
 
           $scope.avispa.$groups.append domain.$el
 
@@ -121,6 +126,36 @@ ID's MUST be fully qualified, or Avispa renders horribly wrong.
 
           $scope.objects.ports[id] = port
           $scope.objects.ports_by_path[obj.path] = port
+
+          context_items = {}
+          context_items['context-expand-links'] = 
+            label: "Expand Hidden Connections"
+            disabled: ->
+              not port.options.expandable
+            callback: ->
+                port.options.expander(port_elem, e)
+
+          context_items['display_reachability'] = 
+              label: "Analyze Reachability"
+              disabled: ->
+                invalid = ['member_obj', 'member_subj', 'attribute_subj',
+                              'attribute_obj', 'module_subj', 'module_obj']
+                if _.contains(invalid, port.options.data.name)
+                  return true
+                return false
+              callback: ->
+                  $scope.highlight_reachability port
+
+          context_items['jump-to-code'] = 
+              label: "Show Code"
+              callback: ->
+                  IDEBackend.highlight(port.options.data)
+                  $timeout IDEBackend.unhighlight, 5000
+
+          port.$el.contextmenu
+            target: '#avispa-context-menu'
+            items: context_items
+
 
           IDEBackend.add_selection_range_object 'dsl', obj.srcloc.start.line, port
           $scope.avispa.$objects.append port.$el
@@ -150,20 +185,20 @@ the endpoint that does exist so that it can obviously be expanded
                   else 
                     return false
 
-                IDEBackend.expand_graph( _.filter(missing_domains, (d)->d))
+                IDEBackend.expand_graph_by_id(
+                  _.union(_.flatten( _.filter(missing_domains, (d)->d))))
 
-          if not right 
+          if not left and not right
+            console.log "Wft"
+          else if not right 
             left.add_class 'expandable'
-            left.$el.contextmenu
-              target: '#node-context-menu'
-              onItem: handle_expand_links(left)
-
+            left.options.expandable = true
+            left.options.expander = handle_expand_links(left)
 
           else if not left
             right.add_class 'expandable'
-            right.$el.contextmenu
-              target: '#node-context-menu'
-              onItem: handle_expand_links(right)
+            right.options.expandable = true
+            right.options.expander = handle_expand_links(right)
 
           else
 
@@ -181,9 +216,20 @@ the endpoint that does exist so that it can obviously be expanded
                 data: data
                 position: link_pos
 
-            $scope.objects.connections[id] = link
-            IDEBackend.add_selection_range_object 'dsl', data.srcloc.start.line, link
-            $scope.avispa.$links.append link.$el
+            context_items = {}
+            context_items['jump-to-code'] = 
+                label: "Show Code"
+                callback: ->
+                    IDEBackend.highlight(link.options.data)
+                    $timeout IDEBackend.unhighlight, 5000
+
+            link.$el.contextmenu
+              target: '#avispa-context-menu'
+              items: context_items
+
+              $scope.objects.connections[id] = link
+              IDEBackend.add_selection_range_object 'dsl', data.srcloc.start.line, link
+              $scope.avispa.$links.append link.$el
 
 
 Use D3's force-direction to layout a set of objects within the bounds.
@@ -370,6 +416,8 @@ Since it's recursive, we check it in each method.
             $q.all(subdomain_defers).then (subdoms)->
               if domain_objects.length > 0
                 domain_objects = _.union domain_objects, subdoms
+              else
+                domain_objects = subdoms
 
 Set the size for the group. If there are no subelements, its size 1.
 Otherwise it's 1.1 * ceil(sqrt(subelement_count)). If there are no
@@ -444,35 +492,57 @@ Run a reachability query
       $scope.reachability_query = (domain)->
         query = IDEBackend.perform_path_query domain.options.numeric_id
 
-        query.then (data)->
-          result = JSON.parse data
-          filtermap = (memo, paths, dom_id)->
-            if $scope.objects.domains[dom_id]?
-              memo.push $scope.objects.domains[dom_id].AncestorList()
-            return memo
+        query.then(
+          (result)->
+            console.error "Deprecated"
+          (data)->
+            console.log "Error", data
+        )
 
-          hidden_domains = _.reduce(result.result, filtermap, [])
-
-          IDEBackend.expand_graph hidden_domains
 
 Highlight all the domains reachable from a given domain. This
 assumes they've all been expanded.
 
       $scope.highlight_reachability = (domain)->
 
-        query = IDEBackend.perform_path_query domain.options.numeric_id
+        $scope.analysisOrigin = domain.options._id
 
-        query.then (data)->
-          result = JSON.parse data
-          ctr = 0
-          _.each result.result, (paths, dom_id)->
+        instance = $modal.open
+            templateUrl: 'analysisModal.html'
+            controller: 'modal.analysis_controls'
+            resolve:
+              origin_id_accessor: ->
+                (data)->
+                  return data.domain
+              port_data: ->
+                ret = domain.options.data
+                ret['id'] = domain.options.numeric_id
+                return ret
 
-            _.each paths, (path)->
-              _.each path, (conn)->
-                $scope.objects.connections[conn].highlight_reachable 0
+        instance.result.then(
+          (paths)-> 
+            if _.isEmpty(_.omit(paths, 'truncated'))
+              $.growl(
+                title: "Info"
+                message: "Analysis returned no results."
+              ,
+                type: 'info'
+              )
 
-            $scope.objects.domains[dom_id].highlight_reachable 0
+            else
 
+              $scope.analysisData = paths
+              $scope.analysisPaneVisible = true
+        )
+
+
+      $scope.highlight = (data)->
+          _.each data.hops, (conn)->
+              $scope.objects.connections[conn.conn].highlight_reachable 0
+
+      $scope.clearAnalysis = ->
+          $scope.analysisData = null
+          $scope.analysisPaneVisible = false
 
 
 Lobster-specific definitions for Avispa
@@ -549,7 +619,9 @@ Lobster-specific definitions for Avispa
 
             return @
 
+The handler for the little expansion icon on collapsed domains.
+
         Expand: (event)->
-          Avispa.context.ide_backend.expand_graph [@AncestorList()]
+          Avispa.context.ide_backend.expand_graph_by_id @AncestorList()
 
           cancelEvent(event)

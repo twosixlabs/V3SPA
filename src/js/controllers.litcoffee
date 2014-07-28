@@ -8,8 +8,8 @@ The main controller. avispa is a subcontroller.
 
       $scope._ = _
 
-      $scope.visibility = 
-        unused_ports = false
+      $scope.view_control = 
+        unused_ports: false
 
       $scope.$watch 'raw_view_selection', (newv, oldv)->
         if newv
@@ -41,8 +41,15 @@ The main controller. avispa is a subcontroller.
                         text: k
                         id: k
 
-      $scope.$watch 'visibility.unused_ports', (newv)->
-          IDEBackend.set_visibility 'unused_ports', newv
+      $scope.$watchCollection 'view_control', (new_collection)->
+        for k, v of new_collection
+          do (k, v)->
+            IDEBackend.set_view_control k, v
+
+      $scope.$watchCollection 'analysis_ctrl', (new_collection)->
+        for k, v of new_collection
+          do (k, v)->
+            IDEBackend.set_query_param k, v
 
       $scope.policy = IDEBackend.current_policy
 
@@ -63,10 +70,21 @@ The main controller. avispa is a subcontroller.
               session.selection.on 'changeSelection', (e, sel)->
                 IDEBackend.highlight_selection nm, sel.getRange()
 
+              session.foldAll()
+
               $scope.editorSessions[nm] = 
                 session: session
+                folded: true
 
-      $scope.visualizer_type = 'avispa'
+              onfold = (session)->
+                return ->
+                  session.folded = false
+
+              session.on('changeFold', onfold($scope.editorSessions[nm]))
+
+          $scope.setEditorTab($scope.view)
+
+      $scope.visualizer_type = 'tl_explore'
       $timeout ->
         $scope.view = 'dsl'
 
@@ -129,6 +147,10 @@ This controls our editor visibility.
         IDEBackend.add_hook 'doc_changed', (doc, contents)->
             $timeout ->
                 $scope.editorSessions[doc].session.setValue contents
+                $timeout ->
+                  if $scope.editorSessions[doc].folded == true
+                    $scope.editorSessions[doc].session.foldAll()
+
 
         $scope.editor_markers = []
 
@@ -187,18 +209,20 @@ This controls our editor visibility.
                 hl.range.end.col - 1
               )
 
-              session = $scope.editorSessions[hl.apply_to]?.session
+              session_data = $scope.editorSessions[hl.apply_to]
 
-              if not session?  # Just bail
+              if not session_data.session?  # Just bail
                 return
 
-              marker = session.addMarker(
+              session_data.session.unfold(range, false) # VSPA-86
+
+              marker = session_data.session.addMarker(
                 range,
                 "#{hl.type}_marker",
                 "text"
               )
 
-              $scope.editor.scrollToLine hl.range.start.line - 1
+              $scope.editor.scrollToLine hl.range.start.line - 10
 
               $scope.editor_markers.push marker
 
@@ -207,6 +231,8 @@ Watch the view control and switch the editor session
         $scope.setEditorTab = (name)->
           $timeout ->
             sessInfo = $scope.editorSessions[name]
+            unless sessInfo
+              return
 
             if sessInfo.tab? and not _.isEmpty sessInfo.tab
               prevIndex = sessInfo.tab.css('z-index')
@@ -248,6 +274,8 @@ Watch the view control and switch the editor session
             $location.path('/avispa')
           else if value =='hive'
             $location.path('/hive')
+          else if value =='tl_explore'
+            $location.path('/tl_explore')
           else
             console.error("Invalid visualizer type")
 
@@ -281,11 +309,13 @@ not been loaded.
               templateUrl: 'refpolicyModal.html'
               controller: 'modal.refpolicy'
 
-          instance.result.then (policy)->
-              RefPolicy.load(policy.id).then (refpol)->
-                # When the refpolicy has actually been loaded,
-                # open the upload modal.
-                open_modal(refpol)
+          instance.result.then (promise)->
+              if promise
+                  promise.then (refpol)->
+                    if refpol
+                      # When the refpolicy has actually been loaded,
+                      # open the upload modal.
+                      open_modal(refpol)
 
 Create a modal for opening a policy
 

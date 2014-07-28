@@ -19,6 +19,9 @@ errors, and generally being awesome.
             valid: false
 
           @graph_expansion = {}
+          @graph_id_expansion = []
+          @view_control = {}
+          @query_params = {}
 
           @hooks =
             policy_load: []
@@ -27,9 +30,8 @@ errors, and generally being awesome.
             validation: []
 
           @selection_ranges = {}
-          @visibility = {}
 
-          @validate_dsl = _.throttle @_validate_dsl, 1000
+          @validate_dsl = _.debounce @_validate_dsl, 500
 
         isCurrent: (id)=>
           id? and id == @current_policy._id
@@ -72,13 +74,16 @@ Clear the current policy
             @current_policy =
               documents: {}
               json:
+                parameterized: null
                 errors: ["nodata"]
+                summary: []
               id: null
               _id: null
               type: null
               valid: false
 
             @graph_expansion = {}
+            @graph_id_expansion = []
 
             for hook in @hooks.policy_load
               hook(@current_policy)
@@ -158,9 +163,43 @@ about highlighting that should be performed.
           _.each @hooks.validation, (hook)->
             hook([])
 
+The locally stored set of domains that we expand can get both
+very large, and out of sync. Re-build it from the local data
+store
+
+        rebuild_expansion: =>
+          data = @current_policy.json['result']['domains']
+
+          @graph_expansion = {}
+          @graph_id_expansion = 
+
+          ancestor_lists = []
+          for id, domain of data
+            do (id, domain)->
+              ancestor_lists.push(domain.path.split('.'))
+
+          _.each ancestor_lists, (ancestor_list)=>
+            curr = @graph_expansion
+            for elem in ancestor_list
+                if elem not of curr
+                    curr[elem] = {}
+
+                curr = curr[elem]
+
 Extend the set of paths that we show.
 
-        expand_graph: (ancestor_lists)=>
+        expand_graph_by_id: (id_list)=>
+          to_add = _.difference(id_list, @graph_id_expansion)
+          if to_add.length > 0
+            @graph_id_expansion = @graph_id_expansion.concat id_list
+            @_validate_dsl()
+
+        contract_graph_by_id: (id_list)=>
+          @graph_id_expansion = _.without.apply(
+            _, [@graph_id_expansion].concat(id_list))
+          @_validate_dsl()
+
+        expand_graph_by_name: (ancestor_lists)=>
 
           _.each ancestor_lists, (ancestor_list)=>
             curr = @graph_expansion
@@ -194,10 +233,13 @@ set of paths.
 Set the visibility of a given key. If we have a policy loaded, then
 trigger revalidation.
 
-        set_visibility: (key, visible)->
-          if @visibility[key] != visible
-            console.log "Visibility '#{key}': #{visible}"
-            @visibility[key] = visible
+        set_query_param: (param, val)->
+          if @query_params[param] != val
+            @query_params[param] = val
+
+        set_view_control: (key, visible)->
+          if @view_control[key] != visible
+            @view_control[key] = visible
 
             unless @current_policy.id == null
               @validate_dsl()
@@ -208,13 +250,22 @@ contents of @current_policy
         _validate_dsl: =>
           deferred = @$q.defer()
 
+          path_params = @write_filter_param(@graph_expansion)
+          path_params = _.union(path_params, 
+                                _.map(@graph_id_expansion, (v)->
+                                    "id=#{v}"
+                                )
+          )
+
           req =
             domain: 'lobster'
             request: 'validate'
             payload:
+              policy: @current_policy._id
               text: @current_policy.documents.dsl.text
-              params: @write_filter_param(@graph_expansion).join("&")
-              hide_unused_ports: if @visibility.unused_ports then false else true
+              params: path_params.join("&")
+              hide_unused_ports: if @view_control.unused_ports then false else true
+
 
           @SockJSService.send req, (result)=>
             if result.error  # Service error
@@ -267,10 +318,11 @@ contents of @current_policy
 Load a policy module from the server (deprecated)
 
         load_policy_module: (refpolicy_id, module_name)=>
-          console.log "This function is deprcated..."
+          console.error "This function is deprcated..."
           deferred = @$q.defer()
 
           @graph_expansion = {}
+          @graph_id_expansion = []
 
           req =
             domain: 'policy'
@@ -319,7 +371,9 @@ Save a modified policy to the server
           req =
             domain: 'refpolicy'
             request: 'update'
-            payload: @current_policy
+            payload: 
+              _id: @current_policy._id
+              dsl: @current_policy.documents.dsl.text
 
           delete req.payload.json
 
@@ -335,6 +389,8 @@ Save a modified policy to the server
               deferred.resolve @current_policy._id
 
           return deferred.promise
+
+Set JSON
 
         list_policies: =>
           deferred = @$q.defer()
@@ -395,20 +451,47 @@ Perform a path query originating from the domain with ID
 `domain_id`. Return a promise which will be resolved
 with the results.
 
-        perform_path_query: (domain_id)->
+        perform_path_query: (domain_id, params)->
           deferred = @$q.defer()
+
+          path_params = _.map(params, (v, k)->
+            if _.isArray v
+                if _.size(v) == 0
+                    return null
+                else
+                    return "#{k}=#{v.join(",")}"
+
+            else
+                return "#{k}=#{v}"
+          )
+          path_params = _.reject(path_params, (v)-> v == null)
 
           req =
             domain: 'lobster'
             request: 'query_reachability'
             payload:
-              id: domain_id
+              policy: @current_policy._id
               text: @current_policy.documents.dsl.text
+              params: path_params.concat("id=#{domain_id}").join("&")
 
-          @SockJSService.send req, (data)->
+
+          @SockJSService.send req, (data)=>
             if data.error?
               deferred.reject(data.payload)
             else
-              deferred.resolve(data.payload)
+              @current_policy.json = data.payload.data
+
+              ids = []
+              _.each @current_policy.json.params.split('&'), (param)->
+                [name, val] = param.split('=')
+                if name == 'id'
+                  ids.push val
+
+              @expand_graph_by_id ids
+
+              _.each @hooks.json_changed, (hook)=>
+                hook(@current_policy.json)
+
+              deferred.resolve(data.payload.paths)
 
           return deferred.promise

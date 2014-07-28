@@ -82,12 +82,12 @@ The init method allows classes to extend the BaseObject without re-implementing 
 
           if @parent
             list = @parent.AncestorList()
-            list.push @options.data.name
+            list.push @options.numeric_id
             return list
           else if @options.fake_container
             return []
           else
-            return [@options.data.name]
+            return [@options.numeric_id]
 
 
         AbsPosition: (expected)->

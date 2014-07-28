@@ -149,14 +149,12 @@ Bind to the position of the left and right sides of the connection
                 @path.css('stroke-width', '6px')
                 @path.css('stroke-opacity', '0.8')
 
-                Avispa.context.ide_backend.highlight(@options.data)
             return
 
         OnMouseLeave: () ->
             if not Avispa.context.dragItem?
                 @path.css('stroke-width', '3px')
                 @path.css('stroke-opacity', '0.5')
-                Avispa.context.ide_backend.unhighlight()
             return
 
         LeftClick: (event) ->

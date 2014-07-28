@@ -25,13 +25,19 @@
             templateUrl: 'partials/hive.html',
             controller: 'hiveCtrl'
 
+          .when '/tl_explore',
+            templateUrl: 'partials/tl_explore.html',
+            controller: 'tlCtrl'
+
           .otherwise 
-            redirectTo: '/avispa'
+            redirectTo: '/tl_explore'
     ])
 
 Preload all of the templates that we're going to use.
 
     v3spa.run ($templateCache, $http)->
+      $templateCache.put('analysisModal.html',
+                         $http.get('partials/modal_analysis.html'))
       $templateCache.put('policyLoadModal.html',
                          $http.get('partials/modal_load.html'))
       $templateCache.put('policyNewModal.html',
@@ -79,4 +85,5 @@ Preload all of the templates that we're going to use.
             }
     };
     `
+
 

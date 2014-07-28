@@ -43,7 +43,7 @@ var $singleLineEditor = function(el) {
     var renderer = new Renderer(el);
 
     renderer.$maxLines = 4;
-    
+
     var editor = new Editor(renderer);
 
     editor.setHighlightActiveLine(false);
@@ -59,14 +59,15 @@ var $singleLineEditor = function(el) {
 var AcePopup = function(parentNode) {
     var el = dom.createElement("div");
     var popup = new $singleLineEditor(el);
-    
+
     if (parentNode)
         parentNode.appendChild(el);
     el.style.display = "none";
     popup.renderer.content.style.cursor = "default";
     popup.renderer.setStyle("ace_autocomplete");
-    
+
     popup.setOption("displayIndentGuides", false);
+    popup.setOption("dragDelay", 150);
 
     var noop = function(){};
 
@@ -86,8 +87,7 @@ var AcePopup = function(parentNode) {
 
     popup.on("mousedown", function(e) {
         var pos = e.getDocumentPosition();
-        popup.moveCursorToPosition(pos);
-        popup.selection.clearSelection();
+        popup.selection.moveToPosition(pos);
         selectionMarker.start.row = selectionMarker.end.row = pos.row;
         e.stop();
     });
@@ -155,11 +155,11 @@ var AcePopup = function(parentNode) {
     popup.getHoveredRow = function() {
         return hoverMarker.start.row;
     };
-    
+
     event.addListener(popup.container, "mouseout", hideHoverMarker);
     popup.on("hide", hideHoverMarker);
     popup.on("changeSelection", hideHoverMarker);
-    
+
     popup.session.doc.getLength = function() {
         return popup.data.length;
     };
@@ -179,7 +179,7 @@ var AcePopup = function(parentNode) {
         if (typeof data == "string")
             data = {value: data};
         if (!data.caption)
-            data.caption = data.value;
+            data.caption = data.value || data.name;
 
         var last = -1;
         var flag, c;
@@ -203,7 +203,7 @@ var AcePopup = function(parentNode) {
     };
     bgTokenizer.$updateOnChange = noop;
     bgTokenizer.start = noop;
-    
+
     popup.session.$computeWidth = function() {
         return this.screenWidth = 0;
     }
@@ -211,7 +211,7 @@ var AcePopup = function(parentNode) {
     // public
     popup.isOpen = false;
     popup.isTopdown = false;
-    
+
     popup.data = [];
     popup.setData = function(list) {
         popup.data = list || [];
@@ -236,7 +236,7 @@ var AcePopup = function(parentNode) {
                 popup._signal("select");
         }
     };
-    
+
     popup.on("changeSelection", function() {
         if (popup.isOpen)
             popup.setRow(popup.selection.lead.row);
@@ -250,6 +250,7 @@ var AcePopup = function(parentNode) {
     popup.show = function(pos, lineHeight, topdownOnly) {
         var el = this.container;
         var screenHeight = window.innerHeight;
+        var screenWidth = window.innerWidth;
         var renderer = this.renderer;
         // var maxLines = Math.min(renderer.$maxLines, this.session.getLength());
         var maxH = renderer.$maxLines * lineHeight * 1.4;
@@ -265,19 +266,24 @@ var AcePopup = function(parentNode) {
             popup.isTopdown = true;
         }
 
-        el.style.left = pos.left + "px";
         el.style.display = "";
         this.renderer.$textLayer.checkForSizeChanges();
+
+        var left = pos.left;
+        if (left + el.offsetWidth > screenWidth)
+            left = screenWidth - el.offsetWidth;
+
+        el.style.left = left + "px";
 
         this._signal("show");
         lastMouseEvent = null;
         popup.isOpen = true;
     };
-    
+
     popup.getTextLeftOffset = function() {
         return this.$borderSize + this.renderer.$padding + this.$imageSize;
     };
-    
+
     popup.$imageSize = 0;
     popup.$borderSize = 1;
 
@@ -285,18 +291,23 @@ var AcePopup = function(parentNode) {
 };
 
 dom.importCssString("\
-.ace_autocomplete.ace-tm .ace_marker-layer .ace_active-line {\
+.ace_editor.ace_autocomplete .ace_marker-layer .ace_active-line {\
     background-color: #CAD6FA;\
     z-index: 1;\
 }\
-.ace_autocomplete.ace-tm .ace_line-hover {\
+.ace_editor.ace_autocomplete .ace_line-hover {\
     border: 1px solid #abbffe;\
     margin-top: -1px;\
     background: rgba(233,233,253,0.4);\
 }\
-.ace_autocomplete .ace_line-hover {\
+.ace_editor.ace_autocomplete .ace_line-hover {\
     position: absolute;\
     z-index: 2;\
+}\
+.ace_editor.ace_autocomplete .ace_scroller {\
+   background: none;\
+   border: none;\
+   box-shadow: none;\
 }\
 .ace_rightAlignedText {\
     color: gray;\
@@ -306,11 +317,11 @@ dom.importCssString("\
     text-align: right;\
     z-index: -1;\
 }\
-.ace_autocomplete .ace_completion-highlight{\
+.ace_editor.ace_autocomplete .ace_completion-highlight{\
     color: #000;\
     text-shadow: 0 0 0.01em;\
 }\
-.ace_autocomplete {\
+.ace_editor.ace_autocomplete {\
     width: 280px;\
     z-index: 200000;\
     background: #fbfbfb;\

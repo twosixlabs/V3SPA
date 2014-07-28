@@ -22,6 +22,30 @@
   z-index: 1;
 }
 
+#overlay {
+  .loading-icon {
+    top: 45%;
+    position: relative;
+    font-size: 4em;
+    color: #fff;
+    text-align: center
+  }
+  z-index: 99999;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background: #000;
+  opacity: .3;
+  filter: alpha(opacity=30);
+  -moz-opacity: .3;
+  }
+
 .container-full {
   padding-top: 10px;
   margin: 0 15px;
@@ -118,9 +142,7 @@ z-index: 10000;
 DIV#surface
 {
     background: #fff;
-    width: 100%;
     height: 100%;
-    position: absolute;
     top: 0em;
     left: 0em;
     right: 0em;
@@ -129,10 +151,16 @@ DIV#surface
 
     background: url('/static/img/bg.png');
 
-    svg.avispa
+    svg
     {
         width: 100%;
         height: 100%;
+
+        .domains {
+          stroke: black;
+          stroke-opacity: 0.5;
+        }
+
     }
 }
 
@@ -195,6 +223,10 @@ position: absolute;
 
 .file-drop-over {
   border-color: @brand-success;
+}
+
+.vertical-scrollable {
+    overflow-y: auto;
 }
 
 .scrollable-2 {
@@ -321,8 +353,26 @@ g.svg-highlight-reach-0 {
 
   path {
     stroke: red;
-    stroke-width: 3px;
+    stroke-width: 5px;
     stroke-opacity: 0.8;
+  }
+}
+
+svg.hiveview {
+  g.link {
+    path {
+      fill: none;
+      stroke: #999;
+      stroke-width: 1px;
+      stroke-linecap: round;
+      stroke-dasharray: 8,4;
+    }
+
+    path.svg-highlight-reach-0 {
+      stroke: red;
+      stroke-width: 3px;
+      stroke-opacity: 0.8;
+    }
   }
 }
 
@@ -337,6 +387,153 @@ g.svg-highlight-reach-0 {
 
   .pre-scrollable{
     max-height: 640px;
+    overflow-x: scroll;
     }
+
+  pre code {
+    overflow-wrap: normal;
+    white-space: pre;
+    counter-reset: line-numbering;
+  }
+
+  pre code .line::before {
+    content: counter(line-numbering);
+    counter-increment: line-numbering;
+    padding-right: 1em; /* space after numbers */
+    width: 1.5em;
+    text-align: right;
+    opacity: 0.5;
+  }
+
+}
+
+.list-group-item {
+  .form-group {
+    margin-bottom: 0px;
+  }
+}
+
+.fullheight {
+  height: 100%;
+  }
+
+.analysis-pane {
+  box-shadow: -6px 0px 8px -5px #999;
+
+  height: 100%;
+
+  .expandable-list {
+    .glyphicon {
+top: 0px;
+     font-size: 0.6em;
+    }
+  }
+}
+
+.indent {
+    padding-left: 1em;
+}
+
+.domains.contractable {
+  cursor: zoom-out;
+}
+
+.domains {
+  cursor: zoom-in;
+  stroke: 1px solid #ccc;
+}
+
+.contextual {
+  cursor: context-menu;
+}
+
+.ports {
+
+}
+
+@activeColor: #FF8282;
+@permittedColor: #75A3FF;
+
+.node {
+  fill: #6F6F65;
+}
+
+.link {
+  fill: none;
+  stroke-opacity: 0.65;
+}
+
+svg.tl_view {
+
+  .active {
+    stroke: @activeColor;
+    &:extend(.link);
+  }
+
+  .active.thick {
+    stroke: darken(@activeColor, 30%);
+  }
+
+  .permitted {
+    stroke: @permittedColor;
+    &:extend(.link);
+  }
+
+  .permitted.thick {
+    stroke: darken(@permittedColor, 30%);
+  }
+
+  .permitted.active {
+    stroke: average(@activeColor, @permittedColor);
+    &:extend(.link);
+  }
+
+  .permitted.active.thick {
+    stroke: darken(average(@activeColor, @permittedColor), 30%);
+  }
+
+  .type {
+    &:extend(.node);
+    font-weight: bold;
+  }
+
+  .permission {
+    &:extend(.node);
+    font-weight: normal;
+  }
+
+  .bold {
+    font-weight: bolder;
+    fill: black;
+  }
+
+  .thick {
+    stroke-width: 4px;
+    stroke-opacity: 1;
+  }
+}
+
+.popover-tooltip {
+  position: absolute;
+  z-index: 100;
+  visibility: hidden;
+  background-color: white;
+  padding: 7px;
+  border: 1px solid #ccc;
+  box-shadow: 3px 3px 5px #bbb;
+
+  max-height: 500px;
+  overflow-y: auto;
+  
+  ul.list-unstyled {
+    margin-bottom: 0px;
+  }
+}
+
+.toolbox {
+  position: absolute;
+  z-index: 10;
+  right: 15px;
+  top:  15px;
 
 }

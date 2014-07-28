@@ -5,6 +5,8 @@ from tornado import gen
 import logging
 logger = logging.getLogger(__name__)
 
+import gridfs
+
 
 class Database(object):
 
@@ -20,6 +22,21 @@ class Database(object):
 
     db_name = api.config.get('storage', 'db_name')
     self.db = self._client[db_name]
+
+    self.bulk = gridfs.GridFS(self.db, 'bulkfiles')
+
+  def RetrieveBlob(self, identifier):
+      return self.bulk.get(identifier)
+
+  def RetrieveBlobData(self, identifier):
+      return self.bulk.get(identifier).read()
+
+  def InsertBlob(self, blob):
+      return self.bulk.put(str(blob))
+
+  def RemoveBlob(self, identifier):
+      self.bulk.delete(identifier)
+      return True
 
   def Find(self, collection, criteria, projection, **opts):
     if '_id' in criteria:

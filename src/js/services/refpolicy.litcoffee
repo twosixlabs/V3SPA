@@ -8,11 +8,10 @@
           @chunks_to_upload = []
           @current = null
           @_deferred_load = null
-          @loading = null
 
         promise: =>
-          if @loading?
-            return @loading
+          if @_deferred_load?
+            return @_deferred_load.promise
           @_deferred_load = @$q.defer()
 
           # If promise comes back, no matter what the
@@ -46,11 +45,10 @@
           return deferred.promise
 
         load: (id)=>
-          if @current?.id == id
+          if @current? and @current.id == id
             return
 
           deferred = @_deferred_load || @$q.defer()
-          @loading = deferred.promise
 
           req = 
             domain: 'refpolicy'
@@ -61,7 +59,6 @@
             if data.error?
               @current = null
               deferred.reject(@current)
-              @loading = null
             else
               @current = data.payload
               @current._id = @current._id.$oid
@@ -70,9 +67,27 @@
               @IDEBackend.clear_policy()
 
               deferred.resolve(@current)
-              @loading = null
 
-          return @loading
+          return deferred.promise
+
+        delete: (id)->
+            deferred = @_deferred_load || @$q.defer()
+
+            req = 
+              domain: 'refpolicy'
+              request: 'delete'
+              payload: id
+
+            @SockJSService.send req, (data)=>
+              if data.error?
+                deferred.reject(null)
+              else
+                @VespaLogger.log 'policy', 'info', "Deleted Reference Policy: #{id}"
+                @IDEBackend.clear_policy()
+
+                deferred.resolve(null)
+
+            return deferred.promise
 
         current_as_select2: =>
           return null unless @current?

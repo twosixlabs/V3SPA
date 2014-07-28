@@ -8,6 +8,16 @@ import api
 __all__ = ['initialize', 'Entry']
 
 
+def merge(d, u):
+    for k, v in u.iteritems():
+        if isinstance(v, collections.Mapping):
+            r = merge(d.get(k, {}), v)
+            d[k] = r
+        else:
+            d[k] = u[k]
+    return d
+
+
 def initialize():
     engine = api.config.get('storage', 'engine')
 
@@ -30,10 +40,44 @@ def initialize():
     logging.info('Storage engine: %s', engine)
 
 
+def get_field(collection, field_desc):
+  current = collection
+  for field in field_desc.split('.'):
+    current = current.get(field)
+    if current is None:
+      return None
+
+  return current
+
+
+def set_field(collection, field_desc, value):
+  current = collection
+  fields = field_desc.split('.')
+  for field in fields[:-1]:
+    n = current.get(field)
+    if n is None:
+      current[field] = {}
+    current = n
+
+  current[fields[-1]] = value
+
+
 class Entry(collections.MutableMapping):
+    __bulk_fields__ = {}
+
     def __init__(self, entry):
         self.id = entry['id']
         self.entry = dict(entry.items())
+
+        for field_desc, (enc, dec) in self.__bulk_fields__.iteritems():
+          bulk_field = get_field(self.entry, field_desc)
+          if bulk_field is None:
+            pass
+          else:
+            blobid = bulk_field
+            set_field(self.entry, field_desc,
+                dec(api.db.RetrieveBlobData(blobid)))
+
         self.Init()
 
     def Init(self):
@@ -57,7 +101,31 @@ class Entry(collections.MutableMapping):
         return cls(values).Insert()
 
     def Insert(self):
+        # remove any actual bulk data and store it in the blob store
+        stored_blobs = {}
+        current_data = api.db.FindOne(self.TABLE, self._id)
+
+        for field_desc, (enc, dec) in self.__bulk_fields__.iteritems():
+          bulk_field = get_field(self.entry, field_desc)
+          if bulk_field is None:
+            pass
+          else:
+            current_db_blob = get_field(current_data, field_desc)
+            api.db.RemoveBlob(current_db_blob)
+
+            blob = bulk_field
+            blobid = api.db.InsertBlob(enc(blob))
+            stored_blobs[field_desc] = blob
+            set_field(self.entry, field_desc, blobid)
+
+        # Remove and replace the blobs with blobids
+        # so that we can insert them in the database. 
+        # Then put them back.
         api.db.Insert(self.TABLE, self.entry)
+
+        for field_desc, blob in stored_blobs.iteritems():
+          set_field(self.entry, field_desc, blob)
+
         return self
 
     @classmethod
@@ -71,9 +139,9 @@ class Entry(collections.MutableMapping):
           entry = api.db.FindOne(cls.TABLE, params)
         return cls(entry) if entry else None
 
-    def Update(self, values=None):
+    def Update(self, values={}):
         if values:
-            self.entry.update(values)
+            merge(self.entry, values)
         # WE use Insert here because it replaces, 
         # and we're not doing anything so complicated as needed 
         # by  MongoDB's update
@@ -81,6 +149,13 @@ class Entry(collections.MutableMapping):
         return self
 
     def Delete(self):
+        data = api.db.FindOne(self.TABLE, self.entry['_id'])
+
+        for field_desc, (enc, dec) in self.__bulk_fields__.iteritems():
+          bulk_field = get_field(data, field_desc)
+          logging.info("Removing {0}".format(field_desc))
+          api.db.RemoveBlob(bulk_field)
+
         try:
           api.db.Remove(self.TABLE, self['_id'])
         except KeyError:  # It wasn't in the database anyway

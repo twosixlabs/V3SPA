@@ -107,6 +107,7 @@ Percolate changes to the server
                 @d.resolve
                   remote_update: false
                   data: @
+                console.log "#{@id} resolved"
                 @d = null
 
           return @d.promise
