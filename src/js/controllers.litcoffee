@@ -70,8 +70,17 @@ The main controller. avispa is a subcontroller.
               session.selection.on 'changeSelection', (e, sel)->
                 IDEBackend.highlight_selection nm, sel.getRange()
 
+              session.foldAll()
+
               $scope.editorSessions[nm] = 
                 session: session
+                folded: true
+
+              onfold = (session)->
+                return ->
+                  session.folded = false
+
+              session.on('changeFold', onfold($scope.editorSessions[nm]))
 
           $scope.setEditorTab($scope.view)
 
@@ -138,6 +147,10 @@ This controls our editor visibility.
         IDEBackend.add_hook 'doc_changed', (doc, contents)->
             $timeout ->
                 $scope.editorSessions[doc].session.setValue contents
+                $timeout ->
+                  if $scope.editorSessions[doc].folded == true
+                    $scope.editorSessions[doc].session.foldAll()
+
 
         $scope.editor_markers = []
 
@@ -196,12 +209,14 @@ This controls our editor visibility.
                 hl.range.end.col - 1
               )
 
-              session = $scope.editorSessions[hl.apply_to]?.session
+              session_data = $scope.editorSessions[hl.apply_to]
 
-              if not session?  # Just bail
+              if not session_data.session?  # Just bail
                 return
 
-              marker = session.addMarker(
+              session_data.session.unfold(range, false) # VSPA-86
+
+              marker = session_data.session.addMarker(
                 range,
                 "#{hl.type}_marker",
                 "text"
