@@ -1,5 +1,5 @@
-define('ace/ext/modelist', ['require', 'exports', 'module' ], function(require, exports, module) {
-
+define("ace/ext/modelist",["require","exports","module"], function(require, exports, module) {
+"use strict";
 
 var modes = [];
 function getModeForPath(path) {
@@ -37,13 +37,15 @@ var supportedModes = {
     ABAP:        ["abap"],
     ActionScript:["as"],
     ADA:         ["ada|adb"],
+    Apache_Conf: ["^htaccess|^htgroups|^htpasswd|^conf|htaccess|htgroups|htpasswd"],
     AsciiDoc:    ["asciidoc"],
     Assembly_x86:["asm"],
     AutoHotKey:  ["ahk"],
     BatchFile:   ["bat|cmd"],
     C9Search:    ["c9search_results"],
     C_Cpp:       ["cpp|c|cc|cxx|h|hh|hpp"],
-    Clojure:     ["clj"],
+    Cirru:       ["cirru|cr"],
+    Clojure:     ["clj|cljs"],
     Cobol:       ["CBL|COB"],
     coffee:      ["coffee|cf|cson|^Cakefile"],
     ColdFusion:  ["cfm"],
@@ -53,11 +55,15 @@ var supportedModes = {
     D:           ["d|di"],
     Dart:        ["dart"],
     Diff:        ["diff|patch"],
+    Dockerfile:  ["^Dockerfile"],
     Dot:         ["dot"],
+    Eiffel:      ["e"],
     Erlang:      ["erl|hrl"],
     EJS:         ["ejs"],
     Forth:       ["frt|fs|ldr"],
     FTL:         ["ftl"],
+    Gherkin:     ["feature"],
+    Gitignore:   ["^.gitignore"],
     Glsl:        ["glsl|frag|vert"],
     golang:      ["go"],
     Groovy:      ["groovy"],
@@ -90,6 +96,7 @@ var supportedModes = {
     Makefile:    ["^Makefile|^GNUmakefile|^makefile|^OCamlMakefile|make"],
     MATLAB:      ["matlab"],
     Markdown:    ["md|markdown"],
+    MEL:         ["mel"],
     MySQL:       ["mysql"],
     MUSHCode:    ["mc|mush"],
     Nix:         ["nix"],
@@ -100,6 +107,7 @@ var supportedModes = {
     pgSQL:       ["pgsql"],
     PHP:         ["php|phtml"],
     Powershell:  ["ps1"],
+    Praat:       ["praat|praatscript|psc|proc"],
     Prolog:      ["plg|prolog"],
     Properties:  ["properties"],
     Protobuf:    ["proto"],
@@ -112,6 +120,7 @@ var supportedModes = {
     SASS:        ["sass"],
     SCAD:        ["scad"],
     Scala:       ["scala"],
+    Smarty:      ["smarty|tpl"],
     Scheme:      ["scm|rkt"],
     SCSS:        ["scss"],
     SH:          ["sh|bash|^.bashrc"],
@@ -129,6 +138,7 @@ var supportedModes = {
     Toml:        ["toml"],
     Twig:        ["twig"],
     Typescript:  ["ts|typescript|str"],
+    Vala:        ["vala"],
     VBScript:    ["vbs"],
     Velocity:    ["vm"],
     Verilog:     ["v|vh|sv|svh"],
@@ -149,7 +159,7 @@ var nameOverrides = {
 var modesByName = {};
 for (var name in supportedModes) {
     var data = supportedModes[name];
-    var displayName = nameOverrides[name] || name;
+    var displayName = (nameOverrides[name] || name).replace(/_/g, " ");
     var filename = name.toLowerCase();
     var mode = new Mode(filename, displayName, data[0]);
     modesByName[filename] = mode;
@@ -163,4 +173,8 @@ module.exports = {
 };
 
 });
-
+;
+                (function() {
+                    window.require(["ace/ext/modelist"], function() {});
+                })();
+            

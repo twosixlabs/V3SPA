@@ -118,9 +118,10 @@ var Gutter = function(parentEl) {
     };
 
     this.update = function(config) {
-        var firstRow = config.firstRow;
-        var lastRow = config.lastRow;
         var session = this.session;
+        var firstRow = config.firstRow;
+        var lastRow = Math.min(config.lastRow + config.gutterOffset,  // needed to compensate for hor scollbar
+            session.getLength() - 1);
         var fold = session.getNextFoldLine(firstRow);
         var foldStart = fold ? fold.start.row : Infinity;
         var foldWidgets = this.$showFoldWidgets && session.foldWidgets;
@@ -129,7 +130,7 @@ var Gutter = function(parentEl) {
         var firstLineNumber = session.$firstLineNumber;
         var lastLineNumber = 0;
         
-        var gutterRenderer = session.gutterRenderer;
+        var gutterRenderer = session.gutterRenderer || this.$renderer;
 
         var cell = null;
         var index = -1;
@@ -214,7 +215,7 @@ var Gutter = function(parentEl) {
         this.element.style.height = config.minHeight + "px";
 
         if (this.$fixedWidth || session.$useWrapMode)
-            lastLineNumber = session.getLength();
+            lastLineNumber = session.getLength() + firstLineNumber;
 
         var gutterWidth = gutterRenderer 
             ? gutterRenderer.getWidth(session, lastLineNumber, config)
@@ -230,6 +231,19 @@ var Gutter = function(parentEl) {
     };
 
     this.$fixedWidth = false;
+    
+    this.$showLineNumbers = true;
+    this.$renderer = "";
+    this.setShowLineNumbers = function(show) {
+        this.$renderer = !show && {
+            getWidth: function() {return ""},
+            getText: function() {return ""}
+        };
+    };
+    
+    this.getShowLineNumbers = function() {
+        return this.$showLineNumbers;
+    };
     
     this.$showFoldWidgets = true;
     this.setShowFoldWidgets = function(show) {
