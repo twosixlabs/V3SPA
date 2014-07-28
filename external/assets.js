@@ -12,7 +12,6 @@
 //= include backbone/backbone-min.js
 //= require svg-pan-zoom/svg-pan-zoom.js
 //= require spin.min.js
-//= require d3hive/dist/hive.js
 //= require bootstrap-growl/bootstrap-growl.js
 //= require angular-file-upload/angular-file-upload.min.js
 //= require bootstrap-contextmenu/bootstrap-contextmenu.js
