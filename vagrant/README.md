@@ -1,0 +1,1 @@
+The boxes you will need to import into vagrant are currently stored on the nas.labs/public share.
