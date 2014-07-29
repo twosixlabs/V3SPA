@@ -18,7 +18,7 @@ sudo npm install
 gulp
 cd -
 gulp
-cd ~/vespa/ide
+cd ~/vespa/
 mkdir mongodb
 
 #mongod --dbpath ~/vespa/ide/mongodb &

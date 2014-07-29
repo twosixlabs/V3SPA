@@ -14,8 +14,8 @@ To set up the environment:
     $ brew install node
 
     $ # Fedora
-    $ sudo yum install gcc kernel-devel kernel-headers dkms make bzip2 perl nodejs npm python-pip git python-devel mongodb-server
-    $ pip install virtualenv
+    $ sudo yum install gcc nodejs npm python-torando python-pip git python-devel mongodb-server
+    $ sudo pip install virtualenv
     $ mkdir vespa && cd vespa
     $ git init
     $ git clone http://gitlab.labs/v3spa/ide.git
@@ -61,7 +61,7 @@ Mongo and two more binaries need to be launched.
 
     $ mongod --dbpath ./mongodb &
     $ ./ide/api/bin/lobster-server &
-    $ ./ide/vespa.py &
+    $ python ide/vespa.py &
 
 ## Automated Install
 
