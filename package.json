@@ -1,6 +1,6 @@
 {
   "name": "V3SPA",
-  "version": "0.5.0",
+  "version": "1.0.0",
   "dependencies": {
     "gulp-include": "cwacek/gulp-include#improved",
     "gulp-coffee": "~1.4.1",
