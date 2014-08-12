@@ -63,6 +63,11 @@ Mongo and two more binaries need to be launched.
     $ ./ide/api/bin/lobster-server &
     $ python ide/vespa.py &
 
+## Misc
+At this point you should create the appropriate firewall rules for 
+your machine to allow external access to port 8080 if you would like
+the service open to other clients.
+
 ## Automated Install
 
 There is a vagrant file and shell script provided to execute all the steps
