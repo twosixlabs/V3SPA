@@ -14,7 +14,7 @@ To set up the environment:
     $ brew install node
 
     $ # Fedora
-    $ sudo yum install gcc nodejs npm python-torando python-pip git python-devel mongodb-server
+    $ sudo yum install gcc nodejs npm python-tornado python-pip git python-devel mongodb-server
     $ sudo pip install virtualenv
     $ mkdir vespa && cd vespa
     $ git init
@@ -60,8 +60,8 @@ Mongo and two more binaries need to be launched.
 (Assuming you are in the vespa dirrectory.)
 
     $ mongod --dbpath ./mongodb &
-    $ ./ide/api/bin/lobster-server &
     $ python ide/vespa.py &
+    $ (cd tmp/bulk && ../../api/bin/lobster-server) &
 
 ## Misc
 At this point you should create the appropriate firewall rules for 
@@ -72,4 +72,3 @@ the service open to other clients.
 
 There is a vagrant file and shell script provided to execute all the steps
 during provisioning without launching Mongo or the two binaries at the end.
-
