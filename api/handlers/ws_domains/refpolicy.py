@@ -10,6 +10,7 @@ import hashlib
 import restful
 import api.handlers.ws_domains as ws_domains
 import api
+from pprint import pprint
 
 def iter_lines(fil_or_str):
   if isinstance(fil_or_str, (basestring)):
@@ -94,39 +95,79 @@ class RefPolicy(restful.ResourceDomain):
 
         refpol = RefPolicy.Read(refpol_id)
 
-        if refpol.documents is None or 'dsl' not in refpol.documents:
-            logger.info("Missing DSL. Making service request")
-            dsl = ws_domains.call(
-                'lobster',
-                'translate_selinux',
-                {
-                    'refpolicy': refpol.id,
-                    'modules': []
-                }
-            )
+        # For each module in modules, send module.te_file to te2json.py
+        # Just get the last module for now, though
+        for modname in refpol['modules']:
+          print refpol['modules'][modname]['te_file']
+          # Use ws_domains.call() to invoke raw.py and get the raw policy
+          module = refpol['modules'][modname]
+          raw = ws_domains.call(
+              'raw',
+              'translate_selinux',
+              {
+                  'refpolicy': refpol.id,
+                  'module': module
+              }
+          )
 
-            if len(dsl['errors']) > 0:
-              raise Exception("Failed to translate DSL: {0}"
-                              .format("\n".join(
-                                  ("{0}".format(x) for x in dsl['errors']))))
+        result_pol = {
+            'modules': refpol['modules'],
+            'written': refpol['written'],
+            'disk_location': refpol['disk_location'],
+            'valid': refpol['valid'],
+            'total': refpol['total'],
+            'id': refpol['id'],
+            '_id': refpol['_id'],
+            'documents': {}
+        }
 
-            if 'documents' not in refpol:
-              refpol['documents'] = {}
+        result_pol['documents']['raw'] = {
+            'text': raw,
+            'mode': 'python',
+            'digest': hashlib.md5(raw).hexdigest()
+        }
 
-            refpol['documents']['dsl'] = {
-                'text': dsl['result'],
-                'mode': 'lobster',
-                'digest': hashlib.md5(dsl['result']).hexdigest()
-            }
 
-            refpol.Insert()
+        # Concatinate all the module files together
+        # refpol['documents']['raw'] = {
+        #     'text': dsl['result'],
+        #     'mode': 'lobster',
+        #     'digest': hashlib.md5(dsl['result']).hexdigest()
+        # }
 
-        elif 'digest' not in refpol.documents['dsl']:
-            refpol.documents['dsl']['digest'] = hashlib.md5(
-                refpol.documents['dsl']['text']).hexdigest()
-            refpol.Insert()
+        # if refpol.documents is None or 'dsl' not in refpol.documents:
+        #     logger.info("Missing DSL. Making service request")
+        #     dsl = ws_domains.call(
+        #         'lobster',
+        #         'translate_selinux',
+        #         {
+        #             'refpolicy': refpol.id,
+        #             'modules': []
+        #         }
+        #     )
 
-        response['payload'] = refpol
+        #     if len(dsl['errors']) > 0:
+        #       raise Exception("Failed to translate DSL: {0}"
+        #                       .format("\n".join(
+        #                           ("{0}".format(x) for x in dsl['errors']))))
+
+        #     if 'documents' not in refpol:
+        #       refpol['documents'] = {}
+
+        #     refpol['documents']['dsl'] = {
+        #         'text': dsl['result'],
+        #         'mode': 'lobster',
+        #         'digest': hashlib.md5(dsl['result']).hexdigest()
+        #     }
+
+        #     refpol.Insert()
+
+        # elif 'digest' not in refpol.documents['dsl']:
+        #     refpol.documents['dsl']['digest'] = hashlib.md5(
+        #         refpol.documents['dsl']['text']).hexdigest()
+        #     refpol.Insert()
+
+        response['payload'] = result_pol
         response['payload'].get('parsed', {}).pop('full', None)
         return response
 

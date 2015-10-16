@@ -29,6 +29,10 @@
             templateUrl: 'partials/tl_explore.html',
             controller: 'tlCtrl'
 
+          .when '/raw',
+            templateUrl: 'partials/raw.html',
+            controller: 'rawCtrl'
+
           .otherwise 
             redirectTo: '/tl_explore'
     ])

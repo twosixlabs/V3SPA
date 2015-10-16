@@ -16,3 +16,4 @@
 //= require angular-file-upload/angular-file-upload.min.js
 //= require bootstrap-contextmenu/bootstrap-contextmenu.js
 //= require queue/Queue.js
+//= require crossfilter/crossfilter.js

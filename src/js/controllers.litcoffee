@@ -84,7 +84,7 @@ The main controller. avispa is a subcontroller.
 
       $scope.visualizer_type = 'tl_explore'
       $timeout ->
-        $scope.view = 'dsl'
+        $scope.view = 'raw'
 
 This controls our editor visibility.
 
