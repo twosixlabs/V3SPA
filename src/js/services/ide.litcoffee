@@ -32,6 +32,7 @@ errors, and generally being awesome.
           @selection_ranges = {}
 
           @validate_dsl = _.debounce @_validate_dsl, 500
+          @parse_raw = _.debounce @_parse_raw, 500
 
         isCurrent: (id)=>
           id? and id == @current_policy._id
@@ -135,6 +136,9 @@ application representation) can be done from here
 
           if doc == 'dsl'
             @validate_dsl()
+
+          if doc == 'raw'
+            @parse_raw()
 
 Return the JSON representation if valid, and null if it is
 invalid
@@ -244,8 +248,60 @@ trigger revalidation.
             unless @current_policy.id == null
               @validate_dsl()
 
+Send a request to the server to parse the raw policy and return the JSON parsed
+version of the policy.
+
+        _parse_raw: =>
+          deferred = @$q.defer()
+
+          path_params = @write_filter_param(@graph_expansion)
+          path_params = _.union(path_params, 
+                                _.map(@graph_id_expansion, (v)->
+                                    "id=#{v}"
+                                )
+          )
+
+          req =
+            domain: 'raw'
+            request: 'parse'
+            payload:
+              policy: @current_policy._id
+              text: @current_policy.documents.raw.text
+              params: path_params.join("&")
+              hide_unused_ports: if @view_control.unused_ports then false else true
+
+
+          @SockJSService.send req, (result)=>
+            if result.error  # Service error
+
+              $.growl(
+                title: "Error"
+                message: result.payload
+              ,
+                type: 'danger'
+              )
+
+              deferred.reject result.payload
+
+            else  # valid response. Must parse
+              @current_policy.json = JSON.parse result.payload
+
+              # For now, disable calling the validation hooks because they are
+              # related to the DSL and not raw policies.
+              # for hook in @hooks.validation
+              #   annotations =
+              #     errors: @current_policy.json.errors
+              #   hook(annotations)
+
+              _.each @hooks.json_changed, (hook)=>
+                hook(@current_policy.json)
+
+              deferred.resolve()
+
+          return deferred.promise
+
 Send a request to the server to validate the current
-contents of @current_policy
+contents of @current_policy and get the parsed JSON
 
         _validate_dsl: =>
           deferred = @$q.defer()
