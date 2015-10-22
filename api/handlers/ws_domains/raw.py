@@ -101,7 +101,10 @@ class RawDomain(object):
         with open(params['module']['te_file'], 'r') as myfile:
             data = myfile.read()
 
-        return data#api.db.json.loads(output)
+        return {
+            "result": data,
+            "errors": []
+        }
 
     def handle(self, msg):
         if msg['request'] == 'parse':

@@ -11,6 +11,8 @@ import restful
 import api.handlers.ws_domains as ws_domains
 import api
 
+import pprint
+
 def iter_lines(fil_or_str):
   if isinstance(fil_or_str, (basestring)):
     fil_or_str = fil_or_str.split('\n')
@@ -112,17 +114,17 @@ class RefPolicy(restful.ResourceDomain):
                 )
 
             if len(raw['errors']) > 0:
-              raise Exception("Failed to translate DSL: {0}"
+              raise Exception("Failed to translate raw: {0}"
                               .format("\n".join(
-                                  ("{0}".format(x) for x in dsl['errors']))))
+                                  ("{0}".format(x) for x in raw['errors']))))
 
             if 'documents' not in refpol:
                 refpol['documents'] = {}
-
+            pprint.pprint(raw)
             refpol['documents']['raw'] = {
-                'text': raw,
+                'text': raw['result'],
                 'mode': 'python',
-                'digest': hashlib.md5(raw).hexdigest()
+                'digest': hashlib.md5(raw['result']).hexdigest()
             }
 
             refpol.Insert()
