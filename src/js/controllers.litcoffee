@@ -158,6 +158,8 @@ This controls our editor visibility.
 
         $scope.editor_markers = []
 
+Add all the highlights/annotations from the old session to the new DSL session.
+
         IDEBackend.add_hook 'validation', (annotations)->
           dsl_session = $scope.editorSessions.dsl.session
 
@@ -280,6 +282,8 @@ Watch the view control and switch the editor session
             $location.path('/hive')
           else if value =='tl_explore'
             $location.path('/tl_explore')
+          else if value =='raw'
+            $location.path('/raw')
           else
             console.error("Invalid visualizer type")
 

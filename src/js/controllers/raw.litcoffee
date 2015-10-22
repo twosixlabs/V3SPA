@@ -3,40 +3,16 @@
     vespaControllers.controller 'rawCtrl', ($scope, VespaLogger,
         IDEBackend, $timeout, $modal, PositionManager, $q, SockJSService) ->
 
-      # Call service to get the raw SELinux policy data
+      $scope.update_view = (data) ->
+        console.log "in rawCtrl $scope.update_view"
+        $scope.rules = data.parameterized.rules
+        $scope.xfilterRules = crossfilter $scope.rules
+        console.log $scope.xfilterRules.size()
 
-      req =
-        domain: 'raw'
-        request: 'get'
-        payload:
-          filename: "apache.te"
-          policy: "@current_policy._id"
-          text: "@current_policy.documents.dsl.text"
-          params: 'path_params.join("&")'
-          hide_unused_ports: false
+      IDEBackend.add_hook "json_changed", $scope.update_view
+      $scope.$on "$destroy", ->
+        IDEBackend.unhook "json_changed", $scope.update_view
 
-
-      SockJSService.send req, (result)=>
-        if result.error  # Service error
-
-          $.growl(
-            title: "Error"
-            message: result.payload
-          ,
-            type: 'danger'
-          )
-
-        else  # valid response. Must parse
-          $.growl
-              title: "Loaded"
-              message: "Loaded raw policy"
-
-          $scope.parse_data result.payload
-
-      $scope.parse_data = (data) ->
-        $scope.current_policy =
-          json: null
-
-        $scope.current_policy.json = JSON.parse data
-        
-        crossfilter $scope.current_policy.rules
+      start_data = IDEBackend.get_json()
+      if start_data
+        $scope.update_view(start_data)
