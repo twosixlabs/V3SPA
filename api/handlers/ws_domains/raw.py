@@ -33,7 +33,7 @@ class RawDomain(object):
 
         # If the raw is identical, and the parameters are identical, just return the one we already
         # translated.
-        if (False and refpol.parsed
+        if (refpol.parsed
                 and refpol.documents['raw']['digest'] == raw_hash
                 and refpol.parsed['params'] == msg['payload']['params']):
 
