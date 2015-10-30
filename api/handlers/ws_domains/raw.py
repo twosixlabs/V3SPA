@@ -53,8 +53,52 @@ class RawDomain(object):
                 # Use ws_domains.call() to invoke raw.py and get the raw policy
                 module = refpol['modules'][modname]
                 with open(module['te_file'], 'r') as f:
+                    line_num = 0
                     for line in f:
+                        line_num += 1
                         if line.lstrip(' \t\n\r').startswith("allow"):
+                            # Split on ":"
+                            rule = line.strip().split(":")
+
+                            # Skip allow rules that do not have semicolons
+                            if line.find(":") == -1:
+                                continue
+
+                            lside = rule[0].strip()
+                            rside = rule[1].strip()
+
+                            subj_t = lside.split(" ")[1]
+
+                            if lside.find("{") == -1 and lside.find("}") == -1:
+                                obj_t = lside[lside.find("{"):lside.find("}")]
+                            else:
+                                obj_t = lside.split(" ")[3]
+
+                            if rside.find("{") == -1:
+                                # Should be "obj_c perm;"
+                                obj_c = rside.split(" ")[0]
+                                perms = rside.split(" ")[1].rstrip(";")
+                            elif rside.find("{") < rside.find(" "):
+                                # We have a list of classes
+                                obj_c = rside[rside.find("{"):rside.find("}")].strip()
+                                if rside.find("}") == rside.rfind("}"):
+                                    # {obj_c1 obj_c2} permission;
+                                    perms = rside.split("}")[1].rstrip(";").strip()
+                                else:
+                                    # {obj_c1 obj_c2} {perm1 perm2};
+                                    perms = rside[rside.rfind("{"):rside.rfind("}")].strip()
+                            else:
+                                # obj_c {perm1 perm2};
+                                obj_c = rside.split("{")[0].strip()
+                                perms = rside[rside.find("{"):rside.find("}")].strip()
+
+                            row = {"subject":subj_t, "object":obj_t, "class":obj_c, "perms":perms, "module":modname}
+                            row["rule"] = line.lstrip().rstrip('\n')
+                            table.append(row)
+
+                            continue
+
+
                             rule = line.strip().split(" ")
                             #TODO:Need to handle lists of perms, right now this assumes only one perm
                             if "{" in rule[3]:
@@ -62,6 +106,14 @@ class RawDomain(object):
                             obj_t = rule[2].split(":")[0]
                             if obj_t.lower() == "self":
                                 obj_t = rule[1]
+                            try:
+                                blah = rule[2]
+                                blah = rule[2].split(":")[1]
+                            except:
+                                print module['te_file']
+                                print line_num
+                                print rule
+                                print line
                             obj_c = rule[2].split(":")[1]
                             row = {"subject":rule[1],"object":obj_t,"class":obj_c,"perms":rule[3].strip(),"module":modname}
                             # Also save the entire rule as text
