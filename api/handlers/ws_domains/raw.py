@@ -96,31 +96,6 @@ class RawDomain(object):
                             row["rule"] = line.lstrip().rstrip('\n')
                             table.append(row)
 
-                            continue
-
-
-                            rule = line.strip().split(" ")
-                            #TODO:Need to handle lists of perms, right now this assumes only one perm
-                            if "{" in rule[3]:
-                                rule[3] = line.split("{")[1].rstrip(' \t\n\r').rstrip(' };')
-                            obj_t = rule[2].split(":")[0]
-                            if obj_t.lower() == "self":
-                                obj_t = rule[1]
-                            try:
-                                blah = rule[2]
-                                blah = rule[2].split(":")[1]
-                            except:
-                                print module['te_file']
-                                print line_num
-                                print rule
-                                print line
-                            obj_c = rule[2].split(":")[1]
-                            row = {"subject":rule[1],"object":obj_t,"class":obj_c,"perms":rule[3].strip(),"module":modname}
-                            # Also save the entire rule as text
-                            row["rule"] = line.lstrip().rstrip('\n')
-
-                            table.append(row)
-
             # exec_str = "./ide/tools/te2json.py"
             # exec_str += " -j -t -i"
             # #filename = "~/Documents/V3SPA/ide/tools/" + (params['filename'] if params['filename'] else "apache.te")
