@@ -70,9 +70,9 @@ class RawDomain(object):
                             subj_t = lside.split(" ")[1]
 
                             if lside.find("{") == -1 and lside.find("}") == -1:
-                                obj_t = lside[lside.find("{"):lside.find("}")]
+                                obj_t = lside.split(" ")[2]
                             else:
-                                obj_t = lside.split(" ")[3]
+                                obj_t = lside[lside.find("{")+1:lside.find("}")].strip()
 
                             if rside.find("{") == -1:
                                 # Should be "obj_c perm;"
@@ -80,17 +80,17 @@ class RawDomain(object):
                                 perms = rside.split(" ")[1].rstrip(";")
                             elif rside.find("{") < rside.find(" "):
                                 # We have a list of classes
-                                obj_c = rside[rside.find("{"):rside.find("}")].strip()
+                                obj_c = rside[rside.find("{")+1:rside.find("}")].strip()
                                 if rside.find("}") == rside.rfind("}"):
                                     # {obj_c1 obj_c2} permission;
                                     perms = rside.split("}")[1].rstrip(";").strip()
                                 else:
                                     # {obj_c1 obj_c2} {perm1 perm2};
-                                    perms = rside[rside.rfind("{"):rside.rfind("}")].strip()
+                                    perms = rside[rside.rfind("{")+1:rside.rfind("}")].strip()
                             else:
                                 # obj_c {perm1 perm2};
                                 obj_c = rside.split("{")[0].strip()
-                                perms = rside[rside.find("{"):rside.find("}")].strip()
+                                perms = rside[rside.find("{")+1:rside.find("}")].strip()
 
                             row = {"subject":subj_t, "object":obj_t, "class":obj_c, "perms":perms, "module":modname}
                             row["rule"] = line.lstrip().rstrip('\n')
