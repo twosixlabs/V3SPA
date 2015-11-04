@@ -5,6 +5,7 @@ import restful
 import api.handlers.ws_domains as ws_domains
 import api
 import hashlib
+import os
 
 from subprocess import *
 
@@ -33,7 +34,7 @@ class RawDomain(object):
 
         # If the raw is identical, and the parameters are identical, just return the one we already
         # translated.
-        if (refpol.parsed
+        if (refpol.parsed and False # TODO: remove 'and False' to allow caching
                 and refpol.documents['raw']['digest'] == raw_hash
                 and refpol.parsed['params'] == msg['payload']['params']):
 
@@ -93,6 +94,7 @@ class RawDomain(object):
                                 perms = rside[rside.find("{")+1:rside.find("}")].strip()
 
                             row = {"subject":subj_t, "object":obj_t, "class":obj_c, "perms":perms, "module":modname}
+                            row["directory"] = os.path.basename(os.path.dirname(f.name))
                             row["rule"] = line.lstrip().rstrip('\n')
                             table.append(row)
 
