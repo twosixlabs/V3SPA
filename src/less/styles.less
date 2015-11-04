@@ -377,8 +377,16 @@ svg.hiveview {
 }
 
 svg.rawview {
-  text {
-    text-anchor: start;
+
+  g.node {
+    text {
+      text-anchor: start;
+      pointer-events: none;
+    }
+    rect {
+      stroke: #3182bd;
+      stroke-width: 1.5px;
+    }
   }
 }
 

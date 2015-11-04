@@ -4,7 +4,7 @@
         IDEBackend, $timeout, $modal, PositionManager, $q, SockJSService) ->
 
       barHeight = 20
-      barWidth = 100
+      barWidth = 300
       duration = 400
       root = {}
       svg = d3.select("svg.rawview").select("g.viewer")
@@ -13,7 +13,7 @@
 
       $scope.update_view = (data) ->
         $scope.policy = IDEBackend.current_policy
-        
+
         # If the policy has changed, need to update/remove the old visuals
         $scope.rules = if data.parameterized?.rules? then data.parameterized.rules else []
 
