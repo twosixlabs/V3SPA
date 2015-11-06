@@ -70,7 +70,7 @@
         nodeEnter.append("text")
           .attr("dy", 3.5)
           .attr("dx", 5.5)
-          .text((d) -> if d.children? then "#{d.name} (#{d.children.length})" else d.name)
+          .text((d) -> if d.children? then "#{d.name} (#{d.children.length})" else if d._children? then "#{d.name} (#{d._children.length})" else d.name)
 
         nodeEnter.transition()
           .duration(duration)
