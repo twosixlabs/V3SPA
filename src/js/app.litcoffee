@@ -33,6 +33,10 @@
             templateUrl: 'partials/raw.html',
             controller: 'rawCtrl'
 
+          .when '/gib',
+            templateUrl: 'partials/gib.html',
+            controller: 'gibCtrl'
+
           .otherwise 
             redirectTo: '/tl_explore'
     ])
