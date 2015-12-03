@@ -376,8 +376,7 @@ svg.hiveview {
   }
 }
 
-svg.rawview {
-
+.rawview {
   g.node {
     text {
       text-anchor: start;
@@ -386,6 +385,51 @@ svg.rawview {
     rect {
       stroke: #3182bd;
       stroke-width: 1.5px;
+    }
+  }
+}
+
+.gibview {
+  g.node {
+    circle {
+      stroke-width: 1.5px;
+    }
+    text {
+      text-anchor: middle;
+      dominant-baseline: ideographic;
+      pointer-events: none;
+    }
+  }
+  .subjects {
+    circle {
+      stroke: #1f77b4;
+    }
+    text {
+      fill: #15537d;
+    }
+  }
+  .objects {
+    circle {
+      stroke: #ff7f0e;
+    }
+    text {
+      fill: #b25809;
+    }
+  }
+  .classes {
+    circle {
+      stroke: #2ca02c;
+    }
+    text {
+      fill: #1e701e;
+    }
+  }
+  .permissions {
+    circle {
+      stroke: #d62728;
+    }
+    text {
+      fill: #951b1c;
     }
   }
 }

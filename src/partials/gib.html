@@ -1,6 +1,34 @@
-<div id='surface' class='row' 
-  ng-class="{'col-md-12': analysisPaneVisible, 'col-md-8': analysisPaneVisible}">
+<div id='surface' class='row'>
+  <div class='toolbox panel panel-default'>
+    <div class='panel-body'>
+    <div class="form-group">
+      <small><strong>Select a comparison policy:</strong></small>
+      <div ng-hide='uploading.status'>
+      <input class='form-control' id='refPolicySelect'
+        ui-select2='list_refpolicies'
+        placeholder="Select existing reference policy"
+        ng-model='input.refpolicy' type='hidden'/>
+      </div>
+    </div>
+    <div class="form-group text-right">
+      <button type="button" ng-disabled='!input.refpolicy'
+        class="btn btn-primary" ng-click='load()'>Load</button>
+    </div>
+    <hr/>
+    <small><strong>Changed relationships:</strong></small>
+    </div>
+  </div>
   <svg xmlns="http://www.w3.org/2000/svg" class='gibview'>
+    <defs>
+      <pattern id="diff-left" x="0" y="0" width="10" height="10">
+        <circle cx="5" cy="5" r="5" style="stroke: none; fill: #fff;" />
+        <path d="M 5 2 L 2 5 L 5 8 M 2 5 L 9 5" fill="none" stroke="#777" stroke-width="2" />
+      </pattern>
+      <pattern id="diff-right" x="0" y="0" width="10" height="10">
+        <circle cx="5" cy="5" r="5" style="stroke: none; fill: #fff;" />
+        <path d="M 5 2 L 8 5 L 5 8 M 8 5 L 1 5" fill="none" stroke="#777" stroke-width="2" />
+      </pattern>
+    </defs>
     <g class="viewer">
       <g class="labels"></g>
       <g class="links"></g>

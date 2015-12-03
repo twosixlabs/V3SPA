@@ -1,7 +1,88 @@
     vespaControllers = angular.module('vespaControllers')
 
     vespaControllers.controller 'gibCtrl', ($scope, VespaLogger,
-        IDEBackend, $timeout, $modal, PositionManager, $q, SockJSService) ->
+        IDEBackend, $timeout, $modal, PositionManager, RefPolicy, $q, SockJSService) ->
+
+      comparisonPolicy = null
+      $scope.input = 
+        refpolicy: comparisonPolicy
+
+      # The 'outstanding' attribute is truthy when a policy is being loaded
+      $scope.status = SockJSService.status
+
+      fetch_raw = ->
+        deferred = $q.defer()
+
+        path_params = IDEBackend.write_filter_param([])
+
+        req =
+          domain: 'raw'
+          request: 'parse'
+          payload:
+            policy: comparisonPolicy._id
+            text: comparisonPolicy.documents.raw.text
+            params: path_params.join("&")
+
+        SockJSService.send req, (result)=>
+          if result.error  # Service error
+
+            $.growl(
+              title: "Error"
+              message: result.payload
+            ,
+              type: 'danger'
+            )
+
+            deferred.reject result.payload
+
+          else  # valid response. Must parse
+            comparisonPolicy.json = JSON.parse result.payload
+
+            deferred.resolve()
+
+        return deferred.promise
+
+      load_refpolicy = (id)=>
+        if comparisonPolicy? and comparisonPolicy.id == id
+          return
+
+        deferred = @_deferred_load || $q.defer()
+
+        req = 
+          domain: 'refpolicy'
+          request: 'get'
+          payload: id
+
+        SockJSService.send req, (data)=>
+          if data.error?
+            comparisonPolicy = null
+            deferred.reject(comparisonPolicy)
+          else
+            comparisonPolicy = data.payload
+            comparisonPolicy._id = comparisonPolicy._id.$oid
+
+            console.log 'policy', 'info', "Loaded Reference Policy: #{comparisonPolicy.id}"
+
+            deferred.resolve(comparisonPolicy)
+
+        return deferred.promise
+
+      $scope.load = ->
+        load_refpolicy($scope.input.refpolicy.id).then(fetch_raw)
+
+      $scope.list_refpolicies = 
+        query: (query)->
+          promise = RefPolicy.list()
+          promise.then(
+            (policy_list)->
+              dropdown = 
+                results:  for d in policy_list
+                  id: d._id.$oid
+                  text: d.id
+                  data: d
+
+              query.callback(dropdown)
+          )
 
       width = 250
       height = 500
@@ -166,21 +247,17 @@
             .attr "class", (d) -> "node t-#{d.type}-#{d.name}"
 
           nodeEnter.append "text"
-            .attr "class", (d) -> "t-#{d.type}-#{d.name}"
+            .attr "class", (d) -> "node-label t-#{d.type}-#{d.name}"
             .attr "x", 0
             .attr "y", "-5px"
-            .style "fill", (d) -> return d3.rgb(color(d.type)).darker(1)
-            .style "text-anchor", "middle"
-            .style "dominant-baseline", "ideographic"
             .style "display", "none"
             .text (d) -> d.name
 
           nodeEnter.append "circle"
-            .attr "class", "node"
             .attr "r", 5
             .attr "cx", 0
             .attr "cy", 0
-            .style "fill", (d) -> return color d.type
+            .style "fill", (d) -> return "url(#diff-left)"
             .on "mouseover", nodeMouseover
             .on "mouseout", nodeMouseout
 
