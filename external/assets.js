@@ -17,3 +17,4 @@
 //= require bootstrap-contextmenu/bootstrap-contextmenu.js
 //= require queue/Queue.js
 //= require forceInABox.js
+//= require alasql/alasql.js
