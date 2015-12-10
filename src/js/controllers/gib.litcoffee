@@ -4,11 +4,14 @@
         IDEBackend, $timeout, $modal, PositionManager, RefPolicy, $q, SockJSService) ->
 
       comparisonPolicy = null
+      comparisonRules = []
       $scope.input = 
         refpolicy: comparisonPolicy
 
       # The 'outstanding' attribute is truthy when a policy is being loaded
       $scope.status = SockJSService.status
+
+Get the raw JSON
 
       fetch_raw = ->
         deferred = $q.defer()
@@ -37,10 +40,13 @@
 
           else  # valid response. Must parse
             comparisonPolicy.json = JSON.parse result.payload
+            comparisonRules = comparisonPolicy.json.parameterized.rules
 
             deferred.resolve()
 
         return deferred.promise
+
+Fetch the policy info (refpolicy) needed to get the raw JSON
 
       load_refpolicy = (id)=>
         if comparisonPolicy? and comparisonPolicy.id == id
@@ -61,14 +67,63 @@
             comparisonPolicy = data.payload
             comparisonPolicy._id = comparisonPolicy._id.$oid
 
-            console.log 'policy', 'info', "Loaded Reference Policy: #{comparisonPolicy.id}"
-
             deferred.resolve(comparisonPolicy)
 
         return deferred.promise
+      
+Enumerate the differences between the two policies
+
+      find_differences = () =>
+        uniqueQueryString = (field, sourceId) ->
+          # "SELECT *, ARRAY({rule:rule}) as rules FROM ? a WHERE NOT EXISTS(SELECT * FROM ? b WHERE a.subject = b.subject) GROUP BY subject"
+          "SELECT distinct [#{field}], ARRAY({rule:rule}) as rules, '[#{field}]' as type, '#{sourceId}' as policyid FROM ? a WHERE [#{field}] NOT IN (SELECT [#{field}] FROM ?) GROUP BY [#{field}]"
+
+        intersectQueryString = (field) ->
+          # Can use INTERSECT to get this result?
+          # "SELECT distinct #{field} FROM ? WHERE #{field} IN (SELECT #{field} FROM ?)"
+          "SELECT distinct [#{field}] FROM ?"
+
+        # Get all in A, all in B, all in both
+        # Set item.type=subject,object,perm,class
+        # Set item.policy=A_ID,B_ID,both on each item
+        # Group rules by each item and set item.rules=[rule_arr]
+
+        #alasql('SELECT Phase, Step, Task, Val, ARRAY({Phase:Phase,Step:Step,Task:Task,Val:Val}) AS rules FROM ? GROUP BY Phase',[testData]);
+
+        alasql("CREATE DATABASE diff; USE diff;")
+        alasql("CREATE TABLE rules")
+        alasql("CREATE TABLE comparison")
+
+        alasql.tables.rules.data = $scope.rules
+        alasql.tables.comparison.data = comparisonRules
+
+        # db.compile('INSERT INTO one ($a,$b)');
+
+        uniqueStmt = alasql.compile(
+          "SELECT distinct [$field], ARRAY({rule:rule}) as rules, '[$field]' as type, '$sourceId' as policyid
+          FROM rules WHERE [$field] NOT IN (SELECT [$field] FROM comparison) GROUP BY [$field]"
+          ,
+          "diff"
+          )
+
+        [
+          {attr:"subject", arr:"subjNodes"},
+          {attr:"object", arr:"objNodes"},
+          {attr:"perms", arr:"permsNodes"},
+          {attr:"class", arr:"classNodes"}
+        ].forEach (type) ->
+          #sourceRules = alasql(uniqueQueryString(type.attr, $scope.input.refpolicy.id), [$scope.rules, comparisonRules])
+          #targetRules = alasql(uniqueQueryString(type.attr, comparisonPolicy.id), [comparisonRules, $scope.rules])
+          sourceRules = uniqueStmt({field:type.attr,sourceId:$scope.input.refpolicy.id})
+          targetRules = uniqueStmt({field:type.attr,sourceId:comparisonPolicy.id})
+          intersectRules = []#alasql(intersectQueryString(type.attr), [comparisonRules, $scope.rules])
+          graph[type.arr] = sourceRules.concat(targetRules).concat(intersectRules)
+
+        console.log graph
+        
 
       $scope.load = ->
-        load_refpolicy($scope.input.refpolicy.id).then(fetch_raw)
+        load_refpolicy($scope.input.refpolicy.id).then(fetch_raw).then(find_differences)
 
       $scope.list_refpolicies = 
         query: (query)->
