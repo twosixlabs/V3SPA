@@ -73,7 +73,7 @@ Fetch the policy info (refpolicy) needed to get the raw JSON
       
 Enumerate the differences between the two policies
 
-      find_differences = () =>
+      find_differences2 = () =>
         uniqueQueryString = (field, sourceId) ->
           # "SELECT *, ARRAY({rule:rule}) as rules FROM ? a WHERE NOT EXISTS(SELECT * FROM ? b WHERE a.subject = b.subject) GROUP BY subject"
           "SELECT distinct [#{field}], ARRAY({rule:rule}) as rules, '[#{field}]' as type, '#{sourceId}' as policyid FROM ? a WHERE [#{field}] NOT IN (SELECT [#{field}] FROM ?) GROUP BY [#{field}]"
@@ -120,6 +120,91 @@ Enumerate the differences between the two policies
           graph[type.arr] = sourceRules.concat(targetRules).concat(intersectRules)
 
         console.log graph
+
+      find_differences = () =>
+        # Loop through each primary rule, getting the distinct subjects, objects, permissions, and classes
+        # Give each of them the type, name, rules, and policy attributes
+        # Set policy = primaryId
+        nodesFromRules = (rules, policyid, nodes, links) ->
+          rules.forEach (r) ->
+            new_subject_node = new_object_node = new_class_node = new_perms_node = undefined
+
+            # Find existing node if it exists
+            curr_subject_node = _.findWhere(nodes, {type: "subject", name: r.subject})
+            curr_object_node = _.findWhere(nodes, {type: "object", name: r.object})
+            curr_class_node = _.findWhere(nodes, {type: "class", name: r.class})
+            curr_perms_node = _.findWhere(nodes, {type: "perms", name: r.perm})
+
+            # If node exists then update it, else create a new one
+            if curr_subject_node
+              curr_subject_node.rules.push r
+            else
+              new_subject_node = {type: "subject", name: r.subject, rules: [r], policy: policyid}
+              nodes.push new_subject_node
+            if curr_object_node
+              curr_object_node.rules.push r
+            else
+              new_object_node = {type: "object", name: r.object, rules: [r], policy: policyid}
+              nodes.push new_object_node
+            if curr_class_node
+              curr_class_node.rules.push r
+            else
+              new_class_node = {type: "class", name: r.class, rules: [r], policy: policyid}
+              nodes.push new_class_node
+            if curr_perms_node
+              curr_perms_node.rules.push r
+            else
+              new_perms_node = {type: "perms", name: r.perms, rules: [r], policy: policyid}
+              nodes.push new_perms_node
+
+            # Generate links
+            generateLink = (curr_source_node, curr_target_node, new_source_node, new_target_node, links) ->
+              if curr_source_node and !curr_target_node
+                links.push {source: curr_source_node, target: new_target_node, rules: [new_target_node.rule]}
+              else if !curr_source_node and curr_target_node
+                links.push {source: new_source_node, target: curr_target_node, rules: [new_source_node.rule]}
+              else if !curr_source_node and !curr_target_node
+                links.push {source: new_source_node, target: new_target_node, rules: [new_source_node.rule]}
+              else
+                l = _.findWhere links, {source: curr_source_node, target: curr_target_node}
+                if l
+                  l.rules.push r
+                else
+                  # Source and target were previously found in two separate rules
+                  links.push {source: curr_source_node, target: curr_target_node, rules: [r]}
+
+            generateLink(curr_subject_node, curr_object_node, new_subject_node, new_object_node, links)
+            generateLink(curr_subject_node, curr_perms_node, new_subject_node, new_perms_node, links)
+            generateLink(curr_object_node, curr_class_node, new_object_node, new_class_node, links)
+            generateLink(curr_perms_node, curr_class_node, new_perms_node, new_class_node, links)
+
+        graph.links.length = 0
+
+        primaryNodes = []
+        comparisonNodes = []
+        nodesFromRules($scope.rules, $scope.input.refpolicy.id, primaryNodes, graph.links)
+        nodesFromRules(comparisonRules, comparisonPolicy.id, comparisonNodes, graph.links)
+
+        # Reconcile the two lists of nodes
+        # Loop over the primary nodes: if in comparison nodes
+        # - change "policy" to "both"
+        # - push the comparison's rules onto the primary's (ignore duplicates)
+        # - remove from comparisonNodes
+        primaryNodes.forEach (node) ->
+          comparisonNode = _.findWhere(comparisonNodes, {type: node.type, name: node.name})
+          if comparisonNode
+            node.rules = _.uniq node.rules.concat(comparisonNode.rules)
+            node.policy = "both"
+            comparisonNodes = _.without(comparisonNodes, comparisonNode)
+
+        allNodes = primaryNodes.concat comparisonNodes
+
+        graph.subjNodes = allNodes.filter (d) -> d.type == "subject"
+        graph.objNodes = allNodes.filter (d) -> d.type == "object"
+        graph.classNodes = allNodes.filter (d) -> d.type == "class"
+        graph.permNodes = allNodes.filter (d) -> d.type == "perms"
+
+        console.log graph
         
 
       $scope.load = ->
@@ -146,6 +231,7 @@ Enumerate the differences between the two policies
         subjNodes: []
         objNodes: []
         classNodes: []
+        permNodes: []
       color = d3.scale.category10()
       svg = d3.select("svg.gibview").select("g.viewer")
       subjSvg = svg.select("g.subjects").attr("transform", "translate(0,0)")
