@@ -61,18 +61,29 @@ class RawDomain(object):
                             # Split on ":"
                             rule = line.strip().split(":")
 
-                            # Skip allow rules that do not have semicolons
-                            if line.find(":") == -1:
+                            # Skip allow rules that do not have semicolons (e.g. multiline rules)
+                            if line.find(";") == -1:
                                 continue
 
-                            lside = rule[0].strip()
+                            lside = rule[0].lstrip("allow").strip()
                             rside = rule[1].strip()
 
-                            subj_t = lside.split(" ")[1]
-
-                            if lside.find("{") == -1 and lside.find("}") == -1:
-                                obj_t = lside.split(" ")[2]
+                            if lside.find("{") == -1:
+                                # Should be "subj_t obj_t;"
+                                subj_t = lside.split(" ")[0]
+                                obj_t = lside.split(" ")[1]
+                            elif lside.find("{") < lside.find(" "):
+                                # We have a list of subjects
+                                subj_t = lside[lside.find("{")+1:lside.find("}")].strip()
+                                if lside.find("}") == lside.rfind("}"):
+                                    # {subj_t1 subj_t2} obj_t;
+                                    obj_t = lside.split("}")[1].rstrip(";").strip()
+                                else:
+                                    # {subj_t1 subj_t2} {obj_t1 obj_t2};
+                                    obj_t = lside[lside.rfind("{")+1:lside.rfind("}")].strip()
                             else:
+                                # subj_t {obj_t1 obj_t2};
+                                subj_t = lside.split("{")[0].strip()
                                 obj_t = lside[lside.find("{")+1:lside.find("}")].strip()
 
                             if rside.find("{") == -1:
@@ -93,10 +104,14 @@ class RawDomain(object):
                                 obj_c = rside.split("{")[0].strip()
                                 perms = rside[rside.find("{")+1:rside.find("}")].strip()
 
-                            row = {"subject":subj_t, "object":obj_t, "class":obj_c, "perms":perms, "module":modname}
-                            row["directory"] = os.path.basename(os.path.dirname(f.name))
-                            row["rule"] = line.lstrip().rstrip('\n')
-                            table.append(row)
+                            for s in subj_t.split(" "):
+                                for ot in obj_t.split(" "):
+                                    for oc in obj_c.split(" "):
+                                        for p in perms.split(" "):
+                                            row = {"subject":s, "object":ot, "class":oc, "perms":p, "module":modname}
+                                            row["directory"] = os.path.basename(os.path.dirname(f.name))
+                                            row["rule"] = line.lstrip().rstrip('\n')
+                                            table.append(row)
 
             # exec_str = "./ide/tools/te2json.py"
             # exec_str += " -j -t -i"
