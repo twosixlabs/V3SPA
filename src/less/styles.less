@@ -394,6 +394,12 @@ svg.hiveview {
     circle {
       stroke-width: 1.5px;
     }
+    circle.diff-left {
+      fill: url(#diff-left);
+    }
+    circle.diff-right {
+      fill: url(#diff-right);
+    }
     text {
       text-anchor: middle;
       dominant-baseline: ideographic;
@@ -403,6 +409,7 @@ svg.hiveview {
   .subjects {
     circle {
       stroke: #1f77b4;
+      fill: #72b7f9;
     }
     text {
       fill: #15537d;
@@ -411,6 +418,7 @@ svg.hiveview {
   .objects {
     circle {
       stroke: #ff7f0e;
+      fill: #ffc259;
     }
     text {
       fill: #b25809;
@@ -419,6 +427,7 @@ svg.hiveview {
   .classes {
     circle {
       stroke: #2ca02c;
+      fill: #78e46c;
     }
     text {
       fill: #1e701e;
@@ -427,6 +436,7 @@ svg.hiveview {
   .permissions {
     circle {
       stroke: #d62728;
+      fill: #ff7361;
     }
     text {
       fill: #951b1c;

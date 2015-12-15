@@ -125,15 +125,15 @@ Enumerate the differences between the two policies
         # Loop through each primary rule, getting the distinct subjects, objects, permissions, and classes
         # Give each of them the type, name, rules, and policy attributes
         # Set policy = primaryId
-        nodesFromRules = (rules, policyid, nodes, links) ->
+        nodesFromRules = (rules, policyid, nodes, links, otherNodes) ->
           rules.forEach (r) ->
-            new_subject_node = new_object_node = new_class_node = new_perms_node = undefined
+            new_subject_node = new_object_node = new_class_node = new_perm_node = undefined
 
             # Find existing node if it exists
             curr_subject_node = _.findWhere(nodes, {type: "subject", name: r.subject})
             curr_object_node = _.findWhere(nodes, {type: "object", name: r.object})
             curr_class_node = _.findWhere(nodes, {type: "class", name: r.class})
-            curr_perms_node = _.findWhere(nodes, {type: "perms", name: r.perm})
+            curr_perm_node = _.findWhere(nodes, {type: "perm", name: r.perm})
 
             # If node exists then update it, else create a new one
             if curr_subject_node
@@ -151,11 +151,11 @@ Enumerate the differences between the two policies
             else
               new_class_node = {type: "class", name: r.class, rules: [r], policy: policyid}
               nodes.push new_class_node
-            if curr_perms_node
-              curr_perms_node.rules.push r
+            if curr_perm_node
+              curr_perm_node.rules.push r
             else
-              new_perms_node = {type: "perms", name: r.perms, rules: [r], policy: policyid}
-              nodes.push new_perms_node
+              new_perm_node = {type: "perm", name: r.perm, rules: [r], policy: policyid}
+              nodes.push new_perm_node
 
             # Generate links
             generateLink = (curr_source_node, curr_target_node, new_source_node, new_target_node, links) ->
@@ -173,17 +173,17 @@ Enumerate the differences between the two policies
                   # Source and target were previously found in two separate rules
                   links.push {source: curr_source_node, target: curr_target_node, rules: [r]}
 
-            generateLink(curr_subject_node, curr_object_node, new_subject_node, new_object_node, links)
-            generateLink(curr_subject_node, curr_perms_node, new_subject_node, new_perms_node, links)
+            generateLink(curr_perm_node, curr_object_node, new_perm_node, new_object_node, links)
+            generateLink(curr_subject_node, curr_perm_node, new_subject_node, new_perm_node, links)
             generateLink(curr_object_node, curr_class_node, new_object_node, new_class_node, links)
-            generateLink(curr_perms_node, curr_class_node, new_perms_node, new_class_node, links)
+            generateLink(curr_perm_node, curr_class_node, new_perm_node, new_class_node, links)
 
         graph.links.length = 0
 
         primaryNodes = []
         comparisonNodes = []
-        nodesFromRules($scope.rules, $scope.input.refpolicy.id, primaryNodes, graph.links)
-        nodesFromRules(comparisonRules, comparisonPolicy.id, comparisonNodes, graph.links)
+        nodesFromRules($scope.rules, IDEBackend.current_policy.id, primaryNodes, graph.links, comparisonNodes)
+        nodesFromRules(comparisonRules, (if comparisonPolicy then comparisonPolicy.id else ""), comparisonNodes, graph.links, primaryNodes)
 
         # Reconcile the two lists of nodes
         # Loop over the primary nodes: if in comparison nodes
@@ -196,19 +196,23 @@ Enumerate the differences between the two policies
             node.rules = _.uniq node.rules.concat(comparisonNode.rules)
             node.policy = "both"
             comparisonNodes = _.without(comparisonNodes, comparisonNode)
+            linkSource = _.where(graph.links, {source: comparisonNode})
+            linkTarget = _.where(graph.links, {target: comparisonNode})
+            if linkSource.length
+              graph.links = _.difference(graph.links, linkSource)
+            if linkTarget.length
+              graph.links = _.difference(graph.links, linkTarget)
 
         allNodes = primaryNodes.concat comparisonNodes
 
         graph.subjNodes = allNodes.filter (d) -> d.type == "subject"
         graph.objNodes = allNodes.filter (d) -> d.type == "object"
         graph.classNodes = allNodes.filter (d) -> d.type == "class"
-        graph.permNodes = allNodes.filter (d) -> d.type == "perms"
-
-        console.log graph
+        graph.permNodes = allNodes.filter (d) -> d.type == "perm"
         
 
       $scope.load = ->
-        load_refpolicy($scope.input.refpolicy.id).then(fetch_raw).then(find_differences)
+        load_refpolicy($scope.input.refpolicy.id).then(fetch_raw).then(update)
 
       $scope.list_refpolicies = 
         query: (query)->
@@ -224,7 +228,7 @@ Enumerate the differences between the two policies
               query.callback(dropdown)
           )
 
-      width = 250
+      width = 300
       height = 500
       graph =
         links: []
@@ -235,10 +239,12 @@ Enumerate the differences between the two policies
       color = d3.scale.category10()
       svg = d3.select("svg.gibview").select("g.viewer")
       subjSvg = svg.select("g.subjects").attr("transform", "translate(0,0)")
-      objSvg = svg.select("g.objects").attr("transform", "translate(#{width},0)")
-      classSvg = svg.select("g.classes").attr("transform", "translate(#{2*width},0)")
+      permSvg = svg.select("g.permissions").attr("transform", "translate(#{width},0)")
+      objSvg = svg.select("g.objects").attr("transform", "translate(#{2*width},-#{height/2})")
+      classSvg = svg.select("g.classes").attr("transform", "translate(#{3*width},0)")
       subjForce = d3.layout.force().size([width, height]).charge(-40)
       objForce = d3.layout.force().size([width, height]).charge(-40)
+      permForce = d3.layout.force().size([width, height]).charge(-40)
       classForce = d3.layout.force().size([width, height]).charge(-40)
 
       textStyle =
@@ -254,9 +260,14 @@ Enumerate the differences between the two policies
         .attr "x", width + width / 2
         .attr "y", height / 2
         .style textStyle
-        .text "objects"
+        .text "permissions"
       svg.select("g.labels").append("text")
         .attr "x", 2 * width + width / 2
+        .attr "y", 0
+        .style textStyle
+        .text "objects"
+      svg.select("g.labels").append("text")
+        .attr "x", 3 * width + width / 2
         .attr "y", height / 2
         .style textStyle
         .text "classes"
@@ -267,85 +278,20 @@ Enumerate the differences between the two policies
         # If the policy has changed, need to update/remove the old visuals
         $scope.rules = if data.parameterized?.rules? then data.parameterized.rules else []
 
-        nodes = []
-        graph.links.length = 0
-
-        # Get a list of unique subjects, objects, and classes
-        # Get a list of links (subject -> object, and object -> class)
-        # For each link, store an array of rules from which the link was derived
-        $scope.rules.forEach (r) ->
-          new_subject_node = new_object_node = new_class_node = undefined
-
-          curr_subject_node = _.findWhere(nodes, {type: "subject", name: r.subject})
-          curr_object_node = _.findWhere(nodes, {type: "object", name: r.object})
-          curr_class_node = _.findWhere(nodes, {type: "class", name: r.class})
-
-          unless curr_subject_node
-            new_subject_node = {type: "subject", name: r.subject, rule: r}
-            nodes.push new_subject_node
-          unless curr_object_node
-            new_object_node = {type: "object", name: r.object, rule: r}
-            nodes.push new_object_node
-          unless curr_class_node
-            new_class_node = {type: "class", name: r.class, rule: r}
-            nodes.push new_class_node
-
-          # Create the subject->object links
-          if curr_subject_node and !curr_object_node
-            graph.links.push {source: curr_subject_node, target: new_object_node, rules: [new_object_node.rule]}
-          else if !curr_subject_node and curr_object_node
-            graph.links.push {source: new_subject_node, target: curr_object_node, rules: [new_subject_node.rule]}
-          else if !curr_subject_node and !curr_object_node
-            graph.links.push {source: new_subject_node, target: new_object_node, rules: [new_subject_node.rule]}
-          else
-            l = _.findWhere graph.links, {source: curr_subject_node, target: curr_object_node}
-            if l
-              l.rules.push r
-            else
-              # Subject and object were previously found in two separate rules
-              graph.links.push {source: curr_subject_node, target: curr_object_node, rules: [r]}
-
-          # Create the object->class links
-          if curr_object_node and !curr_class_node
-            graph.links.push {source: curr_object_node, target: new_class_node, rules: [new_class_node.rule]}
-          else if !curr_object_node and curr_class_node
-            graph.links.push {source: new_object_node, target: curr_class_node, rules: [new_object_node.rule]}
-          else if !curr_object_node and !curr_class_node
-            graph.links.push {source: new_object_node, target: new_class_node, rules: [new_object_node.rule]}
-          else
-            l = _.findWhere graph.links, {source: curr_object_node, target: curr_class_node}
-            if l
-              l.rules.push r
-            else
-              # Object and class were previously found in two separate rules
-              graph.links.push {source: curr_object_node, target: curr_class_node, rules: [r]}
-
-        graph.subjNodes = nodes.filter (d) -> d.type == "subject"
-        graph.objNodes = nodes.filter (d) -> d.type == "object"
-        graph.classNodes = nodes.filter (d) -> d.type == "class"
-
         update()
 
       update = () ->
+        find_differences()
+
         subjForce.nodes(graph.subjNodes).start()
         objForce.nodes(graph.objNodes).start()
+        permForce.nodes(graph.permNodes).start()
         classForce.nodes(graph.classNodes).start()
-
-        link = svg.select("g.links").selectAll ".link"
-          .data graph.links, (d,i) -> return d.id or (d.id = $scope.policy.id + "-" + i)
-
-        link.enter().append "line"
-          .attr "class", (d) -> "link l-#{d.source.type}-#{d.source.name}-#{d.target.type}-#{d.target.name}"
-          .style "stroke-width", (d) -> return d.rules.length
-          .style "display", "none"
-
-        link.style "stroke-width", (d) -> return d.rules.length
-
-        link.exit().remove()
 
         [
           {force: subjForce, nodes: graph.subjNodes, svg: subjSvg},
           {force: objForce, nodes: graph.objNodes, svg: objSvg},
+          {force: permForce, nodes: graph.permNodes, svg: permSvg},
           {force: classForce, nodes: graph.classNodes, svg: classSvg}
         ].forEach (tuple) ->
           nodeMouseover = (d,i) ->
@@ -353,14 +299,42 @@ Enumerate the differences between the two policies
 
             # Find all links associated with this node
             if d.type == "object"
+              # Get links to permissions
               linksToShow = _.where graph.links, {target: d}
+              # Get links to classes
               linksToShow = linksToShow.concat _.where graph.links, {source: d}
+              # Get links from permissions to classes, if they are associated with this object
+              linksToShow = linksToShow.concat _.filter graph.links, (link) ->
+                return _.findWhere(linksToShow, {source: link.source}) and _.findWhere(linksToShow, {target: link.target})
+              # Get links from subjects to permissions
+              permRules = _.uniq(_.where($scope.rules, {object: d.name}), (d) -> return d.perm)
+              linksToShow = linksToShow.concat _.filter graph.links, (link) -> return _.findWhere permRules, {perm: link.target.name}
             else if d.type == "subject"
+              # Get links from permissions to objects and permissions to classes
+              permRules = _.uniq(_.where($scope.rules, {subject: d.name}), (d) -> return d.perm)
+              linksToShow = linksToShow.concat _.filter graph.links, (link) -> return _.findWhere permRules, {perm: link.source.name}
+              # Get links from objects to classes
+              linksToShow = linksToShow.concat _.filter graph.links, (link) ->
+                return _.findWhere(linksToShow, {target: link.source}) and _.findWhere(linksToShow, {target: link.target})
+              # Get links to permissions
+              linksToShow = linksToShow.concat _.where graph.links, {source: d}
+            else if d.type == "perm"
+              # Get links to objects and classes
               linksToShow = _.where graph.links, {source: d}
-              linksToShow = linksToShow.concat _.filter graph.links, (link) -> return _.findWhere linksToShow, {target: link.source}
+              # Get links from objects to classes, if the they are associated with this permission
+              linksToShow = linksToShow.concat _.filter graph.links, (link) ->
+                return _.findWhere(linksToShow, {target: link.source}) and _.findWhere(linksToShow, {target: link.target})
+              # Get links from subjects to this perm
+              linksToShow = linksToShow.concat _.where graph.links, {target: d}
             else # this is d.type == "class"
-              linksToShow = _.where graph.links, {target: d}
-              linksToShow = linksToShow.concat _.filter graph.links, (link) -> return _.findWhere linksToShow, {source: link.target}
+              # Find all permissions and object types on this class
+              linksToShow = _.where(graph.links, {target: d})
+              # Get links from permissions to objects, if the they are associated with this class
+              linksToShow = linksToShow.concat _.filter graph.links, (link) ->
+                return _.findWhere(linksToShow, {source: link.source}) and _.findWhere(linksToShow, {source: link.target})
+              # Find all subjects that have permissions on this class
+              permRules = _.uniq(_.where($scope.rules, {class: d.name}), (d) -> return d.perm)
+              linksToShow = linksToShow.concat _.filter graph.links, (link) -> return _.findWhere permRules, {perm: link.target.name}
 
             d3.selectAll linksToShow.map((link) -> ".l-#{link.source.type}-#{link.source.name}-#{link.target.type}-#{link.target.name}").join ","
               .style "display", ""
@@ -382,7 +356,7 @@ Enumerate the differences between the two policies
               .style "display", "none"
 
           node = tuple.svg.selectAll ".node"
-            .data tuple.nodes, (d,i) -> return d.id or (d.id = $scope.policy.id + "-" + i)
+            .data tuple.nodes, (d,i) -> return d.id or (d.id = d.policy + "-" + i)
 
           nodeEnter = node.enter().append "g"
             .attr "class", (d) -> "node t-#{d.type}-#{d.name}"
@@ -398,19 +372,48 @@ Enumerate the differences between the two policies
             .attr "r", 5
             .attr "cx", 0
             .attr "cy", 0
-            .style "fill", (d) -> return "url(#diff-left)"
+            .attr "class", (d) ->
+              if d.policy == IDEBackend.current_policy.id
+                return "diff-left"
+              else if d.policy == (if comparisonPolicy then comparisonPolicy.id else "")
+                return "diff-right"
             .on "mouseover", nodeMouseover
             .on "mouseout", nodeMouseout
 
           node.exit().remove()
 
           tuple.force.on "tick", (e) ->
-            link.attr "x1", (d) -> return d.source.x + if d.source.type == "object" then width else 0
-              .attr "y1", (d) -> return d.source.y
-              .attr "x2", (d) -> return d.target.x + if d.target.type == "object" then width else 2*width
-              .attr "y2", (d) -> return d.target.y
+            link
+              .attr "x1", (d) ->
+                offset = 0
+                if d.source.type == "perm"
+                  offset = width
+                else if d.source.type == "object"
+                  offset = 2 * width
+                return d.source.x + offset
+              .attr "y1", (d) -> return d.source.y - if d.source.type == "object" then height/2 else 0
+              .attr "x2", (d) ->
+                offset = width
+                if d.target.type == "object"
+                  offset = 2 * width
+                else if d.target.type == "class"
+                  offset = 3 * width
+                return d.target.x + offset
+              .attr "y2", (d) -> return d.target.y - if d.target.type == "object" then height/2 else 0
 
             node.attr "transform", (d) -> return "translate(#{d.x},#{d.y})"
+
+        link = svg.select("g.links").selectAll ".link"
+          .data graph.links, (d,i) -> return d.source.policy + "-" + d.target.policy + "-" + i
+
+        link.enter().append "line"
+          .attr "class", (d) -> "link l-#{d.source.type}-#{d.source.name}-#{d.target.type}-#{d.target.name}"
+          .style "stroke-width", (d) -> return d.rules.length
+          .style "display", "none"
+
+        link.style "stroke-width", (d) -> return d.rules.length
+
+        link.exit().remove()
 
 Set up the viewport scroll
 
