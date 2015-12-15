@@ -125,7 +125,7 @@ Enumerate the differences between the two policies
         # Loop through each primary rule, getting the distinct subjects, objects, permissions, and classes
         # Give each of them the type, name, rules, and policy attributes
         # Set policy = primaryId
-        nodesFromRules = (rules, policyid, nodes, links, otherNodes) ->
+        nodesFromRules = (rules, policyid, nodes, links) ->
           rules.forEach (r) ->
             new_subject_node = new_object_node = new_class_node = new_perm_node = undefined
 
@@ -182,8 +182,8 @@ Enumerate the differences between the two policies
 
         primaryNodes = []
         comparisonNodes = []
-        nodesFromRules($scope.rules, IDEBackend.current_policy.id, primaryNodes, graph.links, comparisonNodes)
-        nodesFromRules(comparisonRules, (if comparisonPolicy then comparisonPolicy.id else ""), comparisonNodes, graph.links, primaryNodes)
+        nodesFromRules($scope.rules, IDEBackend.current_policy.id, primaryNodes, graph.links)
+        nodesFromRules(comparisonRules, (if comparisonPolicy then comparisonPolicy.id else ""), comparisonNodes, graph.links)
 
         # Reconcile the two lists of nodes
         # Loop over the primary nodes: if in comparison nodes
