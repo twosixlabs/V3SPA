@@ -160,11 +160,11 @@ Enumerate the differences between the two policies
             # Generate links
             generateLink = (curr_source_node, curr_target_node, new_source_node, new_target_node, links) ->
               if curr_source_node and !curr_target_node
-                links.push {source: curr_source_node, target: new_target_node, rules: [new_target_node.rule]}
+                links.push {source: curr_source_node, target: new_target_node, rules: [new_target_node.rules]}
               else if !curr_source_node and curr_target_node
-                links.push {source: new_source_node, target: curr_target_node, rules: [new_source_node.rule]}
+                links.push {source: new_source_node, target: curr_target_node, rules: [new_source_node.rules]}
               else if !curr_source_node and !curr_target_node
-                links.push {source: new_source_node, target: new_target_node, rules: [new_source_node.rule]}
+                links.push {source: new_source_node, target: new_target_node, rules: [new_source_node.rules]}
               else
                 l = _.findWhere links, {source: curr_source_node, target: curr_target_node}
                 if l
@@ -356,7 +356,12 @@ Enumerate the differences between the two policies
               .style "display", "none"
 
           node = tuple.svg.selectAll ".node"
-            .data tuple.nodes, (d,i) -> return d.id or (d.id = d.policy + "-" + i)
+          
+          node.remove()
+
+          node = tuple.svg.selectAll ".node"
+            .data tuple.nodes
+            .attr "class", (d) -> "node t-#{d.type}-#{d.name}"
 
           nodeEnter = node.enter().append "g"
             .attr "class", (d) -> "node t-#{d.type}-#{d.name}"
@@ -404,7 +409,7 @@ Enumerate the differences between the two policies
             node.attr "transform", (d) -> return "translate(#{d.x},#{d.y})"
 
         link = svg.select("g.links").selectAll ".link"
-          .data graph.links, (d,i) -> return d.source.policy + "-" + d.target.policy + "-" + i
+          .data graph.links, (d,i) -> return "#{d.source.type}-#{d.source.name}-#{d.target.type}-#{d.target.name}"
 
         link.enter().append "line"
           .attr "class", (d) -> "link l-#{d.source.type}-#{d.source.name}-#{d.target.type}-#{d.target.name}"
