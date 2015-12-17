@@ -307,11 +307,11 @@ Enumerate the differences between the two policies
               linksToShow = linksToShow.concat _.filter graph.links, (link) ->
                 return _.findWhere(linksToShow, {source: link.source}) and _.findWhere(linksToShow, {target: link.target})
               # Get links from subjects to permissions
-              permRules = _.uniq(_.where($scope.rules, {object: d.name}), (d) -> return d.perm)
+              permRules = _.uniq(_.where($scope.rules.concat(comparisonRules), {object: d.name}), (d) -> return d.perm)
               linksToShow = linksToShow.concat _.filter graph.links, (link) -> return _.findWhere permRules, {perm: link.target.name}
             else if d.type == "subject"
               # Get links from permissions to objects and permissions to classes
-              permRules = _.uniq(_.where($scope.rules, {subject: d.name}), (d) -> return d.perm)
+              permRules = _.uniq(_.where($scope.rules.concat(comparisonRules), {subject: d.name}), (d) -> return d.perm)
               linksToShow = linksToShow.concat _.filter graph.links, (link) -> return _.findWhere permRules, {perm: link.source.name}
               # Get links from objects to classes
               linksToShow = linksToShow.concat _.filter graph.links, (link) ->
@@ -333,7 +333,7 @@ Enumerate the differences between the two policies
               linksToShow = linksToShow.concat _.filter graph.links, (link) ->
                 return _.findWhere(linksToShow, {source: link.source}) and _.findWhere(linksToShow, {source: link.target})
               # Find all subjects that have permissions on this class
-              permRules = _.uniq(_.where($scope.rules, {class: d.name}), (d) -> return d.perm)
+              permRules = _.uniq(_.where($scope.rules.concat(comparisonRules), {class: d.name}), (d) -> return d.perm)
               linksToShow = linksToShow.concat _.filter graph.links, (link) -> return _.findWhere permRules, {perm: link.target.name}
 
             d3.selectAll linksToShow.map((link) -> ".l-#{link.source.type}-#{link.source.name}-#{link.target.type}-#{link.target.name}").join ","
