@@ -11,6 +11,9 @@
       # The 'outstanding' attribute is truthy when a policy is being loaded
       $scope.status = SockJSService.status
 
+      comparisonPolicyId = () ->
+        if comparisonPolicy then comparisonPolicy.id else ""
+
 Get the raw JSON
 
       fetch_raw = ->
@@ -183,7 +186,7 @@ Enumerate the differences between the two policies
         primaryNodes = []
         comparisonNodes = []
         nodesFromRules($scope.rules, IDEBackend.current_policy.id, primaryNodes, graph.links)
-        nodesFromRules(comparisonRules, (if comparisonPolicy then comparisonPolicy.id else ""), comparisonNodes, graph.links)
+        nodesFromRules(comparisonRules, comparisonPolicyId(), comparisonNodes, graph.links)
 
         # Reconcile the two lists of nodes
         # Loop over the primary nodes: if in comparison nodes
@@ -209,6 +212,8 @@ Enumerate the differences between the two policies
         graph.objNodes = allNodes.filter (d) -> d.type == "object"
         graph.classNodes = allNodes.filter (d) -> d.type == "class"
         graph.permNodes = allNodes.filter (d) -> d.type == "perm"
+
+        linkScale.domain d3.extent(graph.links, (l) -> return l.rules.length)
         
 
       $scope.load = ->
@@ -230,6 +235,8 @@ Enumerate the differences between the two policies
 
       width = 300
       height = 500
+      padding = 50
+      radius = 5
       graph =
         links: []
         subjNodes: []
@@ -239,13 +246,16 @@ Enumerate the differences between the two policies
       color = d3.scale.category10()
       svg = d3.select("svg.gibview").select("g.viewer")
       subjSvg = svg.select("g.subjects").attr("transform", "translate(0,0)")
-      permSvg = svg.select("g.permissions").attr("transform", "translate(#{width},0)")
-      objSvg = svg.select("g.objects").attr("transform", "translate(#{2*width},-#{height/2})")
-      classSvg = svg.select("g.classes").attr("transform", "translate(#{3*width},0)")
-      subjForce = d3.layout.force().size([width, height]).charge(-40)
-      objForce = d3.layout.force().size([width, height]).charge(-40)
-      permForce = d3.layout.force().size([width, height]).charge(-40)
-      classForce = d3.layout.force().size([width, height]).charge(-40)
+      permSvg = svg.select("g.permissions").attr("transform", "translate(#{width+padding},0)")
+      objSvg = svg.select("g.objects").attr("transform", "translate(#{2*(width+padding)},-#{height/2})")
+      classSvg = svg.select("g.classes").attr("transform", "translate(#{3*(width+padding)},0)")
+
+      linkScale = d3.scale.linear()
+        .range([1,2*radius])
+
+      gridLayout = d3.layout.grid()
+        .points()
+        .size([width, height])
 
       textStyle =
         'text-anchor': "middle"
@@ -257,17 +267,17 @@ Enumerate the differences between the two policies
         .style textStyle
         .text "subjects"
       svg.select("g.labels").append("text")
-        .attr "x", width + width / 2
+        .attr "x", (width + padding) + width / 2
         .attr "y", height / 2
         .style textStyle
         .text "permissions"
       svg.select("g.labels").append("text")
-        .attr "x", 2 * width + width / 2
+        .attr "x", 2 * (width + padding) + width / 2
         .attr "y", 0
         .style textStyle
         .text "objects"
       svg.select("g.labels").append("text")
-        .attr "x", 3 * width + width / 2
+        .attr "x", 3 * (width + padding) + width / 2
         .attr "y", height / 2
         .style textStyle
         .text "classes"
@@ -283,16 +293,11 @@ Enumerate the differences between the two policies
       update = () ->
         find_differences()
 
-        subjForce.nodes(graph.subjNodes).start()
-        objForce.nodes(graph.objNodes).start()
-        permForce.nodes(graph.permNodes).start()
-        classForce.nodes(graph.classNodes).start()
-
         [
-          {force: subjForce, nodes: graph.subjNodes, svg: subjSvg},
-          {force: objForce, nodes: graph.objNodes, svg: objSvg},
-          {force: permForce, nodes: graph.permNodes, svg: permSvg},
-          {force: classForce, nodes: graph.classNodes, svg: classSvg}
+          {nodes: graph.subjNodes, svg: subjSvg},
+          {nodes: graph.objNodes, svg: objSvg},
+          {nodes: graph.permNodes, svg: permSvg},
+          {nodes: graph.classNodes, svg: classSvg}
         ].forEach (tuple) ->
           nodeMouseover = (d,i) ->
             linksToShow = []
@@ -355,16 +360,27 @@ Enumerate the differences between the two policies
             d3.selectAll "g.node text"
               .style "display", "none"
 
+          # Sort 
+          tuple.nodes.sort (a,b) ->
+            if (a.policy == IDEBackend.current_policy.id && a.policy != b.policy) || (a.policy == "both" && b.policy == comparisonPolicyId())
+              return -1
+            else if a.policy == b.policy
+              return 0
+            else
+              return 1
+
           node = tuple.svg.selectAll ".node"
           
+          # Clear the old nodes and redraw everything
           node.remove()
 
           node = tuple.svg.selectAll ".node"
-            .data tuple.nodes
+            .data gridLayout(tuple.nodes)
             .attr "class", (d) -> "node t-#{d.type}-#{d.name}"
 
           nodeEnter = node.enter().append "g"
             .attr "class", (d) -> "node t-#{d.type}-#{d.name}"
+            .attr "transform", (d) -> return "translate(#{d.x},#{d.y})"
 
           nodeEnter.append "text"
             .attr "class", (d) -> "node-label t-#{d.type}-#{d.name}"
@@ -374,39 +390,23 @@ Enumerate the differences between the two policies
             .text (d) -> d.name
 
           nodeEnter.append "circle"
-            .attr "r", 5
+            .attr "r", radius
             .attr "cx", 0
             .attr "cy", 0
             .attr "class", (d) ->
               if d.policy == IDEBackend.current_policy.id
                 return "diff-left"
-              else if d.policy == (if comparisonPolicy then comparisonPolicy.id else "")
+              else if d.policy == comparisonPolicyId()
                 return "diff-right"
             .on "mouseover", nodeMouseover
             .on "mouseout", nodeMouseout
 
           node.exit().remove()
 
-          tuple.force.on "tick", (e) ->
-            link
-              .attr "x1", (d) ->
-                offset = 0
-                if d.source.type == "perm"
-                  offset = width
-                else if d.source.type == "object"
-                  offset = 2 * width
-                return d.source.x + offset
-              .attr "y1", (d) -> return d.source.y - if d.source.type == "object" then height/2 else 0
-              .attr "x2", (d) ->
-                offset = width
-                if d.target.type == "object"
-                  offset = 2 * width
-                else if d.target.type == "class"
-                  offset = 3 * width
-                return d.target.x + offset
-              .attr "y2", (d) -> return d.target.y - if d.target.type == "object" then height/2 else 0
+        link = svg.select("g.links").selectAll ".link"
 
-            node.attr "transform", (d) -> return "translate(#{d.x},#{d.y})"
+        # Clear the old links and redraw everything
+        link.remove()
 
         link = svg.select("g.links").selectAll ".link"
           .data graph.links, (d,i) -> return "#{d.source.type}-#{d.source.name}-#{d.target.type}-#{d.target.name}"
@@ -415,8 +415,24 @@ Enumerate the differences between the two policies
           .attr "class", (d) -> "link l-#{d.source.type}-#{d.source.name}-#{d.target.type}-#{d.target.name}"
           .style "stroke-width", (d) -> return d.rules.length
           .style "display", "none"
+          .attr "x1", (d) ->
+            offset = 0
+            if d.source.type == "perm"
+              offset = width + padding
+            else if d.source.type == "object"
+              offset = 2 * (width + padding)
+            return d.source.x + offset
+          .attr "y1", (d) -> return d.source.y - if d.source.type == "object" then height/2 else 0
+          .attr "x2", (d) ->
+            offset = width + padding
+            if d.target.type == "object"
+              offset = 2 * (width + padding)
+            else if d.target.type == "class"
+              offset = 3 * (width + padding)
+            return d.target.x + offset
+          .attr "y2", (d) -> return d.target.y - if d.target.type == "object" then height/2 else 0
 
-        link.style "stroke-width", (d) -> return d.rules.length
+        link.style "stroke-width", (d) -> return linkScale(d.rules.length)
 
         link.exit().remove()
 
