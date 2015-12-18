@@ -18,3 +18,4 @@
 //= require queue/Queue.js
 //= require forceInABox.js
 //= require alasql/alasql.js
+//= require d3-grid/d3-grid.js
