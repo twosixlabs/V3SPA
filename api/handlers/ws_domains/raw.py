@@ -58,12 +58,16 @@ class RawDomain(object):
                     for line in f:
                         line_num += 1
                         if line.lstrip(' \t\n\r').startswith("allow"):
-                            # Split on ":"
-                            rule = line.strip().split(":")
+                            # Skip allow rules that do not have colons
+                            if line.find(":") == -1:
+                                continue
 
                             # Skip allow rules that do not have semicolons (e.g. multiline rules)
                             if line.find(";") == -1:
                                 continue
+
+                            # Split on ":"
+                            rule = line.strip().split(":")
 
                             lside = rule[0].lstrip("allow").strip()
                             rside = rule[1].strip()
