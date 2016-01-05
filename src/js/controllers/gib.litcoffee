@@ -237,9 +237,9 @@ Enumerate the differences between the two policies
               query.callback(dropdown)
           )
 
-      width = 300
+      width = 350
       height = 500
-      padding = 50
+      padding = 75
       radius = 5
       graph =
         links: []
