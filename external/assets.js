@@ -19,3 +19,4 @@
 //= require forceInABox.js
 //= require alasql/alasql.js
 //= require d3-grid/d3-grid.js
+//= require css.escape/css.escape.js

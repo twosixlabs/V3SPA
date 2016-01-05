@@ -345,7 +345,7 @@ Enumerate the differences between the two policies
               permRules = _.uniq(_.where($scope.rules.concat(comparisonRules), {class: d.name}), (d) -> return d.perm)
               linksToShow = linksToShow.concat _.filter graph.links, (link) -> return _.findWhere permRules, {perm: link.target.name}
 
-            d3.selectAll linksToShow.map((link) -> ".l-#{link.source.type}-#{link.source.name}-#{link.target.type}-#{link.target.name}").join ","
+            d3.selectAll linksToShow.map((link) -> "." + CSS.escape("l-#{link.source.type}-#{link.source.name}-#{link.target.type}-#{link.target.name}")).join ","
               .style "display", ""
 
             uniqNodes = linksToShow.reduce((prev, l) ->
@@ -354,9 +354,9 @@ Enumerate the differences between the two policies
               return prev
             , [])
             
-            d3.selectAll _.uniq(uniqNodes.map((n) -> return "text.t-#{n.type}-#{n.name}")).join(",")
+            d3.selectAll _.uniq(uniqNodes.map((n) -> return "text." + CSS.escape("t-#{n.type}-#{n.name}"))).join(",")
               .style "display", ""
-            d3.selectAll _.uniq(uniqNodes.map((n) -> return "g.node.t-#{n.type}-#{n.name}")).join(",")
+            d3.selectAll _.uniq(uniqNodes.map((n) -> return "g.node." + CSS.escape("t-#{n.type}-#{n.name}"))).join(",")
               .each () -> @.parentNode.appendChild(@)
 
           nodeMouseout = (d,i) ->
