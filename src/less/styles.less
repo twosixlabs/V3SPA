@@ -401,15 +401,31 @@ svg.hiveview {
       fill: url(#diff-right);
     }
     text {
+      display: none;
       text-anchor: middle;
       dominant-baseline: ideographic;
       pointer-events: none;
     }
   }
+  g.node.highlight {
+    circle.diff-left {
+      fill: url(#diff-left-inverse);
+    }
+    circle.diff-right {
+      fill: url(#diff-right-inverse);
+    }
+    text {
+      display: inline;
+    }
+  }
   .subjects {
     circle {
-      stroke: #1f77b4;
+      stroke: #005892;
       fill: #72b7f9;
+    }
+    .highlight circle {
+      stroke: #003064;
+      fill: #005892;
     }
     text {
       fill: #15537d;
@@ -420,6 +436,10 @@ svg.hiveview {
       stroke: #ff7f0e;
       fill: #ffc259;
     }
+    .highlight circle {
+      stroke: #c55000;
+      fill: #ff7f0e;
+    }
     text {
       fill: #b25809;
     }
@@ -429,6 +449,10 @@ svg.hiveview {
       stroke: #2ca02c;
       fill: #78e46c;
     }
+    .highlight circle {
+      stroke: #007000;
+      fill: #2ca02c;
+    }
     text {
       fill: #1e701e;
     }
@@ -437,6 +461,10 @@ svg.hiveview {
     circle {
       stroke: #d62728;
       fill: #ff7361;
+    }
+    .highlight circle {
+      stroke: #9c0000;
+      fill: #d62728;
     }
     text {
       fill: #951b1c;

@@ -354,15 +354,14 @@ Enumerate the differences between the two policies
               return prev
             , [])
             
-            d3.selectAll _.uniq(uniqNodes.map((n) -> return "text." + CSS.escape("t-#{n.type}-#{n.name}"))).join(",")
-              .style "display", ""
             d3.selectAll _.uniq(uniqNodes.map((n) -> return "g.node." + CSS.escape("t-#{n.type}-#{n.name}"))).join(",")
+              .classed "highlight", true
               .each () -> @.parentNode.appendChild(@)
 
           nodeMouseout = (d,i) ->
             link.style "display", "none"
-            d3.selectAll "g.node text"
-              .style "display", "none"
+            d3.selectAll "g.node.highlight"
+              .classed "highlight", false
 
           # Sort 
           tuple.nodes.sort (a,b) ->
@@ -390,7 +389,6 @@ Enumerate the differences between the two policies
             .attr "class", (d) -> "node-label t-#{d.type}-#{d.name}"
             .attr "x", 0
             .attr "y", "-5px"
-            .style "display", "none"
             .text (d) -> d.name
 
           nodeEnter.append "circle"
