@@ -133,6 +133,7 @@ Enumerate the differences between the two policies
             new_subject_node = new_object_node = new_class_node = new_perm_node = undefined
 
             # Find existing node if it exists
+            # TODO: use a map to look up nodes instead of a linear search over the array
             curr_subject_node = _.findWhere(nodes, {type: "subject", name: r.subject})
             curr_object_node = _.findWhere(nodes, {type: "object", name: r.object})
             curr_class_node = _.findWhere(nodes, {type: "class", name: r.class})
@@ -169,6 +170,7 @@ Enumerate the differences between the two policies
               else if !curr_source_node and !curr_target_node
                 links.push {source: new_source_node, target: new_target_node, rules: [new_source_node.rules]}
               else
+                # TODO: Use a map for lookups instead of doing a linear search over the array
                 l = _.findWhere links, {source: curr_source_node, target: curr_target_node}
                 if l
                   l.rules.push r
