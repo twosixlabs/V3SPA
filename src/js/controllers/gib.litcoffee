@@ -365,12 +365,12 @@ Enumerate the differences between the two policies
             d3.selectAll "g.node.highlight"
               .classed "highlight", false
 
-          # Sort 
+          # Sort first by policy, then by name
           tuple.nodes.sort (a,b) ->
             if (a.policy == IDEBackend.current_policy.id && a.policy != b.policy) || (a.policy == "both" && b.policy == comparisonPolicyId())
               return -1
             else if a.policy == b.policy
-              return 0
+              return if a.name == b.name then 0 else if a.name < b.name then return -1 else return 1
             else
               return 1
 
