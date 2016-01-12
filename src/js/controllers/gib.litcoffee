@@ -125,6 +125,15 @@ Enumerate the differences between the two policies
         console.log graph
 
       find_differences = () =>
+        createNode = (type, name, rules, policy, selected) ->
+          return {
+            type: type
+            name: name
+            rules: rules
+            policy: policy
+            selected: selected
+          }
+
         # Loop through each primary rule, getting the distinct subjects, objects, permissions, and classes
         # Give each of them the type, name, rules, and policy attributes
         # Set policy = primaryId
@@ -143,22 +152,22 @@ Enumerate the differences between the two policies
             if curr_subject_node
               curr_subject_node.rules.push r
             else
-              new_subject_node = {type: "subject", name: r.subject, rules: [r], policy: policyid}
+              new_subject_node = createNode("subject", r.subject, [r], policyid, true)
               nodes.push new_subject_node
             if curr_object_node
               curr_object_node.rules.push r
             else
-              new_object_node = {type: "object", name: r.object, rules: [r], policy: policyid}
+              new_object_node = createNode("object", r.object, [r], policyid, true)
               nodes.push new_object_node
             if curr_class_node
               curr_class_node.rules.push r
             else
-              new_class_node = {type: "class", name: r.class, rules: [r], policy: policyid}
+              new_class_node = createNode("class", r.class, [r], policyid, true)
               nodes.push new_class_node
             if curr_perm_node
               curr_perm_node.rules.push r
             else
-              new_perm_node = {type: "perm", name: r.perm, rules: [r], policy: policyid}
+              new_perm_node = createNode("perm", r.perm, [r], policyid, true)
               nodes.push new_perm_node
 
             # Generate links
@@ -193,6 +202,7 @@ Enumerate the differences between the two policies
         # Reconcile the two lists of nodes
         # Loop over the primary nodes: if in comparison nodes
         # - change "policy" to "both"
+        # - set it to unselected
         # - push the comparison's rules onto the primary's (ignore duplicates)
         # - remove from comparisonNodes
         primaryNodes.forEach (node) ->
@@ -200,6 +210,7 @@ Enumerate the differences between the two policies
           if comparisonNode
             node.rules = _.uniq node.rules.concat(comparisonNode.rules)
             node.policy = "both"
+            node.selected = false
             comparisonNodes = _.without(comparisonNodes, comparisonNode)
 
             # Rewire the links to use the "both" node instead of comparisonNode
@@ -221,6 +232,10 @@ Enumerate the differences between the two policies
 
         linkScale.domain d3.extent(graph.links, (l) -> return l.rules.length)
         
+      $scope.selectionChange = () ->
+        console.log "Selection change"
+        d3.selectAll "g.node"
+          .classed "hidden-node", (d) -> !d.selected
 
       $scope.load = ->
         load_refpolicy($scope.input.refpolicy.id).then(fetch_raw).then(update)
@@ -249,6 +264,7 @@ Enumerate the differences between the two policies
         objNodes: []
         classNodes: []
         permNodes: []
+      $scope.graph = graph
       color = d3.scale.category10()
       svg = d3.select("svg.gibview").select("g.viewer")
       subjSvg = svg.select("g.subjects").attr("transform", "translate(0,0)")
@@ -299,6 +315,11 @@ Enumerate the differences between the two policies
       update = () ->
         find_differences()
 
+        $scope.policyIds =
+          primary: IDEBackend.current_policy.id
+          both: "both"
+          comparison: comparisonPolicyId()
+
         [
           {nodes: graph.subjNodes, svg: subjSvg},
           {nodes: graph.objNodes, svg: objSvg},
@@ -347,18 +368,28 @@ Enumerate the differences between the two policies
               permRules = _.uniq(_.where($scope.rules.concat(comparisonRules), {class: d.name}), (d) -> return d.perm)
               linksToShow = linksToShow.concat _.filter graph.links, (link) -> return _.findWhere permRules, {perm: link.target.name}
 
-            d3.selectAll linksToShow.map((link) -> "." + CSS.escape("l-#{link.source.type}-#{link.source.name}-#{link.target.type}-#{link.target.name}")).join ","
-              .style "display", ""
+            linksToShow = linksToShow.filter (l) -> return l.source.selected && l.target.selected
 
             uniqNodes = linksToShow.reduce((prev, l) ->
               prev.push l.source
               prev.push l.target
               return prev
             , [])
+
+            # No links to show, so make sure we highlight to node the user moused over
+            if uniqNodes.length == 0
+              uniqNodes.push d
             
             d3.selectAll _.uniq(uniqNodes.map((n) -> return "g.node." + CSS.escape("t-#{n.type}-#{n.name}"))).join(",")
               .classed "highlight", true
               .each () -> @.parentNode.appendChild(@)
+
+            # No links to show, so return
+            if linksToShow.length == 0
+              return
+
+            d3.selectAll linksToShow.map((link) -> "." + CSS.escape("l-#{link.source.type}-#{link.source.name}-#{link.target.type}-#{link.target.name}")).join ","
+              .style "display", ""
 
           nodeMouseout = (d,i) ->
             link.style "display", "none"
@@ -382,9 +413,11 @@ Enumerate the differences between the two policies
           node = tuple.svg.selectAll ".node"
             .data gridLayout(tuple.nodes)
             .attr "class", (d) -> "node t-#{d.type}-#{d.name}"
+            .classed "hidden-node", (d) -> !d.selected
 
           nodeEnter = node.enter().append "g"
             .attr "class", (d) -> "node t-#{d.type}-#{d.name}"
+            .classed "hidden-node", (d) -> !d.selected
             .attr "transform", (d) -> return "translate(#{d.x},#{d.y})"
 
           nodeEnter.append "text"

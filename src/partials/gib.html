@@ -1,21 +1,38 @@
 <div id='surface' class='row'>
   <div class='toolbox panel panel-default'>
     <div class='panel-body'>
-    <div class="form-group">
-      <small><strong>Select a comparison policy:</strong></small>
-      <div ng-hide='uploading.status'>
-      <input class='form-control' id='refPolicySelect'
-        ui-select2='list_refpolicies'
-        placeholder="Select existing reference policy"
-        ng-model='input.refpolicy' type='hidden'/>
+      <div class="container diff-toolbox-container">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <small><strong>Select a comparison policy:</strong></small>
+              <div ng-hide='uploading.status'>
+              <input class='form-control' id='refPolicySelect'
+                ui-select2='list_refpolicies'
+                placeholder="Select existing reference policy"
+                ng-model='input.refpolicy' type='hidden'/>
+              </div>
+            </div>
+            <div class="form-group text-right">
+              <button type="button" ng-disabled='!input.refpolicy'
+                class="btn btn-primary" ng-click='load()'>Load</button>
+            </div>
+          </div>
+          <div class="col-md-6">Legend</div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <hr/>
+            <small><strong>Changed entities:</strong></small>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-3"><changed-nodes title="Subjects" policy-ids="policyIds" nodes="graph.subjNodes" selection-change="selectionChange()"></changed-nodes></div>
+          <div class="col-md-3"><changed-nodes title="Permissions" policy-ids="policyIds" nodes="graph.permNodes" selection-change="selectionChange()"></changed-nodes></div>
+          <div class="col-md-3"><changed-nodes title="Objects" policy-ids="policyIds" nodes="graph.objNodes" selection-change="selectionChange()"></changed-nodes></div>
+          <div class="col-md-3"><changed-nodes title="Classes" policy-ids="policyIds" nodes="graph.classNodes" selection-change="selectionChange()"></changed-nodes></div>
+        </div>
       </div>
-    </div>
-    <div class="form-group text-right">
-      <button type="button" ng-disabled='!input.refpolicy'
-        class="btn btn-primary" ng-click='load()'>Load</button>
-    </div>
-    <hr/>
-    <small><strong>Changed relationships:</strong></small>
     </div>
   </div>
   <svg xmlns="http://www.w3.org/2000/svg" class='gibview'>

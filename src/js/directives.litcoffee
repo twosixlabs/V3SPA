@@ -172,3 +172,40 @@ Set up editor sessions
 
 
       return ret
+
+    v3spa.directive 'changedNodes', ->
+      ret =
+        restrict: 'E'
+        replace: true
+        scope:
+          policyIds: '='
+          nodes: '='
+          title: '@'
+          selectionChange: '&'
+        template: """
+          <div>
+            <small><strong>{{title}}</strong></small>
+            <small><strong>{{policyIds.primary}}</strong></small>
+            <label ng-repeat="node in primaryNodes" style="text-overflow:ellipsis; white-space:nowrap; overflow:hidden; min-width:80px; max-width:100%;">
+              <input type="checkbox" ng-model="node.selected" ng-change="selectionChange()">{{node.name}}
+            </label>
+            <small><strong>{{policyIds.both}}</strong></small>
+            <label ng-repeat="node in bothNodes" style="text-overflow:ellipsis; white-space:nowrap; overflow:hidden; min-width:80px; max-width:100%;">
+              <input type="checkbox" ng-model="node.selected" ng-change="selectionChange()">{{node.name}}
+            </label>
+            <small><strong>{{policyIds.comparison}}</strong></small>
+            <label ng-repeat="node in comparisonNodes" style="text-overflow:ellipsis; white-space:nowrap; overflow:hidden; min-width:80px; max-width:100%;">
+              <input type="checkbox" ng-model="node.selected" ng-change="selectionChange()">{{node.name}}
+            </label>
+          </div>
+        """
+        link: (scope, element, attrs) ->
+          update = (newVal, oldVal) ->
+            scope.primaryNodes = scope.nodes.filter (n) -> n.policy == scope.policyIds.primary
+            scope.bothNodes = scope.nodes.filter (n) -> n.policy == scope.policyIds.both
+            scope.comparisonNodes = scope.nodes.filter (n) -> n.policy == scope.policyIds.comparison
+          
+          scope.$watch 'nodes', update
+          scope.$watch 'policyIds', update
+
+      return ret
