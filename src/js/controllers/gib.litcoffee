@@ -229,7 +229,7 @@ Enumerate the differences between the two policies
 
       width = 350
       height = 500
-      padding = 75
+      padding = 50
       radius = 5
       graph =
         links: []
@@ -245,6 +245,31 @@ Enumerate the differences between the two policies
       objSvg = svg.select("g.objects").attr("transform", "translate(#{2*(width+padding)},-#{height/2})")
       classSvg = svg.select("g.classes").attr("transform", "translate(#{3*(width+padding)},0)")
 
+      subjSvg.append("rect")
+        .attr("width", width + 16)
+        .attr("height", height + 16)
+        .attr("x", -8)
+        .attr("y", -8)
+        .attr("style", "fill:rgba(200,200,200,0.15)")
+      objSvg.append("rect")
+        .attr("width", width + 16)
+        .attr("height", height + 16)
+        .attr("x", -8)
+        .attr("y", -8)
+        .attr("style", "fill:rgba(200,200,200,0.15)")
+      classSvg.append("rect")
+        .attr("width", width + 16)
+        .attr("height", height + 16)
+        .attr("x", -8)
+        .attr("y", -8)
+        .attr("style", "fill:rgba(200,200,200,0.15)")
+      permSvg.append("rect")
+        .attr("width", width + 16)
+        .attr("height", height + 16)
+        .attr("x", -8)
+        .attr("y", -8)
+        .attr("style", "fill:rgba(200,200,200,0.15)")
+
       linkScale = d3.scale.linear()
         .range([1,2*radius])
 
@@ -254,7 +279,7 @@ Enumerate the differences between the two policies
 
       textStyle =
         'text-anchor': "middle"
-        'fill': "#ddd"
+        'fill': "#ccc"
         'font-size': "56px"
       svg.select("g.labels").append("text")
         .attr "x", width / 2
@@ -418,10 +443,12 @@ Enumerate the differences between the two policies
           node = tuple.svg.selectAll ".node"
             .data gridLayout(tuple.nodes.filter (d) -> return d.selected)
             .attr "class", (d) -> "node t-#{d.type}-#{d.name}"
+            .classed "clicked", (d) -> d.clicked
 
           nodeEnter = node.enter().append "g"
             .attr "class", (d) -> "node t-#{d.type}-#{d.name}"
             .attr "transform", (d) -> return "translate(#{d.x},#{d.y})"
+            .classed "clicked", (d) -> d.clicked
 
           nodeEnter.append "text"
             .attr "class", (d) -> "node-label t-#{d.type}-#{d.name}"
@@ -471,6 +498,7 @@ Enumerate the differences between the two policies
               offset = 3 * (width + padding)
             return d.target.x + offset
           .attr "y2", (d) -> return d.target.y - if d.target.type == "object" then height/2 else 0
+          .classed "clicked", (d) -> d.source.clicked && d.target.clicked
 
         link.style "stroke-width", (d) -> return linkScale(d.rules.length)
 
