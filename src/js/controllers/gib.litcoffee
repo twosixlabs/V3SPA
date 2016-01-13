@@ -238,10 +238,20 @@ Enumerate the differences between the two policies
 
         allNodes = primaryNodes.concat comparisonNodes
 
-        graph.subjNodes = allNodes.filter (d) -> d.type == "subject"
-        graph.objNodes = allNodes.filter (d) -> d.type == "object"
-        graph.classNodes = allNodes.filter (d) -> d.type == "class"
-        graph.permNodes = allNodes.filter (d) -> d.type == "perm"
+        graph.subjNodes = [] # allNodes.filter (d) -> d.type == "subject"
+        graph.objNodes = [] # allNodes.filter (d) -> d.type == "object"
+        graph.classNodes = [] # allNodes.filter (d) -> d.type == "class"
+        graph.permNodes = [] # allNodes.filter (d) -> d.type == "perm"
+
+        allNodes.forEach (n) ->
+          if n.type == "subject"
+            graph.subjNodes.push n
+          else if n.type == "object"
+            graph.objNodes.push n
+          else if n.type == "class"
+            graph.classNodes.push n
+          else #perm
+            graph.permNodes.push n
 
         linkScale.domain d3.extent(graph.links, (l) -> return l.rules.length)
         
