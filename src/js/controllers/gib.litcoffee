@@ -479,7 +479,7 @@ Set up the viewport scroll
       )
 
       svgPanZoom.init
-        selector: '#surface svg'
+        selector: '#surface svg.gibview'
         panEnabled: true
         zoomEnabled: true
         dragEnabled: false
@@ -496,7 +496,7 @@ Set up the viewport scroll
         (newv, oldv) ->
           if not newv? or _.keys(newv).length == 0
             return
-          g = svgPanZoom.getSVGViewport($("#surface svg")[0])
+          g = svgPanZoom.getSVGViewport($("#surface svg.gibview")[0])
           svgPanZoom.set_transform(g, newv)
       )
 

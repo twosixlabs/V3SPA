@@ -18,11 +18,41 @@
                 class="btn btn-primary" ng-click='load()'>Load</button>
             </div>
           </div>
-          <div class="col-md-6">Legend</div>
+          <div class="col-md-6">
+            <div style="margin-left:40px">
+              <small><strong>Legend</strong></small>
+            </div>
+            <div style="margin-left:40px;">
+            <svg style="width:18px; height:18px; float:left">
+              <g transform="scale(1.5,1.5)translate(1,1)">
+                <circle cx="5" cy="5" r="5" style="stroke:#777; fill:#fff;" />
+                <path d="M 5 2 L 2 5 L 5 8 M 2 5 L 9 5" fill="none" stroke="#666" stroke-width="2" />
+              </g>
+            </svg>
+            <p style="margin-left:22px;">&nbsp;{{policyIds.primary}}</p>
+            </div>
+            <div style="margin-left:40px;">
+            <svg style="width:18px; height:18px; float:left">
+              <g transform="scale(1.5,1.5)translate(1,1)">
+                <circle cx="5" cy="5" r="5" style="stroke:#777; fill:#ddd;" />
+              </g>
+            </svg>
+            <p style="margin-left:22px;">&nbsp;{{policyIds.both || '&lt;select comparison&gt;'}}</p>
+            </div>
+            <div style="margin-left:40px;">
+            <svg style="width:18px; height:18px; float:left">
+              <g transform="scale(1.5,1.5)translate(1,1)">
+                <circle cx="5" cy="5" r="5" style="stroke:#777; fill:#fff;" />
+                <path d="M 5 2 L 8 5 L 5 8 M 8 5 L 1 5" fill="none" stroke="#666" stroke-width="2" />
+              </g>
+            </svg>
+            <p style="margin-left:22px;">&nbsp;{{policyIds.comparison || '&lt;select comparison&gt;'}}</p>
+            </div>
+          </div>
         </div>
         <div class="row">
           <div class="col-md-12">
-            <div style="border-bottom: 1px solid #eee;">Changed entities:</div>
+            <hr>
           </div>
         </div>
         <div class="row node-controls">
