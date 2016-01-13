@@ -403,8 +403,11 @@ svg.hiveview {
 }
 
 .gibview {
-  g.node.hidden-node {
+  line.link {
     display: none;
+  }
+  line.link.highlight, line.link.clicked {
+    display: inline;
   }
   g.node {
     circle {
@@ -423,7 +426,7 @@ svg.hiveview {
       pointer-events: none;
     }
   }
-  g.node.highlight {
+  g.node.highlight, g.node.clicked {
     circle.diff-left {
       fill: url(#diff-left-inverse);
     }

@@ -301,7 +301,7 @@ Enumerate the differences between the two policies
           {nodes: graph.permNodes, svg: permSvg},
           {nodes: graph.classNodes, svg: classSvg}
         ].forEach (tuple) ->
-          nodeMouseover = (d,i) ->
+          getConnected = (d) ->
             linksToShow = []
 
             # Find all links associated with this node
@@ -351,10 +351,15 @@ Enumerate the differences between the two policies
               return prev
             , [])
 
-            # No links to show, so make sure we highlight to node the user moused over
+            # No links to show, so make sure we highlight the node the user moused over
             if uniqNodes.length == 0
               uniqNodes.push d
-            
+
+            return [uniqNodes, linksToShow]
+
+          nodeMouseover = (d) ->
+            [uniqNodes, linksToShow] = getConnected(d)
+
             d3.selectAll _.uniq(uniqNodes.map((n) -> return "g.node." + CSS.escape("t-#{n.type}-#{n.name}"))).join(",")
               .classed "highlight", true
               .each () -> @.parentNode.appendChild(@)
@@ -364,12 +369,37 @@ Enumerate the differences between the two policies
               return
 
             d3.selectAll linksToShow.map((link) -> "." + CSS.escape("l-#{link.source.type}-#{link.source.name}-#{link.target.type}-#{link.target.name}")).join ","
-              .style "display", ""
+              .classed "highlight", true
 
-          nodeMouseout = (d,i) ->
-            link.style "display", "none"
+          nodeMouseout = (d) ->
+            link.classed "highlight", false
             d3.selectAll "g.node.highlight"
               .classed "highlight", false
+
+          nodeClick = (clickedNode) ->
+            [uniqNodes, linksToShow] = getConnected(clickedNode)
+            clicked = !clickedNode.clicked
+
+            # Set clicked = false on all nodes
+            graph.subjNodes.forEach (d) -> d.clicked = false
+            graph.objNodes.forEach (d) -> d.clicked = false
+            graph.classNodes.forEach (d) -> d.clicked = false
+            graph.permNodes.forEach (d) -> d.clicked = false
+
+            # Toggle clicked
+            uniqNodes.forEach (d) -> d.clicked = clicked
+
+            # For all nodes with clicked == true, add the "clicked" class
+            d3.selectAll _.uniq(uniqNodes.map((n) -> return "g.node." + CSS.escape("t-#{n.type}-#{n.name}"))).join(",")
+              .classed "clicked", (d) -> d.clicked
+              .each () -> @.parentNode.appendChild(@)
+
+            # No links to show, so return
+            if linksToShow.length == 0
+              return
+
+            d3.selectAll linksToShow.map((link) -> "." + CSS.escape("l-#{link.source.type}-#{link.source.name}-#{link.target.type}-#{link.target.name}")).join ","
+              .classed "clicked", (d) -> d.source.clicked && d.target.clicked
 
           # Sort first by policy, then by name
           tuple.nodes.sort (a,b) ->
@@ -388,11 +418,9 @@ Enumerate the differences between the two policies
           node = tuple.svg.selectAll ".node"
             .data gridLayout(tuple.nodes.filter (d) -> return d.selected)
             .attr "class", (d) -> "node t-#{d.type}-#{d.name}"
-            .classed "hidden-node", (d) -> !d.selected
 
           nodeEnter = node.enter().append "g"
             .attr "class", (d) -> "node t-#{d.type}-#{d.name}"
-            .classed "hidden-node", (d) -> !d.selected
             .attr "transform", (d) -> return "translate(#{d.x},#{d.y})"
 
           nodeEnter.append "text"
@@ -412,6 +440,7 @@ Enumerate the differences between the two policies
                 return "diff-right"
             .on "mouseover", nodeMouseover
             .on "mouseout", nodeMouseout
+            .on "click", nodeClick
 
           node.exit().remove()
 
@@ -426,7 +455,6 @@ Enumerate the differences between the two policies
         link.enter().append "line"
           .attr "class", (d) -> "link l-#{d.source.type}-#{d.source.name}-#{d.target.type}-#{d.target.name}"
           .style "stroke-width", (d) -> return d.rules.length
-          .style "display", "none"
           .attr "x1", (d) ->
             offset = 0
             if d.source.type == "perm"
