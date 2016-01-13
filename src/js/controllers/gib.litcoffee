@@ -233,7 +233,6 @@ Enumerate the differences between the two policies
         linkScale.domain d3.extent(graph.links, (l) -> return l.rules.length)
         
       $scope.selectionChange = () ->
-        console.log "Selection change"
         d3.selectAll "g.node"
           .classed "hidden-node", (d) -> !d.selected
 
@@ -317,8 +316,8 @@ Enumerate the differences between the two policies
 
         $scope.policyIds =
           primary: IDEBackend.current_policy.id
-          both: "both"
-          comparison: comparisonPolicyId()
+          both: if comparisonPolicyId() then "both" else undefined
+          comparison: comparisonPolicyId() || undefined
 
         [
           {nodes: graph.subjNodes, svg: subjSvg},

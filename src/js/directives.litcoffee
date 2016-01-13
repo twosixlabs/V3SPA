@@ -184,19 +184,31 @@ Set up editor sessions
           selectionChange: '&'
         template: """
           <div>
-            <small><strong>{{title}}</strong></small>
-            <small><strong>{{policyIds.primary}}</strong></small>
-            <label ng-repeat="node in primaryNodes" style="text-overflow:ellipsis; white-space:nowrap; overflow:hidden; min-width:80px; max-width:100%;">
-              <input type="checkbox" ng-model="node.selected" ng-change="selectionChange()">{{node.name}}
-            </label>
-            <small><strong>{{policyIds.both}}</strong></small>
-            <label ng-repeat="node in bothNodes" style="text-overflow:ellipsis; white-space:nowrap; overflow:hidden; min-width:80px; max-width:100%;">
-              <input type="checkbox" ng-model="node.selected" ng-change="selectionChange()">{{node.name}}
-            </label>
-            <small><strong>{{policyIds.comparison}}</strong></small>
-            <label ng-repeat="node in comparisonNodes" style="text-overflow:ellipsis; white-space:nowrap; overflow:hidden; min-width:80px; max-width:100%;">
-              <input type="checkbox" ng-model="node.selected" ng-change="selectionChange()">{{node.name}}
-            </label>
+            {{title}}
+            <div ng-show="policyIds.primary">
+              <small>{{policyIds.primary}}</small>
+              <div style="height:85px; overflow-y:scroll; background:#f5f5f5; border:1px solid #ddd;">
+                <label ng-repeat="node in primaryNodes" style="text-overflow:ellipsis; white-space:nowrap; overflow:hidden; min-width:80px; max-width:100%;">
+                  <input type="checkbox" ng-model="node.selected" ng-change="selectionChange()" style="margin:2px 0 0;"><small>{{node.name}}</small>
+                </label>
+              </div>
+            </div>
+            <div ng-show="policyIds.both">
+              <small>{{policyIds.both}}</small>
+              <div style="height:85px; overflow-y:scroll; background:#f5f5f5; border:1px solid #ddd;">
+                <label ng-repeat="node in bothNodes" style="text-overflow:ellipsis; white-space:nowrap; overflow:hidden; min-width:80px; max-width:100%;">
+                  <input type="checkbox" ng-model="node.selected" ng-change="selectionChange()" style="margin:2px 0 0;"><small>{{node.name}}</small>
+                </label>
+              </div>
+            </div>
+            <div ng-show="policyIds.comparison">
+              <small>{{policyIds.comparison}}</small>
+              <div style="height:85px; overflow-y:scroll; background:#f5f5f5; border:1px solid #ddd;">
+                <label ng-repeat="node in comparisonNodes" style="text-overflow:ellipsis; white-space:nowrap; overflow:hidden; min-width:80px; max-width:100%;">
+                  <input type="checkbox" ng-model="node.selected" ng-change="selectionChange()" style="margin:2px 0 0;"><small>{{node.name}}</small>
+                </label>
+              </div>
+            </div>
           </div>
         """
         link: (scope, element, attrs) ->
