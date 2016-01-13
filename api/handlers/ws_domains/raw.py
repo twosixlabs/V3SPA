@@ -6,6 +6,7 @@ import api.handlers.ws_domains as ws_domains
 import api
 import hashlib
 import os
+import re
 
 from subprocess import *
 
@@ -66,8 +67,8 @@ class RawDomain(object):
                             if line.find(";") == -1:
                                 continue
 
-                            # Split on ":"
-                            rule = line.strip().split(":")
+                            # Replace sequences of spaces with a single space, trim, and split on ":"
+                            rule = re.sub(" +", " ", line.strip()).split(":")
 
                             lside = rule[0].lstrip("allow").strip()
                             rside = rule[1].strip()
