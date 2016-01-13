@@ -137,67 +137,76 @@ Enumerate the differences between the two policies
         # Loop through each primary rule, getting the distinct subjects, objects, permissions, and classes
         # Give each of them the type, name, rules, and policy attributes
         # Set policy = primaryId
-        nodesFromRules = (rules, policyid, nodes, links) ->
+        nodesFromRules = (rules, policyid, nodeMap, linksMap) ->
           rules.forEach (r) ->
             new_subject_node = new_object_node = new_class_node = new_perm_node = undefined
 
             # Find existing node if it exists
             # TODO: use a map to look up nodes instead of a linear search over the array
-            curr_subject_node = _.findWhere(nodes, {type: "subject", name: r.subject})
-            curr_object_node = _.findWhere(nodes, {type: "object", name: r.object})
-            curr_class_node = _.findWhere(nodes, {type: "class", name: r.class})
-            curr_perm_node = _.findWhere(nodes, {type: "perm", name: r.perm})
+            curr_subject_node = nodeMap["subject-#{r.subject}"] # _.findWhere(nodes, {type: "subject", name: r.subject})
+            curr_object_node = nodeMap["object-#{r.object}"] # _.findWhere(nodes, {type: "object", name: r.object})
+            curr_class_node = nodeMap["class-#{r.class}"] # _.findWhere(nodes, {type: "class", name: r.class})
+            curr_perm_node = nodeMap["perm-#{r.perm}"] # _.findWhere(nodes, {type: "perm", name: r.perm})
 
             # If node exists then update it, else create a new one
             if curr_subject_node
               curr_subject_node.rules.push r
             else
               new_subject_node = createNode("subject", r.subject, [r], policyid, true)
-              nodes.push new_subject_node
+              #nodes.push new_subject_node
+              nodeMap["subject-#{r.subject}"] = new_subject_node
             if curr_object_node
               curr_object_node.rules.push r
             else
               new_object_node = createNode("object", r.object, [r], policyid, true)
-              nodes.push new_object_node
+              #nodes.push new_object_node
+              nodeMap["object-#{r.object}"] = new_object_node
             if curr_class_node
               curr_class_node.rules.push r
             else
               new_class_node = createNode("class", r.class, [r], policyid, true)
-              nodes.push new_class_node
+              #nodes.push new_class_node
+              nodeMap["class-#{r.class}"] = new_class_node
             if curr_perm_node
               curr_perm_node.rules.push r
             else
               new_perm_node = createNode("perm", r.perm, [r], policyid, true)
-              nodes.push new_perm_node
+              #nodes.push new_perm_node
+              nodeMap["perm-#{r.perm}"] = new_perm_node
 
             # Generate links
-            generateLink = (curr_source_node, curr_target_node, new_source_node, new_target_node, links) ->
+            generateLink = (curr_source_node, curr_target_node, new_source_node, new_target_node, linksMap) ->
               if curr_source_node and !curr_target_node
-                links.push {source: curr_source_node, target: new_target_node, rules: [new_target_node.rules]}
+                linksMap["#{curr_source_node.policy}-#{curr_source_node.type}-#{curr_source_node.name}-#{new_target_node.policy}-#{new_target_node.type}-#{new_target_node.name}"] = {source: curr_source_node, target: new_target_node, rules: [new_target_node.rules]}
               else if !curr_source_node and curr_target_node
-                links.push {source: new_source_node, target: curr_target_node, rules: [new_source_node.rules]}
+                linksMap["#{new_source_node.policy}-#{new_source_node.type}-#{new_source_node.name}-#{curr_target_node.policy}-#{curr_target_node.type}-#{curr_target_node.name}"] = {source: new_source_node, target: curr_target_node, rules: [new_source_node.rules]}
               else if !curr_source_node and !curr_target_node
-                links.push {source: new_source_node, target: new_target_node, rules: [new_source_node.rules]}
+                linksMap["#{new_source_node.policy}-#{new_source_node.type}-#{new_source_node.name}-#{new_target_node.policy}-#{new_target_node.type}-#{new_target_node.name}"] = {source: new_source_node, target: new_target_node, rules: [new_source_node.rules]}
               else
                 # TODO: Use a map for lookups instead of doing a linear search over the array
-                l = _.findWhere links, {source: curr_source_node, target: curr_target_node}
+                l = linksMap["#{curr_source_node.policy}-#{curr_source_node.type}-#{curr_source_node.name}-#{curr_target_node.policy}-#{curr_target_node.type}-#{curr_target_node.name}"] # _.findWhere links, {source: curr_source_node, target: curr_target_node}
                 if l
                   l.rules.push r
                 else
                   # Source and target were previously found in two separate rules
-                  links.push {source: curr_source_node, target: curr_target_node, rules: [r]}
+                  linksMap["#{curr_source_node.policy}-#{curr_source_node.type}-#{curr_source_node.name}-#{curr_target_node.policy}-#{curr_target_node.type}-#{curr_target_node.name}"] = {source: curr_source_node, target: curr_target_node, rules: [r]}
 
-            generateLink(curr_perm_node, curr_object_node, new_perm_node, new_object_node, links)
-            generateLink(curr_subject_node, curr_perm_node, new_subject_node, new_perm_node, links)
-            generateLink(curr_object_node, curr_class_node, new_object_node, new_class_node, links)
-            generateLink(curr_perm_node, curr_class_node, new_perm_node, new_class_node, links)
+            generateLink(curr_perm_node, curr_object_node, new_perm_node, new_object_node, linksMap)
+            generateLink(curr_subject_node, curr_perm_node, new_subject_node, new_perm_node, linksMap)
+            generateLink(curr_object_node, curr_class_node, new_object_node, new_class_node, linksMap)
+            generateLink(curr_perm_node, curr_class_node, new_perm_node, new_class_node, linksMap)
 
         graph.links.length = 0
 
         primaryNodes = []
+        primaryNodeMap = {}
         comparisonNodes = []
-        nodesFromRules($scope.rules, IDEBackend.current_policy.id, primaryNodes, graph.links)
-        nodesFromRules(comparisonRules, comparisonPolicyId(), comparisonNodes, graph.links)
+        comparisonNodeMap = {}
+        linksMap = {}
+        nodesFromRules($scope.rules, IDEBackend.current_policy.id, primaryNodeMap, linksMap)
+        nodesFromRules(comparisonRules, comparisonPolicyId(), comparisonNodeMap, linksMap)
+
+        graph.links = d3.values linksMap
 
         # Reconcile the two lists of nodes
         # Loop over the primary nodes: if in comparison nodes
@@ -205,13 +214,15 @@ Enumerate the differences between the two policies
         # - set it to unselected
         # - push the comparison's rules onto the primary's (ignore duplicates)
         # - remove from comparisonNodes
+        primaryNodes = d3.values primaryNodeMap
         primaryNodes.forEach (node) ->
-          comparisonNode = _.findWhere(comparisonNodes, {type: node.type, name: node.name})
+          comparisonNode = comparisonNodeMap["#{node.type}-#{node.name}"] # _.findWhere(comparisonNodes, {type: node.type, name: node.name})
           if comparisonNode
             node.rules = _.uniq node.rules.concat(comparisonNode.rules)
             node.policy = "both"
             node.selected = false
-            comparisonNodes = _.without(comparisonNodes, comparisonNode)
+            #comparisonNodes = _.without(comparisonNodes, comparisonNode)
+            delete comparisonNodeMap["#{node.type}-#{node.name}"]
 
             # Rewire the links to use the "both" node instead of comparisonNode
             graph.links.forEach (l) ->
@@ -219,6 +230,8 @@ Enumerate the differences between the two policies
                 l.source = node
               if l.target == comparisonNode
                 l.target = node
+
+        comparisonNodes = d3.values comparisonNodeMap
 
         # Remove any duplicate links we may have generated by rewiring the links
         graph.links = _.uniq(graph.links, (l) -> return "#{l.source.policy}-#{l.source.type}-#{l.source.name}-#{l.target.policy}-#{l.target.type}-#{l.target.name}")
