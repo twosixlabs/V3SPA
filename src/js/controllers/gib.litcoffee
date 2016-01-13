@@ -256,8 +256,12 @@ Enumerate the differences between the two policies
         linkScale.domain d3.extent(graph.links, (l) -> return l.rules.length)
         
       $scope.selectionChange = () ->
-        d3.selectAll "g.node"
-          .classed "hidden-node", (d) -> !d.selected
+        #d3.selectAll "g.node"
+        #  .classed "hidden-node", (d) -> !d.selected
+
+        # TODO: Redraw the nodes of this type
+        # TODO: Redraw all the links
+        redraw()
 
       $scope.load = ->
         load_refpolicy($scope.input.refpolicy.id).then(fetch_raw).then(update)
@@ -336,7 +340,9 @@ Enumerate the differences between the two policies
 
       update = () ->
         find_differences()
+        redraw()
 
+      redraw = () ->
         $scope.policyIds =
           primary: IDEBackend.current_policy.id
           both: if comparisonPolicyId() then "both" else undefined
@@ -433,7 +439,7 @@ Enumerate the differences between the two policies
           node.remove()
 
           node = tuple.svg.selectAll ".node"
-            .data gridLayout(tuple.nodes)
+            .data gridLayout(tuple.nodes.filter (d) -> return d.selected)
             .attr "class", (d) -> "node t-#{d.type}-#{d.name}"
             .classed "hidden-node", (d) -> !d.selected
 
@@ -468,7 +474,7 @@ Enumerate the differences between the two policies
         link.remove()
 
         link = svg.select("g.links").selectAll ".link"
-          .data graph.links, (d,i) -> return "#{d.source.type}-#{d.source.name}-#{d.target.type}-#{d.target.name}"
+          .data graph.links.filter((d) -> return d.source.selected && d.target.selected), (d,i) -> return "#{d.source.type}-#{d.source.name}-#{d.target.type}-#{d.target.name}"
 
         link.enter().append "line"
           .attr "class", (d) -> "link l-#{d.source.type}-#{d.source.name}-#{d.target.type}-#{d.target.name}"
