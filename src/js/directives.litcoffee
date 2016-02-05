@@ -187,7 +187,11 @@ Set up editor sessions
             {{title}}
             <div ng-show="policyIds.primary">
               <small>{{policyIds.primary}}</small>
-              <div><small><a ng-click="selectAll(policyIds.primary)">all</a> | <a ng-click="selectNone(policyIds.primary)">none</a></small></div>
+              <div>
+                <small>
+                  <span ng-click="selectAll(policyIds.primary)" class="glyphicon glyphicon-check select-all" aria-hidden="true"></span> | <span ng-click="selectNone(policyIds.primary)" class="glyphicon glyphicon-unchecked select-all" aria-hidden="true"></span>
+                </small>
+              </div>
               <div style="height:85px; overflow-y:scroll; background:#f5f5f5; border:1px solid #ddd;">
                 <label ng-repeat="node in primaryNodes" style="text-overflow:ellipsis; white-space:nowrap; overflow:hidden; min-width:80px; max-width:100%;">
                   <input type="checkbox" ng-model="node.selected" ng-change="selectionChange()" style=""><small>{{node.name}}</small>
@@ -196,7 +200,11 @@ Set up editor sessions
             </div>
             <div ng-show="policyIds.both">
               <small>{{policyIds.both}}</small>
-              <div><small><a ng-click="selectAll(policyIds.both)">all</a> | <a ng-click="selectNone(policyIds.both)">none</a></small></div>
+              <div>
+                <small>
+                  <span ng-click="selectAll(policyIds.both)" class="glyphicon glyphicon-check select-all" aria-hidden="true"></span> | <span ng-click="selectNone(policyIds.both)" class="glyphicon glyphicon-unchecked select-all" aria-hidden="true"></span>
+                </small>
+              </div>
               <div style="height:85px; overflow-y:scroll; background:#f5f5f5; border:1px solid #ddd;">
                 <label ng-repeat="node in bothNodes" style="text-overflow:ellipsis; white-space:nowrap; overflow:hidden; min-width:80px; max-width:100%;">
                   <input type="checkbox" ng-model="node.selected" ng-change="selectionChange()" style=""><small>{{node.name}}</small>
@@ -205,7 +213,11 @@ Set up editor sessions
             </div>
             <div ng-show="policyIds.comparison">
               <small>{{policyIds.comparison}}</small>
-              <div><small><a ng-click="selectAll(policyIds.comparison)">all</a> | <a ng-click="selectNone(policyIds.comparison)">none</a></small></div>
+              <div>
+                <small>
+                  <span ng-click="selectAll(policyIds.comparison)" class="glyphicon glyphicon-check select-all" aria-hidden="true"></span> | <span ng-click="selectNone(policyIds.comparison)" class="glyphicon glyphicon-unchecked select-all" aria-hidden="true"></span>
+                </small>
+              </div>
               <div style="height:85px; overflow-y:scroll; background:#f5f5f5; border:1px solid #ddd;">
                 <label ng-repeat="node in comparisonNodes" style="text-overflow:ellipsis; white-space:nowrap; overflow:hidden; min-width:80px; max-width:100%;">
                   <input type="checkbox" ng-model="node.selected" ng-change="selectionChange()" style=""><small>{{node.name}}</small>
