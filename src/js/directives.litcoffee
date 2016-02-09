@@ -186,51 +186,80 @@ Set up editor sessions
           <div>
             {{title}}
             <div ng-show="policyIds.primary">
-              <small>{{policyIds.primary}}</small>
-              <div>
-                <small>
-                  <span ng-click="selectAll(policyIds.primary)" class="glyphicon glyphicon-check select-all" aria-hidden="true"></span> | <span ng-click="selectNone(policyIds.primary)" class="glyphicon glyphicon-unchecked select-all" aria-hidden="true"></span>
-                </small>
+              <div class="small">
+                <div class="policy-name"><span>{{policyIds.primary}}</span></div>
+                <div class="selection-controls">
+                  <span ng-if="allChecked['primary']" ng-click="selectNone(policyIds.primary)" class="glyphicon glyphicon-check" aria-hidden="true"></span>
+                  <span ng-if="!allChecked['primary']" ng-click="selectAll(policyIds.primary)" class="glyphicon glyphicon-unchecked" aria-hidden="true"></span>
+                </div>
               </div>
-              <div style="height:85px; overflow-y:scroll; background:#f5f5f5; border:1px solid #ddd;">
-                <label ng-repeat="node in primaryNodes" style="text-overflow:ellipsis; white-space:nowrap; overflow:hidden; min-width:80px; max-width:100%;">
-                  <input type="checkbox" ng-model="node.selected" ng-change="selectionChange()" style=""><small>{{node.name}}</small>
+              <div class="selection-list">
+                <label ng-repeat="node in primaryNodes">
+                  <input type="checkbox" ng-model="node.selected" ng-change="selectionChange()">{{node.name}}
                 </label>
               </div>
             </div>
             <div ng-show="policyIds.both">
-              <small>{{policyIds.both}}</small>
-              <div>
-                <small>
-                  <span ng-click="selectAll(policyIds.both)" class="glyphicon glyphicon-check select-all" aria-hidden="true"></span> | <span ng-click="selectNone(policyIds.both)" class="glyphicon glyphicon-unchecked select-all" aria-hidden="true"></span>
-                </small>
+              <div class="small">
+                <div class="policy-name"><span>{{policyIds.both}}</span></div>
+                <div class="selection-controls">
+                  <span ng-if="allChecked['both']" ng-click="selectNone(policyIds.both)" class="glyphicon glyphicon-check" aria-hidden="true"></span>
+                  <span ng-if="!allChecked['both']" ng-click="selectAll(policyIds.both)" class="glyphicon glyphicon-unchecked" aria-hidden="true"></span>
+                </div>
               </div>
-              <div style="height:85px; overflow-y:scroll; background:#f5f5f5; border:1px solid #ddd;">
-                <label ng-repeat="node in bothNodes" style="text-overflow:ellipsis; white-space:nowrap; overflow:hidden; min-width:80px; max-width:100%;">
-                  <input type="checkbox" ng-model="node.selected" ng-change="selectionChange()" style=""><small>{{node.name}}</small>
+              <div class="selection-list">
+                <label ng-repeat="node in bothNodes">
+                  <input type="checkbox" ng-model="node.selected" ng-change="selectionChange()">{{node.name}}
                 </label>
               </div>
             </div>
             <div ng-show="policyIds.comparison">
-              <small>{{policyIds.comparison}}</small>
-              <div>
-                <small>
-                  <span ng-click="selectAll(policyIds.comparison)" class="glyphicon glyphicon-check select-all" aria-hidden="true"></span> | <span ng-click="selectNone(policyIds.comparison)" class="glyphicon glyphicon-unchecked select-all" aria-hidden="true"></span>
-                </small>
+              <div class="small">
+                <div class="policy-name"><span>{{policyIds.comparison}}</span></div>
+                <div class="selection-controls">
+                  <span ng-if="allChecked['comparison']" ng-click="selectNone(policyIds.comparison)" class="glyphicon glyphicon-check" aria-hidden="true"></span>
+                  <span ng-if="!allChecked['comparison']" ng-click="selectAll(policyIds.comparison)" class="glyphicon glyphicon-unchecked" aria-hidden="true"></span>
+                </div>
               </div>
-              <div style="height:85px; overflow-y:scroll; background:#f5f5f5; border:1px solid #ddd;">
-                <label ng-repeat="node in comparisonNodes" style="text-overflow:ellipsis; white-space:nowrap; overflow:hidden; min-width:80px; max-width:100%;">
-                  <input type="checkbox" ng-model="node.selected" ng-change="selectionChange()" style=""><small>{{node.name}}</small>
+              <div class="selection-list">
+                <label ng-repeat="node in comparisonNodes">
+                  <input type="checkbox" ng-model="node.selected" ng-change="selectionChange()">{{node.name}}
                 </label>
               </div>
             </div>
           </div>
         """
         link: (scope, element, attrs) ->
+          deregistrationArr = []
+          scope.allChecked =
+            primary: false,
+            both: false,
+            comparison: false
+
+          setupNodeWatch = (nodeList, policy) ->
+            scope.$watch(
+              ((scope) ->
+                nodeList.map (n) -> n.selected
+              ),
+              ((newVal, oldVal) ->
+                scope.allChecked[policy] = newVal.reduce ((prevVal, currSelected) -> prevVal && currSelected), true
+              ), true)
+
           update = (newVal, oldVal) ->
+            deregistration() while (deregistration = deregistrationArr.pop())
+
+            scope.allChecked =
+              primary: false,
+              both: false,
+              comparison: false
+
             scope.primaryNodes = scope.nodes.filter (n) -> n.policy == scope.policyIds.primary
             scope.bothNodes = scope.nodes.filter (n) -> n.policy == scope.policyIds.both
             scope.comparisonNodes = scope.nodes.filter (n) -> n.policy == scope.policyIds.comparison
+
+            deregistrationArr.push setupNodeWatch(scope.primaryNodes, "primary")
+            deregistrationArr.push setupNodeWatch(scope.bothNodes, "both")
+            deregistrationArr.push setupNodeWatch(scope.comparisonNodes, "comparison")
           
           scope.$watch 'nodes', update
           scope.$watch 'policyIds', update
@@ -238,19 +267,27 @@ Set up editor sessions
           scope.selectAll = (policyId) ->
             if policyId == scope.policyIds.primary
               nodes = scope.primaryNodes
+              scope.allChecked['primary'] = true
             else if policyId == scope.policyIds.both
               nodes = scope.bothNodes
-            else nodes = scope.comparisonNodes
+              scope.allChecked['both'] = true
+            else
+              scope.allChecked['comparison'] = true
+              nodes = scope.comparisonNodes
             nodes.forEach (n) ->
               n.selected = true
             scope.selectionChange()
 
           scope.selectNone = (policyId) ->
             if policyId == scope.policyIds.primary
+              scope.allChecked['primary'] = false
               nodes = scope.primaryNodes
             else if policyId == scope.policyIds.both
+              scope.allChecked['both'] = false
               nodes = scope.bothNodes
-            else nodes = scope.comparisonNodes
+            else
+              scope.allChecked['comparison'] = false
+              nodes = scope.comparisonNodes
             nodes.forEach (n) ->
               n.selected = false
             scope.selectionChange()
