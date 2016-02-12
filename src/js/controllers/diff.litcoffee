@@ -1,6 +1,6 @@
     vespaControllers = angular.module('vespaControllers')
 
-    vespaControllers.controller 'gibCtrl', ($scope, VespaLogger,
+    vespaControllers.controller 'diffCtrl', ($scope, VespaLogger,
         IDEBackend, $timeout, $modal, PositionManager, RefPolicy, $q, SockJSService) ->
 
       comparisonPolicy = null
@@ -239,7 +239,7 @@ Enumerate the differences between the two policies
         permNodes: []
       $scope.graph = graph
       color = d3.scale.category10()
-      svg = d3.select("svg.gibview").select("g.viewer")
+      svg = d3.select("svg.diffview").select("g.viewer")
       subjSvg = svg.select("g.subjects").attr("transform", "translate(0,0)")
       permSvg = svg.select("g.permissions").attr("transform", "translate(#{width+padding},0)")
       objSvg = svg.select("g.objects").attr("transform", "translate(#{2*(width+padding)},-#{height/2})")
@@ -511,7 +511,7 @@ Set up the viewport scroll
       )
 
       svgPanZoom.init
-        selector: '#surface svg.gibview'
+        selector: '#surface svg.diffview'
         panEnabled: true
         zoomEnabled: true
         dragEnabled: false
@@ -528,7 +528,7 @@ Set up the viewport scroll
         (newv, oldv) ->
           if not newv? or _.keys(newv).length == 0
             return
-          g = svgPanZoom.getSVGViewport($("#surface svg.gibview")[0])
+          g = svgPanZoom.getSVGViewport($("#surface svg.diffview")[0])
           svgPanZoom.set_transform(g, newv)
       )
 

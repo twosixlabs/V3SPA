@@ -284,8 +284,8 @@ Watch the view control and switch the editor session
             $location.path('/tl_explore')
           else if value =='raw'
             $location.path('/raw')
-          else if value =='gib'
-            $location.path('/gib')
+          else if value =='diff'
+            $location.path('/diff')
           else
             console.error("Invalid visualizer type")
 

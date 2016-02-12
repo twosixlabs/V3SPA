@@ -33,9 +33,9 @@
             templateUrl: 'partials/raw.html',
             controller: 'rawCtrl'
 
-          .when '/gib',
-            templateUrl: 'partials/gib.html',
-            controller: 'gibCtrl'
+          .when '/diff',
+            templateUrl: 'partials/diff.html',
+            controller: 'diffCtrl'
 
           .otherwise 
             redirectTo: '/tl_explore'
