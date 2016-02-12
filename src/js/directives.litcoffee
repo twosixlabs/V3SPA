@@ -182,53 +182,7 @@ Set up editor sessions
           nodes: '='
           title: '@'
           selectionChange: '&'
-        template: """
-          <div>
-            {{title}}
-            <div ng-show="policyIds.primary">
-              <div class="small">
-                <div class="policy-name"><span>{{policyIds.primary}}</span></div>
-                <div class="selection-controls">
-                  <span ng-if="allChecked['primary']" ng-click="selectNone(policyIds.primary)" class="glyphicon glyphicon-check" aria-hidden="true"></span>
-                  <span ng-if="!allChecked['primary']" ng-click="selectAll(policyIds.primary)" class="glyphicon glyphicon-unchecked" aria-hidden="true"></span>
-                </div>
-              </div>
-              <div class="selection-list">
-                <label ng-repeat="node in primaryNodes">
-                  <input type="checkbox" ng-model="node.selected" ng-change="selectionChange()">{{node.name}}
-                </label>
-              </div>
-            </div>
-            <div ng-show="policyIds.both">
-              <div class="small">
-                <div class="policy-name"><span>{{policyIds.both}}</span></div>
-                <div class="selection-controls">
-                  <span ng-if="allChecked['both']" ng-click="selectNone(policyIds.both)" class="glyphicon glyphicon-check" aria-hidden="true"></span>
-                  <span ng-if="!allChecked['both']" ng-click="selectAll(policyIds.both)" class="glyphicon glyphicon-unchecked" aria-hidden="true"></span>
-                </div>
-              </div>
-              <div class="selection-list">
-                <label ng-repeat="node in bothNodes">
-                  <input type="checkbox" ng-model="node.selected" ng-change="selectionChange()">{{node.name}}
-                </label>
-              </div>
-            </div>
-            <div ng-show="policyIds.comparison">
-              <div class="small">
-                <div class="policy-name"><span>{{policyIds.comparison}}</span></div>
-                <div class="selection-controls">
-                  <span ng-if="allChecked['comparison']" ng-click="selectNone(policyIds.comparison)" class="glyphicon glyphicon-check" aria-hidden="true"></span>
-                  <span ng-if="!allChecked['comparison']" ng-click="selectAll(policyIds.comparison)" class="glyphicon glyphicon-unchecked" aria-hidden="true"></span>
-                </div>
-              </div>
-              <div class="selection-list">
-                <label ng-repeat="node in comparisonNodes">
-                  <input type="checkbox" ng-model="node.selected" ng-change="selectionChange()">{{node.name}}
-                </label>
-              </div>
-            </div>
-          </div>
-        """
+        templateUrl: 'partials/diff_controls.html'
         link: (scope, element, attrs) ->
           deregistrationArr = []
           scope.allChecked =
