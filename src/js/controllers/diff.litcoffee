@@ -168,12 +168,11 @@ Enumerate the differences between the two policies
         # - remove from comparisonNodes
         primaryNodes = d3.values primaryNodeMap
         primaryNodes.forEach (node) ->
-          comparisonNode = comparisonNodeMap["#{node.type}-#{node.name}"] # _.findWhere(comparisonNodes, {type: node.type, name: node.name})
+          comparisonNode = comparisonNodeMap["#{node.type}-#{node.name}"]
           if comparisonNode
             node.rules = _.uniq node.rules.concat(comparisonNode.rules)
             node.policy = "both"
             node.selected = false
-            #comparisonNodes = _.without(comparisonNodes, comparisonNode)
             delete comparisonNodeMap["#{node.type}-#{node.name}"]
 
             # Rewire the links to use the "both" node instead of comparisonNode
@@ -190,10 +189,10 @@ Enumerate the differences between the two policies
 
         allNodes = primaryNodes.concat comparisonNodes
 
-        graph.subjNodes = [] # allNodes.filter (d) -> d.type == "subject"
-        graph.objNodes = [] # allNodes.filter (d) -> d.type == "object"
-        graph.classNodes = [] # allNodes.filter (d) -> d.type == "class"
-        graph.permNodes = [] # allNodes.filter (d) -> d.type == "perm"
+        graph.subjNodes = []
+        graph.objNodes = []
+        graph.classNodes = []
+        graph.permNodes = []
 
         allNodes.forEach (n) ->
           if n.type == "subject"
