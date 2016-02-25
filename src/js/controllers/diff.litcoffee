@@ -14,6 +14,9 @@
       comparisonPolicyId = () ->
         if comparisonPolicy then comparisonPolicy.id else ""
 
+      primaryPolicyId = () ->
+        if IDEBackend.current_policy then IDEBackend.current_policy.id else ""
+
 Get the raw JSON
 
       fetch_raw = ->
@@ -94,7 +97,6 @@ Enumerate the differences between the two policies
             new_subject_node = new_object_node = new_class_node = new_perm_node = undefined
 
             # Find existing node if it exists
-            # TODO: use a map to look up nodes instead of a linear search over the array
             curr_subject_node = nodeMap["subject-#{r.subject}"] # _.findWhere(nodes, {type: "subject", name: r.subject})
             curr_object_node = nodeMap["object-#{r.object}"] # _.findWhere(nodes, {type: "object", name: r.object})
             curr_class_node = nodeMap["class-#{r.class}"] # _.findWhere(nodes, {type: "class", name: r.class})
@@ -105,44 +107,57 @@ Enumerate the differences between the two policies
               curr_subject_node.rules.push r
             else
               new_subject_node = createNode("subject", r.subject, [r], policyid, true)
-              #nodes.push new_subject_node
               nodeMap["subject-#{r.subject}"] = new_subject_node
             if curr_object_node
               curr_object_node.rules.push r
             else
               new_object_node = createNode("object", r.object, [r], policyid, true)
-              #nodes.push new_object_node
               nodeMap["object-#{r.object}"] = new_object_node
             if curr_class_node
               curr_class_node.rules.push r
             else
               new_class_node = createNode("class", r.class, [r], policyid, true)
-              #nodes.push new_class_node
               nodeMap["class-#{r.class}"] = new_class_node
             if curr_perm_node
               curr_perm_node.rules.push r
             else
               new_perm_node = createNode("perm", r.perm, [r], policyid, true)
-              #nodes.push new_perm_node
               nodeMap["perm-#{r.perm}"] = new_perm_node
 
             # Generate links
             generateLink = (curr_source_node, curr_target_node, new_source_node, new_target_node, linksMap) ->
               if curr_source_node and !curr_target_node
-                linksMap["#{curr_source_node.policy}-#{curr_source_node.type}-#{curr_source_node.name}-#{new_target_node.policy}-#{new_target_node.type}-#{new_target_node.name}"] = {source: curr_source_node, target: new_target_node, rules: [new_target_node.rules]}
+                source = curr_source_node
+                target = new_target_node
+                link = {source: source, target: target, rules: [target.rules], policy: policyid}
+                linksMap["#{source.policy}-#{source.type}-#{source.name}-#{target.policy}-#{target.type}-#{target.name}"] = link
               else if !curr_source_node and curr_target_node
-                linksMap["#{new_source_node.policy}-#{new_source_node.type}-#{new_source_node.name}-#{curr_target_node.policy}-#{curr_target_node.type}-#{curr_target_node.name}"] = {source: new_source_node, target: curr_target_node, rules: [new_source_node.rules]}
+                source = new_source_node
+                target = curr_target_node
+                link = {source: source, target: target, rules: [source.rules], policy: policyid}
+                linksMap["#{source.policy}-#{source.type}-#{source.name}-#{target.policy}-#{target.type}-#{target.name}"] = link
               else if !curr_source_node and !curr_target_node
-                linksMap["#{new_source_node.policy}-#{new_source_node.type}-#{new_source_node.name}-#{new_target_node.policy}-#{new_target_node.type}-#{new_target_node.name}"] = {source: new_source_node, target: new_target_node, rules: [new_source_node.rules]}
+                source = new_source_node
+                target = new_target_node
+                link = {source: source, target: target, rules: [source.rules], policy: policyid}
+                linksMap["#{source.policy}-#{source.type}-#{source.name}-#{target.policy}-#{target.type}-#{target.name}"] = link
               else
-                # TODO: Use a map for lookups instead of doing a linear search over the array
-                l = linksMap["#{curr_source_node.policy}-#{curr_source_node.type}-#{curr_source_node.name}-#{curr_target_node.policy}-#{curr_target_node.type}-#{curr_target_node.name}"] # _.findWhere links, {source: curr_source_node, target: curr_target_node}
-                if l
-                  l.rules.push r
+                source = curr_source_node
+                target = curr_target_node
+                link = linksMap["#{source.policy}-#{source.type}-#{source.name}-#{target.policy}-#{target.type}-#{target.name}"]
+
+                if link
+                  link.rules.push r
+
+                  # If this link is from the other policy, mark it as both
+                  if link.policy != policyid and link.policy != 'both'
+                    link.policy = 'both'
                 else
                   # Source and target were previously found in two separate rules
-                  linksMap["#{curr_source_node.policy}-#{curr_source_node.type}-#{curr_source_node.name}-#{curr_target_node.policy}-#{curr_target_node.type}-#{curr_target_node.name}"] = {source: curr_source_node, target: curr_target_node, rules: [r]}
+                  link = {source: source, target: target, rules: [r], policy: policyid}
+                  linksMap["#{source.policy}-#{source.type}-#{source.name}-#{target.policy}-#{target.type}-#{target.name}"] = link
 
+            # Generate the list of links separately for each policy, so we know which link is in which policy
             generateLink(curr_perm_node, curr_object_node, new_perm_node, new_object_node, linksMap)
             generateLink(curr_subject_node, curr_perm_node, new_subject_node, new_perm_node, linksMap)
             generateLink(curr_object_node, curr_class_node, new_object_node, new_class_node, linksMap)
@@ -155,7 +170,7 @@ Enumerate the differences between the two policies
         comparisonNodes = []
         comparisonNodeMap = {}
         linksMap = {}
-        nodesFromRules($scope.rules, IDEBackend.current_policy.id, primaryNodeMap, linksMap)
+        nodesFromRules($scope.rules, primaryPolicyId(), primaryNodeMap, linksMap)
         nodesFromRules(comparisonRules, comparisonPolicyId(), comparisonNodeMap, linksMap)
 
         graph.links = d3.values linksMap
@@ -315,7 +330,7 @@ Enumerate the differences between the two policies
 
       redraw = () ->
         $scope.policyIds =
-          primary: IDEBackend.current_policy.id
+          primary: primaryPolicyId()
           both: if comparisonPolicyId() then "both" else undefined
           comparison: comparisonPolicyId() || undefined
 
@@ -427,7 +442,7 @@ Enumerate the differences between the two policies
 
           # Sort first by policy, then by name
           tuple.nodes.sort (a,b) ->
-            if (a.policy == IDEBackend.current_policy.id && a.policy != b.policy) || (a.policy == "both" && b.policy == comparisonPolicyId())
+            if (a.policy == primaryPolicyId() && a.policy != b.policy) || (a.policy == "both" && b.policy == comparisonPolicyId())
               return -1
             else if a.policy == b.policy
               return if a.name == b.name then 0 else if a.name < b.name then return -1 else return 1
@@ -460,7 +475,7 @@ Enumerate the differences between the two policies
             .attr "cx", 0
             .attr "cy", 0
             .attr "class", (d) ->
-              if d.policy == IDEBackend.current_policy.id
+              if d.policy == primaryPolicyId()
                 return "diff-left"
               else if d.policy == comparisonPolicyId()
                 return "diff-right"

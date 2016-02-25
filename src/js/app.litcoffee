@@ -29,16 +29,16 @@
             templateUrl: 'partials/tl_explore.html',
             controller: 'tlCtrl'
 
-          .when '/raw',
-            templateUrl: 'partials/raw.html',
-            controller: 'rawCtrl'
+          .when '/module_browser',
+            templateUrl: 'partials/module_browser.html',
+            controller: 'module_browserCtrl'
 
           .when '/diff',
             templateUrl: 'partials/diff.html',
             controller: 'diffCtrl'
 
           .otherwise 
-            redirectTo: '/tl_explore'
+            redirectTo: '/blah'
     ])
 
 Preload all of the templates that we're going to use.

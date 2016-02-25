@@ -4,7 +4,7 @@
 
 The main controller. avispa is a subcontroller.
 
-    vespaControllers.controller 'ideCtrl', ($scope, $rootScope, SockJSService, VespaLogger, $modal, AsyncFileReader, IDEBackend, $timeout, $location, RefPolicy) ->
+    vespaControllers.controller 'ideCtrl', ($scope, $rootScope, SockJSService, VespaLogger, $modal, AsyncFileReader, IDEBackend, $timeout, RefPolicy) ->
 
       $scope._ = _
 
@@ -82,9 +82,8 @@ The main controller. avispa is a subcontroller.
 
           $scope.setEditorTab($scope.view)
 
-      $scope.visualizer_type = 'tl_explore'
       $timeout ->
-        $scope.view = 'raw'
+        $scope.view = 'module_browser'
 
 This controls our editor visibility.
 
@@ -274,20 +273,6 @@ Watch the view control and switch the editor session
                 highlightActiveLine: true
                 highlightGutterLine: true
               editor.renderer.$cursorLayer.element.style.opacity=1
-
-        $scope.$watch 'visualizer_type', (value)->
-          if value == 'avispa'
-            $location.path('/avispa')
-          else if value =='hive'
-            $location.path('/hive')
-          else if value =='tl_explore'
-            $location.path('/tl_explore')
-          else if value =='raw'
-            $location.path('/raw')
-          else if value =='diff'
-            $location.path('/diff')
-          else
-            console.error("Invalid visualizer type")
 
 Ace needs a statically sized div to initialize, but we want it
 to be the full page, so make it so.

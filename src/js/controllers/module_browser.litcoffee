@@ -1,13 +1,13 @@
     vespaControllers = angular.module('vespaControllers')
 
-    vespaControllers.controller 'rawCtrl', ($scope, VespaLogger,
+    vespaControllers.controller 'module_browserCtrl', ($scope, VespaLogger,
         IDEBackend, $timeout, $modal, PositionManager, $q, SockJSService) ->
 
       barHeight = 20
       barWidth = 300
       duration = 400
       root = {}
-      svg = d3.select("svg.rawview").select("g.viewer")
+      svg = d3.select("svg.module_browserview").select("g.viewer")
       tree = d3.layout.tree()
         .nodeSize([0, 20])
 
@@ -48,7 +48,7 @@
 
         height = 500
 
-        d3.select("svg.rawview").transition()
+        d3.select("svg.module_browserview").transition()
           .duration(duration)
           .attr("height", height)
 

@@ -28,6 +28,15 @@
         <a ng-click='load_refpolicy()'>(switch)</a>
       </span>
       </p>
+      <ul class='nav navbar-nav'>
+        <li class='dropdown'>
+          <a href='#' id='visualizer-dropdown' class='dropdown-toggle' data-toggle='dropdown' role='button' aria-haspopup='true' aria-expanded='false'>Visualizer Type <span class='caret'></span></a>
+          <ul class='dropdown-menu'>
+            <li><a ng-click="visualizer_type = 'module_browser'">Modules</a></li>
+            <li><a ng-click="visualizer_type = 'diff'">Diff</a></li>
+          </ul>
+        </li>
+      </ul>
       <p class='navbar-right navbar-text small'> &copy;2014 <b>Invincea Labs</b> </p>
     </div>
     <div class='container-full' ng-controller='ideCtrl'>
@@ -86,18 +95,6 @@
                         </div>
                         <div class='horizontal-pad'></div>
                         <div class='clearfix'></div>
-                        <div class='row'>
-                          <div class='form-group'>
-                            <label class='control-label pad-right'>Visualizer Type</label>
-                            <div class='btn-group'>
-                              <button btn-radio="'tl_explore'" type='button' class='btn btn-sm btn-default' ng-model='visualizer_type'> Summary</button>
-                              <button btn-radio="'avispa'" type='button' class='btn btn-sm btn-default' active ng-model="visualizer_type">Structured</button>
-                              <button btn-radio="'hive'" type='button' class='btn btn-sm btn-default' ng-model='visualizer_type'> Hive</button>
-                              <button btn-radio="'raw'" type='button' class='btn btn-sm btn-default' ng-model='visualizer_type'> Raw</button>
-                              <button btn-radio="'diff'" type='button' class='btn btn-sm btn-default' ng-model='visualizer_type'> Diff</button>
-                            </div>
-                          </div>
-                        </div>
                         <div class='row'>
                           <div class='form-group'>
                             <label class='control-label pad-right'>Visibility</label>
