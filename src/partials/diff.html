@@ -3,7 +3,7 @@
     <div class='panel-body'>
       <div class="container diff-toolbox-container">
         <div class="row">
-          <div class="col-md-6">
+          <div class="col-xs-6">
             <div class="form-group">
               <small><strong>Select a comparison policy:</strong></small>
               <div ng-hide='uploading.status'>
@@ -18,7 +18,7 @@
                 class="btn btn-primary" ng-click='load()'>Load</button>
             </div>
           </div>
-          <div class="col-md-6">
+          <div class="col-xs-6">
             <div style="margin-left:40px">
               <small><strong>Legend</strong></small>
             </div>
@@ -51,10 +51,10 @@
           </div>
         </div>
         <div class="row node-controls">
-          <div class="col-md-3"><changed-nodes title="Subjects" policy-ids="policyIds" nodes="graph.subjNodes" selection-change="selectionChange()"></changed-nodes></div>
-          <div class="col-md-3"><changed-nodes title="Permissions" policy-ids="policyIds" nodes="graph.permNodes" selection-change="selectionChange()"></changed-nodes></div>
-          <div class="col-md-3"><changed-nodes title="Objects" policy-ids="policyIds" nodes="graph.objNodes" selection-change="selectionChange()"></changed-nodes></div>
-          <div class="col-md-3"><changed-nodes title="Classes" policy-ids="policyIds" nodes="graph.classNodes" selection-change="selectionChange()"></changed-nodes></div>
+          <div class="col-xs-3"><changed-nodes title="Subjects" policy-ids="policyIds" nodes="graph.subjNodes" selection-change="selectionChange()"></changed-nodes></div>
+          <div class="col-xs-3"><changed-nodes title="Permissions" policy-ids="policyIds" nodes="graph.permNodes" selection-change="selectionChange()"></changed-nodes></div>
+          <div class="col-xs-3"><changed-nodes title="Objects" policy-ids="policyIds" nodes="graph.objNodes" selection-change="selectionChange()"></changed-nodes></div>
+          <div class="col-xs-3"><changed-nodes title="Classes" policy-ids="policyIds" nodes="graph.classNodes" selection-change="selectionChange()"></changed-nodes></div>
         </div>
       </div>
     </div>
