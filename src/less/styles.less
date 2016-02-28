@@ -389,6 +389,25 @@ svg.hiveview {
   }
 }
 
+@media (min-width: 992px) {
+  .controls-container {
+    float: left;
+    width: 600px;
+  }
+
+  .viz-container {
+    float: left;
+    width: calc(~"100% - 600px");
+  }
+}
+
+.controls-container, .viz-container {
+  position: relative;
+  min-height: 1px;
+  padding-left: 2.5px;
+  padding-right: 2.5px;
+}
+
 .diff-toolbox-container {
   width: 500px;
 

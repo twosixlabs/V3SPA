@@ -1,69 +1,65 @@
-<editor></editor>
-<div ng-class="{'col-md-12': editorSize == 0,
-                      'col-md-8': editorSize == 1,
-                      'col-md-4': editorSize == 2}">
-  <div id='visualizer' auto-height='210' auto-height-type='offset_bottom_px'>
-    <div id='surface' class='row'>
-      <div class='toolbox panel panel-default'>
-        <div class='panel-body'>
-          <div class="container diff-toolbox-container">
-            <div class="row">
-              <div class="col-xs-6">
-                <div class="form-group">
-                  <small><strong>Select a comparison policy:</strong></small>
-                  <div ng-hide='uploading.status'>
-                  <input class='form-control' id='refPolicySelect'
-                    ui-select2='list_refpolicies'
-                    placeholder="Select existing reference policy"
-                    ng-model='input.refpolicy' type='hidden'/>
-                  </div>
-                </div>
-                <div class="form-group text-right">
-                  <button type="button" ng-disabled='!input.refpolicy'
-                    class="btn btn-primary" ng-click='load()'>Load</button>
-                </div>
-              </div>
-              <div class="col-xs-6">
-                <div style="margin-left:40px">
-                  <small><strong>Legend</strong></small>
-                </div>
-                <div style="margin-left:40px;">
-                <svg style="width:18px; height:18px; float:left">
-                  <g transform="scale(1.5,1.5)translate(1,1)">
-                    <circle cx="5" cy="5" r="5" style="stroke:#777; fill:#fff;" />
-                    <path d="M 5 2 L 2 5 L 5 8 M 2 5 L 9 5" fill="none" stroke="#666" stroke-width="2" />
-                  </g>
-                </svg>
-                <p style="margin-left:22px;">&nbsp;{{policyIds.primary}}</p>
-                </div>
-                <div style="margin-left:40px;">
-                <svg style="width:18px; height:18px; float:left">
-                  <g transform="scale(1.5,1.5)translate(1,1)">
-                    <circle cx="5" cy="5" r="5" style="stroke:#777; fill:#ddd;" />
-                  </g>
-                </svg>
-                <p style="margin-left:22px;">&nbsp;{{policyIds.both || '&lt;select comparison&gt;'}}</p>
-                </div>
-                <div style="margin-left:40px;">
-                <svg style="width:18px; height:18px; float:left">
-                  <g transform="scale(1.5,1.5)translate(1,1)">
-                    <circle cx="5" cy="5" r="5" style="stroke:#777; fill:#fff;" />
-                    <path d="M 5 2 L 8 5 L 5 8 M 8 5 L 1 5" fill="none" stroke="#666" stroke-width="2" />
-                  </g>
-                </svg>
-                <p style="margin-left:22px;">&nbsp;{{policyIds.comparison || '&lt;select comparison&gt;'}}</p>
-                </div>
-              </div>
-            </div>
-            <div class="row node-controls">
-              <div class="col-xs-3"><changed-nodes title="Subjects" policy-ids="policyIds" nodes="graph.subjNodes" selection-change="selectionChange()"></changed-nodes></div>
-              <div class="col-xs-3"><changed-nodes title="Permissions" policy-ids="policyIds" nodes="graph.permNodes" selection-change="selectionChange()"></changed-nodes></div>
-              <div class="col-xs-3"><changed-nodes title="Objects" policy-ids="policyIds" nodes="graph.objNodes" selection-change="selectionChange()"></changed-nodes></div>
-              <div class="col-xs-3"><changed-nodes title="Classes" policy-ids="policyIds" nodes="graph.classNodes" selection-change="selectionChange()"></changed-nodes></div>
-            </div>
+<editor>
+  <div class="diff-toolbox-container">
+    <div class="row">
+      <div class="col-xs-6">
+        <div class="form-group">
+          <small><strong>Select a comparison policy:</strong></small>
+          <div ng-hide='uploading.status'>
+          <input class='form-control' id='refPolicySelect'
+            ui-select2='list_refpolicies'
+            placeholder="Select existing reference policy"
+            ng-model='input.refpolicy' type='hidden'/>
           </div>
         </div>
+        <div class="form-group text-right">
+          <button type="button" ng-disabled='!input.refpolicy'
+            class="btn btn-primary" ng-click='load()'>Load</button>
+        </div>
       </div>
+      <div class="col-xs-6">
+        <div style="margin-left:40px">
+          <small><strong>Legend</strong></small>
+        </div>
+        <div style="margin-left:40px;">
+        <svg style="width:18px; height:18px; float:left">
+          <g transform="scale(1.5,1.5)translate(1,1)">
+            <circle cx="5" cy="5" r="5" style="stroke:#777; fill:#fff;" />
+            <path d="M 5 2 L 2 5 L 5 8 M 2 5 L 9 5" fill="none" stroke="#666" stroke-width="2" />
+          </g>
+        </svg>
+        <p style="margin-left:22px;">&nbsp;{{policyIds.primary}}</p>
+        </div>
+        <div style="margin-left:40px;">
+        <svg style="width:18px; height:18px; float:left">
+          <g transform="scale(1.5,1.5)translate(1,1)">
+            <circle cx="5" cy="5" r="5" style="stroke:#777; fill:#ddd;" />
+          </g>
+        </svg>
+        <p style="margin-left:22px;">&nbsp;{{policyIds.both || '&lt;select comparison&gt;'}}</p>
+        </div>
+        <div style="margin-left:40px;">
+        <svg style="width:18px; height:18px; float:left">
+          <g transform="scale(1.5,1.5)translate(1,1)">
+            <circle cx="5" cy="5" r="5" style="stroke:#777; fill:#fff;" />
+            <path d="M 5 2 L 8 5 L 5 8 M 8 5 L 1 5" fill="none" stroke="#666" stroke-width="2" />
+          </g>
+        </svg>
+        <p style="margin-left:22px;">&nbsp;{{policyIds.comparison || '&lt;select comparison&gt;'}}</p>
+        </div>
+      </div>
+    </div>
+    <div class="row node-controls">
+      <div class="col-xs-3"><changed-nodes title="Subjects" policy-ids="policyIds" nodes="graph.subjNodes" selection-change="selectionChange()"></changed-nodes></div>
+      <div class="col-xs-3"><changed-nodes title="Permissions" policy-ids="policyIds" nodes="graph.permNodes" selection-change="selectionChange()"></changed-nodes></div>
+      <div class="col-xs-3"><changed-nodes title="Objects" policy-ids="policyIds" nodes="graph.objNodes" selection-change="selectionChange()"></changed-nodes></div>
+      <div class="col-xs-3"><changed-nodes title="Classes" policy-ids="policyIds" nodes="graph.classNodes" selection-change="selectionChange()"></changed-nodes></div>
+    </div>
+  </div>
+</editor>
+<div ng-class="{'col-md-12': editorSize == 0,
+                      'viz-container': editorSize == 1}">
+  <div id='visualizer' auto-height='210' auto-height-type='offset_bottom_px'>
+    <div id='surface' class='row'>
       <svg xmlns="http://www.w3.org/2000/svg" class='diffview'>
         <defs>
           <pattern id="diff-left" x="0" y="0" width="10" height="10">
