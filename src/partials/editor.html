@@ -1,0 +1,45 @@
+<div ng-class="{'col-md-4': editorSize == 1,
+                'col-md-8': editorSize == 2
+  }" 
+  ng-show='editorSize > 0'>
+  <div class='editor-container'>
+    <div class='panel panel-default'>
+      <div class='panel-body'>
+        <div class='form-group'>
+          <div>
+            <div class='row'>
+              <div class='col-md-12'>
+                <div class='pull-right'>
+                  <a ng-click='resizeEditor("smaller")'>
+                    <span class='glyphicon glyphicon-arrow-left'></span>
+                  </a>
+                  <a ng-hide='editorSize > 1'
+                    ng-click="resizeEditor('larger')" >
+                    <span class='glyphicon glyphicon-arrow-right'></span>
+                  </a>
+                </div>
+                <span class='lead'>{{policy.id || "Editor"}}</span>
+              </div>
+            </div>
+            <div class='clearfix'></div>
+            <div class='row'>
+              <div class='col-md-8'>
+                <div class='row'>
+                  <div class='col-md-12 form-horizontal'>
+                    <input id='moduleSelect'
+                    ui-select2='raw_module_select2'
+                    ng-model='raw_view_selection' type='hidden'
+                    placeholder='View module files'
+                    ng-disabled='policy.modules == null' />
+                  </div>
+                </div>
+                <div class='horizontal-pad'></div>
+                <div class='clearfix'></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

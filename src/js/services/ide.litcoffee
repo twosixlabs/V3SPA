@@ -357,6 +357,10 @@ contents of @current_policy and get the parsed JSON
             @current_policy = refpolicy
             @current_policy.valid = true
 
+            # Adding this because raw views do not have editor, and therefore no document or text
+            # So need to manually trigger getting the raw json
+            @parse_raw()
+
             for hook in @hooks.policy_load
               hook(@current_policy)
 

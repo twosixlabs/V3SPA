@@ -1,7 +1,14 @@
-<div id='surface' class='row' 
-  ng-class="{'col-md-12': analysisPaneVisible, 'col-md-8': analysisPaneVisible}">
-  <svg xmlns="http://www.w3.org/2000/svg" class='module_browserview'>
-    <g class="viewer">
-    </g>
-  </svg>
+<editor></editor>
+<div ng-class="{'col-md-12': editorSize == 0,
+                      'col-md-8': editorSize == 1,
+                      'col-md-4': editorSize == 2}">
+  <div id='visualizer' auto-height='210' auto-height-type='offset_bottom_px'>
+    <div id='surface' class='row' 
+      ng-class="{'col-md-12': analysisPaneVisible, 'col-md-8': analysisPaneVisible}">
+      <svg xmlns="http://www.w3.org/2000/svg" class='module_browserview'>
+        <g class="viewer">
+        </g>
+      </svg>
+    </div>
+  </div>
 </div>

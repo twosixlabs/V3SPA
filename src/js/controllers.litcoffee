@@ -11,36 +11,6 @@ The main controller. avispa is a subcontroller.
       $scope.view_control = 
         unused_ports: false
 
-      $scope.$watch 'raw_view_selection', (newv, oldv)->
-        if newv
-          m = $modal.open
-            templateUrl: 'moduleViewModal.html'
-            controller: 'modal.view_module'
-            windowClass: 'super-large-modal'
-            resolve:
-              documents: ->
-                RefPolicy.fetch_module_files(newv.id)
-              module: ->
-                newv
-            size: 'lg'
-
-          m.result.finally ->
-            $scope.raw_view_selection = null
-
-        console.log newv
-
-      $scope.raw_module_select2 =
-        data: ->
-            unless $scope.policy?.modules
-              retval =
-                results: []
-            else 
-              retval = 
-                  results: _.map $scope.policy.modules, (v, k)->
-                      ret = 
-                        text: k
-                        id: k
-
       $scope.$watchCollection 'view_control', (new_collection)->
         for k, v of new_collection
           do (k, v)->
@@ -80,7 +50,8 @@ The main controller. avispa is a subcontroller.
 
               session.on('changeFold', onfold($scope.editorSessions[nm]))
 
-          $scope.setEditorTab($scope.view)
+          # There is no editor tab anymore
+          #$scope.setEditorTab($scope.view)
 
       $timeout ->
         $scope.view = 'module_browser'

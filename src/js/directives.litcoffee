@@ -1,4 +1,6 @@
-    v3spa = angular.module 'vespa.directives', []
+    v3spa = angular.module 'vespa.directives',
+        ['ui.ace', 'vespa.services', 'ui.bootstrap', 'ui.select2',
+        'angularFileUpload', 'vespa.directives']
 
     v3spa.filter 'join', ->
         return (input, separator)->
@@ -172,6 +174,49 @@ Set up editor sessions
 
 
       return ret
+
+    v3spa.directive 'editor', ['IDEBackend', 'RefPolicy', '$modal', (IDEBackend, RefPolicy, $modal) ->
+      ret =
+        restrict: 'E'
+        replace: true
+        templateUrl: 'partials/editor.html'
+        link:
+          pre: (scope, element, attrs) ->
+            scope.policy = IDEBackend.current_policy
+
+            IDEBackend.add_hook 'policy_load', (info)->
+              scope.policy = IDEBackend.current_policy
+
+            scope.$watch 'raw_view_selection', (newv, oldv)->
+              if newv
+                m = $modal.open
+                  templateUrl: 'moduleViewModal.html'
+                  controller: 'modal.view_module'
+                  windowClass: 'super-large-modal'
+                  resolve:
+                    documents: ->
+                      RefPolicy.fetch_module_files(newv.id)
+                    module: ->
+                      newv
+                  size: 'lg'
+
+                m.result.finally ->
+                  scope.raw_view_selection = null
+
+            scope.raw_module_select2 =
+              data: ->
+                  unless scope.policy?.modules
+                    retval =
+                      results: []
+                  else 
+                    retval = 
+                        results: _.map scope.policy.modules, (v, k)->
+                            ret = 
+                              text: k
+                              id: k
+
+      return ret
+      ]
 
     v3spa.directive 'changedNodes', ->
       ret =
