@@ -179,9 +179,12 @@ Set up editor sessions
       ret =
         restrict: 'E'
         replace: true
+        transclude: true
         templateUrl: 'partials/editor.html'
         link:
           pre: (scope, element, attrs) ->
+            # Assumes ideCtrl is the parent controller
+
             scope.policy = IDEBackend.current_policy
 
             IDEBackend.add_hook 'policy_load', (info)->
@@ -217,6 +220,23 @@ Set up editor sessions
 
       return ret
       ]
+
+    v3spa.directive 'moduleBrowserControls', ->
+      ret =
+        restrict: 'E'
+        replace: true
+        template: """
+                  <div class="row">
+                    <div class="form-group">
+                      <label class="control-label pad-right">Controls</label>
+                      <div class="btn-group" role="group">
+                        <button btn-radio="'collapse-all'" type="button" class="btn btn-sm btn-default ng-pristine ng-valid" ng-model="controls.collapse">Collapse all</button>
+                        <button btn-radio="'open-all'" type="button" class="btn btn-sm btn-default ng-valid ng-dirty active" ng-model="controls.collapse">Open all</button>
+                      </div>
+                    </div>
+                  </div>
+                  """
+      return ret
 
     v3spa.directive 'changedNodes', ->
       ret =

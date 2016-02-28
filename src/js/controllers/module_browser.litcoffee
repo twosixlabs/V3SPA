@@ -11,6 +11,33 @@
       tree = d3.layout.tree()
         .nodeSize([0, 20])
 
+      $scope.controls =
+        collapse: 'collapse-all'
+
+      collapseAll = (node) ->
+        if node.children
+          node._children = node.children
+          node.children = null
+          node._children.forEach collapseAll
+        if Array.isArray node._children
+          node._children.forEach collapseAll
+
+      openAll = (node) ->
+        if node._children
+          node.children = node._children
+          node._children = null
+          node.children.forEach openAll
+        if Array.isArray node.children
+          node.children.forEach openAll
+
+      $scope.$watch 'controls.collapse', (value)->
+        if value == 'collapse-all'
+          collapseAll(root)
+        else if value == 'open-all'
+          openAll(root)
+        if value and root.name
+          update(root)
+
       $scope.update_view = (data) ->
         $scope.policy = IDEBackend.current_policy
 
