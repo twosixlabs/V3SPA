@@ -19,11 +19,20 @@
         </div>
       </div>
     </div>
-    <div class="row node-controls">
+    <div class="row">
+      <ul class="nav nav-tabs">
+        <li role="presentation" ng-class="{'active': tab == 'nodesTab'}"><a href ng-click="tab = 'nodesTab'">Nodes</a></li>
+        <li role="presentation" ng-class="{'active': tab == 'linksTab'}"><a href ng-click="tab = 'linksTab'">Links</a></li>
+      </ul>
+    </div>
+    <div class="row node-controls" ng-show="tab == 'nodesTab'">
       <div class="col-xs-3"><changed-nodes title="Subjects" policy-ids="policyIds" nodes="graph.subjNodes" selection-change="selectionChange()"></changed-nodes></div>
       <div class="col-xs-3"><changed-nodes title="Permissions" policy-ids="policyIds" nodes="graph.permNodes" selection-change="selectionChange()"></changed-nodes></div>
       <div class="col-xs-3"><changed-nodes title="Objects" policy-ids="policyIds" nodes="graph.objNodes" selection-change="selectionChange()"></changed-nodes></div>
       <div class="col-xs-3"><changed-nodes title="Classes" policy-ids="policyIds" nodes="graph.classNodes" selection-change="selectionChange()"></changed-nodes></div>
+    </div>
+    <div class="row node-controls" ng-show="tab == 'linksTab'">
+      Links
     </div>
   </div>
 </editor>

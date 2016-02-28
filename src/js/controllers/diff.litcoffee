@@ -11,6 +11,8 @@
       # The 'outstanding' attribute is truthy when a policy is being loaded
       $scope.status = SockJSService.status
 
+      $scope.tab = 'nodesTab'
+
       comparisonPolicyId = () ->
         if comparisonPolicy then comparisonPolicy.id else ""
 
