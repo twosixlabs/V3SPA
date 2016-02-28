@@ -30,7 +30,7 @@
         if Array.isArray node.children
           node.children.forEach openAll
 
-      $scope.$watch 'controls.collapse', (value)->
+      $scope.collapse = (value) ->
         if value == 'collapse-all'
           collapseAll(root)
         else if value == 'open-all'

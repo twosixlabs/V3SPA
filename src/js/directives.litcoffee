@@ -230,8 +230,8 @@ Set up editor sessions
                     <div class="form-group">
                       <label class="control-label pad-right">Controls</label>
                       <div class="btn-group" role="group">
-                        <button btn-radio="'collapse-all'" type="button" class="btn btn-sm btn-default ng-pristine ng-valid" ng-model="controls.collapse">Collapse all</button>
-                        <button btn-radio="'open-all'" type="button" class="btn btn-sm btn-default ng-valid ng-dirty active" ng-model="controls.collapse">Open all</button>
+                        <button ng-click="collapse('collapse-all')" type="button" class="btn btn-sm btn-default">Collapse all</button>
+                        <button ng-click="collapse('open-all')" type="button" class="btn btn-sm btn-default">Open all</button>
                       </div>
                     </div>
                   </div>
