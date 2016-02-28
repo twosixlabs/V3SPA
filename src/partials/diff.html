@@ -1,9 +1,9 @@
 <editor>
   <div class="diff-toolbox-container">
+    <small><strong>Select a comparison policy:</strong></small>
     <div class="row">
-      <div class="col-xs-6">
+      <div class="col-xs-8">
         <div class="form-group">
-          <small><strong>Select a comparison policy:</strong></small>
           <div ng-hide='uploading.status'>
           <input class='form-control' id='refPolicySelect'
             ui-select2='list_refpolicies'
@@ -11,40 +11,11 @@
             ng-model='input.refpolicy' type='hidden'/>
           </div>
         </div>
-        <div class="form-group text-right">
+      </div>
+      <div class="col-xs-4">
+        <div class="form-group">
           <button type="button" ng-disabled='!input.refpolicy'
             class="btn btn-primary" ng-click='load()'>Load</button>
-        </div>
-      </div>
-      <div class="col-xs-6">
-        <div style="margin-left:40px">
-          <small><strong>Legend</strong></small>
-        </div>
-        <div style="margin-left:40px;">
-        <svg style="width:18px; height:18px; float:left">
-          <g transform="scale(1.5,1.5)translate(1,1)">
-            <circle cx="5" cy="5" r="5" style="stroke:#777; fill:#fff;" />
-            <path d="M 5 2 L 2 5 L 5 8 M 2 5 L 9 5" fill="none" stroke="#666" stroke-width="2" />
-          </g>
-        </svg>
-        <p style="margin-left:22px;">&nbsp;{{policyIds.primary}}</p>
-        </div>
-        <div style="margin-left:40px;">
-        <svg style="width:18px; height:18px; float:left">
-          <g transform="scale(1.5,1.5)translate(1,1)">
-            <circle cx="5" cy="5" r="5" style="stroke:#777; fill:#ddd;" />
-          </g>
-        </svg>
-        <p style="margin-left:22px;">&nbsp;{{policyIds.both || '&lt;select comparison&gt;'}}</p>
-        </div>
-        <div style="margin-left:40px;">
-        <svg style="width:18px; height:18px; float:left">
-          <g transform="scale(1.5,1.5)translate(1,1)">
-            <circle cx="5" cy="5" r="5" style="stroke:#777; fill:#fff;" />
-            <path d="M 5 2 L 8 5 L 5 8 M 8 5 L 1 5" fill="none" stroke="#666" stroke-width="2" />
-          </g>
-        </svg>
-        <p style="margin-left:22px;">&nbsp;{{policyIds.comparison || '&lt;select comparison&gt;'}}</p>
         </div>
       </div>
     </div>
@@ -60,6 +31,39 @@
                       'viz-container': editorSize == 1}">
   <div id='visualizer' auto-height='210' auto-height-type='offset_bottom_px'>
     <div id='surface' class='row'>
+      <div class='toolbox panel panel-default'>
+        <div class='panel-body'>
+          <div>
+            <small><strong>Legend</strong></small>
+          </div>
+          <div>
+            <svg style="width:18px; height:18px; float:left">
+              <g transform="scale(1.5,1.5)translate(1,1)">
+                <circle cx="5" cy="5" r="5" style="stroke:#777; fill:#fff;" />
+                <path d="M 5 2 L 2 5 L 5 8 M 2 5 L 9 5" fill="none" stroke="#666" stroke-width="2" />
+              </g>
+            </svg>
+            <p style="margin-left:22px;">&nbsp;{{policyIds.primary}}</p>
+          </div>
+          <div>
+            <svg style="width:18px; height:18px; float:left">
+              <g transform="scale(1.5,1.5)translate(1,1)">
+                <circle cx="5" cy="5" r="5" style="stroke:#777; fill:#ddd;" />
+              </g>
+            </svg>
+            <p style="margin-left:22px;">&nbsp;{{policyIds.both || '&lt;select comparison&gt;'}}</p>
+          </div>
+          <div>
+            <svg style="width:18px; height:18px; float:left">
+              <g transform="scale(1.5,1.5)translate(1,1)">
+                <circle cx="5" cy="5" r="5" style="stroke:#777; fill:#fff;" />
+                <path d="M 5 2 L 8 5 L 5 8 M 8 5 L 1 5" fill="none" stroke="#666" stroke-width="2" />
+              </g>
+            </svg>
+            <p style="margin-left:22px;">&nbsp;{{policyIds.comparison || '&lt;select comparison&gt;'}}</p>
+          </div>
+        </div>
+      </div>
       <svg xmlns="http://www.w3.org/2000/svg" class='diffview'>
         <defs>
           <pattern id="diff-left" x="0" y="0" width="10" height="10">
