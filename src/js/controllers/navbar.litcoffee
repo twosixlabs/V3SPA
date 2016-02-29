@@ -6,7 +6,7 @@
         #policy.then (policy)->
         #  $scope.refpolicy = policy
 
-        $scope.visualizer_type = 'module_browser'
+        $scope.visualizer_type = 'diff'
 
         $scope.$watch 'visualizer_type', (value)->
           if value == 'avispa'
