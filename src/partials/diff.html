@@ -33,28 +33,22 @@
     </div>
     <div class="row node-controls" ng-show="controls.tab == 'linksTab'">
       Only show links that are in:
-      <div class="radio">
+      <div class="checkbox">
         <label>
-          <input type="radio" name="linksRadio" id="linksRadio" value="primary" ng-model="controls.links" ng-disabled="!policyIds.primary">
+          <input type="checkbox" ng-model="controls.links.primary" ng-disabled="!policyIds.primary">
           {{policyIds.primary || '&lt;no ref policy selected&gt;'}}
         </label>
       </div>
-      <div class="radio">
+      <div class="checkbox">
         <label>
-          <input type="radio" name="linksRadio" id="linksRadio" value="both" ng-model="controls.links" ng-disabled="!policyIds.both">
+          <input type="checkbox" ng-model="controls.links.both" ng-disabled="!policyIds.both">
           {{policyIds.both || '&lt;no comparison policy selected&gt;'}}
         </label>
       </div>
-      <div class="radio">
+      <div class="checkbox">
         <label>
-          <input type="radio" name="linksRadio" id="linksRadio" value="comparison" ng-model="controls.links" ng-disabled="!policyIds.comparison">
+          <input type="checkbox" ng-model="controls.links.comparison" ng-disabled="!policyIds.comparison">
           {{policyIds.comparison || '&lt;no comparison policy selected&gt;'}}
-        </label>
-      </div>
-      <div class="radio">
-        <label>
-          <input type="radio" name="linksRadio" id="linksRadio" value="all" ng-model="controls.links">
-          All
         </label>
       </div>
     </div>

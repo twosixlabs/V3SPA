@@ -13,11 +13,12 @@
 
       $scope.controls =
         tab: 'nodesTab'
-        links: 'all'
+        links:
+          primary: true
+          both: true
+          comparison: true
 
-      $scope.$watch 'controls.links', (value) ->
-        if value
-          redraw()
+      $scope.$watch 'controls.links', ((value) -> if value then redraw()), true
 
       comparisonPolicyId = () ->
         if comparisonPolicy then comparisonPolicy.id else ""
@@ -501,8 +502,11 @@ Enumerate the differences between the two policies
         link = svg.select("g.links").selectAll ".link"
           .data graph.links.filter((d) ->
             policyFilter = true
-            if $scope.controls.links != 'all'
-              policyFilter = d.policy == $scope.policyIds[$scope.controls.links]
+            for type,id of $scope.policyIds
+              if id == d.policy
+                policyFilter = $scope.controls.links[type]
+            #if $scope.controls.links != 'all'
+            #  policyFilter = d.policy == $scope.policyIds[$scope.controls.links]
             return d.source.selected && d.target.selected && policyFilter
           ), (d,i) -> return "#{d.source.type}-#{d.source.name}-#{d.target.type}-#{d.target.name}"
 
