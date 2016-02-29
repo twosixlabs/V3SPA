@@ -64,8 +64,6 @@
         rules_root.x0 = 0
         rules_root.y0 = 0
 
-        console.log "New policy #{$scope.policy.id}"
-
         update(root = rules_root)
 
       update = (rules_root) ->

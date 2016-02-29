@@ -23,6 +23,7 @@
       <ul class="nav nav-tabs">
         <li role="presentation" ng-class="{'active': controls.tab == 'nodesTab'}"><a href ng-click="controls.tab = 'nodesTab'">Nodes</a></li>
         <li role="presentation" ng-class="{'active': controls.tab == 'linksTab'}"><a href ng-click="controls.tab = 'linksTab'">Links</a></li>
+        <li role="presentation" ng-class="{'active': controls.tab == 'detailsTab'}"><a href ng-click="controls.tab = 'detailsTab'">Details</a></li>
       </ul>
     </div>
     <div class="row node-controls" ng-show="controls.tab == 'nodesTab'">
@@ -51,6 +52,8 @@
           {{policyIds.comparison || '&lt;no comparison policy selected&gt;'}}
         </label>
       </div>
+    </div>
+    <div class="row node-controls" ng-show="controls.tab == 'linksTab'">
     </div>
   </div>
 </editor>
