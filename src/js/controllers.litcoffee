@@ -54,7 +54,7 @@ The main controller. avispa is a subcontroller.
           #$scope.setEditorTab($scope.view)
 
       $timeout ->
-        $scope.view = 'module_browser'
+        $scope.view = 'diff'
 
 This controls our editor visibility.
 
