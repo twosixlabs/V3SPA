@@ -11,7 +11,13 @@
       # The 'outstanding' attribute is truthy when a policy is being loaded
       $scope.status = SockJSService.status
 
-      $scope.tab = 'nodesTab'
+      $scope.controls =
+        tab: 'nodesTab'
+        links: 'all'
+
+      $scope.$watch 'controls.links', (value) ->
+        if value
+          redraw()
 
       comparisonPolicyId = () ->
         if comparisonPolicy then comparisonPolicy.id else ""
@@ -99,10 +105,10 @@ Enumerate the differences between the two policies
             new_subject_node = new_object_node = new_class_node = new_perm_node = undefined
 
             # Find existing node if it exists
-            curr_subject_node = nodeMap["subject-#{r.subject}"] # _.findWhere(nodes, {type: "subject", name: r.subject})
-            curr_object_node = nodeMap["object-#{r.object}"] # _.findWhere(nodes, {type: "object", name: r.object})
-            curr_class_node = nodeMap["class-#{r.class}"] # _.findWhere(nodes, {type: "class", name: r.class})
-            curr_perm_node = nodeMap["perm-#{r.perm}"] # _.findWhere(nodes, {type: "perm", name: r.perm})
+            curr_subject_node = nodeMap["subject-#{r.subject}"]
+            curr_object_node = nodeMap["object-#{r.object}"]
+            curr_class_node = nodeMap["class-#{r.class}"]
+            curr_perm_node = nodeMap["perm-#{r.perm}"]
 
             # If node exists then update it, else create a new one
             if curr_subject_node
@@ -132,21 +138,21 @@ Enumerate the differences between the two policies
                 source = curr_source_node
                 target = new_target_node
                 link = {source: source, target: target, rules: [target.rules], policy: policyid}
-                linksMap["#{source.policy}-#{source.type}-#{source.name}-#{target.policy}-#{target.type}-#{target.name}"] = link
+                linksMap["#{source.type}-#{source.name}-#{target.type}-#{target.name}"] = link
               else if !curr_source_node and curr_target_node
                 source = new_source_node
                 target = curr_target_node
                 link = {source: source, target: target, rules: [source.rules], policy: policyid}
-                linksMap["#{source.policy}-#{source.type}-#{source.name}-#{target.policy}-#{target.type}-#{target.name}"] = link
+                linksMap["#{source.type}-#{source.name}-#{target.type}-#{target.name}"] = link
               else if !curr_source_node and !curr_target_node
                 source = new_source_node
                 target = new_target_node
                 link = {source: source, target: target, rules: [source.rules], policy: policyid}
-                linksMap["#{source.policy}-#{source.type}-#{source.name}-#{target.policy}-#{target.type}-#{target.name}"] = link
+                linksMap["#{source.type}-#{source.name}-#{target.type}-#{target.name}"] = link
               else
                 source = curr_source_node
                 target = curr_target_node
-                link = linksMap["#{source.policy}-#{source.type}-#{source.name}-#{target.policy}-#{target.type}-#{target.name}"]
+                link = linksMap["#{source.type}-#{source.name}-#{target.type}-#{target.name}"]
 
                 if link
                   link.rules.push r
@@ -157,7 +163,7 @@ Enumerate the differences between the two policies
                 else
                   # Source and target were previously found in two separate rules
                   link = {source: source, target: target, rules: [r], policy: policyid}
-                  linksMap["#{source.policy}-#{source.type}-#{source.name}-#{target.policy}-#{target.type}-#{target.name}"] = link
+                  linksMap["#{source.type}-#{source.name}-#{target.type}-#{target.name}"] = link
 
             # Generate the list of links separately for each policy, so we know which link is in which policy
             generateLink(curr_perm_node, curr_object_node, new_perm_node, new_object_node, linksMap)
@@ -493,7 +499,12 @@ Enumerate the differences between the two policies
         link.remove()
 
         link = svg.select("g.links").selectAll ".link"
-          .data graph.links.filter((d) -> return d.source.selected && d.target.selected), (d,i) -> return "#{d.source.type}-#{d.source.name}-#{d.target.type}-#{d.target.name}"
+          .data graph.links.filter((d) ->
+            policyFilter = true
+            if $scope.controls.links != 'all'
+              policyFilter = d.policy == $scope.policyIds[$scope.controls.links]
+            return d.source.selected && d.target.selected && policyFilter
+          ), (d,i) -> return "#{d.source.type}-#{d.source.name}-#{d.target.type}-#{d.target.name}"
 
         link.enter().append "line"
           .attr "class", (d) -> "link l-#{d.source.type}-#{d.source.name}-#{d.target.type}-#{d.target.name}"

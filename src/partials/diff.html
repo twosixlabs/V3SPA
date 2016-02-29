@@ -21,18 +21,42 @@
     </div>
     <div class="row">
       <ul class="nav nav-tabs">
-        <li role="presentation" ng-class="{'active': tab == 'nodesTab'}"><a href ng-click="tab = 'nodesTab'">Nodes</a></li>
-        <li role="presentation" ng-class="{'active': tab == 'linksTab'}"><a href ng-click="tab = 'linksTab'">Links</a></li>
+        <li role="presentation" ng-class="{'active': controls.tab == 'nodesTab'}"><a href ng-click="controls.tab = 'nodesTab'">Nodes</a></li>
+        <li role="presentation" ng-class="{'active': controls.tab == 'linksTab'}"><a href ng-click="controls.tab = 'linksTab'">Links</a></li>
       </ul>
     </div>
-    <div class="row node-controls" ng-show="tab == 'nodesTab'">
+    <div class="row node-controls" ng-show="controls.tab == 'nodesTab'">
       <div class="col-xs-3"><changed-nodes title="Subjects" policy-ids="policyIds" nodes="graph.subjNodes" selection-change="selectionChange()"></changed-nodes></div>
       <div class="col-xs-3"><changed-nodes title="Permissions" policy-ids="policyIds" nodes="graph.permNodes" selection-change="selectionChange()"></changed-nodes></div>
       <div class="col-xs-3"><changed-nodes title="Objects" policy-ids="policyIds" nodes="graph.objNodes" selection-change="selectionChange()"></changed-nodes></div>
       <div class="col-xs-3"><changed-nodes title="Classes" policy-ids="policyIds" nodes="graph.classNodes" selection-change="selectionChange()"></changed-nodes></div>
     </div>
-    <div class="row node-controls" ng-show="tab == 'linksTab'">
-      Links
+    <div class="row node-controls" ng-show="controls.tab == 'linksTab'">
+      Only show links that are in:
+      <div class="radio">
+        <label>
+          <input type="radio" name="linksRadio" id="linksRadio" value="primary" ng-model="controls.links" ng-disabled="!policyIds.primary">
+          {{policyIds.primary || '&lt;no ref policy selected&gt;'}}
+        </label>
+      </div>
+      <div class="radio">
+        <label>
+          <input type="radio" name="linksRadio" id="linksRadio" value="both" ng-model="controls.links" ng-disabled="!policyIds.both">
+          {{policyIds.both || '&lt;no comparison policy selected&gt;'}}
+        </label>
+      </div>
+      <div class="radio">
+        <label>
+          <input type="radio" name="linksRadio" id="linksRadio" value="comparison" ng-model="controls.links" ng-disabled="!policyIds.comparison">
+          {{policyIds.comparison || '&lt;no comparison policy selected&gt;'}}
+        </label>
+      </div>
+      <div class="radio">
+        <label>
+          <input type="radio" name="linksRadio" id="linksRadio" value="all" ng-model="controls.links">
+          All
+        </label>
+      </div>
     </div>
   </div>
 </editor>
@@ -52,7 +76,7 @@
                 <path d="M 5 2 L 2 5 L 5 8 M 2 5 L 9 5" fill="none" stroke="#666" stroke-width="2" />
               </g>
             </svg>
-            <p style="margin-left:22px;">&nbsp;{{policyIds.primary}}</p>
+            <p style="margin-left:22px;">&nbsp;{{policyIds.primary || '&lt;load ref policy&gt;'}}</p>
           </div>
           <div>
             <svg style="width:18px; height:18px; float:left">
