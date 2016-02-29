@@ -54,9 +54,10 @@
       </div>
     </div>
     <div class="row node-controls" ng-show="controls.tab == 'detailsTab'">
-      <p ng-show="!clickedNode">Click a node to see its rules</p>
-      <div style="max-height:300px; overflow-y:scroll" ng-show="clickedNode">
-        <table class="table table-condensed" ng-show="clickedNode">
+      <div style="max-height:300px; overflow-y:scroll">
+        <table class="table table-condensed">
+          <caption ng-show="!clickedNode">Click a node to see its rules</caption>
+          <caption ng-show="clickedNode">Showing {{clickedNode.type}} {{clickedNode.name}}</caption>
           <thead>
             <tr>
               <th>Line</th>
