@@ -113,7 +113,7 @@ class RawDomain(object):
                                 for ot in obj_t.split(" "):
                                     for oc in obj_c.split(" "):
                                         for p in perms.split(" "):
-                                            row = {"subject":s, "object":ot, "class":oc, "perm":p, "module":modname}
+                                            row = {"subject":s, "object":ot, "class":oc, "perm":p, "module":modname, "line": line_num}
                                             row["directory"] = os.path.basename(os.path.dirname(f.name))
                                             row["rule"] = line.lstrip().rstrip('\n')
                                             table.append(row)
