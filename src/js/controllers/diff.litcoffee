@@ -144,17 +144,17 @@ Enumerate the differences between the two policies
               if curr_source_node and !curr_target_node
                 source = curr_source_node
                 target = new_target_node
-                link = {source: source, target: target, rules: [target.rules], policy: policyid}
+                link = {source: source, target: target, rules: _.uniq(target.rules.concat(source.rules)), policy: policyid}
                 linksMap["#{source.type}-#{source.name}-#{target.type}-#{target.name}"] = link
               else if !curr_source_node and curr_target_node
                 source = new_source_node
                 target = curr_target_node
-                link = {source: source, target: target, rules: [source.rules], policy: policyid}
+                link = {source: source, target: target, rules: _.uniq(target.rules.concat(source.rules)), policy: policyid}
                 linksMap["#{source.type}-#{source.name}-#{target.type}-#{target.name}"] = link
               else if !curr_source_node and !curr_target_node
                 source = new_source_node
                 target = new_target_node
-                link = {source: source, target: target, rules: [source.rules], policy: policyid}
+                link = {source: source, target: target, rules: _.uniq(target.rules.concat(source.rules)), policy: policyid}
                 linksMap["#{source.type}-#{source.name}-#{target.type}-#{target.name}"] = link
               else
                 source = curr_source_node
@@ -164,16 +164,11 @@ Enumerate the differences between the two policies
                 if link
                   if link.rules.indexOf(r) == -1
                     link.rules.push r
-
-                  # If this link is from the other policy, mark it as both
-                  if link.policy != policyid and link.policy != 'both'
-                    link.policy = 'both'
                 else
                   # Source and target were previously found in two separate rules
                   link = {source: source, target: target, rules: [r], policy: policyid}
                   linksMap["#{source.type}-#{source.name}-#{target.type}-#{target.name}"] = link
 
-            # Generate the list of links separately for each policy, so we know which link is in which policy
             generateLink(curr_perm_node, curr_object_node, new_perm_node, new_object_node, linksMap)
             generateLink(curr_subject_node, curr_perm_node, new_subject_node, new_perm_node, linksMap)
             generateLink(curr_object_node, curr_class_node, new_object_node, new_class_node, linksMap)
@@ -185,11 +180,26 @@ Enumerate the differences between the two policies
         primaryNodeMap = {}
         comparisonNodes = []
         comparisonNodeMap = {}
-        linksMap = {}
-        nodesFromRules($scope.rules, primaryPolicyId(), primaryNodeMap, linksMap)
-        nodesFromRules(comparisonRules, comparisonPolicyId(), comparisonNodeMap, linksMap)
+        primaryLinkMap = {}
+        comparisonLinkMap = {}
+        nodesFromRules($scope.rules, primaryPolicyId(), primaryNodeMap, primaryLinkMap)
+        nodesFromRules(comparisonRules, comparisonPolicyId(), comparisonNodeMap, comparisonLinkMap)
 
-        graph.links = d3.values linksMap
+        # Reconcile the two lists of links
+        # Loop over the primary links: if in comparison links
+        # - change "policy" to "both"
+        # - set it to unselected
+        # - push the comparison's rules onto the primary's (ignore duplicates)
+        # - remove from comparisonNodes
+        primaryLinks = d3.values primaryLinkMap
+        primaryLinks.forEach (link) ->
+          comparisonLink = comparisonLinkMap["#{link.source.type}-#{link.source.name}-#{link.target.type}-#{link.target.name}"]
+          if comparisonLink
+            link.rules = _.uniq link.rules.concat(comparisonLink.rules)
+            link.policy = "both"
+            delete comparisonLinkMap["#{link.source.type}-#{link.source.name}-#{link.target.type}-#{link.target.name}"]
+
+        graph.links = d3.values(comparisonLinkMap).concat(primaryLinks)
 
         # Reconcile the two lists of nodes
         # Loop over the primary nodes: if in comparison nodes
