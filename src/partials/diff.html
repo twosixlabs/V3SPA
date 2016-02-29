@@ -33,7 +33,13 @@
       <div class="col-xs-3"><changed-nodes title="Classes" policy-ids="policyIds" nodes="graph.classNodes" selection-change="selectionChange()"></changed-nodes></div>
     </div>
     <div class="row node-controls" ng-show="controls.tab == 'linksTab'">
-      Only show links that are in:
+      <div class="checkbox">
+        <label>
+          <input type="checkbox" ng-model="controls.linksVisible">
+          Links are always visible
+        </label>
+      </div>
+      <strong>Only show links that are in:</strong>
       <div class="checkbox">
         <label>
           <input type="checkbox" ng-model="controls.links.primary" ng-disabled="!policyIds.primary">

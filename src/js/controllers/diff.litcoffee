@@ -13,12 +13,14 @@
 
       $scope.controls =
         tab: 'nodesTab'
+        linksVisible: false
         links:
           primary: true
           both: true
           comparison: true
 
       $scope.$watch 'controls.links', ((value) -> if value then redraw()), true
+      $scope.$watch 'controls.linksVisible', ((value) -> if value == false or value == true then redraw())
 
       comparisonPolicyId = () ->
         if comparisonPolicy then comparisonPolicy.id else ""
@@ -439,6 +441,7 @@ Enumerate the differences between the two policies
 
             d3.selectAll linksToShow.map((link) -> "." + CSS.escape("l-#{link.source.type}-#{link.source.name}-#{link.target.type}-#{link.target.name}")).join ","
               .classed "highlight", true
+              .each () -> @.parentNode.appendChild(@)
 
           nodeMouseout = (d) ->
             link.classed "highlight", false
@@ -446,7 +449,6 @@ Enumerate the differences between the two policies
               .classed "highlight", false
 
           nodeClick = (clickedNode) ->
-            console.log clickedNode
             [uniqNodes, linksToShow] = getConnected(clickedNode)
             clicked = !clickedNode.clicked
 
@@ -561,6 +563,7 @@ Enumerate the differences between the two policies
             return d.target.x + offset
           .attr "y2", (d) -> return d.target.y - if d.target.type == "object" then height/2 else 0
           .classed "clicked", (d) -> d.source.clicked && d.target.clicked
+          .classed "visible", $scope.controls.linksVisible
 
         link.style "stroke-width", (d) -> return linkScale(d.rules.length)
 
