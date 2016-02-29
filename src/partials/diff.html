@@ -6,6 +6,7 @@
         <div class="form-group">
           <div ng-hide='uploading.status'>
           <input class='form-control' id='refPolicySelect'
+            ng-disabled="!policyIds.primary"
             ui-select2='list_refpolicies'
             placeholder="Select existing reference policy"
             ng-model='input.refpolicy' type='hidden'/>
