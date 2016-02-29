@@ -1,5 +1,6 @@
     #= include ../../external/avispa/src/avispa.litcoffee
 
+    #= require filters.litcoffee
     #= require directives.litcoffee
     #= require services/main.litcoffee
     #= require services/ide.litcoffee

@@ -105,6 +105,8 @@ Enumerate the differences between the two policies
           rules.forEach (r) ->
             new_subject_node = new_object_node = new_class_node = new_perm_node = undefined
 
+            r.policy = policyid
+
             # Find existing node if it exists
             curr_subject_node = nodeMap["subject-#{r.subject}"]
             curr_object_node = nodeMap["object-#{r.object}"]
@@ -113,22 +115,26 @@ Enumerate the differences between the two policies
 
             # If node exists then update it, else create a new one
             if curr_subject_node
-              curr_subject_node.rules.push r
+              if curr_subject_node.rules.indexOf(r) == -1
+                curr_subject_node.rules.push r
             else
               new_subject_node = createNode("subject", r.subject, [r], policyid, true)
               nodeMap["subject-#{r.subject}"] = new_subject_node
             if curr_object_node
-              curr_object_node.rules.push r
+              if curr_object_node.rules.indexOf(r) == -1
+                curr_object_node.rules.push r
             else
               new_object_node = createNode("object", r.object, [r], policyid, true)
               nodeMap["object-#{r.object}"] = new_object_node
             if curr_class_node
-              curr_class_node.rules.push r
+              if curr_class_node.rules.indexOf(r) == -1
+                curr_class_node.rules.push r
             else
               new_class_node = createNode("class", r.class, [r], policyid, true)
               nodeMap["class-#{r.class}"] = new_class_node
             if curr_perm_node
-              curr_perm_node.rules.push r
+              if curr_perm_node.rules.indexOf(r) == -1
+                curr_perm_node.rules.push r
             else
               new_perm_node = createNode("perm", r.perm, [r], policyid, true)
               nodeMap["perm-#{r.perm}"] = new_perm_node
@@ -156,7 +162,8 @@ Enumerate the differences between the two policies
                 link = linksMap["#{source.type}-#{source.name}-#{target.type}-#{target.name}"]
 
                 if link
-                  link.rules.push r
+                  if link.rules.indexOf(r) == -1
+                    link.rules.push r
 
                   # If this link is from the other policy, mark it as both
                   if link.policy != policyid and link.policy != 'both'
@@ -336,6 +343,7 @@ Enumerate the differences between the two policies
 
       update = () ->
         find_differences()
+        $scope.clickedNode = null
         redraw()
 
       redraw = () ->
@@ -428,8 +436,15 @@ Enumerate the differences between the two policies
               .classed "highlight", false
 
           nodeClick = (clickedNode) ->
+            console.log clickedNode
             [uniqNodes, linksToShow] = getConnected(clickedNode)
             clicked = !clickedNode.clicked
+
+            if clicked
+              $scope.clickedNode = clickedNode
+            else
+              $scope.clickedNode = null
+            if !$scope.$$phase then $scope.$apply()
 
             changedNodes = graph.allNodes.filter (n) -> return n.clicked
             changedLinks = graph.links.filter (l) -> return l.source.clicked && l.target.clicked
