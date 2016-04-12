@@ -238,6 +238,22 @@ Set up editor sessions
                   """
       return ret
 
+    v3spa.directive 'modulesListInput', ->
+      ret =
+        restrict: 'E'
+        replace: true
+        scope:
+          module: '='
+          moduleClick: '&'
+        template: '<input type="checkbox" ng-model="module.selected" ng-change="moduleClick()">'
+        link: (scope, element, attrs) ->
+          scope.$watch 'module.indeterminate', (newVal, oldVal) ->
+            if newVal == true
+              $(element).prop('indeterminate', true)
+            else if newVal == false
+              $(element).prop('indeterminate', false)
+      return ret
+
     v3spa.directive 'changedNodes', ->
       ret =
         restrict: 'E'

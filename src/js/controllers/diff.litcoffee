@@ -13,6 +13,7 @@
       $scope.status = SockJSService.status
 
       $scope.controls =
+        allModulesChecked: true
         tab: 'nodesTab'
         linksVisible: false
         links:
@@ -234,7 +235,7 @@ Enumerate the differences between the two policies
           else
             modules[rule.module] = rule.policy
           return modules
-          ), {})).map((module) -> return {module: module.key, policy: module.value, selected: true})
+          ), {})).map((module) -> return {module: module.key, policy: module.value, selected: true, indeterminate: false})
 
         comparisonNodes = d3.values comparisonNodeMap
 
@@ -261,19 +262,51 @@ Enumerate the differences between the two policies
         linkScale.domain d3.extent(graph.links, (l) -> return l.rules.length)
 
       $scope.moduleClick = (module) ->
-        uncheckedModules = $scope.modules.filter((mod) -> return !mod.selected).map((mod) -> return mod.module)
-        # Set all node.selected = module.selected for all nodes
+        checkedModules = $scope.modules.filter((mod) -> return mod.selected).map((mod) -> return mod.module)
+        # Set node.selected = false if any modules for that node are unselected
         graph.allNodes.forEach (n) ->
-          blockedRules = n.rules.filter((r) -> return uncheckedModules.indexOf(r.module) >= 0)
-          if blockedRules.length
-            n.selected = false
-            n.blockedModules = _.uniq blockedRules.map((r) -> return r.module)
-          else
+          selectedRules = n.rules.filter((r) -> return checkedModules.indexOf(r.module) >= 0)
+          if selectedRules.length
             n.selected = true
-            n.blockedModules = []
+          else
+            n.selected = false
+        redraw()
+
+      # Called from the select all/none checkbox
+      $scope.selectModulesClick = (val) ->
+        $scope.controls.allModulesChecked = val
+        $scope.modules.forEach (mod) ->
+          mod.selected = val
+          mod.indeterminate = false
+        graph.allNodes.forEach (n) ->
+          n.selected = val
         redraw()
         
       $scope.selectionChange = () ->
+        # A node has been checked/unchecked, so update which modules are checked
+        checked = {}
+        unchecked = {}
+        $scope.modules.forEach (m) ->
+          checked[m.module] = 0
+          unchecked[m.module] = 0
+        graph.allNodes.forEach (n) ->
+          status = n.selected
+          n.rules.forEach (r) ->
+            if status
+              checked[r.module]++
+            else
+              unchecked[r.module]++
+        $scope.modules.forEach (m) ->
+          if checked[m.module] > 0 and unchecked[m.module] > 0
+            m.indeterminate = true
+            m.selected = true
+          else if unchecked[m.module] > 0 # all unchecked
+            m.indeterminate = false
+            m.selected = false
+          else # checked[module] > 0
+            m.indeterminate = false
+            m.selected = true
+
         redraw()
 
       $scope.load = ->
@@ -380,6 +413,7 @@ Enumerate the differences between the two policies
       update = () ->
         find_differences()
         $scope.clickedNode = null
+        $scope.controls.allModulesChecked = true
         redraw()
 
       redraw = () ->
