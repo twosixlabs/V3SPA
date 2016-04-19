@@ -402,6 +402,22 @@ Enumerate the differences between the two policies
         .style textStyle
         .text "classes"
 
+      nodeExpand = (show, type, clickedNodeData) ->
+        nodeArr = graph.subjNodes
+        if type == 'perm'
+          nodeArr = graph.permNodes
+        else if type == 'object'
+          nodeArr = graph.objNodes
+        else if type == 'class'
+          nodeArr = graph.classNodes
+
+        nodeArr.forEach (n) ->
+          r = -1
+          while ++r < n.rules.length
+            if n.rules[r][clickedNodeData.type] == clickedNodeData.name
+              n.selected = show
+              break
+
       $scope.update_view = (data) ->
         $scope.policy = IDEBackend.current_policy
 
@@ -421,7 +437,6 @@ Enumerate the differences between the two policies
           primary: primaryPolicyId()
           both: if comparisonPolicyId() then "both" else undefined
           comparison: comparisonPolicyId() || undefined
-        console.log(graph)
 
         [
           {nodes: graph.subjNodes, svg: subjSvg},
@@ -588,6 +603,60 @@ Enumerate the differences between the two policies
             .on "click", nodeClick
 
           node.exit().remove()
+
+        genContextItems = (data) ->
+          menuItems = {}
+          if data.type != 'subject'
+            menuItems['show-subject'] =
+              label: 'Show connected subjects'
+              callback: ->
+                nodeExpand(true, 'subject', data)
+                redraw()
+            menuItems['hide-subject'] =
+              label: 'Hide connected subjects'
+              callback: ->
+                nodeExpand(false, 'subject', data)
+                redraw()
+          if data.type != 'object'
+            menuItems['show-object'] =
+              label: 'Show connected objects'
+              callback: ->
+                nodeExpand(true, 'object', data)
+                redraw()
+            menuItems['hide-object'] =
+              label: 'Hide connected objects'
+              callback: ->
+                nodeExpand(false, 'object', data)
+                redraw()
+          if data.type != 'perm'
+            menuItems['show-permission'] =
+              label: 'Show connected permissions'
+              callback: ->
+                nodeExpand(true, 'perm', data)
+                redraw()
+            menuItems['hide-permission'] =
+              label: 'Hide connected permissions'
+              callback: ->
+                nodeExpand(false, 'perm', data)
+                redraw()
+          if data.type != 'class'
+            menuItems['show-class'] =
+              label: 'Show connected classes'
+              callback: ->
+                nodeExpand(true, 'class', data)
+                redraw()
+            menuItems['hide-class'] =
+              label: 'Hide connected classes'
+              callback: ->
+                nodeExpand(false, 'class', data)
+                redraw()
+          return menuItems
+
+        d3.selectAll('.node circle').each (d) ->
+            context_items = genContextItems(d)
+            $(this).contextmenu
+              target: '#diff-context-menu'
+              items: context_items
 
         link = svg.select("g.links").selectAll ".link"
 
