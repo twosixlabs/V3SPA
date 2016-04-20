@@ -1,6 +1,5 @@
 import logging
 logger = logging.getLogger(__name__)
-
 import base64
 import itertools
 import os
@@ -12,6 +11,9 @@ import api.handlers.ws_domains as ws_domains
 import api
 
 import pprint
+import subprocess
+import IPython
+
 
 def iter_lines(fil_or_str):
   if isinstance(fil_or_str, (basestring)):
@@ -40,7 +42,7 @@ def read_module_files(module_data, limit=None, **addl_props):
   their data as a dictionary. """
 
   files = {}
-
+  
   if 'te_file' in module_data:
     with open(module_data['te_file']) as fin:
       info = os.fstat(fin.fileno())
@@ -121,8 +123,20 @@ class RefPolicy(restful.ResourceDomain):
             if 'documents' not in refpol:
                 refpol['documents'] = {}
             pprint.pprint(raw)
+
+
+            #
+            #  Parse policy binary using SESEARCH, then store result into 'TEXT' field
+            #  
+            #  RESULT IS EMPTY STRING "" on FAILURE. No exception, only logger warnings
+            # 
+            returned_sesearch_result = refpol.parse_policy_binary()
+
+
+
+
             refpol['documents']['raw'] = {
-                'text': raw['result'],
+                'text': returned_sesearch_result,
                 'mode': 'python',
                 'digest': hashlib.md5(raw['result']).hexdigest()
             }
@@ -136,6 +150,7 @@ class RefPolicy(restful.ResourceDomain):
 
 
         refpol.Insert()
+        
 
         # if refpol.documents is None or 'dsl' not in refpol.documents:
         #     logger.info("Missing DSL. Making service request")
@@ -314,6 +329,44 @@ class RefPolicy(restful.ResourceDomain):
                 }
 
         return modules
+    
+    def parse_policy_binary(self):
+        
+        policy_dir = os.path.join(
+            api.config.get('storage', 'bulk_storage_dir'),
+            'refpolicy', self['id'],'policy')
+
+        # regex for compatible policy versions
+        policy_binary_regex = "^policy\.(1[1-9]|2[0-9])$"
+        regex_compiled = re.compile(policy_binary_regex)
+
+        
+        # count number of regex matches
+        matches = 0
+        re_result = None
+        for fname in os.listdir(policy_dir):
+            re_match_result=re.match(policy_binary_regex,str(fname))
+            if re_match_result:
+                re_result = re_match_result
+                matches += 1
+
+        sesearch_result = ""
+
+        if matches > 1:
+            logger.warn("Too many binary policies") 
+            return sesearch_result
+        elif matches < 1:
+            logger.warn("Could not find compatible binary policy") 
+            return sesearch_result
+        
+        # perform sesearch if we have unique policy regex match
+        
+        policy_file = os.path.join(policy_dir,re_result.string)
+        policy_file = os.path.abspath(policy_file)
+        
+        sesearch_result = subprocess.check_output(["sesearch","--allow",policy_file])
+        
+        return sesearch_result
 
     def extract_zipped_policy(self):
         """ Validate that the uploaded file is actually a policy.
