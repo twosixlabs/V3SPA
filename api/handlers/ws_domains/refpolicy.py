@@ -138,7 +138,7 @@ class RefPolicy(restful.ResourceDomain):
             refpol['documents']['raw'] = {
                 'text': returned_sesearch_result,
                 'mode': 'python',
-                'digest': hashlib.md5(raw['result']).hexdigest()
+                'digest': hashlib.md5(returned_sesearch_result).hexdigest()
             }
 
             refpol.Insert()
