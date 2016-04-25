@@ -12,7 +12,6 @@ import api
 
 import pprint
 import subprocess
-import IPython
 
 
 def iter_lines(fil_or_str):
