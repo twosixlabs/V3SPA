@@ -430,14 +430,15 @@ Enumerate the differences between the two policies
         find_differences()
         $scope.clickedNode = null
         $scope.controls.allModulesChecked = true
-        redraw()
-
-      redraw = () ->
         $scope.policyIds =
           primary: primaryPolicyId()
           both: if comparisonPolicyId() then "both" else undefined
           comparison: comparisonPolicyId() || undefined
 
+        if $scope.policyIds.primary and $scope.policyIds.comparison
+          redraw()
+
+      redraw = () ->
         [
           {nodes: graph.subjNodes, svg: subjSvg},
           {nodes: graph.objNodes, svg: objSvg},
