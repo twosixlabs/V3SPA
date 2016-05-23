@@ -271,7 +271,9 @@ version of the policy.
               hide_unused_ports: if @view_control.unused_ports then false else true
 
 
+          console.log("MAKING THE CALL")
           @SockJSService.send req, (result)=>
+            console.log("HEAR ME")
             if result.error  # Service error
 
               $.growl(

@@ -93,102 +93,24 @@ Fetch the policy info (refpolicy) needed to get the raw JSON
 Enumerate the differences between the two policies
 
       find_differences = () =>
-        createNode = (type, name, rules, policy, selected) ->
-          return {
-            type: type
-            name: name
-            rules: rules
-            policy: policy
-            selected: selected
-            blockedModules: []
-          }
-
-        # Loop through each primary rule, getting the distinct subjects, objects, permissions, and classes
-        # Give each of them the type, name, rules, and policy attributes
-        # Set policy = primaryId
-        nodesFromRules = (rules, policyid, nodeMap, linksMap) ->
-          rules.forEach (r) ->
-            new_subject_node = new_object_node = new_class_node = new_perm_node = undefined
-
-            r.policy = policyid
-
-            # Find existing node if it exists
-            curr_subject_node = nodeMap["subject-#{r.subject}"]
-            curr_object_node = nodeMap["object-#{r.object}"]
-            curr_class_node = nodeMap["class-#{r.class}"]
-            curr_perm_node = nodeMap["perm-#{r.perm}"]
-
-            # If node exists then update it, else create a new one
-            if curr_subject_node
-              if curr_subject_node.rules.indexOf(r) == -1
-                curr_subject_node.rules.push r
-            else
-              new_subject_node = createNode("subject", r.subject, [r], policyid, true)
-              nodeMap["subject-#{r.subject}"] = new_subject_node
-            if curr_object_node
-              if curr_object_node.rules.indexOf(r) == -1
-                curr_object_node.rules.push r
-            else
-              new_object_node = createNode("object", r.object, [r], policyid, true)
-              nodeMap["object-#{r.object}"] = new_object_node
-            if curr_class_node
-              if curr_class_node.rules.indexOf(r) == -1
-                curr_class_node.rules.push r
-            else
-              new_class_node = createNode("class", r.class, [r], policyid, true)
-              nodeMap["class-#{r.class}"] = new_class_node
-            if curr_perm_node
-              if curr_perm_node.rules.indexOf(r) == -1
-                curr_perm_node.rules.push r
-            else
-              new_perm_node = createNode("perm", r.perm, [r], policyid, true)
-              nodeMap["perm-#{r.perm}"] = new_perm_node
-
-            # Generate links
-            generateLink = (curr_source_node, curr_target_node, new_source_node, new_target_node, linksMap) ->
-              if curr_source_node and !curr_target_node
-                source = curr_source_node
-                target = new_target_node
-                link = {source: source, target: target, rules: _.uniq(target.rules.concat(source.rules)), policy: policyid}
-                linksMap["#{source.type}-#{source.name}-#{target.type}-#{target.name}"] = link
-              else if !curr_source_node and curr_target_node
-                source = new_source_node
-                target = curr_target_node
-                link = {source: source, target: target, rules: _.uniq(target.rules.concat(source.rules)), policy: policyid}
-                linksMap["#{source.type}-#{source.name}-#{target.type}-#{target.name}"] = link
-              else if !curr_source_node and !curr_target_node
-                source = new_source_node
-                target = new_target_node
-                link = {source: source, target: target, rules: _.uniq(target.rules.concat(source.rules)), policy: policyid}
-                linksMap["#{source.type}-#{source.name}-#{target.type}-#{target.name}"] = link
-              else
-                source = curr_source_node
-                target = curr_target_node
-                link = linksMap["#{source.type}-#{source.name}-#{target.type}-#{target.name}"]
-
-                if link
-                  if link.rules.indexOf(r) == -1
-                    link.rules.push r
-                else
-                  # Source and target were previously found in two separate rules
-                  link = {source: source, target: target, rules: [r], policy: policyid}
-                  linksMap["#{source.type}-#{source.name}-#{target.type}-#{target.name}"] = link
-
-            generateLink(curr_perm_node, curr_object_node, new_perm_node, new_object_node, linksMap)
-            generateLink(curr_subject_node, curr_perm_node, new_subject_node, new_perm_node, linksMap)
-            generateLink(curr_object_node, curr_class_node, new_object_node, new_class_node, linksMap)
-            generateLink(curr_perm_node, curr_class_node, new_perm_node, new_class_node, linksMap)
-
         graph.links.length = 0
 
         primaryNodes = []
-        primaryNodeMap = {}
+        primaryNodeMap = $scope.nodeMap
         comparisonNodes = []
-        comparisonNodeMap = {}
-        primaryLinkMap = {}
-        comparisonLinkMap = {}
-        nodesFromRules($scope.rules, primaryPolicyId(), primaryNodeMap, primaryLinkMap)
-        nodesFromRules(comparisonRules, comparisonPolicyId(), comparisonNodeMap, comparisonLinkMap)
+        primaryLinkMap = $scope.linkMap
+
+        comparisonNodeMap = if comparisonPolicy?.json?.parameterized?.nodemap?
+          comparisonNodeMap = data.parameterized.nodemap
+        else
+          comparisonNodeMap = {}
+
+        comparisonLinkMap = if comparisonPolicy?.json?.parameterized?.linkmap?
+          comparisonLinkMap = data.parameterized.nodemap
+        else
+          comparisonLinkMap = {}
+
+        console.log "ROAR"
 
         # Reconcile the two lists of links
         # Loop over the primary links: if in comparison links
@@ -197,6 +119,7 @@ Enumerate the differences between the two policies
         # - push the comparison's rules onto the primary's (ignore duplicates)
         # - remove from comparisonNodes
         primaryLinks = d3.values primaryLinkMap
+        console.log "primaryLinks", primaryLinks.length
         primaryLinks.forEach (link) ->
           comparisonLink = comparisonLinkMap["#{link.source.type}-#{link.source.name}-#{link.target.type}-#{link.target.name}"]
           if comparisonLink
@@ -423,6 +346,8 @@ Enumerate the differences between the two policies
 
         # If the policy has changed, need to update/remove the old visuals
         $scope.rules = if data.parameterized?.rules? then data.parameterized.rules else []
+        $scope.nodeMap = if data.parameterized?.nodemap? then data.parameterized.nodemap else []
+        $scope.linkMap = if data.parameterized?.linkmap? then data.parameterized.linkmap else []
 
         update()
 
