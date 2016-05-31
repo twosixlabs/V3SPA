@@ -9,6 +9,8 @@ import os
 import re
 import sys
 
+import api.jsonh
+
 import pprint
 
 from subprocess import *
@@ -19,95 +21,108 @@ class RawDomain(object):
         print "Raw.__init__"
 
     @staticmethod
-    def createNode(node_type, name, rules, policy, selected):
+    def createNode(node_type, name):
 		return {
-			'type': node_type,
-			'name': name,
-			'rules': rules,
-			'policy': policy,
-			'selected': selected
+			't': node_type,
+			'n': name
 			}
 
     @staticmethod
-    def nodesFromRules(rules, policyid, nodeMap, linksMap):
+    def createLink(source, target):
+        return {
+            's': source,
+            't': target
+            }
+
+    @staticmethod
+    def nodesFromRules(rules, policyid, nodeMap, linkMap, nodeList, linkList):
     	for r in rules:
             new_subject_node = new_object_node = new_class_node = new_perm_node = None
 
             r['policy'] = policyid
 
             # Find existing node if it exists
-            curr_subject_node = nodeMap.get("subject-" + r['subject'], None)
-            curr_object_node = nodeMap.get("object-" + r['object'], None)
-            curr_class_node = nodeMap.get("class-" + r['class'], None)
-            curr_perm_node = nodeMap.get("perm-" + r['perm'], None)
+            curr_subject_node = nodeMap.get("subject-" + r['subject'], -1)
+            curr_object_node = nodeMap.get("object-" + r['object'], -1)
+            curr_class_node = nodeMap.get("class-" + r['class'], -1)
+            curr_perm_node = nodeMap.get("perm-" + r['perm'], -1)
 
             # If node exists then update it, else create a new one
-            if curr_subject_node:
-                if r in curr_subject_node['rules']:
-                    curr_subject_node['rules'].append(r)
+            if curr_subject_node >= 0:
+                None
             else:
-                new_subject_node = RawDomain.createNode("subject", r['subject'], [r], policyid, True)
-                nodeMap["subject-" + r['subject']] = new_subject_node
-            if curr_object_node:
-                if r in curr_object_node['rules']:
-                    curr_object_node['rules'].append(r)
+                nodeMap["subject-" + r['subject']] = len(nodeList)
+                new_subject_node = len(nodeList)
+                nodeList.append(RawDomain.createNode("s", r['subject']))
+            if curr_object_node >= 0:
+                None
             else:
-                new_object_node = RawDomain.createNode("object", r['object'], [r], policyid, True)
-                nodeMap["object-" + r['object']] = new_object_node
-            if curr_class_node:
-                if r in curr_class_node['rules']:
-                    curr_class_node['rules'].append(r)
+                nodeMap["object-" + r['object']] = len(nodeList)
+                new_object_node = len(nodeList)
+                nodeList.append(RawDomain.createNode("o", r['object']))
+            if curr_class_node >= 0:
+                None
             else:
-                new_class_node = RawDomain.createNode("class", r['class'], [r], policyid, True)
-                nodeMap["class-" + r['class']] = new_class_node
-            if curr_perm_node:
-                if r in curr_perm_node['rules']:
-                    curr_perm_node['rules'].append(r)
+                nodeMap["class-" + r['class']] = len(nodeList)
+                new_class_node = len(nodeList)
+                nodeList.append(RawDomain.createNode("c", r['class']))
+            if curr_perm_node >= 0:
+                None
             else:
-                new_perm_node = RawDomain.createNode("perm", r['perm'], [r], policyid, True)
-                nodeMap["perm-" + r['perm']] = new_perm_node
+                nodeMap["perm-" + r['perm']] = len(nodeList)
+                new_perm_node = len(nodeList)
+                nodeList.append(RawDomain.createNode("p", r['perm']))
 
-            RawDomain.generateLink(curr_perm_node, curr_object_node, new_perm_node, new_object_node, linksMap, r, policyid)
-            RawDomain.generateLink(curr_subject_node, curr_perm_node, new_subject_node, new_perm_node, linksMap, r, policyid)
-            RawDomain.generateLink(curr_object_node, curr_class_node, new_object_node, new_class_node, linksMap, r, policyid)
-            RawDomain.generateLink(curr_perm_node, curr_class_node, new_perm_node, new_class_node, linksMap, r, policyid)
+            RawDomain.generateLink(curr_perm_node, curr_object_node, new_perm_node, new_object_node, nodeList, linkMap, linkList, r, policyid)
+            RawDomain.generateLink(curr_subject_node, curr_perm_node, new_subject_node, new_perm_node, nodeList, linkMap, linkList, r, policyid)
+            RawDomain.generateLink(curr_object_node, curr_class_node, new_object_node, new_class_node, nodeList, linkMap, linkList, r, policyid)
+            RawDomain.generateLink(curr_perm_node, curr_class_node, new_perm_node, new_class_node, nodeList, linkMap, linkList, r, policyid)
 
     @staticmethod
-    def generateLink(curr_source_node, curr_target_node, new_source_node, new_target_node, linksMap, r, policyid):
-        if curr_source_node and not curr_target_node:
+    def generateLink(curr_source_node, curr_target_node, new_source_node, new_target_node, nodeList, linkMap, linkList, r, policyid):
+        if curr_source_node >= 0 and curr_target_node == -1:
             source = curr_source_node
             target = new_target_node
-            rules = {v['subject']+'-'+v['object']+'-'+v['perm']+'-'+v['class']:v for v in target['rules'] + source['rules']}.values()
-            link = {'source': source, 'target': target, 'rules': rules, 'policy': policyid}
-            linksMap[source['type'] + '-' + source['name'] + '-' + target['type'] + '-' + target['name']] = link
-        elif not curr_source_node and curr_target_node:
+            s_node = nodeList[source]
+            t_node = nodeList[target]
+            link = RawDomain.createLink(source, target)
+            linkMap[s_node['t'] + '-' + s_node['n'] + '-' + t_node['t'] + '-' + t_node['n']] = len(linkList)
+            linkList.append(link)
+        elif curr_source_node == -1 and curr_target_node >= 0:
             source = new_source_node
             target = curr_target_node
-            rules = {v['subject']+'-'+v['object']+'-'+v['perm']+'-'+v['class']:v for v in target['rules'] + source['rules']}.values()
-            link = {'source': source, 'target': target, 'rules': rules, 'policy': policyid}
-            linksMap[source['type'] + '-' + source['name'] + '-' + target['type'] + '-' + target['name']] = link
-        elif not curr_source_node and not curr_target_node:
+            s_node = nodeList[source]
+            t_node = nodeList[target]
+            link = RawDomain.createLink(source, target)
+            linkMap[s_node['t'] + '-' + s_node['n'] + '-' + t_node['t'] + '-' + t_node['n']] = len(linkList)
+            linkList.append(link)
+        elif curr_source_node == -1 and not curr_target_node >= 0:
             source = new_source_node
             target = new_target_node
-            rules = {v['subject']+'-'+v['object']+'-'+v['perm']+'-'+v['class']:v for v in target['rules'] + source['rules']}.values()
-            link = {'source': source, 'target': target, 'rules': rules, 'policy': policyid}
-            linksMap[source['type'] + '-' + source['name'] + '-' + target['type'] + '-' + target['name']] = link
+            s_node = nodeList[source]
+            t_node = nodeList[target]
+            link = RawDomain.createLink(source, target)
+            linkMap[s_node['t'] + '-' + s_node['n'] + '-' + t_node['t'] + '-' + t_node['n']] = len(linkList)
+            linkList.append(link)
         else:
             source = curr_source_node
             target = curr_target_node
-            link_key = source['type'] + '-' + source['name'] + '-' + target['type'] + '-' + target['name']
-            if link_key in linksMap:
-                link = linksMap[source['type'] + '-' + source['name'] + '-' + target['type'] + '-' + target['name']]
+            s_node = nodeList[source]
+            t_node = nodeList[target]
+            link_key = s_node['t'] + '-' + s_node['n'] + '-' + t_node['t'] + '-' + t_node['n']
+            if link_key in linkMap:
+                linkIdx = linkMap[link_key]
+                link = linkList[linkIdx]
             else:
                 link = None
 
         if link:
-            if r in link['rules']:
-                link['rules'].append(r)
+            None
         else:
             # Source and target were previously found in two separate rules
-            link = {'source': source, 'target': target, 'rules': [r], 'policy': policyid}
-            linksMap[source['type'] + '-' + source['name'] + '-' + target['type'] + '-' + target['name']] = link
+            link = RawDomain.createLink(source, target)
+            linkMap[s_node['t'] + '-' + s_node['n'] + '-' + t_node['t'] + '-' + t_node['n']] = len(linkList)
+            linkList.append(link)
 
     def parse(self, msg):
         """ Given a set of parameters of the form, return the
@@ -129,16 +144,11 @@ class RawDomain(object):
 
         # If the raw is identical, and the parameters are identical, just return the one we already
         # translated.
-        if (refpol.parsed and False
+        if (refpol.parsed
                 and refpol.documents['raw']['digest'] == raw_hash
                 and refpol.parsed['params'] == msg['payload']['params']):
 
             logger.info("Returning cached JSON")
-
-            return {
-                'label': msg['response_id'],
-                'payload': api.db.json.dumps(refpol.parsed)
-            }
 
         else:
 
@@ -203,34 +213,20 @@ class RawDomain(object):
 
             node_map = {}
             link_map = {}
-            RawDomain.nodesFromRules(table, refpol.id, node_map, link_map)
+            node_list = []
+            link_list = []
+            RawDomain.nodesFromRules(table, refpol.id, node_map, link_map, node_list, link_list)
+
+            node_list = api.jsonh.dumps(node_list)
+            link_list = api.jsonh.dumps(link_list)
 
             refpol['parsed'] = {
                 'version': '1.0',
                 'errors': [],
-                'parameterized': {"rules": table},
+                'parameterized': {"rules": table, "nodes": node_list, "links": link_list},
                 'params': msg['payload']['params']
             }
-            logger.info("Size of node_map: {0}".format(sys.getsizeof(node_map)))
-            logger.info("Size of link_map: {0}".format(sys.getsizeof(link_map)))
-            myctr = 0
-            for k in node_map.iterkeys():
-                if myctr == 0:
-                    pprint.pprint(node_map[k])
-                node_map[k].pop('rules', None)
-                if myctr == 0:
-                    pprint.pprint(node_map[k])
-                myctr += 1
-            myctr = 0
-            for v in link_map.itervalues():
-                if myctr == 0:
-                    pprint.pprint(v)
-                v.pop('rules', None)
-                if myctr == 0:
-                    pprint.pprint(v)
-                myctr += 1
-            logger.info("Size of node_map: {0}".format(sys.getsizeof(node_map)))
-            logger.info("Size of link_map: {0}".format(sys.getsizeof(link_map)))
+
             print("=====================")
             print("Pre insert")
             print("=====================")
@@ -239,6 +235,9 @@ class RawDomain(object):
             print("=====================")
             print("Post insert")
             print("=====================")
+
+        # Don't send the rules to the client
+        refpol['parsed']['parameterized'].pop('rules', None)
 
         return {
             'label': msg['response_id'],

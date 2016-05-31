@@ -215,6 +215,41 @@ Extend the set of paths that we show.
 
           @_validate_dsl()
 
+Expand policy from succinct to verbose style.
+
+        _uncompress: () =>
+          # Parse the jsonh format into regular JSON objects
+          @current_policy.json.parameterized.nodes = jsonh.parse @current_policy.json.parameterized.nodes
+          @current_policy.json.parameterized.links = jsonh.parse @current_policy.json.parameterized.links
+
+          # Confirm existence of abbreviated object keys, then expand them
+          if @current_policy?.json?.parameterized?.nodes? and
+          't' of @current_policy.json.parameterized.nodes[0] and
+          'n' of @current_policy.json.parameterized.nodes[0]
+            
+            typeMap =
+              s: 'subject'
+              o: 'object'
+              c: 'class'
+              p: 'perm'
+            
+            nodes = @current_policy.json.parameterized.nodes.map (n) =>
+              'type': typeMap[n.t]
+              'name': n.n
+              'policy': @current_policy.id
+              'selected': true
+            @current_policy.json.parameterized.nodes = nodes
+
+          if @current_policy?.json?.parameterized?.links? and
+          't' of @current_policy.json.parameterized.links[0] and
+          's' of @current_policy.json.parameterized.links[0]
+
+            links = @current_policy.json.parameterized.links.map (l) =>
+              'target': nodes[l.t]
+              'source': nodes[l.s]
+              'policy': @current_policy.id
+            @current_policy.json.parameterized.links = links
+
 Compose the graph expansion dictionary as a
 set of paths.
 
@@ -287,6 +322,7 @@ version of the policy.
 
             else  # valid response. Must parse
               @current_policy.json = JSON.parse result.payload
+              @_uncompress()
 
               # For now, disable calling the validation hooks because they are
               # related to the DSL and not raw policies.

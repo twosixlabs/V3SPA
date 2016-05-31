@@ -60,6 +60,9 @@ Get the raw JSON
           else  # valid response. Must parse
             comparisonPolicy.json = JSON.parse result.payload
             comparisonRules = comparisonPolicy.json.parameterized.rules
+            comparisonNodes = comparisonPolicy.json.parameterized.nodes
+            comparisonNodes = jsonh.parse comparisonPolicy.json.parameterized.nodes
+
 
             deferred.resolve()
 

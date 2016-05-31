@@ -150,7 +150,7 @@ class RefPolicy(restful.ResourceDomain):
 
         logger.info("Size of response: {0}".format(sys.getsizeof(refpol.documents)))
         logger.info("Pre insert--finishing up")
-        refpol.Insert()
+        #refpol.Insert()
         logger.info("Post insert--finishing up")
         
 
