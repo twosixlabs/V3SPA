@@ -129,25 +129,15 @@ class RawDomain(object):
         JSON for the raw module.
         """
 
-        raw = msg['payload']['text']
-        del msg['payload']['text']
-        raw_hash = hashlib.md5(raw).hexdigest()
-
+        # msg.payload.policy is the id
         refpol_id = msg['payload']['policy']
         del msg['payload']['policy']
 
         refpol_id = api.db.idtype(refpol_id)
         refpol = ws_domains.call('refpolicy', 'Read', refpol_id)
 
-        logger.info("WS:validate?%s" % "&".join(
-            ["{0}={1}".format(x, y) for x, y in msg['payload'].iteritems() if x != 'text']))
-
-        # If the raw is identical, and the parameters are identical, just return the one we already
-        # translated.
-        if (refpol.parsed
-                and refpol.documents['raw']['digest'] == raw_hash
-                and refpol.parsed['params'] == msg['payload']['params']):
-
+        # If already parsed, just return the one we already translated.
+        if (refpol.parsed):
             logger.info("Returning cached JSON")
 
         else:
@@ -238,6 +228,7 @@ class RawDomain(object):
 
         # Don't send the rules to the client
         refpol['parsed']['parameterized'].pop('rules', None)
+        refpol['parsed']['parameterized']['link_list'] = []
 
         return {
             'label': msg['response_id'],

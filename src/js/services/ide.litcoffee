@@ -220,7 +220,7 @@ Expand policy from succinct to verbose style.
         _uncompress: () =>
           # Parse the jsonh format into regular JSON objects
           @current_policy.json.parameterized.nodes = jsonh.parse @current_policy.json.parameterized.nodes
-          @current_policy.json.parameterized.links = jsonh.parse @current_policy.json.parameterized.links
+          #@current_policy.json.parameterized.links = jsonh.parse @current_policy.json.parameterized.links
 
           # Confirm existence of abbreviated object keys, then expand them
           if @current_policy?.json?.parameterized?.nodes? and
@@ -240,7 +240,8 @@ Expand policy from succinct to verbose style.
               'selected': true
             @current_policy.json.parameterized.nodes = nodes
 
-          if @current_policy?.json?.parameterized?.links? and
+          #if @current_policy?.json?.parameterized?.links? and
+          if false and
           't' of @current_policy.json.parameterized.links[0] and
           's' of @current_policy.json.parameterized.links[0]
 
@@ -301,9 +302,6 @@ version of the policy.
             request: 'parse'
             payload:
               policy: @current_policy._id
-              text: @current_policy.documents.raw.text
-              params: path_params.join("&")
-              hide_unused_ports: if @view_control.unused_ports then false else true
 
 
           console.log("MAKING THE CALL")

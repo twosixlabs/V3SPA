@@ -101,28 +101,9 @@ class RefPolicy(restful.ResourceDomain):
 
         if refpol.documents is None or 'raw' not in refpol.documents:
             logger.info("Missing raw. Making service request")
-            # For each module in modules, send module.te_file to te2json.py
-            # Just get the last module for now, though
-            for modname in refpol['modules']:
-                # Use ws_domains.call() to invoke raw.py and get the raw policy
-                module = refpol['modules'][modname]
-                raw = ws_domains.call(
-                    'raw',
-                    'translate_selinux',
-                    {
-                        'refpolicy': refpol.id,
-                        'module': module
-                    }
-                )
-
-            if len(raw['errors']) > 0:
-              raise Exception("Failed to translate raw: {0}"
-                              .format("\n".join(
-                                  ("{0}".format(x) for x in raw['errors']))))
 
             if 'documents' not in refpol:
                 refpol['documents'] = {}
-
 
             #
             #  Parse policy binary using SESEARCH, then store result into 'TEXT' field
@@ -187,6 +168,8 @@ class RefPolicy(restful.ResourceDomain):
         #     refpol.Insert()
 
         response['payload'] = refpol
+        refpol['parsed']['parameterized'].pop('rules', None)
+        refpol.pop('documents', None)
         logger.info("Pre get")
         response['payload'].get('parsed', {}).pop('full', None)
         logger.info("Post get")

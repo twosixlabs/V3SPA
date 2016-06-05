@@ -125,56 +125,6 @@
 
       return dir
 
-    v3spa.directive 'v3spaEditor', ->
-      ret = 
-        restrict: 'A'
-        replace: true
-        scope:
-          contents: '='
-        template: """
-          <div>
-          <div></div>
-          <div id='v3spaEditor'>
-          </div>
-          </div>
-        """
-        link: (scope, element, attrs)->
-          editor = ace.edit(element.$('#v3spaEditor'))
-          editor.setTheme("ace/theme/chaos");
-          editor.setKeyboardHandler("vim");
-          editor.setBehavioursEnabled(true);
-          editor.setSelectionStyle('line');
-          editor.setHighlightActiveLine(true);
-          editor.setShowInvisibles(false);
-          editor.setDisplayIndentGuides(false);
-          editor.renderer.setHScrollBarAlwaysVisible(false);
-          editor.setAnimatedScroll(false);
-          editor.renderer.setShowGutter(true);
-          editor.renderer.setShowPrintMargin(false);
-          editor.getSession().setUseSoftTabs(true);
-          editor.setHighlightSelectedWord(true);
-
-Set up editor sessions
-          lobsterSession = new EditSession scope.contents.dsl, 'ace/mode/lobster'
-          lobsterSession.on 'change', (text)->
-            $scope.policy.dsl = text
-
-          scope.$watch contents, (contents)->
-            lobsterSession.setValue contents
-
-          applicationSession = new EditSession scope.contents.application
-          editor.setSession(lobsterSession)
-
-          scope.sessions =  [
-            {name: "DSL", session: lobsterSession},
-            {name: "application", applicationSession}
-          ]
-
-          editor.resize()
-
-
-      return ret
-
     v3spa.directive 'editor', ['IDEBackend', 'RefPolicy', '$modal', (IDEBackend, RefPolicy, $modal) ->
       ret =
         restrict: 'E'
