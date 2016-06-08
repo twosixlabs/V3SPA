@@ -124,6 +124,51 @@ class RawDomain(object):
             linkMap[s_node['t'] + '-' + s_node['n'] + '-' + t_node['t'] + '-' + t_node['n']] = len(linkList)
             linkList.append(link)
 
+    def fetch_graph(self, msg):
+        """ Return JSON for the nodes and links of the raw policy rules.
+        """
+
+        # msg.payload.policy is the id
+        refpol_id = msg['payload']['policy']
+        del msg['payload']['policy']
+
+        refpol_id = api.db.idtype(refpol_id)
+        refpol = ws_domains.call('refpolicy', 'Read', refpol_id)
+
+        # If already parsed, just return the one we already translated.
+        if (refpol.parsed):
+            logger.info("Returning cached JSON")
+        else:
+            refpol = ws_domains.call('raw', 'parse', msg)
+
+        if (not refpol['parsed']['parameterized']['nodes'] and
+            not refpol['parsed']['parameterized']['links']):
+
+            # Build the node and link lists from the rules table
+            rules = refpol['parsed']['parameterized']['rules']
+            node_map = {}
+            link_map = {}
+            node_list = []
+            link_list = []
+            RawDomain.nodesFromRules(rules, refpol.id, node_map, link_map, node_list, link_list)
+
+            # Sparsify/compress the dicts/JSON objects
+            node_list = api.jsonh.dumps(node_list)
+            link_list = api.jsonh.dumps(link_list)
+
+            refpol['parsed']['parameterized']['nodes'] = node_list
+            refpol['parsed']['parameterized']['links'] = link_list
+
+            refpol.Insert()
+
+        # Don't send the rules to the client
+        refpol['parsed']['parameterized'].pop('rules', None)
+
+        return {
+            'label': msg['response_id'],
+            'payload': api.db.json.dumps(refpol.parsed)
+        }
+
     def parse(self, msg):
         """ Given a set of parameters of the form, return the
         JSON for the raw module.
@@ -201,20 +246,10 @@ class RawDomain(object):
                                 row = {"subject":s, "object":ot, "class":oc, "perm":p, "rule": line.strip()}
                                 table.append(row)
 
-            node_map = {}
-            link_map = {}
-            node_list = []
-            link_list = []
-            RawDomain.nodesFromRules(table, refpol.id, node_map, link_map, node_list, link_list)
-
-            node_list = api.jsonh.dumps(node_list)
-            link_list = api.jsonh.dumps(link_list)
-
             refpol['parsed'] = {
                 'version': '1.0',
                 'errors': [],
-                'parameterized': {"rules": table, "nodes": node_list, "links": link_list},
-                'params': msg['payload']['params']
+                'parameterized': {"rules": table}
             }
 
             print("=====================")
@@ -228,7 +263,6 @@ class RawDomain(object):
 
         # Don't send the rules to the client
         refpol['parsed']['parameterized'].pop('rules', None)
-        refpol['parsed']['parameterized']['link_list'] = []
 
         return {
             'label': msg['response_id'],
@@ -273,6 +307,8 @@ class RawDomain(object):
     def handle(self, msg):
         if msg['request'] == 'parse':
             return self.parse(msg)
+        elif msg['request'] == 'fetch_graph':
+            return self.fetch_graph(msg)
         else:
             raise Exception("Invalid message type for 'raw' domain")
 

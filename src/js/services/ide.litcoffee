@@ -7,7 +7,7 @@ errors, and generally being awesome.
 
     mod.service 'IDEBackend',
       class IDEBackend
-        constructor: (@VespaLogger, @$rootScope,
+        constructor: (@VespaLogger, @$rootScope, @WSUtils,
         @SockJSService, @$q, @$timeout) ->
 
           @current_policy =
@@ -220,7 +220,7 @@ Expand policy from succinct to verbose style.
         _uncompress: () =>
           # Parse the jsonh format into regular JSON objects
           @current_policy.json.parameterized.nodes = jsonh.parse @current_policy.json.parameterized.nodes
-          #@current_policy.json.parameterized.links = jsonh.parse @current_policy.json.parameterized.links
+          @current_policy.json.parameterized.links = jsonh.parse @current_policy.json.parameterized.links
 
           # Confirm existence of abbreviated object keys, then expand them
           if @current_policy?.json?.parameterized?.nodes? and
@@ -240,8 +240,7 @@ Expand policy from succinct to verbose style.
               'selected': true
             @current_policy.json.parameterized.nodes = nodes
 
-          #if @current_policy?.json?.parameterized?.links? and
-          if false and
+          if @current_policy?.json?.parameterized?.links? and
           't' of @current_policy.json.parameterized.links[0] and
           's' of @current_policy.json.parameterized.links[0]
 
@@ -386,6 +385,17 @@ contents of @current_policy and get the parsed JSON
 
           return deferred.promise
 
+        load_raw_graph: () =>
+
+            @WSUtils.fetch_raw_graph(@current_policy._id).then (json) =>
+              @current_policy.json ?= {}
+              @current_policy.json.parameterized ?= {}
+              @current_policy.json.parameterized.nodes = json.parameterized.nodes
+              @current_policy.json.parameterized.links = json.parameterized.links
+
+              _.each @hooks.json_changed, (hook)=>
+                hook(@current_policy.json)
+
         load_local_policy: (refpolicy)=>
 
             @graph_expansion = {}
@@ -395,7 +405,7 @@ contents of @current_policy and get the parsed JSON
 
             # Adding this because raw views do not have editor, and therefore no document or text
             # So need to manually trigger getting the raw json
-            @parse_raw()
+            #@parse_raw()
 
             for hook in @hooks.policy_load
               hook(@current_policy)

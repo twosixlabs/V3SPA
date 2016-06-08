@@ -93,46 +93,14 @@ class RefPolicy(restful.ResourceDomain):
 
     @classmethod
     def do_get(cls, refpol_id, response):
+        """ Returns a policy, without the document (list of allow rules)
+        and the parsed version of the policy.
+        """
+
         refpol_id = api.db.idtype(refpol_id)
         logger.info("Retrieving reference policy {0}".format(refpol_id))
 
         refpol = RefPolicy.Read(refpol_id)
-
-
-        if refpol.documents is None or 'raw' not in refpol.documents:
-            logger.info("Missing raw. Making service request")
-
-            if 'documents' not in refpol:
-                refpol['documents'] = {}
-
-            #
-            #  Parse policy binary using SESEARCH, then store result into 'TEXT' field
-            #  
-            #  RESULT IS EMPTY STRING "" on FAILURE. No exception, only logger warnings
-            # 
-            logger.info("Reading allow rules from policy binary")
-            returned_sesearch_result = refpol.parse_policy_binary()
-            logger.info("Size of response: {0}".format(sys.getsizeof(returned_sesearch_result)))
-
-            refpol['documents']['raw'] = {
-                'text': returned_sesearch_result,
-                'mode': 'python',
-                'digest': hashlib.md5(returned_sesearch_result).hexdigest()
-            }
-
-            refpol.Insert()
-
-        elif 'digest' not in refpol.documents['raw']:
-            logger.info("Digest not found. Inserting digest")
-            refpol.documents['raw']['digest'] = hashlib.md5(
-                refpol.documents['raw']['text']).hexdigest()
-            refpol.Insert()
-
-
-        logger.info("Size of response: {0}".format(sys.getsizeof(refpol.documents)))
-        logger.info("Pre insert--finishing up")
-        #refpol.Insert()
-        logger.info("Post insert--finishing up")
         
 
         # if refpol.documents is None or 'dsl' not in refpol.documents:
@@ -168,11 +136,11 @@ class RefPolicy(restful.ResourceDomain):
         #     refpol.Insert()
 
         response['payload'] = refpol
-        refpol['parsed']['parameterized'].pop('rules', None)
+
+        # Don't send the parsed data or the unparsed document
+        refpol.pop('parsed', None)
         refpol.pop('documents', None)
-        logger.info("Pre get")
-        response['payload'].get('parsed', {}).pop('full', None)
-        logger.info("Post get")
+
         return response
 
     @classmethod
@@ -242,6 +210,15 @@ class RefPolicy(restful.ResourceDomain):
             try:
                 metadata.extract_zipped_policy()
                 metadata['modules'] = metadata.read_policy_modules()
+
+                returned_sesearch_result = metadata.parse_policy_binary()
+                refpol['documents'] = {
+                    'raw': {
+                        'text': returned_sesearch_result,
+                        'mode': 'raw',
+                        'digest': hashlib.md5(returned_sesearch_result).hexdigest()
+                    }
+                }
             except Exception:
                 metadata.Delete()
                 raise

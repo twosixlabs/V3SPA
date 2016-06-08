@@ -5,6 +5,7 @@
     #= require services/main.litcoffee
     #= require services/ide.litcoffee
     #= require services/refpolicy.litcoffee
+    #= require services/wsutils.litcoffee
     #= require services/position.litcoffee
     #= require controllers.litcoffee
     #= require_tree controllers

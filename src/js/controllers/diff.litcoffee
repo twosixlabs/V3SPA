@@ -1,10 +1,12 @@
     vespaControllers = angular.module('vespaControllers')
 
-    vespaControllers.controller 'diffCtrl', ($scope, VespaLogger,
+    vespaControllers.controller 'diffCtrl', ($scope, VespaLogger, WSUtils,
         IDEBackend, $timeout, $modal, PositionManager, RefPolicy, $q, SockJSService) ->
 
       comparisonPolicy = null
       comparisonRules = []
+      comparisonNodes = []
+      comparisonLinks = []
       $scope.input = 
         refpolicy: comparisonPolicy
       $scope.modules = []
@@ -33,38 +35,15 @@
 Get the raw JSON
 
       fetch_raw = ->
+
         deferred = $q.defer()
 
-        path_params = IDEBackend.write_filter_param([])
+        WSUtils.fetch_raw_graph(comparisonPolicy._id).then (json) =>
+          comparisonRules = []
+          comparisonNodes = json.parameterized.nodes
+          comparisonLinks = json.parameterized.links
 
-        req =
-          domain: 'raw'
-          request: 'parse'
-          payload:
-            policy: comparisonPolicy._id
-            text: comparisonPolicy.documents.raw.text
-            params: path_params.join("&")
-
-        SockJSService.send req, (result)=>
-          if result.error  # Service error
-
-            $.growl(
-              title: "Error"
-              message: result.payload
-            ,
-              type: 'danger'
-            )
-
-            deferred.reject result.payload
-
-          else  # valid response. Must parse
-            comparisonPolicy.json = JSON.parse result.payload
-            comparisonRules = comparisonPolicy.json.parameterized.rules
-            comparisonNodes = comparisonPolicy.json.parameterized.nodes
-            comparisonNodes = jsonh.parse comparisonPolicy.json.parameterized.nodes
-
-
-            deferred.resolve()
+          deferred.resolve()
 
         return deferred.promise
 
@@ -347,12 +326,9 @@ Enumerate the differences between the two policies
       $scope.update_view = (data) ->
         $scope.policy = IDEBackend.current_policy
 
-        # If the policy has changed, need to update/remove the old visuals
-        $scope.rules = if data.parameterized?.rules? then data.parameterized.rules else []
+        update()
 
-        $scope.primaryNodes = if data.parameterized?.nodes? then data.parameterized.nodes else []
-        #$scope.primaryLinks = if data.parameterized?.links? then data.parameterized.links else []
-        $scope.primaryLinks = []
+      update = () ->
 
         nodeMapReducer = (map, currNode) ->
           map["#{currNode.type}-#{currNode.name}"] = currNode
@@ -365,10 +341,9 @@ Enumerate the differences between the two policies
         # Convert the nodes and links arrays into maps
         $scope.nodeMap = $scope.primaryNodes.reduce nodeMapReducer, {}
         $scope.linkMap = $scope.primaryLinks.reduce linkMapReducer, {}
+        comparisonNodeMap = comparisonNodes.reduce nodeMapReducer, {}
+        comparisonLinkMap = comparisonLinks.reduce linkMapReducer, {}
 
-        update()
-
-      update = () ->
         find_differences()
         $scope.clickedNode = null
         $scope.controls.allModulesChecked = true
@@ -669,9 +644,19 @@ Set up the viewport scroll
       )
 
       IDEBackend.add_hook "json_changed", $scope.update_view
+      IDEBackend.add_hook "policy_load", IDEBackend.load_raw_graph
+      
       $scope.$on "$destroy", ->
         IDEBackend.unhook "json_changed", $scope.update_view
+        IDEBackend.unhook "policy_load", IDEBackend.load_raw_graph
 
-      start_data = IDEBackend.get_json()
-      if start_data
-        $scope.update_view(start_data)
+      $scope.policy = IDEBackend.current_policy
+
+      # Load the raw graph data if it is not loaded
+      if $scope.policy and
+      not ($scope.policy.json?.parameterized?.nodes? and $scope.policy.json?.parameterized?.nodes?)
+        IDEBackend.load_raw_graph()
+
+      # If the graph data is already loaded, render the view
+      if $scope.policy?.parameterized?.nodes? and $scope.policy?.parameterized?.links?
+        $scope.update_view()
