@@ -212,7 +212,7 @@ class RefPolicy(restful.ResourceDomain):
                 metadata['modules'] = metadata.read_policy_modules()
 
                 returned_sesearch_result = metadata.parse_policy_binary()
-                refpol['documents'] = {
+                metadata['documents'] = {
                     'raw': {
                         'text': returned_sesearch_result,
                         'mode': 'raw',
@@ -345,6 +345,8 @@ class RefPolicy(restful.ResourceDomain):
         policy_dir = os.path.abspath(os.path.join(
             api.config.get('storage', 'bulk_storage_dir'),
             'refpolicy'))
+
+        pprint.pprint(zipped_policy)
 
         if not zipfile.is_zipfile(zipped_policy):
             raise api.DisplayError("Unable to extract: file was not a ZIP archive")

@@ -387,6 +387,9 @@ contents of @current_policy and get the parsed JSON
 
         load_raw_graph: () =>
 
+            if not @current_policy.valid
+              return
+
             @WSUtils.fetch_raw_graph(@current_policy._id).then (json) =>
               @current_policy.json ?= {}
               @current_policy.json.parameterized ?= {}

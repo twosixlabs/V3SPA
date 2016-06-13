@@ -46,7 +46,7 @@ version of the policy.
 
 Expand the raw policy nodes and links from succinct to verbose style.
 
-        uncompress: (json, id) =>
+        uncompress: (json) =>
           # Parse the jsonh format into regular JSON objects
           json.parameterized.nodes = jsonh.parse json.parameterized.nodes
           json.parameterized.links = jsonh.parse json.parameterized.links
@@ -65,7 +65,6 @@ Expand the raw policy nodes and links from succinct to verbose style.
             nodes = json.parameterized.nodes.map (n) =>
               'type': typeMap[n.t]
               'name': n.n
-              'policy': id
               'selected': true
             json.parameterized.nodes = nodes
 
@@ -76,7 +75,6 @@ Expand the raw policy nodes and links from succinct to verbose style.
             links = json.parameterized.links.map (l) =>
               'target': nodes[l.t]
               'source': nodes[l.s]
-              'policy': id
             json.parameterized.links = links
 
           return json

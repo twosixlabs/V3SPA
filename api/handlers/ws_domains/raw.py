@@ -130,7 +130,7 @@ class RawDomain(object):
 
         # msg.payload.policy is the id
         refpol_id = msg['payload']['policy']
-        del msg['payload']['policy']
+        #del msg['payload']['policy']
 
         refpol_id = api.db.idtype(refpol_id)
         refpol = ws_domains.call('refpolicy', 'Read', refpol_id)
@@ -139,10 +139,13 @@ class RawDomain(object):
         if (refpol.parsed):
             logger.info("Returning cached JSON")
         else:
-            refpol = ws_domains.call('raw', 'parse', msg)
+            # Parse the policy
+            ws_domains.call('raw', 'parse', msg)
+            # Read the policy again
+            refpol = ws_domains.call('refpolicy', 'Read', refpol_id)
 
-        if (not refpol['parsed']['parameterized']['nodes'] and
-            not refpol['parsed']['parameterized']['links']):
+        if (not 'nodes' in refpol['parsed']['parameterized'] and
+            not 'links' in refpol['parsed']['parameterized']):
 
             # Build the node and link lists from the rules table
             rules = refpol['parsed']['parameterized']['rules']
@@ -186,6 +189,8 @@ class RawDomain(object):
             logger.info("Returning cached JSON")
 
         else:
+
+            raw = refpol['documents']['raw']['text']
 
             table = []
 
