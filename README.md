@@ -7,6 +7,7 @@ V3SPA Angularized
 - python
 - pip
 - mongodb
+- setools
 
 To set up the environment:
 
@@ -26,6 +27,12 @@ To set up the environment:
     $ virtualenv vespa
     $ source vespa/bin/activate
     $ pip install -r requirements.txt
+
+To run sesearch you will need the following:
+
+    $ # Fedora
+    $ sudo dnf install bison flex gcc libsepol-devel libsepol-static libselinux-devel policycoreutils-python3 python3-networkx swig bzip2-devel redhat-rpm-config python3-qt5
+    $ sudo pip install networkx
 
 ## Building
 

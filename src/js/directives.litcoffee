@@ -1,4 +1,6 @@
-    v3spa = angular.module 'vespa.directives', []
+    v3spa = angular.module 'vespa.directives',
+        ['ui.ace', 'vespa.services', 'ui.bootstrap', 'ui.select2',
+        'angularFileUpload', 'vespa.directives']
 
     v3spa.filter 'join', ->
         return (input, separator)->
@@ -123,52 +125,156 @@
 
       return dir
 
-    v3spa.directive 'v3spaEditor', ->
-      ret = 
-        restrict: 'A'
+    v3spa.directive 'editor', ['IDEBackend', 'RefPolicy', '$modal', (IDEBackend, RefPolicy, $modal) ->
+      ret =
+        restrict: 'E'
+        replace: true
+        transclude: true
+        templateUrl: 'partials/editor.html'
+        link:
+          pre: (scope, element, attrs) ->
+            # Assumes ideCtrl is the parent controller
+
+            scope.policy = IDEBackend.current_policy
+
+            IDEBackend.add_hook 'policy_load', (info)->
+              scope.policy = IDEBackend.current_policy
+
+            scope.$watch 'raw_view_selection', (newv, oldv)->
+              if newv
+                m = $modal.open
+                  templateUrl: 'moduleViewModal.html'
+                  controller: 'modal.view_module'
+                  windowClass: 'super-large-modal'
+                  resolve:
+                    documents: ->
+                      RefPolicy.fetch_module_files(newv.id)
+                    module: ->
+                      newv
+                  size: 'lg'
+
+                m.result.finally ->
+                  scope.raw_view_selection = null
+
+            scope.raw_module_select2 =
+              data: ->
+                  unless scope.policy?.modules
+                    retval =
+                      results: []
+                  else 
+                    retval = 
+                        results: _.map scope.policy.modules, (v, k)->
+                            ret = 
+                              text: k
+                              id: k
+
+      return ret
+      ]
+
+    v3spa.directive 'moduleBrowserControls', ->
+      ret =
+        restrict: 'E'
+        replace: true
+        template: """
+                  <div class="row">
+                    <div class="form-group">
+                      <label class="control-label pad-right">Controls</label>
+                      <div class="btn-group" role="group">
+                        <button ng-click="collapse('collapse-all')" type="button" class="btn btn-sm btn-default">Collapse all</button>
+                        <button ng-click="collapse('open-all')" type="button" class="btn btn-sm btn-default">Open all</button>
+                      </div>
+                    </div>
+                  </div>
+                  """
+      return ret
+
+    v3spa.directive 'modulesListInput', ->
+      ret =
+        restrict: 'E'
         replace: true
         scope:
-          contents: '='
-        template: """
-          <div>
-          <div></div>
-          <div id='v3spaEditor'>
-          </div>
-          </div>
-        """
-        link: (scope, element, attrs)->
-          editor = ace.edit(element.$('#v3spaEditor'))
-          editor.setTheme("ace/theme/chaos");
-          editor.setKeyboardHandler("vim");
-          editor.setBehavioursEnabled(true);
-          editor.setSelectionStyle('line');
-          editor.setHighlightActiveLine(true);
-          editor.setShowInvisibles(false);
-          editor.setDisplayIndentGuides(false);
-          editor.renderer.setHScrollBarAlwaysVisible(false);
-          editor.setAnimatedScroll(false);
-          editor.renderer.setShowGutter(true);
-          editor.renderer.setShowPrintMargin(false);
-          editor.getSession().setUseSoftTabs(true);
-          editor.setHighlightSelectedWord(true);
+          module: '='
+          moduleClick: '&'
+        template: '<input type="checkbox" ng-model="module.selected" ng-change="moduleClick()">'
+        link: (scope, element, attrs) ->
+          scope.$watch 'module.indeterminate', (newVal, oldVal) ->
+            if newVal == true
+              $(element).prop('indeterminate', true)
+            else if newVal == false
+              $(element).prop('indeterminate', false)
+      return ret
 
-Set up editor sessions
-          lobsterSession = new EditSession scope.contents.dsl, 'ace/mode/lobster'
-          lobsterSession.on 'change', (text)->
-            $scope.policy.dsl = text
+    v3spa.directive 'changedNodes', ->
+      ret =
+        restrict: 'E'
+        replace: true
+        scope:
+          policyIds: '='
+          nodes: '='
+          title: '@'
+          selectionChange: '&'
+        templateUrl: 'partials/diff_controls.html'
+        link: (scope, element, attrs) ->
+          deregistrationArr = []
+          scope.allChecked =
+            primary: false,
+            both: false,
+            comparison: false
 
-          scope.$watch contents, (contents)->
-            lobsterSession.setValue contents
+          setupNodeWatch = (nodeList, policy) ->
+            scope.$watch(
+              ((scope) ->
+                nodeList.map (n) -> n.selected
+              ),
+              ((newVal, oldVal) ->
+                scope.allChecked[policy] = newVal.reduce ((prevVal, currSelected) -> prevVal && currSelected), true
+              ), true)
 
-          applicationSession = new EditSession scope.contents.application
-          editor.setSession(lobsterSession)
+          update = (newVal, oldVal) ->
+            deregistration() while (deregistration = deregistrationArr.pop())
 
-          scope.sessions =  [
-            {name: "DSL", session: lobsterSession},
-            {name: "application", applicationSession}
-          ]
+            scope.allChecked =
+              primary: false,
+              both: false,
+              comparison: false
 
-          editor.resize()
+            scope.primaryNodes = scope.nodes.filter (n) -> n.policy == scope.policyIds.primary
+            scope.bothNodes = scope.nodes.filter (n) -> n.policy == scope.policyIds.both
+            scope.comparisonNodes = scope.nodes.filter (n) -> n.policy == scope.policyIds.comparison
 
+            deregistrationArr.push setupNodeWatch(scope.primaryNodes, "primary")
+            deregistrationArr.push setupNodeWatch(scope.bothNodes, "both")
+            deregistrationArr.push setupNodeWatch(scope.comparisonNodes, "comparison")
+          
+          scope.$watch 'nodes', update
+          scope.$watch 'policyIds', update
+
+          scope.selectAll = (policyId) ->
+            if policyId == scope.policyIds.primary
+              nodes = scope.primaryNodes
+              scope.allChecked['primary'] = true
+            else if policyId == scope.policyIds.both
+              nodes = scope.bothNodes
+              scope.allChecked['both'] = true
+            else
+              scope.allChecked['comparison'] = true
+              nodes = scope.comparisonNodes
+            nodes.forEach (n) ->
+              n.selected = true
+            scope.selectionChange()
+
+          scope.selectNone = (policyId) ->
+            if policyId == scope.policyIds.primary
+              scope.allChecked['primary'] = false
+              nodes = scope.primaryNodes
+            else if policyId == scope.policyIds.both
+              scope.allChecked['both'] = false
+              nodes = scope.bothNodes
+            else
+              scope.allChecked['comparison'] = false
+              nodes = scope.comparisonNodes
+            nodes.forEach (n) ->
+              n.selected = false
+            scope.selectionChange()
 
       return ret

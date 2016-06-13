@@ -1,45 +1,15 @@
     vespaControllers = angular.module('vespaControllers', 
         ['ui.ace', 'vespa.services', 'ui.bootstrap', 'ui.select2',
-        'angularFileUpload', 'vespa.directives'])
+        'angularFileUpload', 'vespa.directives', 'vespaFilters'])
 
 The main controller. avispa is a subcontroller.
 
-    vespaControllers.controller 'ideCtrl', ($scope, $rootScope, SockJSService, VespaLogger, $modal, AsyncFileReader, IDEBackend, $timeout, $location, RefPolicy) ->
+    vespaControllers.controller 'ideCtrl', ($scope, $rootScope, SockJSService, VespaLogger, $modal, AsyncFileReader, IDEBackend, $timeout, RefPolicy) ->
 
       $scope._ = _
 
       $scope.view_control = 
         unused_ports: false
-
-      $scope.$watch 'raw_view_selection', (newv, oldv)->
-        if newv
-          m = $modal.open
-            templateUrl: 'moduleViewModal.html'
-            controller: 'modal.view_module'
-            windowClass: 'super-large-modal'
-            resolve:
-              documents: ->
-                RefPolicy.fetch_module_files(newv.id)
-              module: ->
-                newv
-            size: 'lg'
-
-          m.result.finally ->
-            $scope.raw_view_selection = null
-
-        console.log newv
-
-      $scope.raw_module_select2 =
-        data: ->
-            unless $scope.policy?.modules
-              retval =
-                results: []
-            else 
-              retval = 
-                  results: _.map $scope.policy.modules, (v, k)->
-                      ret = 
-                        text: k
-                        id: k
 
       $scope.$watchCollection 'view_control', (new_collection)->
         for k, v of new_collection
@@ -53,40 +23,13 @@ The main controller. avispa is a subcontroller.
 
       $scope.policy = IDEBackend.current_policy
 
-      $scope.blank_session = new ace.EditSession "", "ace/mode/text"
-
       IDEBackend.add_hook 'policy_load', (info)->
           $scope.policy = IDEBackend.current_policy
 
-          $scope.editorSessions = {}
-          for nm, doc of $scope.policy.documents
-            do (nm, doc)->
-              mode = if doc.mode then doc.mode else 'text'
-              session = new ace.EditSession doc.text, "ace/mode/#{mode}"
-
-              session.on 'change', (text)->
-                IDEBackend.update_document nm, session.getValue(), 
-
-              session.selection.on 'changeSelection', (e, sel)->
-                IDEBackend.highlight_selection nm, sel.getRange()
-
-              $scope.editorSessions[nm] = 
-                session: session
-                folded: true
-
-              onfold = (session)->
-                return (e)->
-                  session.folded = false
-
-              session.on('changeFold', onfold($scope.editorSessions[nm]))
-
-          $scope.setEditorTab($scope.view)
-
-      $scope.visualizer_type = 'tl_explore'
       $timeout ->
-        $scope.view = 'dsl'
+        $scope.view = 'diff'
 
-This controls our editor visibility.
+This controls our editor/controls visibility.
 
       $scope.resizeEditor = (direction)->
         switch direction
@@ -96,197 +39,6 @@ This controls our editor visibility.
             $scope.editorSize -= 1
 
       $scope.editorSize = 1
-
-      $scope.aceLoaded = (editor) ->
-        editor.setTheme("ace/theme/solarized_light");
-        editor.setKeyboardHandler("vim");
-        editor.setBehavioursEnabled(true);
-        editor.setSelectionStyle('line');
-        editor.setHighlightActiveLine(true);
-        editor.setShowInvisibles(false);
-        editor.setDisplayIndentGuides(false);
-        editor.renderer.setHScrollBarAlwaysVisible(false);
-        editor.setAnimatedScroll(false);
-        editor.renderer.setShowGutter(true);
-        editor.renderer.setShowPrintMargin(false);
-        editor.setHighlightSelectedWord(true);
-
-        $scope.editor = editor
-        editor.setSession $scope.blank_session
-        editor.setOptions
-          readOnly: true
-          highlightActiveLine: false
-          highlightGutterLine: false
-
-        $scope.editorSessions = {}
-        for nm, doc of $scope.policy.documents
-          do (nm, doc)->
-            mode = if doc.mode then doc.mode else 'text'
-            session = new ace.EditSession doc.text, "ace/mode/#{mode}"
-
-            session.on 'change', (text)->
-              IDEBackend.update_document nm, session.getValue()
-
-            $scope.editorSessions[nm] = 
-              session: session
-
-        IDEBackend.add_hook 'on_close', ->
-          $scope.editor.setSession $scope.blank_session
-          $scope.editor.setOptions
-              readOnly: true
-              highlightActiveLine: false
-              highlightGutterLine: false
-
-          for k of $scope.editorSessions
-            delete $scope.editorSessions[k]
-
-          $scope.editorSessions = {}
-
-        IDEBackend.add_hook 'doc_changed', (doc, contents)->
-            console.log "Document #{doc} changed event"
-            $timeout ->
-                $scope.editorSessions[doc].session.setValue contents
-                do_fold = ->
-                  if $scope.editorSessions[doc].folded == true
-                    console.log "Folding", doc
-                    $scope.editorSessions[doc].session.foldAll()
-
-
-                # For some confounded r
-                $timeout do_fold, 400
-
-
-        $scope.editor_markers = []
-
-        IDEBackend.add_hook 'validation', (annotations)->
-          dsl_session = $scope.editorSessions.dsl.session
-
-          format_error = (err)->
-            pos = err.srcloc
-            unless pos.start?
-              lastRow = dsl_session.getLength()
-              while _.isEmpty(toks = dsl_session.getTokens(lastRow))
-                lastRow--
-
-              pos = 
-                start:
-                  line: lastRow + 1
-                  col: 1
-                end:
-                  line: lastRow + 1
-                  col: dsl_session.getLine(lastRow).length + 1
-
-            annotations.highlights ?= []
-            annotations.highlights.push 
-              range:  pos
-              apply_to: 'dsl'
-              type: 'error'
-
-            ret = 
-              row: pos.start.line
-              column: pos.start.col
-              type: 'error'
-              text: "#{err.filename}: #{err.message}"
-
-          $timeout ->
-            session = $scope.editorSessions.dsl.session
-            formatted_annotations = _.map(annotations?.errors, (e)->
-              format_error(e)
-            )                       
-            session.setAnnotations formatted_annotations
-
-          ace_range = ace.require("ace/range")
-
-          $scope.editor_markers = _.filter $scope.editor_markers, (elem)->
-            $scope.editor.getSession().removeMarker(elem)
-            return false
-
-          $timeout ->
-            # highlight for e in annotations.highlighter
-            _.each annotations.highlights, (hl)->
-              return unless hl?
-
-              range = new ace_range.Range(
-                hl.range.start.line - 1,
-                hl.range.start.col - 1,
-                hl.range.end.line - 1,
-                hl.range.end.col - 1
-              )
-
-              session_data = $scope.editorSessions[hl.apply_to]
-
-              if not session_data.session?  # Just bail
-                return
-
-              session_data.session.unfold(range, false) # VSPA-86
-
-              marker = session_data.session.addMarker(
-                range,
-                "#{hl.type}_marker",
-                "text"
-              )
-
-              $scope.editor.scrollToLine hl.range.start.line - 10
-
-              $scope.editor_markers.push marker
-
-Watch the view control and switch the editor session
-
-        $scope.setEditorTab = (name)->
-          $timeout ->
-            sessInfo = $scope.editorSessions[name]
-            unless sessInfo
-              return
-
-            if sessInfo.tab? and not _.isEmpty sessInfo.tab
-              prevIndex = sessInfo.tab.css('z-index')
-
-            idx = 0
-            for nm, info of $scope.editorSessions
-              idx++
-              if not info.tab? or _.isEmpty info.tab
-                info.tab = angular.element "#editor_tabs \#tab_#{nm}"
-
-              if nm == name
-                info.tab.css 'z-index', 4
-              else
-                if prevIndex?
-                  nowindex = info.tab.css('z-index')
-                  if nowindex > prevIndex
-                    info.tab.css 'z-index', nowindex - 1
-                else
-                  info.tab.css 'z-index', _.size($scope.editorSessions) - idx
-
-
-            editor.setSession(sessInfo.session)
-
-            if $scope.policy.documents[name].editable == false
-              editor.setOptions
-                readOnly: true
-                highlightActiveLine: false
-                highlightGutterLine: false
-              editor.renderer.$cursorLayer.element.style.opacity=0
-            else
-              editor.setOptions
-                readOnly: false
-                highlightActiveLine: true
-                highlightGutterLine: true
-              editor.renderer.$cursorLayer.element.style.opacity=1
-
-        $scope.$watch 'visualizer_type', (value)->
-          if value == 'avispa'
-            $location.path('/avispa')
-          else if value =='hive'
-            $location.path('/hive')
-          else if value =='tl_explore'
-            $location.path('/tl_explore')
-          else
-            console.error("Invalid visualizer type")
-
-Ace needs a statically sized div to initialize, but we want it
-to be the full page, so make it so.
-
-        editor.resize()
 
 Save the current file
 

@@ -28,123 +28,26 @@
         <a ng-click='load_refpolicy()'>(switch)</a>
       </span>
       </p>
+      <ul class='nav navbar-nav'>
+        <li class='dropdown'>
+          <a href='#' id='visualizer-dropdown' class='dropdown-toggle' data-toggle='dropdown' role='button' aria-haspopup='true' aria-expanded='false'>Visualizer Type <span class='caret'></span></a>
+          <ul class='dropdown-menu'>
+            <li><a ng-click="visualizer_type = 'diff'">Policy diff</a></li>
+            <li><a ng-click="visualizer_type = 'module_browser'">Module browser</a></li>
+          </ul>
+        </li>
+      </ul>
       <p class='navbar-right navbar-text small'> &copy;2014 <b>Invincea Labs</b> </p>
     </div>
     <div class='container-full' ng-controller='ideCtrl'>
       <div ng-hide='editorSize > 0' class='editor-toggle'>
         <button type='button' class='button btn btn-sm btn-info'
           ng-click='resizeEditor("larger")'>
-          Show Editor
+          Show Controls
         </button>
       </div>
-      <div class='row main'>
-        <div ng-class="{'col-md-4': editorSize == 1,
-                        'col-md-8': editorSize == 2
-          }" 
-          ng-show='editorSize > 0'>
-          <div class='editor-container'>
-            <div class='panel panel-default'>
-              <div class='panel-body'>
-                <div class='form-group'>
-                  <div>
-                    <div class='row'>
-                      <div class='col-md-12'>
-                        <div class='pull-right'>
-                          <a ng-click='resizeEditor("smaller")'>
-                            <span class='glyphicon glyphicon-arrow-left'></span>
-                          </a>
-                          <a ng-hide='editorSize > 1'
-                            ng-click="resizeEditor('larger')" >
-                            <span class='glyphicon glyphicon-arrow-right'></span>
-                          </a>
-                        </div>
-                        <span class='lead'>{{policy.id || "Editor"}}</span>
-                      </div>
-                    </div>
-                    <div class='clearfix'></div>
-                    <div class='row'>
-                      <div class='col-md-5'>
-                        <div class='row'>
-                          <div class='col-md-12 form-horizontal'>
-                            <button class='btn btn-default btn-sm' 
-                              ng-class="{active: loading}"
-                              ng-click='save_policy()'
-                              ng-disabled='policy.id == null'>Save
-                            </button>
-                            <a class='btn btn-default btn-sm' 
-                              ng-class="{active: loading}"
-                              download="{{policy.id}}.txt"
-                              href="/download/refpolicy?id={{policy._id}}"
-                              ng-disabled='policy.id == null'>Export
-                            </a>
-                            <input id='moduleSelect'
-                            ui-select2='raw_module_select2'
-                            ng-model='raw_view_selection' type='hidden'
-                            placeholder='View module files'
-                            ng-disabled='policy.modules == null' />
-                          </div>
-                        </div>
-                        <div class='horizontal-pad'></div>
-                        <div class='clearfix'></div>
-                        <div class='row'>
-                          <div class='form-group'>
-                            <label class='control-label pad-right'>Visualizer Type</label>
-                            <div class='btn-group'>
-                              <button btn-radio="'tl_explore'" type='button' class='btn btn-sm btn-default' ng-model='visualizer_type'> Summary</button>
-                              <button btn-radio="'avispa'" type='button' class='btn btn-sm btn-default' active ng-model="visualizer_type">Structured</button>
-                              <button btn-radio="'hive'" type='button' class='btn btn-sm btn-default' ng-model='visualizer_type'> Hive</button>
-                            </div>
-                          </div>
-                        </div>
-                        <div class='row'>
-                          <div class='form-group'>
-                            <label class='control-label pad-right'>Visibility</label>
-                            <button type='button' 
-                              class='btn btn-xs btn-default' ng-model='view_control.unused_ports'
-                              btn-checkbox btn-checkbox-false='false' btn-checkbox-true='true'>
-                              Unused Ports
-                              <span style='vertical-align:middle'>
-                                <span ng-hide='controlParams.unused_ports' 
-                                  class='glyphicon glyphicon-eye-close'></span>
-                                <span ng-show='controlParams.unused_ports' 
-                                  class='glyphicon glyphicon-eye-open'></span>
-                              </span>
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                </div>
-                    <div class='editor'>
-                      <div ng-show='policy.id'>
-                        <tabset id='editor_tabs'>
-                        <tab id='tab_{{nm}}' ng-repeat='(nm, doc) in policy.documents' 
-                        heading='{{nm}}' select='setEditorTab(nm)'>
-                        </tab>
-                        </tabset>
-                      </div>
-                      <div class='editor-box'>
-                        <div ui-ace="{ onLoad: aceLoaded }"
-                          auto-height="540"
-                          auto-height-type='offset_bottom_px'
-                          on-resize='$scope.editor.resize()'>
-                        </div>
-                        <div class='faded-overlay' ng-hide='policy.id'>
-                          <p class='lead'>Open or create a policy from the 'Policy' menu above</p>
-                        </div>
-                      </div>
-                    </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-        <div ng-class="{'col-md-12': editorSize == 0,
-                        'col-md-8': editorSize == 1,
-                        'col-md-4': editorSize == 2}">
-          <div id='visualizer' ng-view auto-height='210' auto-height-type='offset_bottom_px'>
-          </div>
-        </div>
+      <div ng-view class='row main'>
+        <!-- Put the visualization here -->
       </div>
       <div class='row'>
         <div class='col-md-12'>
@@ -203,6 +106,10 @@
       </ul>
     </div>
     <div id='hive-context-menu'>
+      <ul role='menu' class='dropdown-menu'>
+      </ul>
+    </div>
+    <div id='diff-context-menu'>
       <ul role='menu' class='dropdown-menu'>
       </ul>
     </div>

@@ -1,9 +1,11 @@
     #= include ../../external/avispa/src/avispa.litcoffee
 
+    #= require filters.litcoffee
     #= require directives.litcoffee
     #= require services/main.litcoffee
     #= require services/ide.litcoffee
     #= require services/refpolicy.litcoffee
+    #= require services/wsutils.litcoffee
     #= require services/position.litcoffee
     #= require controllers.litcoffee
     #= require_tree controllers
@@ -29,8 +31,16 @@
             templateUrl: 'partials/tl_explore.html',
             controller: 'tlCtrl'
 
+          .when '/module_browser',
+            templateUrl: 'partials/module_browser.html',
+            controller: 'module_browserCtrl'
+
+          .when '/diff',
+            templateUrl: 'partials/diff.html',
+            controller: 'diffCtrl'
+
           .otherwise 
-            redirectTo: '/tl_explore'
+            redirectTo: '/blah'
     ])
 
 Preload all of the templates that we're going to use.

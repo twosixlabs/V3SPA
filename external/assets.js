@@ -16,3 +16,8 @@
 //= require angular-file-upload/angular-file-upload.min.js
 //= require bootstrap-contextmenu/bootstrap-contextmenu.js
 //= require queue/Queue.js
+//= require forceInABox.js
+//= require alasql/alasql.js
+//= require d3-grid/d3-grid.js
+//= require css.escape/css.escape.js
+//= require jsonh.js

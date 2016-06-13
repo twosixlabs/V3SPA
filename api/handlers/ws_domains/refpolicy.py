@@ -1,15 +1,19 @@
 import logging
 logger = logging.getLogger(__name__)
-
 import base64
 import itertools
 import os
 import re
 import hashlib
+import sys
 
 import restful
 import api.handlers.ws_domains as ws_domains
 import api
+
+import pprint
+import subprocess
+
 
 def iter_lines(fil_or_str):
   if isinstance(fil_or_str, (basestring)):
@@ -38,7 +42,7 @@ def read_module_files(module_data, limit=None, **addl_props):
   their data as a dictionary. """
 
   files = {}
-
+  
   if 'te_file' in module_data:
     with open(module_data['te_file']) as fin:
       info = os.fstat(fin.fileno())
@@ -89,45 +93,54 @@ class RefPolicy(restful.ResourceDomain):
 
     @classmethod
     def do_get(cls, refpol_id, response):
+        """ Returns a policy, without the document (list of allow rules)
+        and the parsed version of the policy.
+        """
+
         refpol_id = api.db.idtype(refpol_id)
         logger.info("Retrieving reference policy {0}".format(refpol_id))
 
         refpol = RefPolicy.Read(refpol_id)
+        
 
-        if refpol.documents is None or 'dsl' not in refpol.documents:
-            logger.info("Missing DSL. Making service request")
-            dsl = ws_domains.call(
-                'lobster',
-                'translate_selinux',
-                {
-                    'refpolicy': refpol.id,
-                    'modules': []
-                }
-            )
+        # if refpol.documents is None or 'dsl' not in refpol.documents:
+        #     logger.info("Missing DSL. Making service request")
+        #     dsl = ws_domains.call(
+        #         'lobster',
+        #         'translate_selinux',
+        #         {
+        #             'refpolicy': refpol.id,
+        #             'modules': []
+        #         }
+        #     )
 
-            if len(dsl['errors']) > 0:
-              raise Exception("Failed to translate DSL: {0}"
-                              .format("\n".join(
-                                  ("{0}".format(x) for x in dsl['errors']))))
+        #     if len(dsl['errors']) > 0:
+        #       raise Exception("Failed to translate DSL: {0}"
+        #                       .format("\n".join(
+        #                           ("{0}".format(x) for x in dsl['errors']))))
 
-            if 'documents' not in refpol:
-              refpol['documents'] = {}
+        #     if 'documents' not in refpol:
+        #       refpol['documents'] = {}
 
-            refpol['documents']['dsl'] = {
-                'text': dsl['result'],
-                'mode': 'lobster',
-                'digest': hashlib.md5(dsl['result']).hexdigest()
-            }
+        #     refpol['documents']['dsl'] = {
+        #         'text': dsl['result'],
+        #         'mode': 'lobster',
+        #         'digest': hashlib.md5(dsl['result']).hexdigest()
+        #     }
 
-            refpol.Insert()
+        #     refpol.Insert()
 
-        elif 'digest' not in refpol.documents['dsl']:
-            refpol.documents['dsl']['digest'] = hashlib.md5(
-                refpol.documents['dsl']['text']).hexdigest()
-            refpol.Insert()
+        # elif 'digest' not in refpol.documents['dsl']:
+        #     refpol.documents['dsl']['digest'] = hashlib.md5(
+        #         refpol.documents['dsl']['text']).hexdigest()
+        #     refpol.Insert()
 
         response['payload'] = refpol
-        response['payload'].get('parsed', {}).pop('full', None)
+
+        # Don't send the parsed data or the unparsed document
+        refpol.pop('parsed', None)
+        refpol.pop('documents', None)
+
         return response
 
     @classmethod
@@ -197,6 +210,15 @@ class RefPolicy(restful.ResourceDomain):
             try:
                 metadata.extract_zipped_policy()
                 metadata['modules'] = metadata.read_policy_modules()
+
+                returned_sesearch_result = metadata.parse_policy_binary()
+                metadata['documents'] = {
+                    'raw': {
+                        'text': returned_sesearch_result,
+                        'mode': 'raw',
+                        'digest': hashlib.md5(returned_sesearch_result).hexdigest()
+                    }
+                }
             except Exception:
                 metadata.Delete()
                 raise
@@ -271,6 +293,44 @@ class RefPolicy(restful.ResourceDomain):
                 }
 
         return modules
+    
+    def parse_policy_binary(self):
+        
+        policy_dir = os.path.join(
+            api.config.get('storage', 'bulk_storage_dir'),
+            'refpolicy', self['id'],'policy')
+
+        # regex for compatible policy versions
+        policy_binary_regex = "^policy\.(1[1-9]|2[0-9])$"
+        regex_compiled = re.compile(policy_binary_regex)
+
+        
+        # count number of regex matches
+        matches = 0
+        re_result = None
+        for fname in os.listdir(policy_dir):
+            re_match_result=re.match(policy_binary_regex,str(fname))
+            if re_match_result:
+                re_result = re_match_result
+                matches += 1
+
+        sesearch_result = ""
+
+        if matches > 1:
+            logger.warn("Too many binary policies") 
+            return sesearch_result
+        elif matches < 1:
+            logger.warn("Could not find compatible binary policy") 
+            return sesearch_result
+        
+        # perform sesearch if we have unique policy regex match
+        
+        policy_file = os.path.join(policy_dir,re_result.string)
+        policy_file = os.path.abspath(policy_file)
+        
+        sesearch_result = subprocess.check_output(["sesearch","--allow",policy_file])
+        
+        return sesearch_result
 
     def extract_zipped_policy(self):
         """ Validate that the uploaded file is actually a policy.
@@ -285,6 +345,8 @@ class RefPolicy(restful.ResourceDomain):
         policy_dir = os.path.abspath(os.path.join(
             api.config.get('storage', 'bulk_storage_dir'),
             'refpolicy'))
+
+        pprint.pprint(zipped_policy)
 
         if not zipfile.is_zipfile(zipped_policy):
             raise api.DisplayError("Unable to extract: file was not a ZIP archive")

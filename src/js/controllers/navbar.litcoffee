@@ -1,10 +1,26 @@
     vespaControllers = angular.module('vespaControllers') 
 
-    vespaControllers.controller 'navCtrl', ($scope, RefPolicy, VespaLogger, SockJSService, $modal, IDEBackend)->
+    vespaControllers.controller 'navCtrl', ($scope, RefPolicy, VespaLogger, SockJSService, $modal, IDEBackend, $location)->
 
         #policy = RefPolicy.promise()
         #policy.then (policy)->
         #  $scope.refpolicy = policy
+
+        $scope.visualizer_type = 'diff'
+
+        $scope.$watch 'visualizer_type', (value)->
+          if value == 'avispa'
+            $location.path('/avispa')
+          else if value =='hive'
+            $location.path('/hive')
+          else if value =='tl_explore'
+            $location.path('/tl_explore')
+          else if value =='module_browser'
+            $location.path('/module_browser')
+          else if value =='diff'
+            $location.path('/diff')
+          else
+            console.error("Invalid visualizer type")
 
         $scope.load_refpolicy = ->
           instance = $modal.open

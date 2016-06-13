@@ -7,7 +7,7 @@ errors, and generally being awesome.
 
     mod.service 'IDEBackend',
       class IDEBackend
-        constructor: (@VespaLogger, @$rootScope,
+        constructor: (@VespaLogger, @$rootScope, @WSUtils,
         @SockJSService, @$q, @$timeout) ->
 
           @current_policy =
@@ -32,6 +32,7 @@ errors, and generally being awesome.
           @selection_ranges = {}
 
           @validate_dsl = _.debounce @_validate_dsl, 500
+          @parse_raw = _.debounce @_parse_raw, 500
 
         isCurrent: (id)=>
           id? and id == @current_policy._id
@@ -136,6 +137,9 @@ application representation) can be done from here
           if doc == 'dsl'
             @validate_dsl()
 
+          if doc == 'raw'
+            @parse_raw()
+
 Return the JSON representation if valid, and null if it is
 invalid
 
@@ -211,6 +215,41 @@ Extend the set of paths that we show.
 
           @_validate_dsl()
 
+Expand policy from succinct to verbose style.
+
+        _uncompress: () =>
+          # Parse the jsonh format into regular JSON objects
+          @current_policy.json.parameterized.nodes = jsonh.parse @current_policy.json.parameterized.nodes
+          @current_policy.json.parameterized.links = jsonh.parse @current_policy.json.parameterized.links
+
+          # Confirm existence of abbreviated object keys, then expand them
+          if @current_policy?.json?.parameterized?.nodes? and
+          't' of @current_policy.json.parameterized.nodes[0] and
+          'n' of @current_policy.json.parameterized.nodes[0]
+            
+            typeMap =
+              s: 'subject'
+              o: 'object'
+              c: 'class'
+              p: 'perm'
+            
+            nodes = @current_policy.json.parameterized.nodes.map (n) =>
+              'type': typeMap[n.t]
+              'name': n.n
+              'policy': @current_policy.id
+              'selected': true
+            @current_policy.json.parameterized.nodes = nodes
+
+          if @current_policy?.json?.parameterized?.links? and
+          't' of @current_policy.json.parameterized.links[0] and
+          's' of @current_policy.json.parameterized.links[0]
+
+            links = @current_policy.json.parameterized.links.map (l) =>
+              'target': nodes[l.t]
+              'source': nodes[l.s]
+              'policy': @current_policy.id
+            @current_policy.json.parameterized.links = links
+
 Compose the graph expansion dictionary as a
 set of paths.
 
@@ -244,8 +283,60 @@ trigger revalidation.
             unless @current_policy.id == null
               @validate_dsl()
 
+Send a request to the server to parse the raw policy and return the JSON parsed
+version of the policy.
+
+        _parse_raw: =>
+          deferred = @$q.defer()
+
+          path_params = @write_filter_param(@graph_expansion)
+          path_params = _.union(path_params, 
+                                _.map(@graph_id_expansion, (v)->
+                                    "id=#{v}"
+                                )
+          )
+
+          req =
+            domain: 'raw'
+            request: 'parse'
+            payload:
+              policy: @current_policy._id
+
+
+          console.log("MAKING THE CALL")
+          @SockJSService.send req, (result)=>
+            console.log("HEAR ME")
+            if result.error  # Service error
+
+              $.growl(
+                title: "Error"
+                message: result.payload
+              ,
+                type: 'danger'
+              )
+
+              deferred.reject result.payload
+
+            else  # valid response. Must parse
+              @current_policy.json = JSON.parse result.payload
+              @_uncompress()
+
+              # For now, disable calling the validation hooks because they are
+              # related to the DSL and not raw policies.
+              # for hook in @hooks.validation
+              #   annotations =
+              #     errors: @current_policy.json.errors
+              #   hook(annotations)
+
+              _.each @hooks.json_changed, (hook)=>
+                hook(@current_policy.json)
+
+              deferred.resolve()
+
+          return deferred.promise
+
 Send a request to the server to validate the current
-contents of @current_policy
+contents of @current_policy and get the parsed JSON
 
         _validate_dsl: =>
           deferred = @$q.defer()
@@ -294,12 +385,30 @@ contents of @current_policy
 
           return deferred.promise
 
+        load_raw_graph: () =>
+
+            if not @current_policy.valid
+              return
+
+            @WSUtils.fetch_raw_graph(@current_policy._id).then (json) =>
+              @current_policy.json ?= {}
+              @current_policy.json.parameterized ?= {}
+              @current_policy.json.parameterized.nodes = json.parameterized.nodes
+              @current_policy.json.parameterized.links = json.parameterized.links
+
+              _.each @hooks.json_changed, (hook)=>
+                hook(@current_policy.json)
+
         load_local_policy: (refpolicy)=>
 
             @graph_expansion = {}
 
             @current_policy = refpolicy
             @current_policy.valid = true
+
+            # Adding this because raw views do not have editor, and therefore no document or text
+            # So need to manually trigger getting the raw json
+            #@parse_raw()
 
             for hook in @hooks.policy_load
               hook(@current_policy)

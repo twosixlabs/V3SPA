@@ -1,18 +1,18 @@
 {
   "name": "V3SPA",
-  "version": "0.5.0",
+  "version": "1.0.0",
   "dependencies": {
-    "gulp-include": "cwacek/gulp-include#improved",
-    "gulp-coffee": "~1.4.1",
-    "gulp": "~3.5.2",
-    "gulp-util": "~2.2.14",
-    "gulp-rename": "~1.0.0",
-    "gulp-debug": "~0.2.0",
-    "jade": "~1.1.5",
     "browserify": "~3.28.2",
-    "jadeify": "~2.1.1",
-    "gulp-uglify": "~0.2.1",
+    "gulp": "~3.5.2",
+    "gulp-chug": "~0.1.8",
+    "gulp-coffee": "~1.4.1",
+    "gulp-debug": "~0.2.0",
+    "gulp-include": "cwacek/gulp-include#improved",
     "gulp-less": "~1.2.1",
-    "gulp-chug": "~0.1.8"
+    "gulp-rename": "~1.0.0",
+    "gulp-uglify": "~0.2.1",
+    "gulp-util": "~2.2.14",
+    "jade": "~1.1.5",
+    "jadeify": "~2.1.1"
   }
 }

@@ -376,6 +376,188 @@ svg.hiveview {
   }
 }
 
+.module_browserview {
+  g.node {
+    text {
+      text-anchor: start;
+      pointer-events: none;
+    }
+    rect {
+      stroke: #3182bd;
+      stroke-width: 1.5px;
+    }
+  }
+}
+
+caption {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  color: #777;
+  text-align: left;
+}
+
+@media (min-width: 992px) {
+  .controls-container {
+    float: left;
+    width: 550px;
+  }
+
+  .viz-container {
+    float: left;
+    width: calc(~"100% - 550px");
+  }
+}
+
+.controls-container, .viz-container {
+  position: relative;
+  min-height: 1px;
+  padding-left: 2.5px;
+  padding-right: 2.5px;
+}
+
+.diff-toolbox-container {
+  width: 500px;
+
+  .node-controls {
+    margin-top: 4px;
+    padding-top: 4px;
+
+    label {
+      font-weight: normal;
+      margin-bottom: 0;
+    }
+
+    input {
+      margin-right: 4px;
+    }
+  }
+
+  .policy-name {
+    margin-top: 12px;
+    width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+    line-height: 1;
+  }
+
+  .selection-controls {
+    display: inline-block;
+  }
+
+  .selection-list {
+    height: 85px;
+    overflow-y: scroll;
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+
+    label {
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+      min-width: 80px;
+      max-width: 100%;
+      line-height: 1;
+      font-size: 85%;
+    }
+  }
+}
+
+.diffview {
+  line.link {
+    display: none;
+    stroke: #aaa;
+  }
+  line.link.visible {
+    display: inline;
+  }
+  line.link.highlight, line.link.clicked {
+    display: inline;
+    stroke: #222;
+  }
+  g.node {
+    circle {
+      stroke-width: 1.5px;
+    }
+    circle.diff-left {
+      fill: url(#diff-left);
+    }
+    circle.diff-right {
+      fill: url(#diff-right);
+    }
+    text {
+      display: none;
+      text-anchor: middle;
+      dominant-baseline: ideographic;
+      pointer-events: none;
+    }
+  }
+  g.node.highlight, g.node.clicked {
+    circle.diff-left {
+      fill: url(#diff-left-inverse);
+    }
+    circle.diff-right {
+      fill: url(#diff-right-inverse);
+    }
+    text {
+      display: inline;
+    }
+  }
+  .subjects {
+    circle {
+      stroke: #005892;
+      fill: #72b7f9;
+    }
+    .highlight circle, .clicked circle {
+      stroke: #003064;
+      fill: #005892;
+    }
+    text {
+      fill: #15537d;
+    }
+  }
+  .objects {
+    circle {
+      stroke: #ff7f0e;
+      fill: #ffc259;
+    }
+    .highlight circle, .clicked circle {
+      stroke: #c55000;
+      fill: #ff7f0e;
+    }
+    text {
+      fill: #b25809;
+    }
+  }
+  .classes {
+    circle {
+      stroke: #2ca02c;
+      fill: #78e46c;
+    }
+    .highlight circle, .clicked circle {
+      stroke: #007000;
+      fill: #2ca02c;
+    }
+    text {
+      fill: #1e701e;
+    }
+  }
+  .permissions {
+    circle {
+      stroke: #d62728;
+      fill: #ff7361;
+    }
+    .highlight circle, .clicked circle {
+      stroke: #9c0000;
+      fill: #d62728;
+    }
+    text {
+      fill: #951b1c;
+    }
+  }
+}
+
 .btn:focus {
   outline: thin dotted;;
   }
