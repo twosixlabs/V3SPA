@@ -100,7 +100,8 @@ class RefPolicy(restful.ResourceDomain):
         refpol_id = api.db.idtype(refpol_id)
         logger.info("Retrieving reference policy {0}".format(refpol_id))
 
-        refpol = RefPolicy.Read(refpol_id)
+        # Don't send the parsed data or the unparsed document
+        refpol = RefPolicy.Find({'_id': refpol_id}, {'parsed': False, 'documents': False}, 1)[0]
         
 
         # if refpol.documents is None or 'dsl' not in refpol.documents:
@@ -137,9 +138,6 @@ class RefPolicy(restful.ResourceDomain):
 
         response['payload'] = refpol
 
-        # Don't send the parsed data or the unparsed document
-        refpol.pop('parsed', None)
-        refpol.pop('documents', None)
 
         return response
 
