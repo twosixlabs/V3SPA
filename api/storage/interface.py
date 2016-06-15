@@ -90,8 +90,8 @@ class Entry(collections.MutableMapping):
       return self.entry.__iter__()
 
     @classmethod
-    def Find(cls, criteria, selection=None):
-        result = api.db.Find(cls.TABLE, criteria, selection)
+    def Find(cls, criteria, selection=None, max=0):
+        result = api.db.Find(cls.TABLE, criteria, selection, limit=max)
         if result is None:
           return []
         return map(cls, result)
