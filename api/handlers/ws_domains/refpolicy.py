@@ -102,6 +102,33 @@ class RefPolicy(restful.ResourceDomain):
 
         # Don't send the parsed data or the unparsed document
         refpol = RefPolicy.Find({'_id': refpol_id}, {'parsed': False, 'documents': False}, 1)[0]
+
+        pprint.pprint(refpol['modules'])
+
+        lobster_import = { 'refpolicy': refpol.id, 'modules': [] }
+
+        # for mod_name, mod in refpol.modules.iteritems():
+        #     pprint.pprint(mod)
+        #     source = read_module_files(mod, editable=False, limit=1500)
+        #     source['name'] = mod_name
+        #     lobster_import['modules'].append(source)
+
+        # lobster_import['modules'] = map(lambda mod: {'name': mod['name'], 'if': mod['if']['text'], 'te': mod['te']['text'], 'fc': mod['fc']['text']}, lobster_import['modules'])
+
+        #pprint.pprint(lobster_import[lobster_import.keys()[0]])
+        #pprint.pprint(lobster_import['modules'][0])
+
+        dsl = ws_domains.call(
+            'lobster',
+            'translate_selinux',
+            lobster_import
+        )
+
+        print("=====LOBSTER KEYS======")
+
+        #pprint.pprint(lobster_import['modules'][0])
+        pprint.pprint(dsl.keys())
+        pprint.pprint(dsl['result'])
         
 
         # if refpol.documents is None or 'dsl' not in refpol.documents:

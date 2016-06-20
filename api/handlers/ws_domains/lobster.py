@@ -8,7 +8,10 @@ import hashlib
 import api.support.decompose
 import api.handlers.ws_domains as ws_domains
 
-__MIN_LSR_VERSION__ = 2
+import pprint
+import json
+
+__MIN_LSR_VERSION__ = 6
 
 
 class LobsterDomain(object):
@@ -66,6 +69,9 @@ class LobsterDomain(object):
             if e.code == 599:
                 logger.warning("Request timed out")
                 raise Exception("backend:lobster - Unavailable")
+            elif e.code == 500:
+                logger.warning("Error during request - {0}".format(e.response.body))
+                raise Exception("backend:lobster - {0}".format(e.response.body))
             else:
                 logger.warning("Error during request - [{0}] {1}"
                                .format(e.code, e.message))
@@ -421,10 +427,16 @@ class LobsterDomain(object):
             }
         """
         logger.info("Params: {0}".format(params))
-        output = self._make_request('POST', '/import/selinux',
+        try:
+            output = self._make_request('POST', '/projects/{0}/import/selinux'.format(params['refpolicy']),
                                     params if isinstance(params, basestring) else api.db.json.dumps(params))
+        except Exception as e:
+            raise api.DisplayError("Unable to import policy: {0}".format(e.message))
+        else:
+            return api.db.json.loads(output.body)
+        
 
-        return api.db.json.loads(output.body)
+        
 
     def handle(self, msg):
         if msg['request'] == 'validate':
