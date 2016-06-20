@@ -39,8 +39,12 @@
             templateUrl: 'partials/diff.html',
             controller: 'diffCtrl'
 
+          .when '/explore',
+            templateUrl: 'partials/explore.html',
+            controller: 'exploreCtrl'
+
           .otherwise 
-            redirectTo: '/blah'
+            redirectTo: '/module_browser'
     ])
 
 Preload all of the templates that we're going to use.

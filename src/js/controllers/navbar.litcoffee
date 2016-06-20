@@ -6,7 +6,7 @@
         #policy.then (policy)->
         #  $scope.refpolicy = policy
 
-        $scope.visualizer_type = 'diff'
+        $scope.visualizer_type = 'explore'
 
         $scope.$watch 'visualizer_type', (value)->
           if value == 'avispa'
@@ -19,6 +19,8 @@
             $location.path('/module_browser')
           else if value =='diff'
             $location.path('/diff')
+          else if value =='explore'
+            $location.path('/explore')
           else
             console.error("Invalid visualizer type")
 

@@ -1,0 +1,55 @@
+<editor>
+  <div>Exploration controls</div>
+  <div><button>Parse denied</button></div>
+  <div>Filter by connections</div>
+  <div>Filter by centrality</div>
+  <div>Filter by module</div>
+</editor>
+<div ng-class="{'col-md-12': editorSize == 0,
+                      'viz-container': editorSize == 1}">
+  <div id='visualizer' auto-height='210' auto-height-type='offset_bottom_px'>
+    <div id='surface' class='row'>
+      <div class='toolbox panel panel-default'>
+        <div class='panel-body'>
+          <div>
+            <small><strong>Legend</strong></small>
+          </div>
+          <div>
+            <svg style="width:18px; height:18px; float:left">
+              <g transform="scale(1.5,1.5)translate(1,1)">
+                <circle cx="5" cy="5" r="5" style="stroke:#777; fill:#fff;" />
+                <path d="M 5 2 L 2 5 L 5 8 M 2 5 L 9 5" fill="none" stroke="#666" stroke-width="2" />
+              </g>
+            </svg>
+            <p style="margin-left:22px;">&nbsp;{{policyIds.primary || '&lt;load ref policy&gt;'}}</p>
+          </div>
+          <div>
+            <svg style="width:18px; height:18px; float:left">
+              <g transform="scale(1.5,1.5)translate(1,1)">
+                <circle cx="5" cy="5" r="5" style="stroke:#777; fill:#ddd;" />
+              </g>
+            </svg>
+            <p style="margin-left:22px;">&nbsp;{{policyIds.both || '&lt;select comparison&gt;'}}</p>
+          </div>
+          <div>
+            <svg style="width:18px; height:18px; float:left">
+              <g transform="scale(1.5,1.5)translate(1,1)">
+                <circle cx="5" cy="5" r="5" style="stroke:#777; fill:#fff;" />
+                <path d="M 5 2 L 8 5 L 5 8 M 8 5 L 1 5" fill="none" stroke="#666" stroke-width="2" />
+              </g>
+            </svg>
+            <p style="margin-left:22px;">&nbsp;{{policyIds.comparison || '&lt;select comparison&gt;'}}</p>
+          </div>
+        </div>
+      </div>
+      <div id="explore-container" style="position: absolute; width: 100%; height: 100%;"></div>
+      <!--<svg xmlns="http://www.w3.org/2000/svg" class='exploreview'>
+        <g class="viewer">
+          <g style="font-size: 32px; fill: #999;">
+            <text>Explore</text>
+          </g>
+        </g>
+      </svg>-->
+    </div>
+  </div>
+</div>
