@@ -4,6 +4,7 @@ logger = logging.getLogger(__name__)
 
 from tornado import httpclient
 import hashlib
+import urllib
 
 import api.support.decompose
 import api.handlers.ws_domains as ws_domains
@@ -428,7 +429,8 @@ class LobsterDomain(object):
         """
         logger.info("Params: {0}".format(params))
         try:
-            output = self._make_request('POST', '/projects/{0}/import/selinux'.format(params['refpolicy']),
+            endpoint_uri = '/projects/{0}/{1}'.format(params['refpolicy'], urllib.urlencode('import/selinux'))
+            output = self._make_request('POST', endpoint_uri,
                                     params if isinstance(params, basestring) else api.db.json.dumps(params))
         except Exception as e:
             raise api.DisplayError("Unable to import policy: {0}".format(e.message))
