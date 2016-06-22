@@ -278,3 +278,70 @@
             scope.selectionChange()
 
       return ret
+
+    v3spa.directive 'rangeSlider', ->
+      ret =
+        restrict: 'E'
+        replace: true
+        scope:
+          width: '@'
+          height: '@'
+          range: '='
+          rangeChange: '&'
+        template: """
+                  <div class="range-slider"></div>
+                  """
+        link: (scope, element, attrs) ->
+          margin =
+            top: 5
+            right: 10
+            bottom: 20
+            left: 10
+
+          width = (scope.width or 500) - margin.left - margin.right
+          height = (scope.height or 50) - margin.top - margin.bottom
+
+          x = d3.scale.linear()
+            .domain(scope.range)
+            .range([0, width])
+
+          brush = d3.svg.brush()
+            .x(x)
+            .extent(scope.range)
+            .on("brush", () -> scope.rangeChange({extent: brush.extent()}))
+
+          brushAxis = d3.svg.axis()
+            .scale(x)
+            .orient("bottom")
+            .tickValues(scope.range)
+            .tickSize(0,4)
+            .tickPadding(5)
+
+          arc = d3.svg.arc()
+            .outerRadius(height/2)
+            .startAngle(0)
+            .endAngle((d,i) -> if i then -Math.PI else Math.PI)
+
+          svg = d3.select(element[0]).append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+
+          svg.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(brushAxis)
+
+          brushg = svg.append("g")
+            .attr("class", "brush")
+            .call(brush)
+
+          brushg.selectAll(".resize").append("path")
+            .attr("transform", "translate(0," + height/2 + ")")
+            .attr("d", arc)
+
+          brushg.selectAll("rect")
+            .attr("height", height)
+
+      return ret

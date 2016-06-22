@@ -1,8 +1,15 @@
 <editor>
-  <div>Exploration controls</div>
-  <div><button>Parse denied</button></div>
-  <div>Filter by connections</div>
-  <div>Filter by centrality</div>
+  <div>
+    <button type="button" class="btn btn-default" ng-click='cancel()'>Filter by denial</button>
+  </div>
+  <div>
+    Filter by connections
+    <range-slider width="200" height="40" range="filters.degreeRange" range-change="filters.degreeChange(extent)"></range-slider>
+  </div>
+  <div>
+    Filter by centrality
+    <range-slider width="200" height="40" range="filters.centralityRange" range-change="filters.centralityChange(extent)"></range-slider>
+  </div>
   <div>Filter by module</div>
 </editor>
 <div ng-class="{'col-md-12': editorSize == 0,
@@ -17,28 +24,34 @@
           <div>
             <svg style="width:18px; height:18px; float:left">
               <g transform="scale(1.5,1.5)translate(1,1)">
-                <circle cx="5" cy="5" r="5" style="stroke:#777; fill:#fff;" />
-                <path d="M 5 2 L 2 5 L 5 8 M 2 5 L 9 5" fill="none" stroke="#666" stroke-width="2" />
+                <circle cx="5" cy="5" r="5" style="stroke:none; fill:#72b7f9;" />
               </g>
             </svg>
-            <p style="margin-left:22px;">&nbsp;{{policyIds.primary || '&lt;load ref policy&gt;'}}</p>
+            <p style="margin-left:22px;">&nbsp;Subjects</p>
           </div>
           <div>
             <svg style="width:18px; height:18px; float:left">
               <g transform="scale(1.5,1.5)translate(1,1)">
-                <circle cx="5" cy="5" r="5" style="stroke:#777; fill:#ddd;" />
+                <circle cx="5" cy="5" r="5" style="stroke:none; fill:#ffc259;" />
               </g>
             </svg>
-            <p style="margin-left:22px;">&nbsp;{{policyIds.both || '&lt;select comparison&gt;'}}</p>
+            <p style="margin-left:22px;">&nbsp;Objects</p>
           </div>
           <div>
             <svg style="width:18px; height:18px; float:left">
               <g transform="scale(1.5,1.5)translate(1,1)">
-                <circle cx="5" cy="5" r="5" style="stroke:#777; fill:#fff;" />
-                <path d="M 5 2 L 8 5 L 5 8 M 8 5 L 1 5" fill="none" stroke="#666" stroke-width="2" />
+                <circle cx="5" cy="5" r="5" style="stroke:none; fill:#ff7361;" />
               </g>
             </svg>
-            <p style="margin-left:22px;">&nbsp;{{policyIds.comparison || '&lt;select comparison&gt;'}}</p>
+            <p style="margin-left:22px;">&nbsp;Permissions</p>
+          </div>
+          <div>
+            <svg style="width:18px; height:18px; float:left">
+              <g transform="scale(1.5,1.5)translate(1,1)">
+                <circle cx="5" cy="5" r="5" style="stroke:none; fill:#78e46c;" />
+              </g>
+            </svg>
+            <p style="margin-left:22px;">&nbsp;Classes</p>
           </div>
         </div>
       </div>

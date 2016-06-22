@@ -6,6 +6,21 @@
       # The 'outstanding' attribute is truthy when a policy is being loaded
       $scope.status = SockJSService.status
 
+      $scope.sigma = new sigma(
+        container: 'explore-container'
+        settings:
+          minEdgeSize: 2
+          maxEdgeSize: 2
+          edgeColor: "default"
+          defaultEdgeColor: "#555"
+      )
+
+      $scope.filters =
+        degreeRange: [0, 100]
+        degreeChange: (extent) -> console.log extent
+        centralityRange: [0, 100]
+        centralityChange: (extent) -> console.log extent
+
       $scope.controls =
         tab: 'nodesTab'
         linksVisible: false
@@ -31,8 +46,9 @@
               query.callback(dropdown)
           )
 
-      width = 350
-      height = 500
+      nodeFillScale = d3.scale.ordinal()
+        .domain(["subj", "obj", "class", "perm"])
+        .range(["#005892", "#ff7f0e", "#2ca02c", "#d62728"])
 
       $scope.update_view = (data) ->
         console.log "update_view"
@@ -41,21 +57,34 @@
 
         testGraph =
           nodes: [
-            { id: "n0", label: "A", x: 0, y: 0, size: 5 },
-            { id: "n1", label: "B", x: 10, y: 20, size: 5 },
-            { id: "n2", label: "C", x: 20, y: 30, size: 5 },
-            { id: "n3", label: "D", x: 30, y: 10, size: 5 },
+            { id: "n0", label: "subj1", x: 0, y: 0, size: 5, type: "subj" },
+            { id: "n1", label: "obj2", x: 10, y: 20, size: 5, type: "obj" },
+            { id: "n2", label: "read", x: 20, y: 30, size: 5, type: "perm" },
+            { id: "n3", label: "file", x: 30, y: 10, size: 5, type: "class" },
+            { id: "n4", label: "ioctl", x: 35, y: 10, size: 5, type: "perm" },
+            { id: "n5", label: "write", x: 25, y: 15, size: 5, type: "perm" },
+            { id: "n6", label: "obj2", x: 10, y: 5, size: 5, type: "obj" },
+            { id: "n7", label: "dir", x: 20, y: 15, size: 5, type: "class" },
           ]
           edges: [
-            {id: "e0", source: "n0", target: "n1"}
-            {id: "e1", source: "n0", target: "n2"}
-            {id: "e2", source: "n2", target: "n3"}
+            {id: "e0", source: "n0", target: "n1", size: 2}
+            {id: "e1", source: "n0", target: "n2", size: 2}
+            {id: "e2", source: "n2", target: "n3", size: 2}
+            {id: "e3", source: "n2", target: "n6", size: 2}
+            {id: "e4", source: "n5", target: "n3", size: 2}
+            {id: "e5", source: "n6", target: "n7", size: 2}
+            {id: "e6", source: "n7", target: "n3", size: 2}
+            {id: "e7", source: "n1", target: "n4", size: 2}
           ]
 
-        s = new sigma(
-          graph: testGraph
-          container: 'explore-container'
-        )
+        testGraph.nodes = testGraph.nodes.map (n) ->
+          n.color = nodeFillScale(n.type)
+          return n
+        console.log testGraph.nodes[0]
+
+        $scope.sigma.graph.clear()
+        $scope.sigma.graph.read(testGraph)
+        $scope.sigma.refresh()
 
       update = () ->
         console.log "update"
