@@ -429,9 +429,9 @@ class LobsterDomain(object):
         """
         logger.info("Params: {0}".format(params))
         try:
-            endpoint_uri = '/projects/{0}/{1}'.format(params['refpolicy'], urllib.urlencode('import/selinux'))
-            output = self._make_request('POST', endpoint_uri,
-                                    params if isinstance(params, basestring) else api.db.json.dumps(params))
+            endpoint_uri = '/projects/{0}/import/selinux'.format(params['refpolicy'])
+            payload = params if isinstance(params, basestring) else api.db.json.dumps(params)
+            output = self._make_request('POST', endpoint_uri, payload)
         except Exception as e:
             raise api.DisplayError("Unable to import policy: {0}".format(e.message))
         else:
