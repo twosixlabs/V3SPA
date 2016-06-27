@@ -59,12 +59,12 @@
         nodeTypes = ["subj", "obj", "perm", "class"]
         N = 7000
         E = 50000
-        testGraph =
+        graph =
           nodes: []
           edges: []
 
         for i in [0...N]
-          testGraph.nodes.push({
+          graph.nodes.push({
             id: 'n' + i
             label: 'Node ' + i
             x: Math.random()
@@ -74,20 +74,21 @@
           })
 
         for i in [0...E]
-          testGraph.edges.push({
+          graph.edges.push({
             id: 'e' + i
             source: 'n' + (Math.random() * N | 0)
             target: 'n' + (Math.random() * N | 0)
             size: 2
           })
 
-        testGraph.nodes = testGraph.nodes.map (n) ->
+        graph.nodes = graph.nodes.map (n) ->
           n.color = nodeFillScale(n.type)
           return n
-        console.log testGraph.nodes[0]
+        
 
         $scope.sigma.graph.clear()
-        $scope.sigma.graph.read(testGraph)
+        $scope.sigma.graph.read(graph)
+        $scope.filters.degreeRange = d3.extent(graph.nodes, (n) -> $scope.sigma.graph.degree(n.id))
         $scope.sigma.refresh()
 
       update = () ->
