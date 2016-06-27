@@ -8,6 +8,7 @@
 
       $scope.sigma = new sigma(
         container: 'explore-container'
+        type: 'webgl'
         settings:
           minEdgeSize: 2
           maxEdgeSize: 2
@@ -55,27 +56,30 @@
 
         # Test sigma
 
+        nodeTypes = ["subj", "obj", "perm", "class"]
+        N = 7000
+        E = 50000
         testGraph =
-          nodes: [
-            { id: "n0", label: "subj1", x: 0, y: 0, size: 5, type: "subj" },
-            { id: "n1", label: "obj2", x: 10, y: 20, size: 5, type: "obj" },
-            { id: "n2", label: "read", x: 20, y: 30, size: 5, type: "perm" },
-            { id: "n3", label: "file", x: 30, y: 10, size: 5, type: "class" },
-            { id: "n4", label: "ioctl", x: 35, y: 10, size: 5, type: "perm" },
-            { id: "n5", label: "write", x: 25, y: 15, size: 5, type: "perm" },
-            { id: "n6", label: "obj2", x: 10, y: 5, size: 5, type: "obj" },
-            { id: "n7", label: "dir", x: 20, y: 15, size: 5, type: "class" },
-          ]
-          edges: [
-            {id: "e0", source: "n0", target: "n1", size: 2}
-            {id: "e1", source: "n0", target: "n2", size: 2}
-            {id: "e2", source: "n2", target: "n3", size: 2}
-            {id: "e3", source: "n2", target: "n6", size: 2}
-            {id: "e4", source: "n5", target: "n3", size: 2}
-            {id: "e5", source: "n6", target: "n7", size: 2}
-            {id: "e6", source: "n7", target: "n3", size: 2}
-            {id: "e7", source: "n1", target: "n4", size: 2}
-          ]
+          nodes: []
+          edges: []
+
+        for i in [0...N]
+          testGraph.nodes.push({
+            id: 'n' + i
+            label: 'Node ' + i
+            x: Math.random()
+            y: Math.random()
+            size: 5
+            type: nodeTypes[Math.floor(Math.random()*4)]
+          })
+
+        for i in [0...E]
+          testGraph.edges.push({
+            id: 'e' + i
+            source: 'n' + (Math.random() * N | 0)
+            target: 'n' + (Math.random() * N | 0)
+            size: 2
+          })
 
         testGraph.nodes = testGraph.nodes.map (n) ->
           n.color = nodeFillScale(n.type)
