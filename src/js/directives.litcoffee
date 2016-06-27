@@ -288,6 +288,8 @@
           height: '@'
           range: '='
           rangeChange: '&'
+          rangeChangeStart: '&'
+          rangeChangeEnd: '&'
         template: """
                   <div class="range-slider"></div>
                   """
@@ -308,7 +310,13 @@
           brush = d3.svg.brush()
             .x(x)
             .extent(scope.range)
-            .on("brush", () -> scope.rangeChange({extent: brush.extent()}))
+
+          if attrs.rangeChange
+            brush.on("brush", () -> scope.rangeChange({extent: brush.extent()}))
+          if attrs.rangeChangeStart
+            brush.on("start", () -> scope.rangeChangeStart({extent: brush.extent()}))
+          if attrs.rangeChangeEnd
+            brush.on("end", () -> scope.rangeChangeEnd({extent: brush.extent()}))
 
           brushAxis = d3.svg.axis()
             .scale(x)
