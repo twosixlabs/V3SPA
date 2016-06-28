@@ -115,7 +115,7 @@
 
         $scope.sigma.graph.clear()
         $scope.sigma.graph.read(graph)
-        $scope.statistics = $scope.sigma.graph.HITS(true)
+        $scope.statistics = $scope.sigma.graph.HITS()
         $scope.filters.degreeRange = d3.extent(graph.nodes, (n) -> $scope.sigma.graph.degree(n.id))
         $scope.filters.authorityRange = d3.extent(d3.values($scope.statistics), (n) -> n.authority)
         $scope.filters.hubRange = d3.extent(d3.values($scope.statistics), (n) -> n.hub)
