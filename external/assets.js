@@ -22,3 +22,5 @@
 //= require css.escape/css.escape.js
 //= require jsonh.js
 //= require sigmajs/sigma.require.js
+//= require sigmajs/plugins/sigma.plugins.filter.min.js
+//= require sigmajs/plugins/sigma.statistics.HITS.min.js

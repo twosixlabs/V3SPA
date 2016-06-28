@@ -16,11 +16,38 @@
           defaultEdgeColor: "#555"
       )
 
+      $scope.statistics
+
+      degreeChangeCallback = (extent) ->
+        nodeDegree = (n) ->
+          $scope.sigma.graph.degree(n.id) > extent[0] and
+          $scope.sigma.graph.degree(n.id) < extent[1]
+        $scope.nodeFilter.undo('node-degree')
+        $scope.nodeFilter.nodesBy(nodeDegree, 'node-degree').apply()
+
+      authorityChangeCallback = (extent) ->
+        nodeAuthority = (n) ->
+          $scope.statistics[n.id].authority > extent[0] and
+          $scope.statistics[n.id].authority < extent[1]
+        $scope.nodeFilter.undo('node-authority')
+        $scope.nodeFilter.nodesBy(nodeAuthority, 'node-authority').apply()
+
+      hubChangeCallback = (extent) ->
+        nodeHub = (n) ->
+          $scope.statistics[n.id].hub > extent[0] and
+          $scope.statistics[n.id].hub < extent[1]
+        $scope.nodeFilter.undo('node-hub')
+        $scope.nodeFilter.nodesBy(nodeHub, 'node-hub').apply()
+
       $scope.filters =
         degreeRange: [0, 100]
-        degreeChange: (extent) -> console.log extent
-        centralityRange: [0, 100]
-        centralityChange: (extent) -> console.log extent
+        degreeChange: degreeChangeCallback
+        authorityRange: [0, 100]
+        authorityChange: authorityChangeCallback
+        hubRange: [0, 100]
+        hubChange: hubChangeCallback
+
+      $scope.nodeFilter = sigma.plugins.filter($scope.sigma)
 
       $scope.controls =
         tab: 'nodesTab'
@@ -84,11 +111,14 @@
         graph.nodes = graph.nodes.map (n) ->
           n.color = nodeFillScale(n.type)
           return n
-        
+
 
         $scope.sigma.graph.clear()
         $scope.sigma.graph.read(graph)
+        $scope.statistics = $scope.sigma.graph.HITS(true)
         $scope.filters.degreeRange = d3.extent(graph.nodes, (n) -> $scope.sigma.graph.degree(n.id))
+        $scope.filters.authorityRange = d3.extent(d3.values($scope.statistics), (n) -> n.authority)
+        $scope.filters.hubRange = d3.extent(d3.values($scope.statistics), (n) -> n.hub)
         $scope.sigma.refresh()
 
       update = () ->

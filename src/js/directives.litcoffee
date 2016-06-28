@@ -314,9 +314,9 @@
           if attrs.rangeChange
             brush.on("brush", () -> scope.rangeChange({extent: brush.extent()}))
           if attrs.rangeChangeStart
-            brush.on("start", () -> scope.rangeChangeStart({extent: brush.extent()}))
+            brush.on("brushstart", () -> scope.rangeChangeStart({extent: brush.extent()}))
           if attrs.rangeChangeEnd
-            brush.on("end", () -> scope.rangeChangeEnd({extent: brush.extent()}))
+            brush.on("brushend", () -> scope.rangeChangeEnd({extent: brush.extent()}))
 
           brushAxis = d3.svg.axis()
             .scale(x)
@@ -336,10 +336,11 @@
             .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 
-          svg.append("g")
+          axisg = svg.append("g")
             .attr("class", "x axis")
             .attr("transform", "translate(0," + height + ")")
-            .call(brushAxis)
+          
+          axisg.call(brushAxis)
 
           brushg = svg.append("g")
             .attr("class", "brush")
@@ -351,5 +352,12 @@
 
           brushg.selectAll("rect")
             .attr("height", height)
+
+          scope.$watch 'range', (newVal, oldVal) ->
+            if newVal
+              x.domain newVal
+              brushAxis.tickValues newVal
+              axisg.call brushAxis
+              brush.extent newVal
 
       return ret

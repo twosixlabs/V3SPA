@@ -4,11 +4,15 @@
   </div>
   <div>
     Filter by connections
-    <range-slider width="200" height="40" range="filters.degreeRange" range-change="filters.degreeChange(extent)"></range-slider>
+    <range-slider width="200" height="40" range="filters.degreeRange" range-change-end="filters.degreeChange(extent)"></range-slider>
   </div>
   <div>
-    Filter by centrality
-    <range-slider width="200" height="40" range="filters.centralityRange" range-change="filters.centralityChange(extent)"></range-slider>
+    Filter by authority statistic
+    <range-slider width="200" height="40" range="filters.authorityRange" range-change-end="filters.authorityChange(extent)"></range-slider>
+  </div>
+  <div>
+    Filter by hub statistic
+    <range-slider width="200" height="40" range="filters.hubRange" range-change-end="filters.hubChange(extent)"></range-slider>
   </div>
   <div>Filter by module</div>
 </editor>
