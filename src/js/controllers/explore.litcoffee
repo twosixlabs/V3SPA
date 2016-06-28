@@ -8,12 +8,18 @@
 
       $scope.sigma = new sigma(
         container: 'explore-container'
-        type: 'webgl'
         settings:
-          minEdgeSize: 2
-          maxEdgeSize: 2
+          minNodeSize: 3
+          maxNodeSize: 3
+          minEdgeSize: 0.5
+          maxEdgeSize: 0.5
           edgeColor: "default"
           defaultEdgeColor: "#555"
+          labelThreshold: 10
+          singleHover: true
+          hideEdgesOnMove: true
+          mouseZoomDuration: 0
+          doubleClickZoomDuration: 0
       )
 
       $scope.statistics
@@ -96,7 +102,7 @@
             label: 'Node ' + i
             x: Math.random()
             y: Math.random()
-            size: 5
+            size: 1
             type: nodeTypes[Math.floor(Math.random()*4)]
           })
 
@@ -105,7 +111,7 @@
             id: 'e' + i
             source: 'n' + (Math.random() * N | 0)
             target: 'n' + (Math.random() * N | 0)
-            size: 2
+            size: 1
           })
 
         graph.nodes = graph.nodes.map (n) ->
