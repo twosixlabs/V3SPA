@@ -437,6 +437,42 @@ class LobsterDomain(object):
         else:
             return api.db.json.loads(output.body)
         
+    def fetch_graph(self, params):
+        """ Return the JSON graph for the given policy. Params of the form
+
+            {
+              "payload":
+                {
+                    "policy": "policyid"
+                }
+            }
+        """
+        logger.info("Params: {0}".format(params))
+
+        # Return the cached version if available
+
+        return api.db.json.loads({})
+
+    def parse(self, params):
+        """ Return the JSON graph for the given policy. Params of the form
+
+            {
+              "payload":
+                {
+                    "policy": "policyid"
+                }
+            }
+        """
+        logger.info("Params: {0}".format(params))
+
+        # NOTE: do the Lobster import in Refpolicy.do_upload_chunk()
+
+        # Return the cached version if available
+
+        return {
+            'label': msg['response_id'],
+            'payload': api.db.json.dumps(refpol.parsed)
+        }
 
         
 
