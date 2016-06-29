@@ -38,35 +38,40 @@
         if value and root.name
           update(root)
 
-      $scope.update_view = (data) ->
+      $scope.update_view = () ->
         $scope.policy = IDEBackend.current_policy
 
-        # If the policy has changed, need to update/remove the old visuals
-        $scope.rules = if data.parameterized?.rules? then data.parameterized.rules else []
+        if not $scope.policy?.modules?
+          return
 
-        rules_root = {}
+        modules_root = 
+          name: (if $scope.policy?.id? then $scope.policy.id else "")
+          children: []
 
         # Group the rules by directory and module
-        rules_root = _.reduce($scope.rules, (root, d) ->
-          d.name = d.subject
-          directory = _.findWhere(root.children, {directory: d.directory})
+        for key, mod of $scope.policy.modules
+          if not mod.te_file
+            return
+          
+          path = mod.te_file.split('/')
+          modDirectory = path[path.length - 2]
+          directory = _.findWhere(modules_root.children, {directory: modDirectory})
           if directory
-            module = _.findWhere(directory.children, {module: d.module})
+            module = _.findWhere(directory.children, {module: mod.name})
             if module
               #module.children.push d
             else
-              directory.children.push {name:d.module, module: d.module}
+              directory.children.push {name: mod.name, module: mod.name}
           else
-            root.children.push {name: d.directory, directory: d.directory, children: [{name: d.module, module: d.module}]}
-          return root
-        , {name: (if $scope.policy?.id? then $scope.policy.id else ""), children: []})
+            child = {name: mod.name, module: mod.name}
+            modules_root.children.push {name: modDirectory, directory: modDirectory, children: [child]}
 
-        rules_root.x0 = 0
-        rules_root.y0 = 0
+        modules_root.x0 = 0
+        modules_root.y0 = 0
 
-        update(root = rules_root)
+        update(root = modules_root)
 
-      update = (rules_root) ->
+      update = (modules_root) ->
         nodes = tree.nodes(root)
         _.each nodes, (d,i) ->
           d.x = i * barHeight
@@ -82,7 +87,7 @@
 
         nodeEnter = node.enter().append("g")
           .attr("class", "node")
-          .attr("transform", (d) -> return "translate(#{rules_root.y0},#{rules_root.x0})")
+          .attr("transform", (d) -> return "translate(#{modules_root.y0},#{modules_root.x0})")
           .style("opacity", 1e-6)
 
         nodeEnter.append("rect")
@@ -111,7 +116,7 @@
 
         node.exit().transition()
           .duration(duration)
-          .attr("transform", (d) -> "translate(#{rules_root.y},#{rules_root.x})")
+          .attr("transform", (d) -> "translate(#{modules_root.y},#{modules_root.x})")
           .style("opacity", 1e-6)
           .remove()
 
@@ -164,10 +169,12 @@ Set up the viewport scroll
           svgPanZoom.set_transform(g, newv)
       )
 
-      IDEBackend.add_hook "json_changed", $scope.update_view
+      IDEBackend.add_hook "policy_load", $scope.update_view
       $scope.$on "$destroy", ->
-        IDEBackend.unhook "json_changed", $scope.update_view
+        IDEBackend.unhook "policy_load", $scope.update_view
 
-      start_data = IDEBackend.get_json()
-      if start_data
-        $scope.update_view(start_data)
+      $scope.policy = IDEBackend.current_policy
+
+      # If policy already loaded, render it
+      if $scope.policy?._id
+        $scope.update_view()
