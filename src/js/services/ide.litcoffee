@@ -393,8 +393,20 @@ contents of @current_policy and get the parsed JSON
             @WSUtils.fetch_raw_graph(@current_policy._id).then (json) =>
               @current_policy.json ?= {}
               @current_policy.json.parameterized ?= {}
-              @current_policy.json.parameterized.nodes = json.parameterized.nodes
-              @current_policy.json.parameterized.links = json.parameterized.links
+              @current_policy.json.parameterized.raw = json.parameterized.raw
+
+              _.each @hooks.json_changed, (hook)=>
+                hook(@current_policy.json)
+
+        load_condensed_graph: () =>
+
+            if not @current_policy.valid
+              return
+
+            @WSUtils.fetch_condensed_graph(@current_policy._id).then (json) =>
+              @current_policy.json ?= {}
+              @current_policy.json.parameterized ?= {}
+              @current_policy.json.parameterized.condensed = json.parameterized.condensed
 
               _.each @hooks.json_changed, (hook)=>
                 hook(@current_policy.json)
