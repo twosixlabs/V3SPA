@@ -124,7 +124,103 @@ class RawDomain(object):
             linkMap[s_node['t'] + '-' + s_node['n'] + '-' + t_node['t'] + '-' + t_node['n']] = len(linkList)
             linkList.append(link)
 
-    def fetch_graph(self, msg):
+    @staticmethod
+    def condensedNodesFromRules(rules, nodeMap, linkMap, nodeList, linkList):
+    	print("-------------len===============")
+    	print(len(rules))
+    	for r in rules:
+    		source_key = r['subject']
+    		target_key = r['object'] + '.' + r['class']
+    		link_key = source_key + '-' + target_key
+    		source_node = nodeMap.get(source_key, -1)
+    		target_node = nodeMap.get(target_key, -1)
+
+    		if source_node == -1:
+    			# Create the node
+    			new_source = { 'n': source_key }
+    			source_node = len(nodeList)
+    			nodeMap[source_key] = source_node
+    			nodeList.append(new_source)
+    		if target_node == -1:
+    			# Create the node
+    			new_target = { 'n': target_key }
+    			target_node = len(nodeList)
+    			nodeMap[target_key] = target_node
+    			nodeList.append(new_target)
+
+    		link = linkMap.get(link_key, -1)
+    		# If the link doesn't exist, create it
+    		if link == -1:
+    			link = {
+    				's': source_node,
+    				't': target_node,
+    				'p': [r['perm']]
+    			}
+    			linkMap[link_key] = link
+    			linkList.append(link)
+    		# If it exists, update the permissions list if necessary
+    		elif r['perm'] not in link['p']:
+    			link['p'].append(r['perm'])
+
+    def fetch_condensed_graph(self, msg):
+        """ Return JSON for the nodes and links of the raw policy rules.
+        This is a condensed format where <subject> and <object>.<class>
+        are nodes, and permissions are links between them.
+        """
+
+        # msg.payload.policy is the id
+        refpol_id = msg['payload']['policy']
+        #del msg['payload']['policy']
+
+        refpol_id = api.db.idtype(refpol_id)
+        refpol = ws_domains.call('refpolicy', 'Read', refpol_id)
+
+        # If already parsed, just return the one we already translated.
+        if ('parsed' in refpol
+        	and 'parameterized' in refpol['parsed']
+        	and 'rules' in refpol['parsed']['parameterized']):
+            logger.info("Returning cached condensed graph JSON")
+        else:
+            # Parse the policy
+            ws_domains.call('raw', 'parse', msg)
+            # Read the policy again
+            refpol = ws_domains.call('refpolicy', 'Read', refpol_id)
+
+        if (not 'condensed' in refpol['parsed']['parameterized']):
+
+            # Build the node and link lists from the rules table
+            rules = refpol['parsed']['parameterized']['rules']
+            node_map = {}
+            link_map = {}
+            node_list = []
+            link_list = []
+            RawDomain.condensedNodesFromRules(rules, node_map, link_map, node_list, link_list)
+
+            # Sparsify/compress the dicts/JSON objects
+            print("----------node_list------------")
+            print(len(node_list))
+            print(len(link_list))
+            print("----------------------")
+            node_list = api.jsonh.dumps(node_list)
+            link_list = api.jsonh.dumps(link_list)
+
+            refpol['parsed']['parameterized']['condensed'] = {
+            	'nodes': node_list,
+            	'links': link_list
+            }
+
+            refpol.Insert()
+
+        # Don't send the rules or raw to the client
+        refpol['parsed']['parameterized'].pop('rules', None)
+        refpol['parsed']['parameterized'].pop('raw', None)
+
+        return {
+            'label': msg['response_id'],
+            'payload': api.db.json.dumps(refpol.parsed)
+        }
+
+    def fetch_raw_graph(self, msg):
         """ Return JSON for the nodes and links of the raw policy rules.
         """
 
@@ -136,7 +232,9 @@ class RawDomain(object):
         refpol = ws_domains.call('refpolicy', 'Read', refpol_id)
 
         # If already parsed, just return the one we already translated.
-        if (refpol.parsed):
+        if ('parsed' in refpol
+        	and 'parameterized' in refpol['parsed']
+        	and'rules' in refpol['parsed']['parameterized']):
             logger.info("Returning cached JSON")
         else:
             # Parse the policy
@@ -144,8 +242,7 @@ class RawDomain(object):
             # Read the policy again
             refpol = ws_domains.call('refpolicy', 'Read', refpol_id)
 
-        if (not 'nodes' in refpol['parsed']['parameterized'] and
-            not 'links' in refpol['parsed']['parameterized']):
+        if (not 'raw' in refpol['parsed']['parameterized']):
 
             # Build the node and link lists from the rules table
             rules = refpol['parsed']['parameterized']['rules']
@@ -159,13 +256,16 @@ class RawDomain(object):
             node_list = api.jsonh.dumps(node_list)
             link_list = api.jsonh.dumps(link_list)
 
-            refpol['parsed']['parameterized']['nodes'] = node_list
-            refpol['parsed']['parameterized']['links'] = link_list
+            refpol['parsed']['parameterized']['raw'] = {
+            	'nodes': node_list,
+            	'links': link_list
+            }
 
             refpol.Insert()
 
-        # Don't send the rules to the client
+        # Don't send the rules or condensed to the client
         refpol['parsed']['parameterized'].pop('rules', None)
+        refpol['parsed']['parameterized'].pop('condensed', None)
 
         return {
             'label': msg['response_id'],
@@ -185,7 +285,9 @@ class RawDomain(object):
         refpol = ws_domains.call('refpolicy', 'Read', refpol_id)
 
         # If already parsed, just return the one we already translated.
-        if (refpol.parsed):
+        if ('parsed' in refpol
+        	and 'parameterized' in refpol['parsed']
+        	and 'rules' in refpol['parsed']['parameterized']):
             logger.info("Returning cached JSON")
 
         else:
@@ -312,8 +414,10 @@ class RawDomain(object):
     def handle(self, msg):
         if msg['request'] == 'parse':
             return self.parse(msg)
-        elif msg['request'] == 'fetch_graph':
-            return self.fetch_graph(msg)
+        elif msg['request'] == 'fetch_raw_graph':
+            return self.fetch_raw_graph(msg)
+        elif msg['request'] == 'fetch_condensed_graph':
+            return self.fetch_condensed_graph(msg)
         else:
             raise Exception("Invalid message type for 'raw' domain")
 
