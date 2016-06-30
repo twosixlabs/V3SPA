@@ -24,3 +24,4 @@
 //= require sigmajs/sigma.require.js
 //= require sigmajs/plugins/sigma.plugins.filter.min.js
 //= require sigmajs/plugins/sigma.statistics.HITS.min.js
+//= require fastforce.js

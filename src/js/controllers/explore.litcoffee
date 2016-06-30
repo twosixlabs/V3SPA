@@ -9,8 +9,8 @@
       $scope.sigma = new sigma(
         container: 'explore-container'
         settings:
-          minNodeSize: 3
-          maxNodeSize: 3
+          minNodeSize: 2
+          maxNodeSize: 2
           minEdgeSize: 0.5
           maxEdgeSize: 0.5
           edgeColor: "default"
@@ -31,7 +31,6 @@
             $scope.sigma.graph.degree(n.id) <= extent[1]
         $scope.nodeFilter.undo('node-degree')
         $scope.nodeFilter.nodesBy(nodeDegree(extent), 'node-degree').apply()
-        $scope.sigma.graph.nodes().forEach (n) -> if !n.hidden then console.log $scope.sigma.graph.degree(n.id)
 
       authorityChangeCallback = (extent) ->
         nodeAuthority = (extent) ->
@@ -91,7 +90,8 @@
         .range(["#005892", "#ff7f0e"])
 
       $scope.update_view = () ->
-        console.log "update_view"
+        width = 4000
+        height = 4000
 
         $scope.policy = IDEBackend.current_policy
 
@@ -119,11 +119,18 @@
 
         $scope.filters.permList = _.uniq(d3.merge($scope.links.map((l) -> l.perm )))
 
-        # Test sigma
+        force = d3.layout.fastForce()
+          .gravity(0.05)
+          .size([width, height])
+          .nodes($scope.nodes)
+          .links($scope.links)
 
-        nodeTypes = ["subj", "obj.class"]
-        N = 20000
-        E = 80000
+        # Compute 50 ticks of the layout
+        force.start()
+        for i in [0...100]
+          force.tick()
+        force.stop()
+
         graph =
           nodes: []
           edges: []
@@ -131,8 +138,8 @@
         graph.nodes = $scope.nodes.map (n) ->
           id: n.name
           label: n.name
-          x: Math.random()
-          y: Math.random()
+          x: n.x
+          y: n.y
           size: 1
           color: nodeFillScale(n.name.indexOf('.') >= 0 ? 'obj.class' : 'subj')
 
