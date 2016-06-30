@@ -42,8 +42,8 @@ Get the raw JSON
 
         WSUtils.fetch_raw_graph(comparisonPolicy._id).then (json) =>
           comparisonRules = []
-          comparisonNodes = json.parameterized.nodes
-          comparisonLinks = json.parameterized.links
+          comparisonNodes = json.parameterized.raw.nodes
+          comparisonLinks = json.parameterized.raw.links
 
           deferred.resolve()
 
@@ -310,9 +310,9 @@ Enumerate the differences between the two policies
       $scope.update_view = (data) ->
         $scope.policy = IDEBackend.current_policy
 
-        if $scope.policy?.json?.parameterized?.nodes? and $scope.policy?.json?.parameterized?.links?
-          $scope.primaryNodes = $scope.policy.json.parameterized.nodes
-          $scope.primaryLinks = $scope.policy.json.parameterized.links
+        if $scope.policy?.json?.parameterized?.raw?
+          $scope.primaryNodes = $scope.policy.json.parameterized.raw.nodes
+          $scope.primaryLinks = $scope.policy.json.parameterized.raw.links
 
         if $scope.primaryNodes and $scope.primaryLinks and comparisonNodes and comparisonLinks
           update()
@@ -652,10 +652,9 @@ Set up the viewport scroll
       $scope.policy = IDEBackend.current_policy
 
       # Load the raw graph data if it is not loaded
-      if $scope.policy?._id and
-      not ($scope.policy.json?.parameterized?.nodes? and $scope.policy.json?.parameterized?.nodes?)
+      if $scope.policy?._id and not $scope.policy.json?.parameterized?.raw?
         IDEBackend.load_raw_graph()
 
       # If the graph data is already loaded, render the view
-      if $scope.policy?.json?.parameterized?.nodes? and $scope.policy?.json?.parameterized?.links?
+      if $scope.policy?.json?.parameterized?.raw?
         $scope.update_view()
