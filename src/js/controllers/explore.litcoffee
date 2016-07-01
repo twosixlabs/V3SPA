@@ -29,6 +29,7 @@
           (n) ->
             $scope.sigma.graph.degree(n.id) >= extent[0] and
             $scope.sigma.graph.degree(n.id) <= extent[1]
+        console.log extent
         $scope.nodeFilter.undo('node-degree')
         $scope.nodeFilter.nodesBy(nodeDegree(extent), 'node-degree').apply()
 
@@ -61,7 +62,8 @@
       $scope.nodeFilter = sigma.plugins.filter($scope.sigma)
 
       $scope.controls =
-        tab: 'nodesTab'
+        policyLoaded: false
+        tab: 'statisticsTab'
         linksVisible: false
         links:
           primary: true
@@ -98,8 +100,17 @@
         if not $scope.policy?.json?.parameterized?.condensed?
           return
 
+        $scope.controls.policyLoaded = true
+
         $scope.nodes = $scope.policy.json.parameterized.condensed.nodes
         $scope.links = $scope.policy.json.parameterized.condensed.links
+
+        # Compute degree of each node
+        $scope.links.forEach (l) ->
+          l.source.degree = if l.source.degree then l.source.degree + 1 else 1
+          l.target.degree = if l.target.degree then l.target.degree + 1 else 1
+
+        maxDegree = d3.max($scope.nodes, (n) -> n.degree)
 
         $scope.filters.classList = []
         $scope.filters.permList = []
@@ -124,6 +135,9 @@
           .size([width, height])
           .nodes($scope.nodes)
           .links($scope.links)
+          .linkStrength(0.8)
+          .linkDistance(40)
+          .charge((d) -> return -100 - 200 * d.degree/maxDegree)
 
         # Compute 50 ticks of the layout
         force.start()

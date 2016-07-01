@@ -1,20 +1,36 @@
 <editor>
-  <div>
-    <button type="button" class="btn btn-default" ng-click='cancel()'>Filter by denial</button>
+  <div ng-if="!controls.policyLoaded" class="row">
+    Load a ref policy policy to see its details and the controls
   </div>
-  <div>
-    Filter by connections
-    <range-slider width="200" height="40" range="filters.degreeRange" range-change-end="filters.degreeChange(extent)"></range-slider>
+  <div ng-if="controls.policyLoaded" class="row">
+    <ul class="nav nav-tabs">
+      <li role="presentation" ng-class="{'active': controls.tab == 'statisticsTab'}"><a href ng-click="controls.tab = 'statisticsTab'">Statistics filter</a></li>
+      <li role="presentation" ng-class="{'active': controls.tab == 'modulesTab'}"><a href ng-click="controls.tab = 'modulesTab'">Modules filter</a></li>
+      <li role="presentation" ng-class="{'active': controls.tab == 'detailsTab'}"><a href ng-click="controls.tab = 'detailsTab'">Details</a></li>
+    </ul>
   </div>
-  <div>
-    Filter by authority statistic
-    <range-slider width="200" height="40" range="filters.authorityRange" range-change-end="filters.authorityChange(extent)"></range-slider>
+  <div ng-if="controls.policyLoaded" class="row node-controls" ng-show="controls.tab == 'statisticsTab'">
+    <div>
+      Filter by connections
+      <range-slider width="400" height="40" range="filters.degreeRange" range-change-end="filters.degreeChange(extent)"></range-slider>
+    </div>
+    <div>
+      Filter by authority statistic
+      <range-slider width="400" height="40" range="filters.authorityRange" range-change-end="filters.authorityChange(extent)"></range-slider>
+    </div>
+    <div>
+      Filter by hub statistic
+      <range-slider width="400" height="40" range="filters.hubRange" range-change-end="filters.hubChange(extent)"></range-slider>
+    </div>
   </div>
-  <div>
-    Filter by hub statistic
-    <range-slider width="200" height="40" range="filters.hubRange" range-change-end="filters.hubChange(extent)"></range-slider>
+  <div ng-if="controls.policyLoaded" class="row node-controls" ng-show="controls.tab == 'modulesTab'">
+    <div>
+      <button type="button" class="btn btn-default" ng-click='cancel()'>Filter by denial</button>
+    </div>
   </div>
-  <div>Filter by module</div>
+  <div ng-if="controls.policyLoaded" class="row node-controls" ng-show="controls.tab == 'detailsTab'">
+    Node details
+  </div>
 </editor>
 <div ng-class="{'col-md-12': editorSize == 0,
                       'viz-container': editorSize == 1}">
