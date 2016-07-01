@@ -1,6 +1,6 @@
 <editor>
   <div ng-if="!controls.policyLoaded" class="row">
-    Load a ref policy policy to see its details and the controls
+    Load a ref policy to see its details and the controls
   </div>
   <div ng-if="controls.policyLoaded" class="row">
     <ul class="nav nav-tabs">
@@ -12,7 +12,7 @@
   <div ng-if="controls.policyLoaded" class="row node-controls" ng-show="controls.tab == 'statisticsTab'">
     <div>
       Filter by connections
-      <range-slider width="400" height="40" range="filters.degreeRange" range-change-end="filters.degreeChange(extent)"></range-slider>
+      <range-slider width="400" height="40" round="true" range="filters.degreeRange" range-change-end="filters.degreeChange(extent)"></range-slider>
     </div>
     <div>
       Filter by authority statistic

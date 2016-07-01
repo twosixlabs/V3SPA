@@ -29,7 +29,6 @@
           (n) ->
             $scope.sigma.graph.degree(n.id) >= extent[0] and
             $scope.sigma.graph.degree(n.id) <= extent[1]
-        console.log extent
         $scope.nodeFilter.undo('node-degree')
         $scope.nodeFilter.nodesBy(nodeDegree(extent), 'node-degree').apply()
 

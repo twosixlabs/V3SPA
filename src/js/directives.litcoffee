@@ -290,15 +290,16 @@
           rangeChange: '&'
           rangeChangeStart: '&'
           rangeChangeEnd: '&'
+          round: '@'
         template: """
                   <div class="range-slider"></div>
                   """
         link: (scope, element, attrs) ->
           margin =
             top: 5
-            right: 10
+            right: 20
             bottom: 20
-            left: 10
+            left: 20
 
           width = (scope.width or 500) - margin.left - margin.right
           height = (scope.height or 50) - margin.top - margin.bottom
@@ -311,12 +312,24 @@
             .x(x)
             .extent(scope.range)
 
+          roundExtent = (extent) ->
+            newExtent = [Math.round(brush.extent()[0]), Math.round(brush.extent()[1])]
+            if newExtent[0] >= newExtent[1]
+              newExtent = [Math.floor(brush.extent()[0]), Math.ceil(brush.extent()[1])]
+            return newExtent
+
           if attrs.rangeChange
-            brush.on("brush", () -> scope.rangeChange({extent: brush.extent()}))
+            brush.on("brush", () ->
+              if attrs.round then brush.extent(roundExtent(brush.extent()))
+              scope.rangeChange({extent: brush.extent()}))
           if attrs.rangeChangeStart
-            brush.on("brushstart", () -> scope.rangeChangeStart({extent: brush.extent()}))
+            brush.on("brushstart", () ->
+              if attrs.round then brush.extent(roundExtent(brush.extent()))
+              scope.rangeChangeStart({extent: brush.extent()}))
           if attrs.rangeChangeEnd
-            brush.on("brushend", () -> scope.rangeChangeEnd({extent: brush.extent()}))
+            brush.on("brushend", () ->
+              if attrs.round then brush.extent(roundExtent(brush.extent()))
+              scope.rangeChangeEnd({extent: brush.extent()}))
 
           brushAxis = d3.svg.axis()
             .scale(x)
