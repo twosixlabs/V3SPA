@@ -5,7 +5,8 @@
   <div ng-if="controls.policyLoaded" class="row">
     <ul class="nav nav-tabs">
       <li role="presentation" ng-class="{'active': controls.tab == 'statisticsTab'}"><a href ng-click="controls.tab = 'statisticsTab'">Statistics filter</a></li>
-      <li role="presentation" ng-class="{'active': controls.tab == 'modulesTab'}"><a href ng-click="controls.tab = 'modulesTab'">Modules filter</a></li>
+      <li role="presentation" ng-class="{'active': controls.tab == 'modulesTab'}"><a href ng-click="controls.tab = 'modulesTab'">Element filter</a></li>
+      <li role="presentation" ng-class="{'active': controls.tab == 'denialTab'}"><a href ng-click="controls.tab = 'denialTab'">Denial filter</a></li>
       <li role="presentation" ng-class="{'active': controls.tab == 'detailsTab'}"><a href ng-click="controls.tab = 'detailsTab'">Details</a></li>
     </ul>
   </div>
@@ -24,6 +25,11 @@
     </div>
   </div>
   <div ng-if="controls.policyLoaded" class="row node-controls" ng-show="controls.tab == 'modulesTab'">
+    <div>
+      Elements
+    </div>
+  </div>
+  <div ng-if="controls.policyLoaded" class="row node-controls" ng-show="controls.tab == 'denialTab'">
     <div>
       <button type="button" class="btn btn-default" ng-click='cancel()'>Filter by denial</button>
     </div>
