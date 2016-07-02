@@ -312,7 +312,7 @@ class RefPolicy(restful.ResourceDomain):
             'refpolicy', self['id'],'policy')
 
         # regex for compatible policy versions
-        policy_binary_regex = "^policy\.(1[1-9]|2[0-9])$"
+        policy_binary_regex = "^sepolicy$"
         regex_compiled = re.compile(policy_binary_regex)
 
         
@@ -327,17 +327,16 @@ class RefPolicy(restful.ResourceDomain):
 
         sesearch_result = ""
 
-        if matches > 1:
-            logger.warn("Too many binary policies") 
-            return sesearch_result
-        elif matches < 1:
-            logger.warn("Could not find compatible binary policy") 
+        if matches < 1:
+            logger.warn("Could not find policy binary: sepolicy") 
             return sesearch_result
         
         # perform sesearch if we have unique policy regex match
         
         policy_file = os.path.join(policy_dir,re_result.string)
         policy_file = os.path.abspath(policy_file)
+
+        # TODO: check if sesearch is installed, and warn if it is not
         
         sesearch_result = subprocess.check_output(["sesearch","--allow",policy_file])
         
