@@ -306,6 +306,13 @@ class RefPolicy(restful.ResourceDomain):
         return modules
     
     def parse_policy_binary(self):
+        """ Parse a binary policy file using sesearch from setools v4.
+
+        Find the binary policy file (must be named sepolicy). Read the allow
+        rules using sesearch, and store in the database.
+        The result is an empty string if the binary policy is not found, or if
+        sesearch could not be run.
+        """
         
         policy_dir = os.path.join(
             api.config.get('storage', 'bulk_storage_dir'),
@@ -335,10 +342,13 @@ class RefPolicy(restful.ResourceDomain):
         
         policy_file = os.path.join(policy_dir,re_result.string)
         policy_file = os.path.abspath(policy_file)
-
-        # TODO: check if sesearch is installed, and warn if it is not
         
-        sesearch_result = subprocess.check_output(["sesearch","--allow",policy_file])
+        try:
+            sesearch_result = subprocess.check_output(["sesearch","--allow",policy_file])
+        except CalledProcessError as e:
+            # sesearch not installed, or cannot run
+            logger.warn("Could not run sesearch: not installed or not on path") 
+            sesearch_result = ""
         
         return sesearch_result
 
