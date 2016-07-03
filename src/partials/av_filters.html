@@ -1,17 +1,14 @@
 <div>
-  {{title}}
-  <div>
-    <div class="small">
-      <div class="policy-name"><span>Subjects</span></div>
-      <div class="selection-controls">
-        <span ng-if="allChecked" ng-click="selectNone()" class="glyphicon glyphicon-check" ng-class="{'text-primary': hover}" ng-mouseenter="hover = true" ng-mouseleave="hover = false" aria-hidden="true"></span>
-        <span ng-if="!allChecked" ng-click="selectAll()" class="glyphicon glyphicon-unchecked" ng-class="{'text-primary': hover}" ng-mouseenter="hover = true" ng-mouseleave="hover = false" aria-hidden="true"></span>
-      </div>
+  <div class="small">
+    <div class="policy-name"><span>{{title}}</span></div>
+    <div class="selection-controls">
+      <span ng-if="allChecked" ng-click="selectNone()" class="glyphicon glyphicon-check" ng-class="{'text-primary': hover}" ng-mouseenter="hover = true" ng-mouseleave="hover = false" aria-hidden="true"></span>
+      <span ng-if="!allChecked" ng-click="selectAll()" class="glyphicon glyphicon-unchecked" ng-class="{'text-primary': hover}" ng-mouseenter="hover = true" ng-mouseleave="hover = false" aria-hidden="true"></span>
     </div>
-    <div class="selection-list">
-      <label ng-repeat="item in items">
-        <input type="checkbox" ng-model="item.selected" ng-change="selectionChange()">{{item.name}}
-      </label>
-    </div>
+  </div>
+  <div class="selection-list">
+    <label ng-repeat="item in items">
+      <input type="checkbox" ng-model="item.selected" ng-change="selectionChange()">{{item.name}}
+    </label>
   </div>
 </div>

@@ -1,45 +1,44 @@
 <editor>
-  <div ng-if="!controls.policyLoaded" class="row">
-    Load a ref policy to see its details and the controls
-  </div>
-  <div ng-if="controls.policyLoaded" class="row">
-    <ul class="nav nav-tabs">
-      <li role="presentation" ng-class="{'active': controls.tab == 'statisticsTab'}"><a href ng-click="controls.tab = 'statisticsTab'">Statistics</a></li>
-      <li role="presentation" ng-class="{'active': controls.tab == 'nodesTab'}"><a href ng-click="controls.tab = 'accessVectorTab'">Access vector</a></li>
-      <li role="presentation" ng-class="{'active': controls.tab == 'denialTab'}"><a href ng-click="controls.tab = 'denialTab'">Denials</a></li>
-      <li role="presentation" ng-class="{'active': controls.tab == 'detailsTab'}"><a href ng-click="controls.tab = 'detailsTab'">Details</a></li>
-    </ul>
-  </div>
-  <div ng-if="controls.policyLoaded" class="row node-controls" ng-show="controls.tab == 'statisticsTab'">
-    <div>
-      Filter by connections
-      <range-slider width="400" height="40" round="true" range="filters.degreeRange" range-change-end="filters.degreeChange(extent)"></range-slider>
+  <div class="explore-toolbox-container">
+    <div ng-if="!controls.policyLoaded" class="row">
+      Load a ref policy to see its details and the controls
     </div>
-    <div>
-      Filter by authority statistic
-      <range-slider width="400" height="40" range="filters.authorityRange" range-change-end="filters.authorityChange(extent)"></range-slider>
+    <div ng-if="controls.policyLoaded" class="row">
+      <ul class="nav nav-tabs">
+        <li role="presentation" ng-class="{'active': controls.tab == 'statisticsTab'}"><a href ng-click="controls.tab = 'statisticsTab'">Statistics</a></li>
+        <li role="presentation" ng-class="{'active': controls.tab == 'nodesTab'}"><a href ng-click="controls.tab = 'accessVectorTab'">Access vector</a></li>
+        <li role="presentation" ng-class="{'active': controls.tab == 'denialTab'}"><a href ng-click="controls.tab = 'denialTab'">Denials</a></li>
+        <li role="presentation" ng-class="{'active': controls.tab == 'detailsTab'}"><a href ng-click="controls.tab = 'detailsTab'">Details</a></li>
+      </ul>
     </div>
-    <div>
-      Filter by hub statistic
-      <range-slider width="400" height="40" range="filters.hubRange" range-change-end="filters.hubChange(extent)"></range-slider>
+    <div ng-if="controls.policyLoaded" class="row node-controls" ng-show="controls.tab == 'statisticsTab'">
+      <div>
+        Filter by connections
+        <range-slider width="400" height="40" round="true" range="filters.degreeRange" range-change-end="filters.degreeChange(extent)"></range-slider>
+      </div>
+      <div>
+        Filter by authority statistic
+        <range-slider width="400" height="40" range="filters.authorityRange" range-change-end="filters.authorityChange(extent)"></range-slider>
+      </div>
+      <div>
+        Filter by hub statistic
+        <range-slider width="400" height="40" range="filters.hubRange" range-change-end="filters.hubChange(extent)"></range-slider>
+      </div>
     </div>
-  </div>
-  <div ng-if="controls.policyLoaded" class="row node-controls" ng-show="controls.tab == 'accessVectorTab'">
-    <div>
-      Access vector (subject, object, class, permission list)
-      <div class="col-xs-3"><av-filter title="Subjects" items="filters.subjList" selection-change="selectionChange()"></av-filter></div>
-      <div class="col-xs-3"><av-filter title="Objects" items="filters.objList" selection-change="selectionChange()"></av-filter></div>
-      <div class="col-xs-3"><av-filter title="Classes" items="filters.classList" selection-change="selectionChange()"></av-filter></div>
-      <div class="col-xs-3"><av-filter title="Permissions" items="filters.permList" selection-change="selectionChange()"></av-filter></div>
+    <div ng-if="controls.policyLoaded" class="row node-controls" ng-show="controls.tab == 'accessVectorTab'">
+      <div class="col-xs-3"><av-filter title="Subjects" items="filters.subjList" selection-change="filters.avChange()"></av-filter></div>
+      <div class="col-xs-3"><av-filter title="Objects" items="filters.objList" selection-change="filters.avChange()"></av-filter></div>
+      <div class="col-xs-3"><av-filter title="Classes" items="filters.classList" selection-change="filters.avChange()"></av-filter></div>
+      <div class="col-xs-3"><av-filter title="Permissions" items="filters.permList" selection-change="filters.avChange()"></av-filter></div>
     </div>
-  </div>
-  <div ng-if="controls.policyLoaded" class="row node-controls" ng-show="controls.tab == 'denialTab'">
-    <div>
-      <button type="button" class="btn btn-default" ng-click='cancel()'>Filter by denial</button>
+    <div ng-if="controls.policyLoaded" class="row node-controls" ng-show="controls.tab == 'denialTab'">
+      <div>
+        <button type="button" class="btn btn-default" ng-click='cancel()'>Filter by denial</button>
+      </div>
     </div>
-  </div>
-  <div ng-if="controls.policyLoaded" class="row node-controls" ng-show="controls.tab == 'detailsTab'">
-    Node details
+    <div ng-if="controls.policyLoaded" class="row node-controls" ng-show="controls.tab == 'detailsTab'">
+      Node details
+    </div>
   </div>
 </editor>
 <div ng-class="{'col-md-12': editorSize == 0,

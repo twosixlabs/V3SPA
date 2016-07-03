@@ -50,6 +50,37 @@
         $scope.nodeFilter.undo('node-hub')
         $scope.nodeFilter.nodesBy(nodeHub(extent), 'node-hub').apply()
 
+      # User checked/unchecked something in the access vector filter
+      avChange = () ->
+        checkboxReducer = (map, currItem) ->
+          if currItem.selected then map[currItem.name] = true
+          return map
+        avObjClsMap = d3.merge(
+          [
+            $scope.filters.objList,
+            $scope.filters.classList
+          ]).reduce(checkboxReducer, {})
+        avSubjMap = $scope.filters.subjList.reduce(checkboxReducer, {})
+        avEdgeMap = $scope.filters.permList.reduce(checkboxReducer, {})
+
+        nodeAv = (n) ->
+          if n.id.indexOf('.') >= 0
+            obj = n.id.split('.')[0]
+            cls = n.id.split('.')[1]
+            return avObjClsMap[obj] && avObjClsMap[cls]
+          else # Subject
+            return avSubjMap[n.id] or false
+
+        edgeAv = (e) ->
+          for perm in e.perm
+            if avEdgeMap[perm] then return true
+          return false
+
+        $scope.nodeFilter.undo('av-node-checkbox')
+        $scope.nodeFilter.nodesBy(nodeAv, 'av-node-checkbox').apply()
+        $scope.nodeFilter.undo('av-edge-checkbox')
+        $scope.nodeFilter.edgesBy(edgeAv, 'av-edge-checkbox').apply()
+
       $scope.filters =
         degreeRange: [0, 100]
         degreeChange: degreeChangeCallback
@@ -57,6 +88,7 @@
         authorityChange: authorityChangeCallback
         hubRange: [0, 100]
         hubChange: hubChangeCallback
+        avChange: avChange
 
       $scope.nodeFilter = sigma.plugins.filter($scope.sigma)
 
@@ -124,10 +156,10 @@
             $scope.filters.objList.push n.name.split('.')[0]
             $scope.filters.classList.push n.name.split('.')[1]
 
-        $scope.filters.subjList = _.uniq $scope.filters.subjList
-        $scope.filters.objList = _.uniq $scope.filters.objList
-        $scope.filters.classList = _.uniq $scope.filters.classList
-        $scope.filters.permList = _.uniq(d3.merge($scope.links.map((l) -> l.perm )))
+        $scope.filters.subjList = _.uniq($scope.filters.subjList).sort()
+        $scope.filters.objList = _.uniq($scope.filters.objList).sort()
+        $scope.filters.classList = _.uniq($scope.filters.classList).sort()
+        $scope.filters.permList = _.uniq(d3.merge($scope.links.map((l) -> l.perm ))).sort()
 
         itemMap = (item) ->
           name: item
@@ -170,6 +202,7 @@
           source: l.source.name
           target: l.target.name
           size: 1
+          perm: l.perm
 
         $scope.sigma.graph.clear()
         $scope.sigma.graph.read(graph)
