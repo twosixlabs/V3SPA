@@ -111,6 +111,7 @@
 
         maxDegree = d3.max($scope.nodes, (n) -> n.degree)
 
+        # Get the lists of subjects, objects, classes, and permissions
         $scope.filters.classList = []
         $scope.filters.permList = []
         $scope.filters.subjList = []
@@ -126,8 +127,16 @@
         $scope.filters.subjList = _.uniq $scope.filters.subjList
         $scope.filters.objList = _.uniq $scope.filters.objList
         $scope.filters.classList = _.uniq $scope.filters.classList
-
         $scope.filters.permList = _.uniq(d3.merge($scope.links.map((l) -> l.perm )))
+
+        itemMap = (item) ->
+          name: item
+          selected: true
+
+        $scope.filters.subjList = $scope.filters.subjList.map itemMap
+        $scope.filters.objList = $scope.filters.objList.map itemMap
+        $scope.filters.classList = $scope.filters.classList.map itemMap
+        $scope.filters.permList = $scope.filters.permList.map itemMap
 
         force = d3.layout.fastForce()
           .gravity(0.05)
@@ -135,12 +144,12 @@
           .nodes($scope.nodes)
           .links($scope.links)
           .linkStrength(0.8)
-          .linkDistance(40)
+          .linkDistance(100)
           .charge((d) -> return -100 - 200 * d.degree/maxDegree)
 
-        # Compute 50 ticks of the layout
+        # Compute several ticks of the layout
         force.start()
-        for i in [0...100]
+        for i in [0...80]
           force.tick()
         force.stop()
 

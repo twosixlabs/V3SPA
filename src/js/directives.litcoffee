@@ -279,6 +279,54 @@
 
       return ret
 
+    v3spa.directive 'avFilter', ->
+      ret =
+        restrict: 'E'
+        replace: true
+        scope:
+          items: '='
+          title: '@'
+          selectionChange: '&'
+        templateUrl: 'partials/av_filters.html'
+        link: (scope, element, attrs) ->
+          deregistration = null
+          scope.allChecked = false
+
+          setupNodeWatch = (itemList) ->
+            scope.$watch(
+              ((scope) ->
+                itemList.map (n) -> n.selected
+              ),
+              ((newVal, oldVal) ->
+                scope.allChecked = newVal.reduce ((prevVal, currSelected) -> prevVal && currSelected), true
+              ), true)
+
+          update = (newVal, oldVal) ->
+            if deregistration then deregistration()
+
+            scope.allChecked =
+              primary: false,
+              both: false,
+              comparison: false
+
+            deregistration = setupNodeWatch(scope.items)
+          
+          scope.$watch 'items', update
+
+          scope.selectAll = () ->
+            scope.allChecked = true
+            scope.items.forEach (n) ->
+              n.selected = true
+            scope.selectionChange()
+
+          scope.selectNone = () ->
+            scope.allChecked = false
+            scope.items.forEach (n) ->
+              n.selected = false
+            scope.selectionChange()
+
+      return ret
+
     v3spa.directive 'rangeSlider', ->
       ret =
         restrict: 'E'
