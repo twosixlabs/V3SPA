@@ -51,7 +51,7 @@
         $scope.nodeFilter.nodesBy(nodeHub(extent), 'node-hub').apply()
 
       # User checked/unchecked something in the access vector filter
-      avChange = () ->
+      avChangeCallback = () ->
         checkboxReducer = (map, currItem) ->
           if currItem.selected then map[currItem.name] = true
           return map
@@ -64,11 +64,11 @@
         avEdgeMap = $scope.filters.permList.reduce(checkboxReducer, {})
 
         nodeAv = (n) ->
-          if n.id.indexOf('.') >= 0
+          if n.id.indexOf('.') >= 0 # object.class
             obj = n.id.split('.')[0]
             cls = n.id.split('.')[1]
-            return avObjClsMap[obj] && avObjClsMap[cls]
-          else # Subject
+            return avObjClsMap[obj] and avObjClsMap[cls]
+          else # subject
             return avSubjMap[n.id] or false
 
         edgeAv = (e) ->
@@ -81,6 +81,88 @@
         $scope.nodeFilter.undo('av-edge-checkbox')
         $scope.nodeFilter.edgesBy(edgeAv, 'av-edge-checkbox').apply()
 
+      denialChangeCallback = () ->
+        console.log "DENIAL", $scope.filters.denial
+
+        denial = $scope.filters.denial
+
+        if denial.length == 0
+          perm = []
+          subj = ''
+          obj = ''
+          cls = ''
+
+        else
+          try 
+            # Permission list is between '{' and '}'.
+            # Replace all whitespace strings with a single space.
+            startIdx = denial.indexOf('{') + 1
+            endIdx = denial.indexOf('}')
+            if startIdx == 0 or endIdx == -1
+              throw new Error('Error parsing permissions in AVC denial: Could not find { or }')
+            perm = denial.slice(startIdx, endIdx).trim().replace(/\s\s+/g, ' ')
+            perm = perm.split(' ')
+
+            # Might throw index out of bounds if could not find the class
+            try
+              cls = denial.match(/tclass=\S+/)[0]
+              cls = cls.replace('tclass=', '')
+            catch e
+              errorMsg = 'Error parsing the target class in AVC denial:
+              Could not find "tclass=example_class_name"'
+              throw new Error(errorMsg)
+
+            try
+              scontext = denial.match(/scontext=\S+/)[0]
+              scontext = scontext.split(':')
+              subj = scontext[scontext.length - 1]
+            catch e
+              errorMsg = 'Error parsing source context in AVC denial:
+              Could not find "tcontext=example_u:example_r:example_t"'
+              throw new Error(errorMsg)
+
+            try
+              tcontext = denial.match(/tcontext=\S+/)[0]
+              tcontext = tcontext.split(':')
+              obj = tcontext[tcontext.length - 1]
+            catch e
+              errorMsg = 'Error parsing target context in AVC denial:
+              Could not find "tcontext=example_u:example_r:example_t"'
+              throw new Error(errorMsg)
+
+          catch e
+            VespaLogger.log 'policy', 'error', e.message
+            perm = []
+            subj = ''
+            obj = ''
+            cls = ''
+        
+        # Select/unselect the appropriate AV elements
+
+        subjObjClsIter = (type) ->
+          (d) ->
+            if !type or type == d.name
+              d.selected = true
+            else
+              d.selected = false
+
+        $scope.filters.subjList.forEach subjObjClsIter(subj)
+        $scope.filters.objList.forEach subjObjClsIter(obj)
+        $scope.filters.classList.forEach subjObjClsIter(cls)
+
+        $scope.filters.permList.forEach (d) ->
+          if perm.length == 0 or perm.indexOf(d.name)
+            d.selected = true
+          else
+            d.selected = false
+
+        avChangeCallback()
+
+
+      denialClearCallback = () ->
+        $scope.filters.denial = ''
+        denialChangeCallback()
+
       $scope.filters =
         degreeRange: [0, 100]
         degreeChange: degreeChangeCallback
@@ -88,7 +170,10 @@
         authorityChange: authorityChangeCallback
         hubRange: [0, 100]
         hubChange: hubChangeCallback
-        avChange: avChange
+        avChange: avChangeCallback
+        dential: ""
+        denialChange: denialChangeCallback
+        denialClear: denialClearCallback
 
       $scope.nodeFilter = sigma.plugins.filter($scope.sigma)
 
@@ -100,9 +185,6 @@
           primary: true
           both: true
           comparison: true
-
-      $scope.$watch 'controls.links', ((value) -> if value then redraw()), true
-      $scope.$watch 'controls.linksVisible', ((value) -> if value == false or value == true then redraw())
 
       $scope.list_refpolicies = 
         query: (query)->
