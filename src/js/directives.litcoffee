@@ -425,7 +425,7 @@
 
 Sigma tooltips for nodes in the condensed graph format.
 
-    v3spa.directive 'condensedTooltip', ['$compile', ($compile) ->
+    v3spa.directive 'condensedTooltip', () ->
       ret =
         restrict: 'E'
         replace: true
@@ -449,4 +449,3 @@ Sigma tooltips for nodes in the condensed graph format.
           if !scope.$$phase then scope.$apply()
 
       return ret
-    ]

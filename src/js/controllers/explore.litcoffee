@@ -42,6 +42,29 @@
       showNeighborsCallback = (node) ->
         console.log "showNeighborsCallback", node
 
+        selectItem = (type) ->
+          (d) -> if d.name == type then d.selected = true
+
+        # Make all the neighbors visible (and other nodes that have the same
+        # object of class)
+        adjacentNodes = $scope.sigma.graph.adjacentNodes(node.id)
+        for adjNode in adjacentNodes
+          if adjNode.id.indexOf('.') >= 0
+            obj = adjNode.id.split('.')[0]
+            cls = adjNode.id.split('.')[1]
+            $scope.filters.objList.forEach selectItem(obj)
+            $scope.filters.classList.forEach selectItem(cls)
+          else
+            $scope.filters.subjList.forEach selectItem(adjNode.id)
+
+        # Get the permissions from all incident edges and make them visible
+        adjacentEdges = $scope.sigma.graph.adjacentEdges(node.id)
+        edgePerms = _.uniq d3.merge(adjacentEdges.map((e) -> return e.perm))
+        $scope.filters.permList.forEach (d) ->
+          if edgePerms.indexOf(d.name) then d.selected = true
+
+        avChangeCallback()
+
       degreeChangeCallback = (extent) ->
         nodeDegree = (extent) ->
           (n) ->
@@ -281,7 +304,7 @@
 
         # Compute several ticks of the layout
         force.start()
-        for i in [0...80]
+        for i in [0...50]
           force.tick()
         force.stop()
 
