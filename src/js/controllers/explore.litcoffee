@@ -82,8 +82,6 @@
         $scope.nodeFilter.edgesBy(edgeAv, 'av-edge-checkbox').apply()
 
       denialChangeCallback = () ->
-        console.log "DENIAL", $scope.filters.denial
-
         denial = $scope.filters.denial
 
         if denial.length == 0
