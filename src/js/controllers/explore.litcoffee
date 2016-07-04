@@ -1,6 +1,6 @@
     vespaControllers = angular.module('vespaControllers')
 
-    vespaControllers.controller 'exploreCtrl', ($scope, VespaLogger, WSUtils,
+    vespaControllers.controller 'exploreCtrl', ($scope, VespaLogger, WSUtils, $compile,
         IDEBackend, $timeout, $modal, PositionManager, RefPolicy, $q, SockJSService) ->
 
       # The 'outstanding' attribute is truthy when a policy is being loaded
@@ -22,7 +22,25 @@
           doubleClickZoomDuration: 0
       )
 
+      tooltipsConfig =
+        node:
+          show: 'rightClickNode'
+          position: 'top'
+          template: """
+          <condensed-tooltip node="controls.tooltipNode"
+                             show-neighbors="filters.showNeighbors(node)"
+                             sigma="sigma">
+          </condensed-tooltip>
+          """
+          renderer: (node, template) ->
+            $scope.controls.tooltipNode = node
+            $compile(template)($scope)[0]
+
       $scope.statistics
+      $scope.tooltips = sigma.plugins.tooltips($scope.sigma, $scope.sigma.renderers[0], tooltipsConfig)
+
+      showNeighborsCallback = (node) ->
+        console.log "showNeighborsCallback", node
 
       degreeChangeCallback = (extent) ->
         nodeDegree = (extent) ->
@@ -172,10 +190,12 @@
         dential: ""
         denialChange: denialChangeCallback
         denialClear: denialClearCallback
+        showNeighbors: showNeighborsCallback
 
       $scope.nodeFilter = sigma.plugins.filter($scope.sigma)
 
       $scope.controls =
+        tooltipNode: null
         policyLoaded: false
         tab: 'statisticsTab'
         linksVisible: false

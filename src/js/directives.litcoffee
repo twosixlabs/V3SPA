@@ -422,3 +422,31 @@
               brush.extent newVal
 
       return ret
+
+Sigma tooltips for nodes in the condensed graph format.
+
+    v3spa.directive 'condensedTooltip', ['$compile', ($compile) ->
+      ret =
+        restrict: 'E'
+        replace: true
+        scope:
+          node: '='
+          showNeighbors: '&'
+          sigma: '='
+        template: """
+          <div>
+            <div class="sigma-tooltip-header">{{node.label}}</div>
+            <div class="sigma-tooltip-body">
+              <button type="button" class="btn btn-default" ng-click='showNeighbors({node:node})'>Show neighbors</button>
+            </div>
+            <div class="sigma-tooltip-footer">
+              Number of connections: {{sigma.graph.degree(node.id)}}
+            </div>
+          </div>
+          """
+        link: (scope, element, attrs) ->
+          # Verify that the template has updated and resolved the {{expressions}}
+          if !scope.$$phase then scope.$apply()
+
+      return ret
+    ]
