@@ -94,7 +94,6 @@
           ret =
             id: @current._id
             text: @current.id
-            data: @current
 
         upload_chunk: (name, chunk, start, len, total)=>
           deferred = @$q.defer()
