@@ -442,6 +442,7 @@
               brushAxis.tickValues newVal
               axisg.call brushAxis
               brush.extent newVal
+              updateHandleValues()
 
       return ret
 
