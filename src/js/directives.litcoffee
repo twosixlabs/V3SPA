@@ -345,12 +345,21 @@
         link: (scope, element, attrs) ->
           margin =
             top: 5
-            right: 20
             bottom: 20
-            left: 20
+          height = (scope.height or 50) - margin.top - margin.bottom
+          margin.right = height/2 + 3 + 40 # handle + padding + approx text width
+          margin.left = margin.right
 
           width = (scope.width or 500) - margin.left - margin.right
-          height = (scope.height or 50) - margin.top - margin.bottom
+
+          updateHandleValues = () ->
+            handleFormat = x.tickFormat()
+            brushg.selectAll(".resize text")
+              .text((d,i) ->
+                extent = brush.extent()
+                if attrs.round then extent = roundExtent(extent)
+                handleFormat(if i then extent[0] else extent[1])
+              )
 
           x = d3.scale.linear()
             .domain(scope.range)
@@ -366,16 +375,18 @@
               newExtent = [Math.floor(brush.extent()[0]), Math.ceil(brush.extent()[1])]
             return newExtent
 
+          brush.on("brush.updatehandles", updateHandleValues)
+
           if attrs.rangeChange
-            brush.on("brush", () ->
+            brush.on("brush.callback", () ->
               if attrs.round then brush.extent(roundExtent(brush.extent()))
               scope.rangeChange({extent: brush.extent()}))
           if attrs.rangeChangeStart
-            brush.on("brushstart", () ->
+            brush.on("brushstart.callback", () ->
               if attrs.round then brush.extent(roundExtent(brush.extent()))
               scope.rangeChangeStart({extent: brush.extent()}))
           if attrs.rangeChangeEnd
-            brush.on("brushend", () ->
+            brush.on("brushend.callback", () ->
               if attrs.round then brush.extent(roundExtent(brush.extent()))
               scope.rangeChangeEnd({extent: brush.extent()}))
 
@@ -394,6 +405,7 @@
           svg = d3.select(element[0]).append("svg")
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
+            .style("margin", "0 0 14px 0")
             .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 
@@ -410,6 +422,16 @@
           brushg.selectAll(".resize").append("path")
             .attr("transform", "translate(0," + height/2 + ")")
             .attr("d", arc)
+
+          brushg.selectAll(".resize").append("text")
+            .attr("transform", (d,i) -> "translate(" + (if i then -1 else 1) * (height/2+3) + "," + height/2 + ")")
+            .attr("dy", "0.35em")
+            .attr("text-anchor", (d,i) -> if i then "end" else "start")
+            .attr("pointer-events", "none")
+            .style("fill", "#888")
+
+          # Add the handle values text
+          updateHandleValues()
 
           brushg.selectAll("rect")
             .attr("height", height)
