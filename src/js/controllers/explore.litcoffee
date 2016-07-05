@@ -22,6 +22,36 @@
           doubleClickZoomDuration: 0
       )
 
+      $scope.sigma.bind 'clickStage rightClickStage', (event) ->
+        $scope.clickedNode = null
+        $scope.clickedNodeRules = []
+        if not $scope.$$phase then $scope.$apply()
+
+      $scope.sigma.bind 'clickNode', (event) ->
+        node = event.data.node
+        $scope.clickedNode = node
+
+        reqParams = {}
+
+        if node.id.indexOf('.') >= 0
+          reqParams['object'] = node.id.split('.')[0]
+          reqParams['class'] = node.id.split('.')[1]
+        else
+          reqParams['subject'] = node.id
+
+        req = 
+          domain: 'raw'
+          request: 'fetch_rules'
+          payload:
+            policy: IDEBackend.current_policy._id
+            params: reqParams
+
+        SockJSService.send req, (result)=>
+          if result.error?
+            $scope.clickedNodeRules = []
+          else
+            $scope.clickedNodeRules = JSON.parse(result.payload).sort()
+
       tooltipsConfig =
         node:
           show: 'rightClickNode'
@@ -40,8 +70,6 @@
       $scope.tooltips = sigma.plugins.tooltips($scope.sigma, $scope.sigma.renderers[0], tooltipsConfig)
 
       showNeighborsCallback = (node) ->
-        console.log "showNeighborsCallback", node
-
         selectItem = (type) ->
           (d) -> if d.name == type then d.selected = true
 
@@ -246,8 +274,8 @@
         .range(["#005892", "#ff7f0e"])
 
       $scope.update_view = () ->
-        width = 4000
-        height = 4000
+        width = 400
+        height = 400
 
         $scope.policy = IDEBackend.current_policy
 
@@ -294,17 +322,17 @@
         $scope.filters.permList = $scope.filters.permList.map itemMap
 
         force = d3.layout.fastForce()
-          .gravity(0.05)
+          .gravity(0.04)
           .size([width, height])
           .nodes($scope.nodes)
           .links($scope.links)
           .linkStrength(0.8)
-          .linkDistance(100)
-          .charge((d) -> return -100 - 200 * d.degree/maxDegree)
+          .linkDistance((d) -> return 100 + 800 / (d.perm.length*10))
+          .charge((d) -> return -100 - 600 * d.degree/maxDegree)
 
         # Compute several ticks of the layout
         force.start()
-        for i in [0...50]
+        for i in [0...100]
           force.tick()
         force.stop()
 
