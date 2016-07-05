@@ -14,15 +14,15 @@
     <div ng-if="controls.policyLoaded" class="row node-controls" ng-show="controls.tab == 'statisticsTab'">
       <div>
         Filter by connections
-        <range-slider width="400" height="40" round="true" range="filters.degreeRange" range-change-end="filters.degreeChange(extent)"></range-slider>
+        <range-slider width="500" height="40" round="true" range="filters.degreeRange" range-change-end="filters.degreeChange(extent)"></range-slider>
       </div>
       <div>
         Filter by authority statistic
-        <range-slider width="400" height="40" range="filters.authorityRange" range-change-end="filters.authorityChange(extent)"></range-slider>
+        <range-slider width="500" height="40" range="filters.authorityRange" range-change-end="filters.authorityChange(extent)"></range-slider>
       </div>
       <div>
         Filter by hub statistic
-        <range-slider width="400" height="40" range="filters.hubRange" range-change-end="filters.hubChange(extent)"></range-slider>
+        <range-slider width="500" height="40" range="filters.hubRange" range-change-end="filters.hubChange(extent)"></range-slider>
       </div>
     </div>
     <div ng-if="controls.policyLoaded" class="row node-controls" ng-show="controls.tab == 'accessVectorTab'">
