@@ -274,8 +274,8 @@
         .range(["#005892", "#ff7f0e"])
 
       $scope.update_view = () ->
-        width = 400
-        height = 400
+        width = 6000
+        height = 6000
 
         $scope.policy = IDEBackend.current_policy
 
@@ -326,15 +326,20 @@
           .size([width, height])
           .nodes($scope.nodes)
           .links($scope.links)
-          .linkStrength(0.8)
-          .linkDistance((d) -> return 1000 + 8000 / (d.perm.length*10))
-          .charge((d) -> return -100 - 600 * d.degree/maxDegree)
+          .linkStrength((d) -> return 1 - Math.max(d.source.degree, d.target.degree) / (2*maxDegree))
+          .linkDistance((d) -> return 100 + 500 * Math.max(d.source.degree, d.target.degree) / maxDegree)
+          .charge((d) -> return -20 - 20 * d.degree/maxDegree)
+          #.linkDistance((d) -> return 1000 + 8000 / (d.perm.length*10))
 
         # Compute several ticks of the layout, but only if they don't have a position
         if not ($scope.nodes[0].x and $scope.nodes[0].y)
           force.start()
-          for i in [0...300]
+          for i in [0...70]
             force.tick()
+
+            for node in $scope.nodes
+              if node.x > width then node.x = width else if node.x < 0 then node.x = 0
+              if node.y > height then node.y = height else if node.y < 0 then node.y = 0
           force.stop()
 
         graph =
