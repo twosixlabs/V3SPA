@@ -327,14 +327,15 @@
           .nodes($scope.nodes)
           .links($scope.links)
           .linkStrength(0.8)
-          .linkDistance((d) -> return 100 + 800 / (d.perm.length*10))
+          .linkDistance((d) -> return 1000 + 8000 / (d.perm.length*10))
           .charge((d) -> return -100 - 600 * d.degree/maxDegree)
 
-        # Compute several ticks of the layout
-        force.start()
-        for i in [0...100]
-          force.tick()
-        force.stop()
+        # Compute several ticks of the layout, but only if they don't have a position
+        if not ($scope.nodes[0].x and $scope.nodes[0].y)
+          force.start()
+          for i in [0...300]
+            force.tick()
+          force.stop()
 
         graph =
           nodes: []
