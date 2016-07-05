@@ -15,7 +15,7 @@
           maxEdgeSize: 0.5
           edgeColor: "default"
           defaultEdgeColor: "#555"
-          labelThreshold: 10
+          labelThreshold: 8
           singleHover: true
           hideEdgesOnMove: true
           mouseZoomDuration: 0
