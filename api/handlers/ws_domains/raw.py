@@ -162,6 +162,74 @@ class RawDomain(object):
     		elif r['perm'] not in link['p']:
     			link['p'].append(r['perm'])
 
+    def fetch_rules(self, msg):
+        """ Return the allow rules that match the given subject, object, class,
+        and permission. Each of the "params" is optional. Only returns rules
+        that match all the given params.
+
+            {
+              "payload":
+                {
+                    "policy": "policyid"
+                    "params":
+                    	{
+                    		"subject": "(optional) name of subject"
+                    		"object": "(optional) name of object"
+                    		"class": "(optional) name of class"
+                    		"perm": "(optional) name of permission"
+                    	}
+                }
+            }
+        """
+
+        # msg.payload.policy is the id
+        refpol_id = msg['payload']['policy']
+
+        refpol_id = api.db.idtype(refpol_id)
+        refpol = ws_domains.call('refpolicy', 'Read', refpol_id)
+
+        found_rules = []
+
+        # If already parsed, just return the one we already translated.
+        if ('parsed' in refpol
+        	and 'parameterized' in refpol['parsed']
+        	and 'rules' in refpol['parsed']['parameterized']):
+            logger.info("Looking up rules")
+
+            subj = msg['payload']['params'].get('subject', None)
+            obj = msg['payload']['params'].get('object', None)
+            cls = msg['payload']['params'].get('class', None)
+            perm = msg['payload']['params'].get('perm', None)
+
+            match_dict = msg['payload']['params']
+
+            # Invalid request, so return empty list
+            if not (subj or obj or cls or perm):
+            	return {
+            		'label': msg['response_id'],
+            		'payload': api.db.json.dumps([])
+            	}
+
+            rules = refpol['parsed']['parameterized']['rules']
+
+            for r in rules:
+            	include_rule = True
+            	for k in match_dict:
+            		if match_dict[k] != r[k]:
+            			include_rule = False
+            	if include_rule:
+            		found_rules.append(r['rule'])
+
+        else:
+        	logger.info("Policy has not been parsed")
+
+
+        # Return the unique rules from the list
+        return {
+            'label': msg['response_id'],
+            'payload': api.db.json.dumps(list(set(found_rules)))
+        }
+
     def fetch_condensed_graph(self, msg):
         """ Return JSON for the nodes and links of the raw policy rules.
         This is a condensed format where <subject> and <object>.<class>
@@ -418,6 +486,8 @@ class RawDomain(object):
             return self.fetch_raw_graph(msg)
         elif msg['request'] == 'fetch_condensed_graph':
             return self.fetch_condensed_graph(msg)
+        elif msg['request'] == 'fetch_rules':
+            return self.fetch_rules(msg)
         else:
             raise Exception("Invalid message type for 'raw' domain")
 
