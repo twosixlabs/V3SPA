@@ -218,7 +218,7 @@
         $scope.filters.classList.forEach subjObjClsIter(cls)
 
         $scope.filters.permList.forEach (d) ->
-          if perm.length == 0 or perm.indexOf(d.name)
+          if perm.length == 0 or perm.indexOf(d.name) >= 0
             d.selected = true
           else
             d.selected = false
