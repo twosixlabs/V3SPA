@@ -32,7 +32,7 @@
       <div class="col-xs-3"><av-filter title="Permissions" items="filters.permList" selection-change="filters.avChange()"></av-filter></div>
     </div>
     <div ng-if="controls.policyLoaded" class="row node-controls" ng-show="controls.tab == 'denialTab'">
-      <p>Paste an AVC denial here to filter the policy and only see allow rules related to the denial. Here is an example denial:</p>
+      <p>Paste an AVC denial here to filter the policy and only see allow rules related to the denial. Type must be AVC or USER_AVC. Here is an example denial:</p>
       <pre>type=AVC msg=audit(1363289005.532:184): avc:  denied  { read } for  pid=29199 comm="Trace" name="online" dev="sysfs" ino=30 scontext=staff_u:staff_r:googletalk_plugin_t tcontext=system_u:object_r:sysfs_t tclass=file</pre>
       <textarea class="form-control" rows="6" ng-model="filters.denial"></textarea>
       <button type="button" class="btn btn-primary" ng-click='filters.denialChange()'>Apply</button>
