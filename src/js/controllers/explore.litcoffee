@@ -180,18 +180,20 @@
               throw new Error(errorMsg)
 
             try
+              # Of the form "scontext=u:role:type:sensitivity"
               scontext = denial.match(/scontext=\S+/)[0]
               scontext = scontext.split(':')
-              subj = scontext[scontext.length - 1]
+              subj = scontext[2]
             catch e
               errorMsg = 'Error parsing source context in AVC denial:
               Could not find "tcontext=example_u:example_r:example_t"'
               throw new Error(errorMsg)
 
             try
+              # Of the form "tcontext=u:role:type:sensitivity"
               tcontext = denial.match(/tcontext=\S+/)[0]
               tcontext = tcontext.split(':')
-              obj = tcontext[tcontext.length - 1]
+              obj = tcontext[2]
             catch e
               errorMsg = 'Error parsing target context in AVC denial:
               Could not find "tcontext=example_u:example_r:example_t"'
