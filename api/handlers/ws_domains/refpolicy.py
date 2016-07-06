@@ -344,7 +344,14 @@ class RefPolicy(restful.ResourceDomain):
         policy_file = os.path.abspath(policy_file)
         
         try:
-            sesearch_result = subprocess.check_output(["sesearch","--allow",policy_file])
+            # sesearch 4 prints its version info to stderr
+            sesearch_version = subprocess.check_output(["sesearch","--version"], stderr=subprocess.STDOUT)
+
+            # Only support sesearch version 4 or higher
+            if sesearch_version.find('4.') => 0:
+                sesearch_result = subprocess.check_output(["sesearch","--allow",policy_file])
+            else:
+                sesearch_result = ""
         except CalledProcessError as e:
             # sesearch not installed, or cannot run
             logger.warn("Could not run sesearch: not installed or not on path") 
