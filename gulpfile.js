@@ -18,6 +18,10 @@ var paths = {
     'external/select2-3.4.5/*.gif',
     'external/select2-3.4.5/*.png',
   ],
+  ngTagsInput: [
+    'external/ng-tags-input/*.js',
+    'external/ng-tags-input/*.css',
+  ],
   fonts: [
     'external/bootstrap/dist/fonts/*'
   ],
@@ -31,6 +35,13 @@ gulp.task('select2', function() {
   .pipe(rename(function(path) {
   }))
   .pipe(gulp.dest("static/select2"))
+})
+
+gulp.task('ngTagsInput', function() {
+  gulp.src(paths.ngTagsInput)
+  .pipe(rename(function(path) {
+  }))
+  .pipe(gulp.dest("static/ng-tags-input"))
 })
 
 gulp.task('fonts', function() {
@@ -116,6 +127,7 @@ gulp.task('default', [
             'script_assets',
             'html',
             'select2',
+            'ngTagsInput',
             'ace',
             'images',
             'fonts'
