@@ -220,14 +220,37 @@ class RefPolicy(restful.ResourceDomain):
         if metadata['written'] == metadata['total']:
             try:
                 metadata.extract_zipped_policy()
-                metadata['modules'] = metadata.read_policy_modules()
+                module_info = metadata.read_policy_modules()
+                sesearch_result = metadata.parse_policy_binary()
 
-                returned_sesearch_result = metadata.parse_policy_binary()
+                errors = []
+
+                supported_docs = []
+
+                # Do we have source rules?
+                if len(module_info['error']) > 0:
+                    errors.append(module_info['error'])
+                else:
+                    supported_docs.append('dsl')
+
+                # Do we have the binary rules?
+                if len(sesearch_result['error']) > 0:
+                    errors.append(sesearch_result['error'])
+                else:
+                    supported_docs.append('raw')
+
+                if len(supported_docs) == 0:
+                    raise api.DisplayError("Cannot find binary policy or reference policy source in the zip file")
+
+                metadata['supported_docs'] = supported_docs
+
+                metadata['modules'] = module_info['data']
+
                 metadata['documents'] = {
                     'raw': {
-                        'text': returned_sesearch_result,
+                        'text': sesearch_result['data'],
                         'mode': 'raw',
-                        'digest': hashlib.md5(returned_sesearch_result).hexdigest()
+                        'digest': hashlib.md5(sesearch_result).hexdigest()
                     }
                 }
             except Exception:
@@ -252,6 +275,12 @@ class RefPolicy(restful.ResourceDomain):
         """ Read an extracted policy off the disk, and understand what modules
         are included in it (and where they are on disk).
         """
+
+        ret = {
+            'data': {}
+            'error': ''
+        }
+
         policy_dir = os.path.join(
             api.config.get('storage', 'bulk_storage_dir'),
             'refpolicy', self['id'])
@@ -303,7 +332,12 @@ class RefPolicy(restful.ResourceDomain):
                         mod + ".if") if mod + ".if" in filenames else None
                 }
 
-        return modules
+        ret['data'] = modules
+
+        if len(modules.keys()) == 0:
+            ret['error'] = 'Could not find reference policy source'
+
+        return ret
     
     def parse_policy_binary(self):
         """ Parse a binary policy file using sesearch from setools v4.
@@ -332,11 +366,14 @@ class RefPolicy(restful.ResourceDomain):
                 re_result = re_match_result
                 matches += 1
 
-        sesearch_result = ""
+        ret = {
+            'data': '',
+            'error': ''
+            }
 
         if matches < 1:
-            logger.warn("Could not find policy binary: sepolicy") 
-            return sesearch_result
+            ret['error'] = "Could not find policy binary file named sepolicy in policy directory"
+            return ret
         
         # perform sesearch if we have unique policy regex match
         
@@ -349,15 +386,14 @@ class RefPolicy(restful.ResourceDomain):
 
             # Only support sesearch version 4 or higher
             if sesearch_version.find('4.') => 0:
-                sesearch_result = subprocess.check_output(["sesearch","--allow",policy_file])
+                ret['data'] = subprocess.check_output(["sesearch","--allow",policy_file])
             else:
-                sesearch_result = ""
+                ret['error'] = "Sesearch must be version 4"
         except CalledProcessError as e:
             # sesearch not installed, or cannot run
-            logger.warn("Could not run sesearch: not installed or not on path") 
-            sesearch_result = ""
+            ret['error'] = "Could not run sesearch: not installed or not on path"
         
-        return sesearch_result
+        return ret
 
     def extract_zipped_policy(self):
         """ Validate that the uploaded file is actually a policy.
@@ -383,12 +419,13 @@ class RefPolicy(restful.ResourceDomain):
         except zipfile.BadZipfile:
             raise api.DisplayError("Unable to extract: file corrupted")
 
+        # Source or binaries must be under the /<name>/policy/ directory.
+        # If directory structure is incorrect, then abort.
         try:
-            #zf.getinfo('{0}/policy/modules.conf'.format(name))
-            zf.getinfo('{0}/policy/modules/'.format(name))
+            zf.getinfo('{0}/policy/'.format(name))
         except KeyError:
             raise api.DisplayError("File does not appear to contain "
-                            "SELinux reference policy source. "
+                            "SELinux reference policy source or binary. "
                             "Make sure the archive name is the same as "
                             "its top-level folder.")
 
