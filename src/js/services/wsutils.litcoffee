@@ -120,21 +120,17 @@ Expand the raw policy nodes and links from succinct to verbose style.
           json.links = jsonh.parse json.links
 
           # Confirm existence of abbreviated object keys, then expand them
-          if json?.nodes? and 'n' of json.nodes[0]
+          if json.nodes?[0]?.n and
+          json?.links?[0]?.hasOwnProperty('t') and
+          json?.links?[0]?.hasOwnProperty('s')
             
-            nodes = json.nodes.map (n) =>
+            json.nodes = json.nodes.map (n) ->
               'name': n.n
               'selected': true
-            json.nodes = nodes
 
-          if json?.links? and
-          't' of json.links[0] and
-          's' of json.links[0]
-
-            links = json.links.map (l) =>
-              'target': nodes[l.t]
-              'source': nodes[l.s]
+            json.links = json.links.map (l) ->
+              'target': json.nodes[l.t]
+              'source': json.nodes[l.s]
               'perm': l.p
-            json.links = links
 
           return json
