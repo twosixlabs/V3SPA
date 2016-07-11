@@ -7,14 +7,16 @@
       $scope.status = SockJSService.status
 
       $scope.sigma = new sigma(
-        container: 'explore-container'
+        renderers: [
+          container: 'explore-container'
+          type: 'canvas'
+        ]
         settings:
           minNodeSize: 2
           maxNodeSize: 2
           minEdgeSize: 0.5
           maxEdgeSize: 0.5
           edgeColor: "default"
-          defaultEdgeColor: "#555"
           labelThreshold: 8
           singleHover: true
           hideEdgesOnMove: true
@@ -362,6 +364,7 @@
           target: l.target.name
           size: 1
           perm: l.perm
+          color: "rgba(85,85,85,0.5)"
 
         $scope.sigma.graph.clear()
         $scope.sigma.graph.read(graph)
