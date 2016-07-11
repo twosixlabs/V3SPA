@@ -6,16 +6,15 @@
         #policy.then (policy)->
         #  $scope.refpolicy = policy
 
+        $scope.getCurrentPolicy = () ->
+          $scope.policy = IDEBackend.current_policy
+
+        $scope.getCurrentPolicy()
+
         $scope.visualizer_type = 'explore'
 
         $scope.$watch 'visualizer_type', (value)->
-          if value == 'avispa'
-            $location.path('/avispa')
-          else if value =='hive'
-            $location.path('/hive')
-          else if value =='tl_explore'
-            $location.path('/tl_explore')
-          else if value =='module_browser'
+          if value =='module_browser'
             $location.path('/module_browser')
           else if value =='diff'
             $location.path('/diff')
@@ -41,4 +40,10 @@
         $scope.status = SockJSService.status
         $scope.have_outstanding = ->
           if SockJSService.status.outstanding > 0 then true else false
+
+
+        IDEBackend.add_hook "policy_load", $scope.getCurrentPolicy
+        
+        $scope.$on "$destroy", ->
+          IDEBackend.unhook "policy_load", $scope.getCurrentPolicy
 

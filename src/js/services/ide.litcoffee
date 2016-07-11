@@ -13,6 +13,9 @@ errors, and generally being awesome.
           @current_policy =
             refpolicy_id: null
             documents: {}
+            supported_docs:
+              dsl: false
+              raw: false
             json: null
             id: null
             _id: null
@@ -74,6 +77,9 @@ Clear the current policy
         clear_policy: =>
             @current_policy =
               documents: {}
+              supported_docs:
+                dsl: false
+                raw: false
               json:
                 parameterized: null
                 errors: ["nodata"]
@@ -104,6 +110,9 @@ Create a new policy, but don't save it or anything
         new_policy: (args)=>
           @current_policy =
             documents: {}
+            supported_docs:
+              dsl: false
+              raw: false
             json: null
             id: null
             _id: null

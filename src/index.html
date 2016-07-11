@@ -28,13 +28,13 @@
         <a ng-click='load_refpolicy()'>(switch)</a>
       </span>
       </p>
-      <ul class='nav navbar-nav'>
+      <ul ng-show="policy.supported_docs['raw'] || policy.supported_docs['dsl']" class='nav navbar-nav'>
         <li class='dropdown'>
           <a href='#' id='visualizer-dropdown' class='dropdown-toggle' data-toggle='dropdown' role='button' aria-haspopup='true' aria-expanded='false'>Visualizer Type <span class='caret'></span></a>
           <ul class='dropdown-menu'>
-            <li><a ng-click="visualizer_type = 'explore'">Policy explorer</a></li>
+            <li ng-show="policy.supported_docs['raw']"><a ng-click="visualizer_type = 'explore'">Policy explorer</a></li>
             <!--<li><a ng-click="visualizer_type = 'diff'">Policy diff</a></li>-->
-            <li><a ng-click="visualizer_type = 'module_browser'">Module browser</a></li>
+            <li ng-show="policy.supported_docs['dsl']"><a ng-click="visualizer_type = 'module_browser'">Module browser</a></li>
           </ul>
         </li>
       </ul>
