@@ -9,6 +9,13 @@
         $scope.getCurrentPolicy = () ->
           $scope.policy = IDEBackend.current_policy
 
+          supported_docs = $scope.policy.supported_docs
+
+          if supported_docs.raw and not supported_docs.dsl
+            $scope.visualizer_type = 'explore'
+          else if not supported_docs.raw and supported_docs.dsl
+            $scope.visualizer_type = 'module_browser'
+
         $scope.getCurrentPolicy()
 
         $scope.visualizer_type = 'explore'
