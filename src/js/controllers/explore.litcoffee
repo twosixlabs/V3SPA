@@ -334,7 +334,7 @@
           #.linkDistance((d) -> return 1000 + 8000 / (d.perm.length*10))
 
         # Compute several ticks of the layout, but only if they don't have a position
-        if not ($scope.nodes[0].x and $scope.nodes[0].y)
+        if not ($scope.nodes?[0]?.hasOwnProperty('x') and $scope.nodes?[0]?.hasOwnProperty('y'))
           force.start()
           for i in [0...70]
             force.tick()

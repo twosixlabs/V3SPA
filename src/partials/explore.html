@@ -3,57 +3,62 @@
     <div ng-if="!controls.policyLoaded" class="row">
       Load a ref policy to see its details and the controls
     </div>
-    <div ng-if="controls.policyLoaded" class="row">
-      <ul class="nav nav-tabs">
-        <li role="presentation" ng-class="{'active': controls.tab == 'statisticsTab'}"><a href ng-click="controls.tab = 'statisticsTab'">Statistics</a></li>
-        <li role="presentation" ng-class="{'active': controls.tab == 'nodesTab'}"><a href ng-click="controls.tab = 'accessVectorTab'">Access vector</a></li>
-        <li role="presentation" ng-class="{'active': controls.tab == 'denialTab'}"><a href ng-click="controls.tab = 'denialTab'">Denials</a></li>
-        <li role="presentation" ng-class="{'active': controls.tab == 'detailsTab'}"><a href ng-click="controls.tab = 'detailsTab'">Details</a></li>
-      </ul>
+    <div ng-if="controls.policyLoaded && !policy.supported_docs.raw" class="row">
+      This view is not supported because {{policy.id}} does not contain a policy in binary format
     </div>
-    <div ng-if="controls.policyLoaded" class="row node-controls" ng-show="controls.tab == 'statisticsTab'">
-      <div>
-        Filter by connections
-        <range-slider width="500" height="40" round="true" range="filters.degreeRange" range-change-end="filters.degreeChange(extent)"></range-slider>
+    <div ng-if="controls.policyLoaded && policy.supported_docs.raw">
+      <div class="row">
+        <ul class="nav nav-tabs">
+          <li role="presentation" ng-class="{'active': controls.tab == 'statisticsTab'}"><a href ng-click="controls.tab = 'statisticsTab'">Statistics</a></li>
+          <li role="presentation" ng-class="{'active': controls.tab == 'nodesTab'}"><a href ng-click="controls.tab = 'accessVectorTab'">Access vector</a></li>
+          <li role="presentation" ng-class="{'active': controls.tab == 'denialTab'}"><a href ng-click="controls.tab = 'denialTab'">Denials</a></li>
+          <li role="presentation" ng-class="{'active': controls.tab == 'detailsTab'}"><a href ng-click="controls.tab = 'detailsTab'">Details</a></li>
+        </ul>
       </div>
-      <div>
-        Filter by authority statistic
-        <range-slider width="500" height="40" range="filters.authorityRange" range-change-end="filters.authorityChange(extent)"></range-slider>
+      <div class="row node-controls" ng-show="controls.tab == 'statisticsTab'">
+        <div>
+          Filter by connections
+          <range-slider width="500" height="40" round="true" range="filters.degreeRange" range-change-end="filters.degreeChange(extent)"></range-slider>
+        </div>
+        <div>
+          Filter by authority statistic
+          <range-slider width="500" height="40" range="filters.authorityRange" range-change-end="filters.authorityChange(extent)"></range-slider>
+        </div>
+        <div>
+          Filter by hub statistic
+          <range-slider width="500" height="40" range="filters.hubRange" range-change-end="filters.hubChange(extent)"></range-slider>
+        </div>
       </div>
-      <div>
-        Filter by hub statistic
-        <range-slider width="500" height="40" range="filters.hubRange" range-change-end="filters.hubChange(extent)"></range-slider>
+      <div class="row node-controls" ng-show="controls.tab == 'accessVectorTab'">
+        <div class="col-xs-3"><av-filter title="Subjects" items="filters.subjList" selection-change="filters.avChange()"></av-filter></div>
+        <div class="col-xs-3"><av-filter title="Objects" items="filters.objList" selection-change="filters.avChange()"></av-filter></div>
+        <div class="col-xs-3"><av-filter title="Classes" items="filters.classList" selection-change="filters.avChange()"></av-filter></div>
+        <div class="col-xs-3"><av-filter title="Permissions" items="filters.permList" selection-change="filters.avChange()"></av-filter></div>
       </div>
-    </div>
-    <div ng-if="controls.policyLoaded" class="row node-controls" ng-show="controls.tab == 'accessVectorTab'">
-      <div class="col-xs-3"><av-filter title="Subjects" items="filters.subjList" selection-change="filters.avChange()"></av-filter></div>
-      <div class="col-xs-3"><av-filter title="Objects" items="filters.objList" selection-change="filters.avChange()"></av-filter></div>
-      <div class="col-xs-3"><av-filter title="Classes" items="filters.classList" selection-change="filters.avChange()"></av-filter></div>
-      <div class="col-xs-3"><av-filter title="Permissions" items="filters.permList" selection-change="filters.avChange()"></av-filter></div>
-    </div>
-    <div ng-if="controls.policyLoaded" class="row node-controls" ng-show="controls.tab == 'denialTab'">
-      <p>Paste an AVC denial here to filter the policy and only see allow rules related to the denial. Type must be AVC or USER_AVC. Here is an example denial:</p>
-      <pre>type=AVC msg=audit(1363289005.532:184): avc:  denied  { read } for  pid=29199 comm="Trace" name="online" dev="sysfs" ino=30 scontext=staff_u:staff_r:googletalk_plugin_t tcontext=system_u:object_r:sysfs_t tclass=file</pre>
-      <textarea class="form-control" rows="6" ng-model="filters.denial"></textarea>
-      <button type="button" class="btn btn-primary" ng-click='filters.denialChange()'>Apply</button>
-      <button type="button" class="btn btn-default" ng-click='filters.denialClear()'>Clear</button>
-    </div>
-    <div ng-if="controls.policyLoaded" class="row node-controls" ng-show="controls.tab == 'detailsTab'">
-      <div style="max-height:300px; overflow-y:scroll">
-        <table class="table table-condensed">
-          <caption ng-show="!clickedNode">Click a node to see its rules</caption>
-          <caption ng-show="!!clickedNode">Showing {{clickedNodeRules.length}} {{clickedNodeRules.length > 1 ? 'rules' : 'rule'}} associated with <code>{{clickedNode.id}}</code></caption>
-          <thead>
-            <tr>
-              <th>Rule</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr ng-repeat="rule in clickedNodeRules">
-              <td>{{rule}}</td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="row node-controls" ng-show="controls.tab == 'denialTab'">
+        <p>Paste an AVC denial here to filter the policy and only see allow rules related to the denial. Type must be AVC or USER_AVC. Here is an example denial:</p>
+        <pre>type=AVC msg=audit(1363289005.532:184): avc:  denied  { read } for  pid=29199 comm="Trace" name="online" dev="sysfs" ino=30 scontext=staff_u:staff_r:googletalk_plugin_t tcontext=system_u:object_r:sysfs_t tclass=file</pre>
+        <textarea class="form-control" rows="6" ng-model="filters.denial"></textarea>
+        <button type="button" class="btn btn-primary" ng-click='filters.denialChange()'>Apply</button>
+        <button type="button" class="btn btn-default" ng-click='filters.denialClear()'>Clear</button>
+      </div>
+      <div class="row node-controls" ng-show="controls.tab == 'detailsTab'">
+        <div style="max-height:300px; overflow-y:scroll">
+          <table class="table table-condensed">
+            <caption ng-show="!clickedNode">Click a node to see its rules</caption>
+            <caption ng-show="!!clickedNode">Showing {{clickedNodeRules.length}} {{clickedNodeRules.length > 1 ? 'rules' : 'rule'}} associated with <code>{{clickedNode.id}}</code></caption>
+            <thead>
+              <tr>
+                <th>Rule</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="rule in clickedNodeRules">
+                <td>{{rule}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
