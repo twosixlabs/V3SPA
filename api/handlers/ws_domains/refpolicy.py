@@ -225,21 +225,24 @@ class RefPolicy(restful.ResourceDomain):
 
                 errors = []
 
-                supported_docs = []
+                supported_docs = {
+                    'dsl': False,
+                    'raw': False
+                }
 
                 # Do we have source rules?
                 if len(module_info['error']) > 0:
                     errors.append(module_info['error'])
                 else:
-                    supported_docs.append('dsl')
+                    supported_docs['dsl'] = True
 
                 # Do we have the binary rules?
                 if len(sesearch_result['error']) > 0:
                     errors.append(sesearch_result['error'])
                 else:
-                    supported_docs.append('raw')
+                    supported_docs['raw'] = True
 
-                if len(supported_docs) == 0:
+                if not supported_docs['dsl'] and not supported_docs['raw']:
                     raise api.DisplayError("Cannot find binary policy or reference policy source in the zip file")
 
                 metadata['supported_docs'] = supported_docs
@@ -250,7 +253,7 @@ class RefPolicy(restful.ResourceDomain):
                     'raw': {
                         'text': sesearch_result['data'],
                         'mode': 'raw',
-                        'digest': hashlib.md5(sesearch_result).hexdigest()
+                        'digest': hashlib.md5(sesearch_result['data']).hexdigest()
                     }
                 }
             except Exception:
@@ -277,7 +280,7 @@ class RefPolicy(restful.ResourceDomain):
         """
 
         ret = {
-            'data': {}
+            'data': {},
             'error': ''
         }
 
@@ -385,7 +388,7 @@ class RefPolicy(restful.ResourceDomain):
             sesearch_version = subprocess.check_output(["sesearch","--version"], stderr=subprocess.STDOUT)
 
             # Only support sesearch version 4 or higher
-            if sesearch_version.find('4.') => 0:
+            if sesearch_version.find('4.') >= 0:
                 ret['data'] = subprocess.check_output(["sesearch","--allow",policy_file])
             else:
                 ret['error'] = "Sesearch must be version 4"
