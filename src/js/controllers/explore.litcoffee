@@ -234,6 +234,14 @@
         $scope.filters.denial = ''
         denialChangeCallback()
 
+      getAutocompleteItems = (query) ->
+        console.log query
+        return [
+          { text: 'Tag 1' }
+          { text: 'Tag 2' }
+          { text: 'Tag 3' }
+        ]
+
       $scope.filters =
         degreeRange: [0, 100]
         degreeChange: degreeChangeCallback
@@ -255,6 +263,7 @@
           { text: 'Tag 2' }
           { text: 'Tag 3' }
         ]
+        autocompleteItems: getAutocompleteItems
         tooltipNode: null
         policyLoaded: false
         tab: 'statisticsTab'
