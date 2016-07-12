@@ -235,12 +235,8 @@
         denialChangeCallback()
 
       getAutocompleteItems = (query) ->
-        console.log query
-        return [
-          { text: 'Tag 1' }
-          { text: 'Tag 2' }
-          { text: 'Tag 3' }
-        ]
+        filtered = $scope.sigma.graph.nodes().filter (n) -> n.id.includes(query)
+        filtered.map (n) -> { text: n.id }
 
       $scope.filters =
         degreeRange: [0, 100]
@@ -258,11 +254,7 @@
       $scope.nodeFilter = sigma.plugins.filter($scope.sigma)
 
       $scope.controls =
-        tags: [
-          { text: 'Tag 1' }
-          { text: 'Tag 2' }
-          { text: 'Tag 3' }
-        ]
+        tags: []
         autocompleteItems: getAutocompleteItems
         tooltipNode: null
         policyLoaded: false

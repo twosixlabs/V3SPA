@@ -28,8 +28,17 @@
           Filter by hub statistic
           <range-slider width="500" height="40" range="filters.hubRange" range-change-end="filters.hubChange(extent)"></range-slider>
         </div>
-        <tags-input ng-model="controls.tags" add-from-autocomplete-only="true">
-          <auto-complete source="controls.autocompleteItems($query)"></auto-complete>
+        <tags-input
+          ng-model="controls.tags"
+          add-from-autocomplete-only="true"
+          placeholder="Type a node name"
+          add-from-autocomplete-only="true"
+          >
+          <auto-complete
+            match-class="controls.tagsMatchClass($match, $index, $selected)"
+            max-results-to-show="3"
+            source="controls.autocompleteItems($query)"
+            ></auto-complete>
         </tags-input>
       </div>
       <div class="row node-controls" ng-show="controls.tab == 'accessVectorTab'">

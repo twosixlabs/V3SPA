@@ -22,4 +22,4 @@
 //= require sigmajs/plugins/sigma.statistics.HITS.min.js
 //= require sigmajs/plugins/sigma.plugins.tooltips.js
 //= require fastforce.js
-//= require ng-tags-input/ng-tags-input.min.js
+//= require ng-tags-input/ng-tags-input.js
