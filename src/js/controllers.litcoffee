@@ -1,5 +1,5 @@
     vespaControllers = angular.module('vespaControllers', 
-        ['ui.ace', 'vespa.services', 'ui.bootstrap', 'ui.select2',
+        ['vespa.services', 'ui.bootstrap', 'ui.select2',
         'angularFileUpload', 'vespa.directives', 'vespaFilters'])
 
 The main controller. avispa is a subcontroller.

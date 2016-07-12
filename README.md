@@ -34,20 +34,6 @@ To run sesearch you will need the following:
     $ sudo dnf install bison flex gcc libsepol-devel libsepol-static libselinux-devel policycoreutils-python3 python3-networkx swig bzip2-devel redhat-rpm-config python3-qt5
     $ sudo pip install networkx
 
-## Building
-
-All of the assets are now served from static/, but they aren't
-actually stored there. The Grunt build system is responsible for
-compiling assets and putting them in the right place.
-
-To build assets:
-
-    $ cd external/d3hive
-    $ sudo npm install
-    $ gulp
-    $ cd -
-    $ gulp
-
 ## Layout
 
 All of the client side code is now located in src/. All external

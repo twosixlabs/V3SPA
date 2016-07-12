@@ -11,7 +11,6 @@ var chug = require('gulp-chug')
 var paths = {
   html: ['src/**/*.html'],
   less: ['src/less/*.less'],
-  ace: ['external/ace/build/src-min-noconflict/*'],
   select2: [
     'external/select2-3.4.5/*.js',
     'external/select2-3.4.5/*.css',
@@ -49,11 +48,6 @@ gulp.task('fonts', function() {
   .pipe(rename(function(path) {
   }))
   .pipe(gulp.dest("static/fonts"))
-})
-
-gulp.task('ace', function() {
-  gulp.src(paths.ace)
-  .pipe(gulp.dest('static/ace'))
 })
 
 gulp.task('images', function() {
@@ -128,7 +122,6 @@ gulp.task('default', [
             'html',
             'select2',
             'ngTagsInput',
-            'ace',
             'images',
             'fonts'
 ])

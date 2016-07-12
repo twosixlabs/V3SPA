@@ -250,6 +250,11 @@
       $scope.nodeFilter = sigma.plugins.filter($scope.sigma)
 
       $scope.controls =
+        tags: [
+          { text: 'Tag 1' }
+          { text: 'Tag 2' }
+          { text: 'Tag 3' }
+        ]
         tooltipNode: null
         policyLoaded: false
         tab: 'statisticsTab'

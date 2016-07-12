@@ -1,5 +1,5 @@
     v3spa = angular.module 'vespa.directives',
-        ['ui.ace', 'vespa.services', 'ui.bootstrap', 'ui.select2',
+        ['vespa.services', 'ui.bootstrap', 'ui.select2',
         'angularFileUpload', 'vespa.directives']
 
     v3spa.filter 'join', ->
