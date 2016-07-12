@@ -7,7 +7,7 @@ V3SPA Angularized
 - python
 - pip
 - mongodb
-- setools
+- setools v4
 
 To set up the environment:
 
@@ -28,11 +28,13 @@ To set up the environment:
     $ source vespa/bin/activate
     $ pip install -r requirements.txt
 
-To run sesearch you will need the following:
+To run sesearch you will need SETools v4, e.g. [https://github.com/TresysTechnology/setools/releases/tag/4.0.1] and follow the [build instructions](https://github.com/TresysTechnology/setools/blob/06ee08141a23b3d88e5f6fc4f53e9654f36611d5/README.md)
 
-    $ # Fedora
-    $ sudo dnf install bison flex gcc libsepol-devel libsepol-static libselinux-devel policycoreutils-python3 python3-networkx swig bzip2-devel redhat-rpm-config python3-qt5
-    $ sudo pip install networkx
+## Building
+
+All of the assets are served from static/, but they aren't
+actually stored there. The Gulp build system is responsible for
+compiling assets and putting them in the right place.
 
 ## Layout
 
