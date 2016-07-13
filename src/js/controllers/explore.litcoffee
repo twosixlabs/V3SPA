@@ -101,33 +101,30 @@
         avChangeCallback()
 
       degreeChangeCallback = (extent) ->
-        nodeDegree = (extent) ->
-          (n) ->
-            ($scope.sigma.graph.degree(n.id) >= extent[0] and
-            $scope.sigma.graph.degree(n.id) <= extent[1]) or
-            isInTagsList(n)
+        nodeDegree = (n) ->
+          ($scope.sigma.graph.degree(n.id) >= extent[0] and
+          $scope.sigma.graph.degree(n.id) <= extent[1]) or
+          isInTagsList(n)
         $scope.nodeFilter.undo('node-degree')
-        $scope.nodeFilter.nodesBy(nodeDegree(extent), 'node-degree').apply()
+        $scope.nodeFilter.nodesBy(nodeDegree, 'node-degree').apply()
 
       authorityChangeCallback = (extent) ->
-        nodeAuthority = (extent) ->
-          (n) ->
-            ($scope.statistics[n.id]? and
-            $scope.statistics[n.id].authority >= extent[0] and
-            $scope.statistics[n.id].authority <= extent[1]) or
-            isInTagsList(n)
+        nodeAuthority = (n) ->
+          ($scope.statistics[n.id]? and
+          $scope.statistics[n.id].authority >= extent[0] and
+          $scope.statistics[n.id].authority <= extent[1]) or
+          isInTagsList(n)
         $scope.nodeFilter.undo('node-authority')
-        $scope.nodeFilter.nodesBy(nodeAuthority(extent), 'node-authority').apply()
+        $scope.nodeFilter.nodesBy(nodeAuthority, 'node-authority').apply()
 
       hubChangeCallback = (extent) ->
-        nodeHub = (extent) ->
-          (n) ->
-            ($scope.statistics[n.id]? and
-            $scope.statistics[n.id].hub >= extent[0] and
-            $scope.statistics[n.id].hub <= extent[1]) or
-            isInTagsList(n)
+        nodeHub = (n) ->
+          ($scope.statistics[n.id]? and
+          $scope.statistics[n.id].hub >= extent[0] and
+          $scope.statistics[n.id].hub <= extent[1]) or
+          isInTagsList(n)
         $scope.nodeFilter.undo('node-hub')
-        $scope.nodeFilter.nodesBy(nodeHub(extent), 'node-hub').apply()
+        $scope.nodeFilter.nodesBy(nodeHub, 'node-hub').apply()
 
       # User checked/unchecked something in the access vector filter
       avChangeCallback = () ->
