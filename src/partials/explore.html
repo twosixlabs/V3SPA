@@ -28,20 +28,22 @@
           Filter by hub statistic
           <range-slider width="500" height="40" range="filters.hubRange" range-change-end="filters.hubChange(extent)"></range-slider>
         </div>
-        <tags-input
-          ng-model="controls.tags"
-          add-from-autocomplete-only="true"
-          placeholder="Type a node name"
-          add-from-autocomplete-only="true"
-          on-tag-added="applyFilters($tag)"
-          on-tag-removed="applyFilters($tag)"
-          >
-          <auto-complete
-            match-class="controls.tagsMatchClass($match, $index, $selected)"
-            max-results-to-show="50"
-            source="controls.autocompleteItems($query)"
-            ></auto-complete>
-        </tags-input>
+        <div class="input-group-sm"> 
+          <tags-input
+            ng-model="controls.tags"
+            add-from-autocomplete-only="true"
+            placeholder="Type a node name"
+            add-from-autocomplete-only="true"
+            on-tag-added="applyFilters($tag)"
+            on-tag-removed="applyFilters($tag)"
+            >
+            <auto-complete
+              match-class="controls.tagsMatchClass($match, $index, $selected)"
+              max-results-to-show="50"
+              source="controls.autocompleteItems($query)"
+              ></auto-complete>
+          </tags-input>
+        </div>
       </div>
       <div class="row node-controls" ng-show="controls.tab == 'accessVectorTab'">
         <div class="col-xs-3"><av-filter title="Subjects" items="filters.subjList" selection-change="filters.avChange()"></av-filter></div>
