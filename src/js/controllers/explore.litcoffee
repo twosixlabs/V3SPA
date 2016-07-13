@@ -83,14 +83,15 @@
         # Make all the neighbors visible (and other nodes that have the same
         # object or class)
         adjacentNodes = $scope.sigma.graph.adjacentNodes(node.id)
-        for adjNode in adjacentNodes
-          if adjNode.id.indexOf('.') >= 0
-            obj = adjNode.id.split('.')[0]
-            cls = adjNode.id.split('.')[1]
-            $scope.filters.objList.forEach selectItem(obj)
-            $scope.filters.classList.forEach selectItem(cls)
-          else
-            $scope.filters.subjList.forEach selectItem(adjNode.id)
+
+        newTags = adjacentNodes.filter (adjNode) ->
+          for tag in $scope.controls.tags
+            if tag.text == adjNode.id then return false
+          return true
+
+        newTags = newTags.map (node) -> return { text: node.id }
+
+        $scope.controls.tags = $scope.controls.tags.concat(newTags)
 
         # Get the permissions from all incident edges and make them visible
         adjacentEdges = $scope.sigma.graph.adjacentEdges(node.id)
@@ -98,6 +99,7 @@
         $scope.filters.permList.forEach (d) ->
           if edgePerms.indexOf(d.name) then d.selected = true
 
+        # $scope.nodeFilter.apply() is called implicitly here
         avChangeCallback()
 
       degreeChangeCallback = (extent) ->
