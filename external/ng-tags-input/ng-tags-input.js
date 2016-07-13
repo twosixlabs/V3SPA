@@ -746,10 +746,6 @@ tagsInput.directive('autoComplete', ["$document", "$timeout", "$sce", "$q", "tag
 
             scope.getSuggestionClass = function(item, index) {
                 var selected = item === suggestionList.selected;
-                console.log(angular.extend(
-                    { selected: selected },
-                    scope.matchClass({$match: item, $index: index, $selected: selected})
-                ))
                 return angular.extend(
                     { selected: selected },
                     scope.matchClass({$match: item, $index: index, $selected: selected})
