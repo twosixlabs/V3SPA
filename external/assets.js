@@ -18,7 +18,7 @@
 //= require d3-grid/d3-grid.js
 //= require jsonh.js
 //= require sigmajs/sigma.require.js
-//= require sigmajs/plugins/sigma.plugins.filter.min.js
+//= require sigmajs/plugins/sigma.plugins.filter.js
 //= require sigmajs/plugins/sigma.statistics.HITS.min.js
 //= require sigmajs/plugins/sigma.plugins.tooltips.js
 //= require fastforce.js
