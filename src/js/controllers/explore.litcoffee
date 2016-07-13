@@ -71,12 +71,17 @@
       $scope.statistics
       $scope.tooltips = sigma.plugins.tooltips($scope.sigma, $scope.sigma.renderers[0], tooltipsConfig)
 
+      isInTagsList = (node) ->
+        for tag in $scope.controls.tags
+          if node.id == tag.text then return true
+        return false
+
       showNeighborsCallback = (node) ->
         selectItem = (type) ->
           (d) -> if d.name == type then d.selected = true
 
         # Make all the neighbors visible (and other nodes that have the same
-        # object of class)
+        # object or class)
         adjacentNodes = $scope.sigma.graph.adjacentNodes(node.id)
         for adjNode in adjacentNodes
           if adjNode.id.indexOf('.') >= 0
@@ -98,26 +103,29 @@
       degreeChangeCallback = (extent) ->
         nodeDegree = (extent) ->
           (n) ->
-            $scope.sigma.graph.degree(n.id) >= extent[0] and
-            $scope.sigma.graph.degree(n.id) <= extent[1]
+            ($scope.sigma.graph.degree(n.id) >= extent[0] and
+            $scope.sigma.graph.degree(n.id) <= extent[1]) or
+            isInTagsList(n)
         $scope.nodeFilter.undo('node-degree')
         $scope.nodeFilter.nodesBy(nodeDegree(extent), 'node-degree').apply()
 
       authorityChangeCallback = (extent) ->
         nodeAuthority = (extent) ->
           (n) ->
-            $scope.statistics[n.id]? and
+            ($scope.statistics[n.id]? and
             $scope.statistics[n.id].authority >= extent[0] and
-            $scope.statistics[n.id].authority <= extent[1]
+            $scope.statistics[n.id].authority <= extent[1]) or
+            isInTagsList(n)
         $scope.nodeFilter.undo('node-authority')
         $scope.nodeFilter.nodesBy(nodeAuthority(extent), 'node-authority').apply()
 
       hubChangeCallback = (extent) ->
         nodeHub = (extent) ->
           (n) ->
-            $scope.statistics[n.id]? and
+            ($scope.statistics[n.id]? and
             $scope.statistics[n.id].hub >= extent[0] and
-            $scope.statistics[n.id].hub <= extent[1]
+            $scope.statistics[n.id].hub <= extent[1]) or
+            isInTagsList(n)
         $scope.nodeFilter.undo('node-hub')
         $scope.nodeFilter.nodesBy(nodeHub(extent), 'node-hub').apply()
 
@@ -138,9 +146,9 @@
           if n.id.indexOf('.') >= 0 # object.class
             obj = n.id.split('.')[0]
             cls = n.id.split('.')[1]
-            return avObjClsMap[obj] and avObjClsMap[cls]
+            return (avObjClsMap[obj] and avObjClsMap[cls]) or isInTagsList(n)
           else # subject
-            return avSubjMap[n.id] or false
+            return avSubjMap[n.id] or isInTagsList(n) or false
 
         edgeAv = (e) ->
           for perm in e.perm
@@ -236,7 +244,8 @@
 
       getAutocompleteItems = (query) ->
         filtered = $scope.sigma.graph.nodes().filter (n) -> n.id.includes(query)
-        filtered.map (n) -> { text: n.id }
+        filtered = filtered.map (n) -> { text: n.id }
+        filtered.sort (a, b) -> if a.text < b.text then -1 else if a.text > b.text then 1 else 0
 
       $scope.filters =
         degreeRange: [0, 100]
@@ -250,6 +259,9 @@
         denialChange: denialChangeCallback
         denialClear: denialClearCallback
         showNeighbors: showNeighborsCallback
+
+      $scope.applyFilters = () ->
+        $scope.nodeFilter.apply()
 
       $scope.nodeFilter = sigma.plugins.filter($scope.sigma)
 

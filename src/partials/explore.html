@@ -33,10 +33,12 @@
           add-from-autocomplete-only="true"
           placeholder="Type a node name"
           add-from-autocomplete-only="true"
+          on-tag-added="applyFilters($tag)"
+          on-tag-removed="applyFilters($tag)"
           >
           <auto-complete
             match-class="controls.tagsMatchClass($match, $index, $selected)"
-            max-results-to-show="3"
+            max-results-to-show="50"
             source="controls.autocompleteItems($query)"
             ></auto-complete>
         </tags-input>
