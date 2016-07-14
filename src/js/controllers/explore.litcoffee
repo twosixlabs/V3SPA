@@ -60,19 +60,53 @@
           position: 'top'
           template: """
           <condensed-tooltip node="controls.tooltipNode"
+                             alternate-nodes="controls.tooltipAlternateNodes"
                              show-neighbors="filters.showNeighbors(node)"
-                             sigma="sigma">
+                             add-to-always-visible-list="filters.addToAlwaysVisibleList(nodes)"
+                             remove-from-always-visible-list="filters.removeFromAlwaysVisibleList(node)"
+                             show-neighbors="filters.showNeighbors(node)"
+                             is-always-visible="{{isInAlwaysVisibleList(controls.tooltipNode)}}"
+                             sigma="sigma"
+                             statistics="statistics"
+                             authority-formatter="authorityFormatter"
+                             hub-formatter="hubFormatter"
+                             >
           </condensed-tooltip>
           """
           renderer: (node, template) ->
             $scope.controls.tooltipNode = node
+
+            if node.id.indexOf('.') == -1
+              # The clicked node is a subject, find all objects
+              $scope.controls.tooltipAlternateNodes = $scope.sigma.graph.nodes().filter (n) ->
+                return n.id != node.id and n.id.indexOf(node.id) >= 0
+            else
+              # The clicked node is an object.class, find the subject node
+              obj = node.id.split('.')[0]
+              $scope.controls.tooltipAlternateNodes = $scope.sigma.graph.nodes().filter (n) ->
+                return obj == node.id
+
             $compile(template)($scope)[0]
 
       $scope.statistics
       $scope.tooltips = sigma.plugins.tooltips($scope.sigma, $scope.sigma.renderers[0], tooltipsConfig)
 
-      isInTagsList = (node) ->
-        for tag in $scope.controls.tags
+      addToAlwaysVisibleList = (nodes) ->
+        if nodes.constructor != Array then nodes = [nodes]
+
+        nodes.forEach (n) ->
+          if not $scope.isInAlwaysVisibleList(n)
+            $scope.controls.alwaysVisible.push { text: n.id }
+
+        $scope.nodeFilter.apply()
+
+      removeFromAlwaysVisibleList = (node) ->
+        $scope.controls.alwaysVisible = $scope.controls.alwaysVisible.filter (tag) ->
+          tag.text != node.id
+
+      $scope.isInAlwaysVisibleList = (node) ->
+        if not node? then return false
+        for tag in $scope.controls.alwaysVisible
           if node.id == tag.text then return true
         return false
 
@@ -85,13 +119,13 @@
         adjacentNodes = $scope.sigma.graph.adjacentNodes(node.id)
 
         newTags = adjacentNodes.filter (adjNode) ->
-          for tag in $scope.controls.tags
+          for tag in $scope.controls.alwaysVisible
             if tag.text == adjNode.id then return false
           return true
 
         newTags = newTags.map (node) -> return { text: node.id }
 
-        $scope.controls.tags = $scope.controls.tags.concat(newTags)
+        $scope.controls.alwaysVisible = $scope.controls.alwaysVisible.concat(newTags)
 
         # Get the permissions from all incident edges and make them visible
         adjacentEdges = $scope.sigma.graph.adjacentEdges(node.id)
@@ -106,7 +140,7 @@
         nodeDegree = (n) ->
           ($scope.sigma.graph.degree(n.id) >= extent[0] and
           $scope.sigma.graph.degree(n.id) <= extent[1]) or
-          isInTagsList(n)
+          $scope.isInAlwaysVisibleList(n)
         $scope.nodeFilter.undo('node-degree')
         $scope.nodeFilter.nodesBy(nodeDegree, 'node-degree').apply()
 
@@ -115,7 +149,7 @@
           ($scope.statistics[n.id]? and
           $scope.statistics[n.id].authority >= extent[0] and
           $scope.statistics[n.id].authority <= extent[1]) or
-          isInTagsList(n)
+          $scope.isInAlwaysVisibleList(n)
         $scope.nodeFilter.undo('node-authority')
         $scope.nodeFilter.nodesBy(nodeAuthority, 'node-authority').apply()
 
@@ -124,7 +158,7 @@
           ($scope.statistics[n.id]? and
           $scope.statistics[n.id].hub >= extent[0] and
           $scope.statistics[n.id].hub <= extent[1]) or
-          isInTagsList(n)
+          $scope.isInAlwaysVisibleList(n)
         $scope.nodeFilter.undo('node-hub')
         $scope.nodeFilter.nodesBy(nodeHub, 'node-hub').apply()
 
@@ -145,9 +179,9 @@
           if n.id.indexOf('.') >= 0 # object.class
             obj = n.id.split('.')[0]
             cls = n.id.split('.')[1]
-            return (avObjClsMap[obj] and avObjClsMap[cls]) or isInTagsList(n)
+            return (avObjClsMap[obj] and avObjClsMap[cls]) or $scope.isInAlwaysVisibleList(n)
           else # subject
-            return avSubjMap[n.id] or isInTagsList(n) or false
+            return avSubjMap[n.id] or $scope.isInAlwaysVisibleList(n) or false
 
         edgeAv = (e) ->
           for perm in e.perm
@@ -258,6 +292,8 @@
         denialChange: denialChangeCallback
         denialClear: denialClearCallback
         showNeighbors: showNeighborsCallback
+        addToAlwaysVisibleList: addToAlwaysVisibleList
+        removeFromAlwaysVisibleList: removeFromAlwaysVisibleList
 
       $scope.applyFilters = () ->
         $scope.nodeFilter.apply()
@@ -265,7 +301,7 @@
       $scope.nodeFilter = sigma.plugins.filter($scope.sigma)
 
       $scope.controls =
-        tags: []
+        alwaysVisible: []
         autocompleteItems: getAutocompleteItems
         tooltipNode: null
         policyLoaded: false
@@ -389,6 +425,13 @@
         $scope.filters.degreeRange = d3.extent(graph.nodes, (n) -> $scope.sigma.graph.degree(n.id))
         $scope.filters.authorityRange = d3.extent(d3.values($scope.statistics), (n) -> n.authority)
         $scope.filters.hubRange = d3.extent(d3.values($scope.statistics), (n) -> n.hub)
+
+        $scope.authorityFormatter = d3.scale.linear()
+          .domain($scope.filters.authorityRange)
+          .tickFormat()
+        $scope.hubFormatter = d3.scale.linear()
+          .domain($scope.filters.hubRange)
+          .tickFormat()
         $scope.sigma.refresh()
 
       update = () ->

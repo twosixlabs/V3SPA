@@ -442,7 +442,7 @@ caption {
 }
 
 .sigma-tooltip {
-  max-width: 240px;
+  max-width: 260px;
   max-height: 280px;
   background-color: #f5f5f5;
   box-shadow: 0 2px 6px rgba(0,0,0,0.3);
@@ -452,6 +452,9 @@ caption {
 .sigma-tooltip-header {
   font-variant: small-caps;
   font-size: 120%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
   border-bottom: 1px solid #ddd;
   padding: 10px;
 }
@@ -461,8 +464,13 @@ caption {
 }
 
 .sigma-tooltip-footer {
+  font-size: 12px;
   padding: 10px;
   border-top: 1px solid #ddd;
+
+  .stats-label {
+    color: #555;
+  }
 }
 
 .sigma-tooltip.top {

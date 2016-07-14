@@ -47,7 +47,7 @@
         <p>The following nodes are always visible in the visualization.</p>
         <div class="input-group-sm"> 
           <tags-input
-            ng-model="controls.tags"
+            ng-model="controls.alwaysVisible"
             add-from-autocomplete-only="true"
             placeholder="Type a node name"
             add-from-autocomplete-only="true"
@@ -55,7 +55,6 @@
             on-tag-removed="applyFilters($tag)"
             >
             <auto-complete
-              match-class="controls.tagsMatchClass($match, $index, $selected)"
               max-results-to-show="50"
               source="controls.autocompleteItems($query)"
               ></auto-complete>
