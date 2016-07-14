@@ -91,6 +91,12 @@
       $scope.statistics
       $scope.tooltips = sigma.plugins.tooltips($scope.sigma, $scope.sigma.renderers[0], tooltipsConfig)
 
+      $scope.isInAlwaysVisibleList = (node) ->
+        if not node? then return false
+        for tag in $scope.controls.alwaysVisible
+          if node.id == tag.text then return true
+        return false
+
       addToAlwaysVisibleList = (nodes) ->
         if nodes.constructor != Array then nodes = [nodes]
 
@@ -104,11 +110,9 @@
         $scope.controls.alwaysVisible = $scope.controls.alwaysVisible.filter (tag) ->
           tag.text != node.id
 
-      $scope.isInAlwaysVisibleList = (node) ->
-        if not node? then return false
-        for tag in $scope.controls.alwaysVisible
-          if node.id == tag.text then return true
-        return false
+      clearAlwaysVisibleList = () ->
+        $scope.controls.alwaysVisible = []
+        $scope.nodeFilter.apply()
 
       showNeighborsCallback = (node) ->
         selectItem = (type) ->
@@ -294,6 +298,7 @@
         showNeighbors: showNeighborsCallback
         addToAlwaysVisibleList: addToAlwaysVisibleList
         removeFromAlwaysVisibleList: removeFromAlwaysVisibleList
+        clearAlwaysVisibleList: clearAlwaysVisibleList
 
       $scope.applyFilters = () ->
         $scope.nodeFilter.apply()

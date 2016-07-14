@@ -470,9 +470,10 @@ Sigma tooltips for nodes in the condensed graph format.
               <button
                       type="button"
                       class="btn btn-default btn-xs btn-block"
+                      ng-if="connections > 0"
                       ng-click='showNeighbors({node:node})'
                       >
-                Add <strong>neighbors</strong> to always visible list
+                Add <strong>{{connections}} {{connections !== 1 ? 'neighbors' : 'neighbor'}}</strong> to always visible list
               </button>
               <button
                       type="button"
