@@ -308,17 +308,23 @@ Enumerate the differences between the two policies
               break
 
       $scope.update_view = (data) ->
+        console.log("update_view", new Date())
         $scope.policy = IDEBackend.current_policy
 
         if $scope.policy?.json?.parameterized?.raw?
           $scope.primaryNodes = $scope.policy.json.parameterized.raw.nodes
           $scope.primaryLinks = $scope.policy.json.parameterized.raw.links
 
-        if $scope.primaryNodes and $scope.primaryLinks and comparisonNodes and comparisonLinks
+        if $scope.primaryNodes?.length
+        and $scope.primaryLinks?.length
+        and comparisonNodes?.length
+        and comparisonLinks?.length
+          console.log("update_view", new Date())
           update()
 
       update = () ->
 
+        console.log("update", new Date())
         nodeMapReducer = (map, currNode) ->
           map["#{currNode.type}-#{currNode.name}"] = currNode
           return map
@@ -352,9 +358,11 @@ Enumerate the differences between the two policies
           comparison: comparisonPolicyId() || undefined
 
         if $scope.policyIds.primary and $scope.policyIds.comparison
+          console.log("update", new Date())
           redraw()
 
       redraw = () ->
+        console.log("redraw", new Date())
         [
           {nodes: graph.subjNodes, svg: subjSvg},
           {nodes: graph.objNodes, svg: objSvg},
@@ -613,6 +621,7 @@ Enumerate the differences between the two policies
         link.style "stroke-width", (d) -> return linkScale(d.rules.length)
 
         link.exit().remove()
+        console.log("redraw", new Date())
 
 Set up the viewport scroll
 
