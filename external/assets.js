@@ -7,7 +7,7 @@
 //= include angular-1.3.4/angular-route.min.js
 //= include angular/angular-ui-bootstrap-0.10.0.min.js
 //= include angular/angular-select2.js
-//= include backbone/underscore-min.js
+//= include lodash.min.js
 //= include backbone/backbone-min.js
 //= require svg-pan-zoom/svg-pan-zoom.js
 //= require spin.min.js
