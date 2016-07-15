@@ -37,7 +37,7 @@
               changed.push k
 
               # if it's a local only, don't mark changed.
-              if @local != true and not _.contains @local, k
+              if @local != true and not _.includes @local, k
                 nonlocal_changed = true
 
           if changed.length > 0 and propagate
