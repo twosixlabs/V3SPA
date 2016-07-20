@@ -16,6 +16,7 @@
 //= require bootstrap-contextmenu/bootstrap-contextmenu.js
 //= require queue/Queue.js
 //= require d3-grid/d3-grid.js
+//= require css.escape/css.escape.js
 //= require jsonh.js
 //= require sigmajs/sigma.require.js
 //= require sigmajs/plugins/sigma.plugins.filter.js
