@@ -91,76 +91,11 @@ class RawDomain(object):
 
             new_links = []
 
-            # Only time we need to add an existing link is if we have a new node
-     #        if new_object_node >= 0:
-     #        	# If subject->perm link exists add it to new_object_node
-     #        	if curr_subject_node >= 0 and curr_perm_node >= 0:
-					# s_node = nodeList[curr_subject_node]
-					# t_node = nodeList[curr_perm_node]
-					# link_key = s_node['t'] + '-' + s_node['n'] + '-' + t_node['t'] + '-' + t_node['n']
-					# if link_key in linkMap:
-					# 	new_links.append(linkMap[link_key])
-     #        	# If perm->class link exists add it to new_object_node
-     #        	if curr_perm_node >= 0 and curr_class_node >= 0:
-					# s_node = nodeList[curr_perm_node]
-					# t_node = nodeList[curr_class_node]
-					# link_key = s_node['t'] + '-' + s_node['n'] + '-' + t_node['t'] + '-' + t_node['n']
-					# if link_key in linkMap:
-					# 	new_links.append(linkMap[link_key])
-     #        if new_subject_node >= 0:
-     #        	# If object->class link exists add it to new_subject_node
-     #        	if curr_object_node >= 0 and curr_class_node >= 0:
-					# s_node = nodeList[curr_object_node]
-					# t_node = nodeList[curr_class_node]
-					# link_key = s_node['t'] + '-' + s_node['n'] + '-' + t_node['t'] + '-' + t_node['n']
-					# if link_key in linkMap:
-					# 	new_links.append(linkMap[link_key])
-     #        	# If perm->class link exists add it to new_subject_node
-     #        	if curr_perm_node >= 0 and curr_class_node >= 0:
-					# s_node = nodeList[curr_perm_node]
-					# t_node = nodeList[curr_class_node]
-					# link_key = s_node['t'] + '-' + s_node['n'] + '-' + t_node['t'] + '-' + t_node['n']
-					# if link_key in linkMap:
-					# 	new_links.append(linkMap[link_key])
-     #        if new_perm_node >= 0:
-     #        	# If object->class link exists add it to new_perm_node
-     #        	if curr_object_node >= 0 and curr_class_node >= 0:
-					# s_node = nodeList[curr_object_node]
-					# t_node = nodeList[curr_class_node]
-					# link_key = s_node['t'] + '-' + s_node['n'] + '-' + t_node['t'] + '-' + t_node['n']
-					# if link_key in linkMap:
-					# 	new_links.append(linkMap[link_key])
-     #        if new_class_node >= 0:
-     #        	# If perm->object link exists add it to new_class_node
-     #        	if curr_perm_node >= 0 and curr_object_node >= 0:
-					# s_node = nodeList[curr_perm_node]
-					# t_node = nodeList[curr_class_node]
-					# link_key = s_node['t'] + '-' + s_node['n'] + '-' + t_node['t'] + '-' + t_node['n']
-					# if link_key in linkMap:
-					# 	new_links.append(linkMap[link_key])
-     #        	# If subject->perm link exists add it to new_class_node
-     #        	if curr_subject_node >= 0 and curr_class_node >= 0:
-					# s_node = nodeList[curr_subject_node]
-					# t_node = nodeList[curr_class_node]
-					# link_key = s_node['t'] + '-' + s_node['n'] + '-' + t_node['t'] + '-' + t_node['n']
-					# if link_key in linkMap:
-					# 	new_links.append(linkMap[link_key])
-
             RawDomain.generateLink(curr_perm_node, curr_object_node, new_perm_node, new_object_node, nodeList, linkMap, linkList, new_links)
             RawDomain.generateLink(curr_subject_node, curr_perm_node, new_subject_node, new_perm_node, nodeList, linkMap, linkList, new_links)
             RawDomain.generateLink(curr_object_node, curr_class_node, new_object_node, new_class_node, nodeList, linkMap, linkList, new_links)
             RawDomain.generateLink(curr_perm_node, curr_class_node, new_perm_node, new_class_node, nodeList, linkMap, linkList, new_links)
 
-            if r['object'] == 'wm_domain':
-            	tmp = {
-            		'subj_idx': curr_subject_node if curr_subject_node >= 0 else new_subject_node,
-            		'subj': 'curr' if curr_subject_node >= 0 else 'new',
-            		'obj': 'curr' if curr_object_node >= 0 else 'new',
-            		'obj_idx': curr_object_node if curr_object_node >= 0 else new_object_node,
-            		'new_links': new_links
-            	}
-            	pprint.pprint(r)
-            	pprint.pprint(tmp)
             RawDomain.append_new_links_to_node(curr_subject_node, new_subject_node, nodeList, new_links)
             RawDomain.append_new_links_to_node(curr_object_node, new_object_node, nodeList, new_links)
             RawDomain.append_new_links_to_node(curr_class_node, new_class_node, nodeList, new_links)
@@ -425,7 +360,6 @@ class RawDomain(object):
             link_list = [] # List of links
             RawDomain.nodesFromRules(rules, refpol.id, node_map, link_map, node_list, link_list)
             for node in node_list:
-            	print(node['n'])
             	node['l'] = list(node['l'])
 
             # Sparsify/compress the dicts/JSON objects
