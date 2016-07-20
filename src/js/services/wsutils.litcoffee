@@ -98,6 +98,7 @@ Expand the raw policy nodes and links from succinct to verbose style.
             nodes = json.nodes.map (n) =>
               'type': typeMap[n.t]
               'name': n.n
+              'links': n.l
               'selected': true
             json.nodes = nodes
 
@@ -109,6 +110,10 @@ Expand the raw policy nodes and links from succinct to verbose style.
               'target': nodes[l.t]
               'source': nodes[l.s]
             json.links = links
+
+          json.nodes.forEach (n) =>
+            n.links = n.links.map (l) =>
+              return links[l]
 
           return json
 
