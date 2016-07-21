@@ -9,7 +9,7 @@
       </div>
     </div>
     <div class="selection-list">
-      <label ng-repeat="node in primaryNodes" title="{{node.blockedModules.length ? 'Filtered by modules: ' + node.blockedModules.join(', ') : ''}}">
+      <label ng-repeat="node in primaryNodes" title="{{node.name}}">
         <input type="checkbox" ng-model="node.selected" ng-change="selectionChange()">{{node.name}}
       </label>
     </div>
@@ -23,7 +23,7 @@
       </div>
     </div>
     <div class="selection-list">
-      <label ng-repeat="node in bothNodes" title="{{node.blockedModules.length ? 'Filtered by modules: ' + node.blockedModules.join(', ') : ''}}">
+      <label ng-repeat="node in bothNodes" title="{{node.name}}">
         <input type="checkbox" ng-model="node.selected" ng-change="selectionChange()">{{node.name}}
       </label>
     </div>
@@ -37,7 +37,7 @@
       </div>
     </div>
     <div class="selection-list">
-      <label ng-repeat="node in comparisonNodes" title="{{node.blockedModules.length ? 'Filtered by modules: ' + node.blockedModules.join(', ') : ''}}">
+      <label ng-repeat="node in comparisonNodes" title="{{node.name}}">
         <input type="checkbox" ng-model="node.selected" ng-change="selectionChange()">{{node.name}}
       </label>
     </div>
