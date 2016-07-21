@@ -401,7 +401,9 @@ contents of @current_policy and get the parsed JSON
 
             @WSUtils.fetch_raw_graph(@current_policy._id).then (json) =>
               @current_policy.json ?= {}
-              @current_policy.json.parameterized ?= {}
+              # Never need raw, lobster, and condensed at same time.
+              # Wipe out any others currently loaded for performance/space.
+              @current_policy.json.parameterized = {}
               @current_policy.json.parameterized.raw = json.parameterized.raw
 
               _.each @hooks.json_changed, (hook)=>
@@ -414,7 +416,9 @@ contents of @current_policy and get the parsed JSON
 
             @WSUtils.fetch_condensed_graph(@current_policy._id).then (json) =>
               @current_policy.json ?= {}
-              @current_policy.json.parameterized ?= {}
+              # Never need raw, lobster, and condensed at same time.
+              # Wipe out any others currently loaded for performance/space.
+              @current_policy.json.parameterized = {}
               @current_policy.json.parameterized.condensed = json.parameterized.condensed
 
               _.each @hooks.json_changed, (hook)=>
