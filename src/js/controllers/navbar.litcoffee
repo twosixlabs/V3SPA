@@ -18,7 +18,7 @@
 
         $scope.getCurrentPolicy()
 
-        $scope.visualizer_type = 'explore'
+        $scope.visualizer_type = 'diff'
 
         $scope.$watch 'visualizer_type', (value)->
           if value =='module_browser'
