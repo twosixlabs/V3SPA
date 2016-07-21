@@ -8,7 +8,6 @@
 //= include angular/angular-ui-bootstrap-0.10.0.min.js
 //= include angular/angular-select2.js
 //= include lodash.min.js
-//= include backbone/backbone-min.js
 //= require svg-pan-zoom/svg-pan-zoom.js
 //= require spin.min.js
 //= require bootstrap-growl/bootstrap-growl.js
