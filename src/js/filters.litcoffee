@@ -34,16 +34,16 @@
 
     vespaFilters.filter 'uniquerule', () ->
 
-      return (items, policy, module, rule, line) ->
-        if policy == false or module == false or rule == false or line == false
+      return (items, policy, rule) ->
+        if policy == false or rule == false
           return items
 
-        if ((policy and module and rule and line) or (angular.isUndefined(policy) and angular.isUndefined(module) and angular.isUndefined(rule) and angular.isUndefined(line))) and angular.isArray(items)
+        if ((policy and rule) or (angular.isUndefined(policy) and angular.isUndefined(rule))) and angular.isArray(items)
           newItems = []
 
           extractValueToCompare = (item) ->
-            if angular.isObject(item) and angular.isString(policy) and angular.isString(module) and angular.isString(rule) and angular.isString(line)
-              return "#{item[policy]}-#{item[module]}-#{item[rule]}-#{item[line]}"
+            if angular.isObject(item) and angular.isString(policy) and angular.isString(rule)
+              return "#{item[policy]}-#{item[rule]}"
             else
               return item
 

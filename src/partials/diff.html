@@ -70,15 +70,13 @@
           <caption ng-show="clickedNode">Showing {{clickedNode.type}} {{clickedNode.name}}</caption>
           <thead>
             <tr>
-              <th>Line</th>
-              <th>Policy:module</th>
+              <th>Policy</th>
               <th>Rule</th>
             </tr>
           </thead>
           <tbody>
-            <tr ng-repeat="rule in clickedNode.rules | uniquerule: 'policy':'module':'rule':'line'">
-              <td>{{rule.line}}</td>
-              <td>{{rule.policy}}:{{rule.module}}</td>
+            <tr ng-repeat="rule in clickedNodeRules | uniquerule: 'policy':'rule'">
+              <td>{{rule.policy}}</td>
               <td>{{rule.rule}}</td>
             </tr>
           </tbody>

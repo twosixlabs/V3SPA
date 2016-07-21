@@ -45,14 +45,14 @@
           domain: 'raw'
           request: 'fetch_rules'
           payload:
-            policy: IDEBackend.current_policy._id
+            policy: [IDEBackend.current_policy._id]
             params: reqParams
 
         SockJSService.send req, (result)=>
           if result.error?
             $scope.clickedNodeRules = []
           else
-            $scope.clickedNodeRules = JSON.parse(result.payload).sort()
+            $scope.clickedNodeRules = JSON.parse(result.payload).map((r) -> return r.rule).sort()
 
       tooltipsConfig =
         node:

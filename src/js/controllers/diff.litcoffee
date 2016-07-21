@@ -51,7 +51,7 @@ Get the raw JSON
 
 Fetch the policy info (refpolicy) needed to get the raw JSON
 
-      load_refpolicy = (id)=>
+      load_refpolicy = (id)->
         if comparisonPolicy? and comparisonPolicy.id == id
           return
 
@@ -310,6 +310,7 @@ Enumerate the differences between the two policies
         find_differences()
 
         $scope.clickedNode = null
+        $scope.clickedNodeRules = []
 
         if $scope.policyIds.primary and $scope.policyIds.comparison
           redraw()
@@ -360,15 +361,41 @@ Enumerate the differences between the two policies
             d3.selectAll "g.node.highlight"
               .classed "highlight", false
 
-          nodeClick = (clickedNode) ->
+          nodeClick = (clickedNode) =>
             [uniqNodes, linksToShow] = getConnected(clickedNode)
             clicked = !clickedNode.clicked
 
             if clicked
               $scope.clickedNode = clickedNode
+              $scope.clickedNodeRules = []
+
+              reqParams = {}
+
+              deferred = $q.defer()
+
+              reqParams[clickedNode.type] = clickedNode.name
+
+              req = 
+                domain: 'raw'
+                request: 'fetch_rules'
+                payload:
+                  policy: [IDEBackend.current_policy._id, comparisonPolicy._id]
+                  params: reqParams
+
+              SockJSService.send req, (result)=>
+                if result.error?
+                  $scope.clickedNodeRules = []
+                else
+                  rules = JSON.parse(result.payload)
+                  $scope.clickedNodeRules = rules.sort (a,b) ->
+                    if a.policy != b.policy then return a.policy - b.policy
+                    return a.rule - b.rule
+                if !$scope.$$phase then $scope.$apply()
+
             else
               $scope.clickedNode = null
-            if !$scope.$$phase then $scope.$apply()
+              $scope.clickedNodeRules = []
+              if !$scope.$$phase then $scope.$apply()
 
             changedNodes = graph.allNodes.filter (n) -> return n.clicked
             changedLinks = graph.links.filter (l) -> return l.source.clicked && l.target.clicked

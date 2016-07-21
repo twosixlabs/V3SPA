@@ -2,6 +2,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 import restful
+import refpolicy
 import api.handlers.ws_domains as ws_domains
 import api
 import hashlib
@@ -159,8 +160,6 @@ class RawDomain(object):
 
     @staticmethod
     def condensedNodesFromRules(rules, nodeMap, linkMap, nodeList, linkList):
-    	print("-------------len===============")
-    	print(len(rules))
     	for r in rules:
     		source_key = r['subject']
     		target_key = r['object'] + '.' + r['class']
@@ -203,7 +202,7 @@ class RawDomain(object):
             {
               "payload":
                 {
-                    "policy": "policyid"
+                    "policy": ["policyid1", "policyid2", ...]
                     "params":
                     	{
                     		"subject": "(optional) name of subject"
@@ -216,51 +215,56 @@ class RawDomain(object):
         """
 
         # msg.payload.policy is the id
-        refpol_id = msg['payload']['policy']
+        refpol_id_arr = msg['payload']['policy']
 
-        refpol_id = api.db.idtype(refpol_id)
-        refpol = ws_domains.call('refpolicy', 'Read', refpol_id)
+        found_rules = {}
 
-        found_rules = []
+        for refpol_id in refpol_id_arr:
 
-        # If already parsed, just return the one we already translated.
-        if ('parsed' in refpol
-        	and 'parameterized' in refpol['parsed']
-        	and 'rules' in refpol['parsed']['parameterized']):
-            logger.info("Looking up rules")
+	        refpol_id = api.db.idtype(refpol_id)
+	        logger.info("Starting read: {0}".format(refpol_id))
+	        refpol = refpolicy.RefPolicy.Find({'_id': refpol_id}, {'parsed': True, 'id': True, '_id': True}, 1)[0]
+	        logger.info("Finished read")
 
-            subj = msg['payload']['params'].get('subject', None)
-            obj = msg['payload']['params'].get('object', None)
-            cls = msg['payload']['params'].get('class', None)
-            perm = msg['payload']['params'].get('perm', None)
 
-            match_dict = msg['payload']['params']
+	        # If already parsed, just return the one we already translated.
+	        if ('parsed' in refpol
+	        	and 'parameterized' in refpol['parsed']
+	        	and 'rules' in refpol['parsed']['parameterized']):
+	            logger.info("Looking up rules")
 
-            # Invalid request, so return empty list
-            if not (subj or obj or cls or perm):
-            	return {
-            		'label': msg['response_id'],
-            		'payload': api.db.json.dumps([])
-            	}
+	            subj = msg['payload']['params'].get('subject', None)
+	            obj = msg['payload']['params'].get('object', None)
+	            cls = msg['payload']['params'].get('class', None)
+	            perm = msg['payload']['params'].get('perm', None)
 
-            rules = refpol['parsed']['parameterized']['rules']
+	            match_dict = msg['payload']['params']
 
-            for r in rules:
-            	include_rule = True
-            	for k in match_dict:
-            		if match_dict[k] != r[k]:
-            			include_rule = False
-            	if include_rule:
-            		found_rules.append(r['rule'])
+	            # Invalid request, so skip this policy
+	            if not (subj or obj or cls or perm):
+	            	continue
 
-        else:
-        	logger.info("Policy has not been parsed")
+	            rules = refpol['parsed']['parameterized']['rules']
+
+	            for r in rules:
+	            	include_rule = True
+	            	for k in match_dict:
+	            		if match_dict[k] != r[k]:
+	            			include_rule = False
+	            	if include_rule:
+	            		if r['rule'] in found_rules:
+	            			found_rules[r['rule']]['policy'] = 'both'
+	            		else:
+	            			found_rules[r['rule']] = { 'rule': r['rule'], 'policy': refpol['id'] }
+
+	        else:
+	        	logger.info("Policy {0} has not been parsed".format(refpol_id))
 
 
         # Return the unique rules from the list
         return {
             'label': msg['response_id'],
-            'payload': api.db.json.dumps(list(set(found_rules)))
+            'payload': api.db.json.dumps(found_rules.values())
         }
 
     def fetch_condensed_graph(self, msg):
@@ -298,10 +302,6 @@ class RawDomain(object):
             RawDomain.condensedNodesFromRules(rules, node_map, link_map, node_list, link_list)
 
             # Sparsify/compress the dicts/JSON objects
-            print("----------node_list------------")
-            print(len(node_list))
-            print(len(link_list))
-            print("----------------------")
             node_list = api.jsonh.dumps(node_list)
             link_list = api.jsonh.dumps(link_list)
 
@@ -409,9 +409,7 @@ class RawDomain(object):
             # Need to get the parsed data for all the modules
             # Use ws_domains.call() to invoke raw.py and get the raw policy
             line_num = 0
-            print("----------------------")
-            print(len(raw.splitlines()))
-            print("----------------------")
+            logger.info("Parsing {0} rule lines".format(len(raw.splitlines())))
             for line in raw.splitlines():
                 line_num += 1
                 # Split on ":"
