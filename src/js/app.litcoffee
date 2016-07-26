@@ -57,6 +57,29 @@ Preload all of the templates that we're going to use.
           return ""
         return input.replace(/\\/g, '/').replace(/.*\//, '')
 
+Define a sigmajs node renderer that draws nodes with a border
+
+    sigma.canvas.nodes.border = (node, context, settings) ->
+      prefix = settings('prefix') or ''
+
+      context.fillStyle = node.color or settings('defaultNodeColor')
+      context.beginPath()
+      context.arc(
+        node[prefix + 'x'],
+        node[prefix + 'y'],
+        node[prefix + 'size'],
+        0,
+        Math.PI * 2,
+        true
+      )
+
+      context.closePath()
+      context.fill()
+
+      context.lineWidth = node[prefix + 'size'] / 4
+      context.strokeStyle = node.borderColor or '#ffffff'
+      context.stroke()
+
     `
     $.growl.default_options = {
         ele: "body",

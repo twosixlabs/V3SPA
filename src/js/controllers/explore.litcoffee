@@ -6,6 +6,14 @@
       # The 'outstanding' attribute is truthy when a policy is being loaded
       $scope.status = SockJSService.status
 
+      nodeFillScale = d3.scale.ordinal()
+        .domain(["subj", "obj.class"])
+        .range(["#4c84c3", "#ffb048"])
+
+      nodeOverFillScale = d3.scale.ordinal()
+        .domain(["subj", "obj.class"])
+        .range(["#005892", "#ff7f0e"])
+
       $scope.sigma = new sigma(
         renderers: [
           container: 'explore-container'
@@ -22,6 +30,9 @@
           hideEdgesOnMove: true
           mouseZoomDuration: 0
           doubleClickZoomDuration: 0
+          batchEdgesDrawing: true
+          canvasEdgesBatchSize: 2000
+          defaultNodeType: 'border'
       )
 
       $scope.sigma.bind 'clickStage rightClickStage', (event) ->
@@ -29,9 +40,27 @@
         $scope.clickedNodeRules = []
         if not $scope.$$phase then $scope.$apply()
 
+        $scope.sigma.graph.nodes().forEach (n) ->
+          n.color = nodeFillScale(if n.id.indexOf('.') >= 0 then 'obj.class' else 'subj')
+          n.borderColor = '#ffffff'
+        $scope.sigma.refresh()
+
       $scope.sigma.bind 'clickNode', (event) ->
         node = event.data.node
         $scope.clickedNode = node
+
+        neighbors = {}
+        $scope.sigma.graph.adjacentNodes(node.id).forEach (neighborNode) ->
+          neighbors[neighborNode.id] = node
+        neighbors[node.id] = node
+
+        $scope.sigma.graph.nodes().forEach (n) ->
+          if neighbors[n.id]
+            n.color = nodeOverFillScale(if n.id.indexOf('.') >= 0 then 'obj.class' else 'subj')
+            n.borderColor = '#333333'
+          else
+            n.color = nodeFillScale(if n.id.indexOf('.') >= 0 then 'obj.class' else 'subj')
+            n.borderColor = '#ffffff'
 
         reqParams = {}
 
@@ -53,6 +82,8 @@
             $scope.clickedNodeRules = []
           else
             $scope.clickedNodeRules = JSON.parse(result.payload).map((r) -> return r.rule).sort()
+
+        $scope.sigma.refresh()
 
       tooltipsConfig =
         node:
@@ -331,10 +362,6 @@
               query.callback(dropdown)
           )
 
-      nodeFillScale = d3.scale.ordinal()
-        .domain(["subj", "obj.class"])
-        .range(["#005892", "#ff7f0e"])
-
       $scope.update_view = () ->
         width = 6000
         height = 6000
@@ -414,7 +441,7 @@
           x: n.x
           y: n.y
           size: 1
-          color: nodeFillScale(n.name.indexOf('.') >= 0 ? 'obj.class' : 'subj')
+          color: nodeFillScale(if n.name.indexOf('.') >= 0 then 'obj.class' else 'subj')
 
         graph.edges = $scope.links.map (l) ->
           id: l.source.name + '-' + l.target.name
