@@ -13,6 +13,7 @@ import api
 
 import pprint
 import subprocess
+from subprocess import CalledProcessError
 
 
 def iter_lines(fil_or_str):
