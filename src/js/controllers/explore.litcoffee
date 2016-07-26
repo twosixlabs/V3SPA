@@ -214,7 +214,7 @@
           if n.id.indexOf('.') >= 0 # object.class
             obj = n.id.split('.')[0]
             cls = n.id.split('.')[1]
-            return (avObjClsMap[obj] and avObjClsMap[cls]) or $scope.isInAlwaysVisibleList(n)
+            return (avObjClsMap[obj] or avObjClsMap[cls]) or $scope.isInAlwaysVisibleList(n)
           else # subject
             return avSubjMap[n.id] or $scope.isInAlwaysVisibleList(n) or false
 
