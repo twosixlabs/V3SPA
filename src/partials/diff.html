@@ -21,7 +21,7 @@
       </div>
     </div>
     <div ng-if="!policyIds.primary || !policyIds.comparison" class="row">
-      Load a ref policy and a comparison policy to see their details and the controls
+      Load a policy and a comparison policy to see their details and the controls
     </div>
     <div ng-if="policyIds.primary && policyIds.comparison" class="row">
       <ul class="nav nav-tabs">
@@ -143,7 +143,7 @@
         </defs>
         <g class="viewer">
           <g ng-show="!policyIds.primary || !policyIds.comparison" transform="translate(-100,200)" style="font-size: 32px; fill: #999;">
-            <text ng-show="!policyIds.primary">Load a reference policy from the top menu to continue</text>
+            <text ng-show="!policyIds.primary">Load a policy from the top menu to continue</text>
             <text ng-show="policyIds.primary && !policyIds.comparison">Load a comparison policy from the side menu to see a diff</text>
           </g>
           <g ng-show="policyIds.primary && policyIds.comparison">
