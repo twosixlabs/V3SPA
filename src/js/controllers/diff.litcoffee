@@ -18,6 +18,7 @@
       $scope.status = SockJSService.status
 
       $scope.controls =
+        showModulesSelect: false
         tab: 'nodesTab'
         linksVisible: false
         links:

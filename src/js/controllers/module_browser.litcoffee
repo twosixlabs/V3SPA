@@ -12,6 +12,7 @@
         .nodeSize([0, 20])
 
       $scope.controls =
+        showModuleSelect: true
         collapse: 'collapse-all'
 
       collapseAll = (node) ->

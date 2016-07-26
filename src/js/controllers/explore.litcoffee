@@ -337,6 +337,7 @@
       $scope.nodeFilter = sigma.plugins.filter($scope.sigma)
 
       $scope.controls =
+        showModuleSelect: false
         alwaysVisible: []
         autocompleteItems: getAutocompleteItems
         tooltipNode: null
