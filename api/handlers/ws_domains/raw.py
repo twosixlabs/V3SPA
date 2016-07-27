@@ -320,13 +320,6 @@ class RawDomain(object):
             'payload': api.db.json.dumps(refpol.parsed)
         }
 
-
-    @staticmethod
-    def build_node_link_map(rules, policyid, nodeMap, linkMap, nodeList, linkList):
-    	""" Builds a dict that maps node names to the list of links.
-    	"""
-    	print("build_node_link_map")
-
     def fetch_raw_graph(self, msg):
         """ Return JSON for the nodes and links of the raw policy rules.
         """
@@ -468,16 +461,12 @@ class RawDomain(object):
                     'parameterized': {}
                 }
 
+            if 'parameterized' not in refpol['parsed']:
+            	refpol['parsed']['parameterized'] = {}
+
             refpol['parsed']['parameterized']['rules'] = table
 
-            print("=====================")
-            print("Pre insert")
-            print("=====================")
-
             refpol.Insert()
-            print("=====================")
-            print("Post insert")
-            print("=====================")
 
         # Don't send the rules to the client
         refpol['parsed']['parameterized'].pop('rules', None)
