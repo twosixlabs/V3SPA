@@ -56,9 +56,9 @@
           
           path = mod.te_file.split('/')
           modDirectory = path[path.length - 2]
-          directory = _.findWhere(modules_root.children, {directory: modDirectory})
+          directory = _.find(modules_root.children, {directory: modDirectory})
           if directory
-            module = _.findWhere(directory.children, {module: mod.name})
+            module = _.find(directory.children, {module: mod.name})
             if module
               #module.children.push d
             else
