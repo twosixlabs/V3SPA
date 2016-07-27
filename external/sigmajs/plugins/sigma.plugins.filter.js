@@ -507,10 +507,11 @@
    */
   sigma.plugins.filter = function(s) {
     // Create filter if undefined
-    if (!filter) {
+    /*if (!filter) {
       filter = new Filter(s);
     }
-    return filter;
+    return filter;*/
+    return new Filter(s);
   };
 
 }).call(this);
