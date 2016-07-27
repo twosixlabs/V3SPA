@@ -269,6 +269,8 @@ class RefPolicy(restful.ResourceDomain):
 
                 metadata['modules'] = module_info['data']
 
+                if 'documents' not in metadata:
+                    metadata['documents'] = {}
                 metadata['documents']['raw'] = {
                     'text': sesearch_result['data'],
                     'mode': 'raw',
