@@ -523,3 +523,82 @@ Sigma tooltips for nodes in the condensed graph format.
           if !scope.$$phase then scope.$apply()
 
       return ret
+
+Sigma tooltips for nodes in the Lobster condensed graph format.
+
+    v3spa.directive 'condensedLobsterTooltip', () ->
+      ret =
+        restrict: 'E'
+        replace: true
+        scope:
+          node: '='
+          alternateNodes: '='
+          showNeighbors: '&'
+          addToAlwaysVisibleList: '&'
+          removeFromAlwaysVisibleList: '&'
+          isAlwaysVisible: '@'
+          sigma: '='
+          statistics: '='
+          authorityFormatter: '='
+          hubFormatter: '='
+        template: """
+          <div>
+            <div class="sigma-tooltip-header" title="{{node.label}}">{{node.label}}</div>
+            <div class="sigma-tooltip-body">
+              <button
+                      type="button"
+                      class="btn btn-default btn-xs btn-block"
+                      ng-if="connections > 0"
+                      ng-click='showNeighbors({node:node})'
+                      >
+                Add <strong>{{connections}} {{connections !== 1 ? 'neighbors' : 'neighbor'}}</strong> to always visible list
+              </button>
+              <button
+                      type="button"
+                      class="btn btn-default btn-xs btn-block"
+                      ng-if="visible"
+                      ng-click='removeFromAlwaysVisibleList({node:node})'
+                      >
+                Remove <strong>this node</strong> from always visible list
+              </button>
+              <button
+                      type="button"
+                      class="btn btn-default btn-xs btn-block"
+                      ng-if="!visible"
+                      ng-click='addToAlwaysVisibleList({nodes:node})'
+                      >
+                Add <strong>this node</strong> to always visible list
+              </button>
+              <div ng-if="alternateNodes.length > 0" style="margin-top: 10px;">
+                This type is also {{isSubject ? 'an object' : 'a subject'}}.
+                <button
+                        type="button"
+                        class="btn btn-default btn-xs btn-block"
+                        ng-click='addToAlwaysVisibleList({nodes:alternateNodes})'
+                        >
+                  Add <strong>{{alternateNodes.length}}
+                  {{isSubject ? 'object' : 'subject'}}
+                  {{alternateNodes.length > 1 ? 'nodes' : 'node'}}</strong>
+                  to always visible list
+                </button>
+              </div>
+            </div>
+            <div class="sigma-tooltip-footer">
+              <div><span class="stats-label">Connections:</span> <strong>{{connections}}</strong></div>
+              <div><span class="stats-label">Authority:</span> <strong>{{authority}}</strong></div>
+              <div><span class="stats-label">Hub:</span> <strong>{{hub}}</strong></div>
+              <div><span class="stats-label">Module:</span> <strong>{{node.module}}</strong></div>
+            </div>
+          </div>
+          """
+        link: (scope, element, attrs) ->
+          scope.visible = scope.$eval(attrs.isAlwaysVisible)
+          scope.connections = scope.sigma.graph.degree(scope.node.id)
+          scope.authority = if scope.statistics[scope.node.id] then scope.authorityFormatter(scope.statistics[scope.node.id].authority) else 'n/a'
+          scope.hub = if scope.statistics[scope.node.id] then scope.hubFormatter(scope.statistics[scope.node.id].hub) else 'n/a'
+          scope.isSubject = scope.node.id.indexOf('.') == -1
+
+          # Verify that the template has updated and resolved the {{expressions}}
+          if !scope.$$phase then scope.$apply()
+
+      return ret

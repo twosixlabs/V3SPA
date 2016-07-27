@@ -63,27 +63,6 @@
             n.color = nodeFillScale(if n.id.indexOf('.') >= 0 then 'obj.class' else 'subj')
             n.borderColor = '#ffffff'
 
-        reqParams = {}
-
-        if node.id.indexOf('.') >= 0
-          reqParams['object'] = node.id.split('.')[0]
-          reqParams['class'] = node.id.split('.')[1]
-        else
-          reqParams['subject'] = node.id
-
-        req = 
-          domain: 'raw'
-          request: 'fetch_rules'
-          payload:
-            policy: [IDEBackend.current_policy._id]
-            params: reqParams
-
-        SockJSService.send req, (result)=>
-          if result.error?
-            $scope.clickedNodeRules = []
-          else
-            $scope.clickedNodeRules = JSON.parse(result.payload).map((r) -> return r.rule).sort()
-
         $scope.sigma.refresh()
 
       tooltipsConfig =
@@ -91,7 +70,7 @@
           show: 'rightClickNode'
           position: 'top'
           template: """
-          <condensed-tooltip node="controls.tooltipNode"
+          <condensed-lobster-tooltip node="controls.tooltipNode"
                              alternate-nodes="controls.tooltipAlternateNodes"
                              show-neighbors="filters.showNeighbors(node)"
                              add-to-always-visible-list="filters.addToAlwaysVisibleList(nodes)"
@@ -103,7 +82,7 @@
                              authority-formatter="authorityFormatter"
                              hub-formatter="hubFormatter"
                              >
-          </condensed-tooltip>
+          </condensed-lobster-tooltip>
           """
           renderer: (node, template) ->
             $scope.controls.tooltipNode = node
@@ -316,6 +295,20 @@
         filtered = filtered.map (n) -> { text: n.id }
         filtered.sort (a, b) -> if a.text < b.text then -1 else if a.text > b.text then 1 else 0
 
+      # User checked/unchecked something in the module filter
+      modChangeCallback = () ->
+        checkboxReducer = (map, currItem) ->
+          map[currItem.name] = currItem.selected
+          return map
+
+        modMap = $scope.filters.modList.reduce(checkboxReducer, {})
+
+        nodeMod = (n) ->
+          return modMap[n.module] or $scope.isInAlwaysVisibleList(n)
+
+        $scope.nodeFilter.undo('mod-node-checkbox')
+        $scope.nodeFilter.nodesBy(nodeMod, 'mod-node-checkbox').apply()
+
       $scope.filters =
         degreeRange: [0, 100]
         degreeChange: degreeChangeCallback
@@ -331,6 +324,8 @@
         addToAlwaysVisibleList: addToAlwaysVisibleList
         removeFromAlwaysVisibleList: removeFromAlwaysVisibleList
         clearAlwaysVisibleList: clearAlwaysVisibleList
+        modList: []
+        modChange: modChangeCallback
 
       $scope.applyFilters = () ->
         $scope.nodeFilter.apply()
@@ -377,6 +372,8 @@
 
         $scope.nodes = $scope.policy.json.parameterized.condensed_lobster.nodes
         $scope.links = $scope.policy.json.parameterized.condensed_lobster.links
+        $scope.filters.modList = $scope.policy.json.parameterized.condensed_lobster.modules.sort().map (mod) ->
+          return {selected: true, name: mod}
 
         # Compute degree of each node
         $scope.links.forEach (l) ->
@@ -444,6 +441,7 @@
           y: n.y
           size: 1
           color: nodeFillScale(if n.name.indexOf('.') >= 0 then 'obj.class' else 'subj')
+          module: n.module
 
         graph.edges = $scope.links.map (l) ->
           id: l.source.name + '-' + l.target.name
