@@ -18,7 +18,7 @@
 
         $scope.getCurrentPolicy()
 
-        $scope.visualizer_type = 'diff'
+        $scope.visualizer_type = 'explore'
 
         $scope.$watch 'visualizer_type', (value)->
           if value =='module_browser'
@@ -27,6 +27,8 @@
             $location.path('/diff')
           else if value =='explore'
             $location.path('/explore')
+          else if value =='explore_lobster'
+            $location.path('/explore_lobster')
           else
             console.error("Invalid visualizer type")
 

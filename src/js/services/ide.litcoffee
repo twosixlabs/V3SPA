@@ -424,6 +424,21 @@ contents of @current_policy and get the parsed JSON
               _.each @hooks.json_changed, (hook)=>
                 hook(@current_policy.json)
 
+        load_lobster_graph: () =>
+
+            if not @current_policy.valid
+              return
+
+            @WSUtils.fetch_lobster_graph(@current_policy._id).then (json) =>
+              @current_policy.json ?= {}
+              # Never need raw, lobster, and condensed at same time.
+              # Wipe out any others currently loaded for performance/space.
+              @current_policy.json.parameterized = {}
+              @current_policy.json.parameterized.condensed_lobster = json.parameterized.condensed_lobster
+
+              _.each @hooks.json_changed, (hook)=>
+                hook(@current_policy.json)
+
         load_local_policy: (refpolicy)=>
 
             @graph_expansion = {}

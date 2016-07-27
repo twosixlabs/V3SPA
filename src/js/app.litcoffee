@@ -30,6 +30,10 @@
             templateUrl: 'partials/explore.html',
             controller: 'exploreCtrl'
 
+          .when '/explore_lobster',
+            templateUrl: 'partials/explore_lobster.html',
+            controller: 'exploreLobsterCtrl'
+
           .otherwise 
             redirectTo: '/module_browser'
     ])

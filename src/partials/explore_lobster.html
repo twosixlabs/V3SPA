@@ -1,0 +1,131 @@
+<editor>
+  <div class="explore-toolbox-container">
+    <div ng-if="!controls.policyLoaded" class="row">
+      Load a policy to see its details and the controls
+    </div>
+    <div ng-if="controls.policyLoaded && !policy.supported_docs.raw" class="row">
+      This view is not supported because {{policy.id}} does not contain a policy in binary format
+    </div>
+    <div ng-if="controls.policyLoaded && policy.supported_docs.raw">
+      <div class="row">
+        <ul class="nav nav-tabs">
+          <li role="presentation" ng-class="{'active': controls.tab == 'statisticsTab'}"><a href ng-click="controls.tab = 'statisticsTab'">Statistics</a></li>
+          <li role="presentation" ng-class="{'active': controls.tab == 'accessVectorTab'}"><a href ng-click="controls.tab = 'accessVectorTab'">Access vector</a></li>
+          <li role="presentation" ng-class="{'active': controls.tab == 'denialTab'}"><a href ng-click="controls.tab = 'denialTab'">Denials</a></li>
+          <li role="presentation" ng-class="{'active': controls.tab == 'alwaysVisibleTab'}"><a href ng-click="controls.tab = 'alwaysVisibleTab'">Always visible</a></li>
+          <li role="presentation" ng-class="{'active': controls.tab == 'detailsTab'}"><a href ng-click="controls.tab = 'detailsTab'">Details</a></li>
+        </ul>
+      </div>
+      <div class="row node-controls" ng-show="controls.tab == 'statisticsTab'">
+        <div>
+          Filter by connections
+          <range-slider width="500" height="40" round="true" range="filters.degreeRange" range-change-end="filters.degreeChange(extent)"></range-slider>
+        </div>
+        <div>
+          Filter by authority statistic
+          <range-slider width="500" height="40" range="filters.authorityRange" range-change-end="filters.authorityChange(extent)"></range-slider>
+        </div>
+        <div>
+          Filter by hub statistic
+          <range-slider width="500" height="40" range="filters.hubRange" range-change-end="filters.hubChange(extent)"></range-slider>
+        </div>
+      </div>
+      <div class="row node-controls" ng-show="controls.tab == 'accessVectorTab'">
+        <div class="col-xs-3"><av-filter title="Subjects" items="filters.subjList" selection-change="filters.avChange()"></av-filter></div>
+        <div class="col-xs-3"><av-filter title="Objects" items="filters.objList" selection-change="filters.avChange()"></av-filter></div>
+        <div class="col-xs-3"><av-filter title="Classes" items="filters.classList" selection-change="filters.avChange()"></av-filter></div>
+        <div class="col-xs-3"><av-filter title="Permissions" items="filters.permList" selection-change="filters.avChange()"></av-filter></div>
+      </div>
+      <div class="row node-controls" ng-show="controls.tab == 'denialTab'">
+        <p>Paste an AVC denial here to filter the policy and only see allow rules related to the denial. Type must be AVC or USER_AVC. Here is an example denial:</p>
+        <pre>type=AVC msg=audit(1363289005.532:184): avc:  denied  { read } for  pid=29199 comm="Trace" name="online" dev="sysfs" ino=30 scontext=staff_u:staff_r:googletalk_plugin_t tcontext=system_u:object_r:sysfs_t tclass=file</pre>
+        <div class="form-group">
+          <textarea class="form-control" rows="6" ng-model="filters.denial"></textarea>
+        </div>
+        <div class="form-group">
+          <button type="button" class="btn btn-primary" ng-click='filters.denialChange()'>Apply</button>
+          <button type="button" class="btn btn-default" ng-click='filters.denialClear()'>Clear</button>
+        </div>
+      </div>
+      <div class="row node-controls" ng-show="controls.tab == 'alwaysVisibleTab'">
+        <p>The following nodes are always visible in the visualization.</p>
+        <div class="input-group-sm">
+          <div class="form-group">
+            <tags-input
+              ng-model="controls.alwaysVisible"
+              add-from-autocomplete-only="true"
+              placeholder="Type a node name"
+              add-from-autocomplete-only="true"
+              on-tag-added="applyFilters($tag)"
+              on-tag-removed="applyFilters($tag)"
+              >
+              <auto-complete
+                max-results-to-show="50"
+                source="controls.autocompleteItems($query)"
+                ></auto-complete>
+            </tags-input>
+          </div>
+          <div class="form-group">
+            <button type="button" class="btn btn-primary" ng-click='filters.clearAlwaysVisibleList()'>Clear all</button>
+          </div>
+        </div>
+      </div>
+      <div class="row node-controls" ng-show="controls.tab == 'detailsTab'">
+        <div style="max-height:300px; overflow-y:scroll">
+          <table class="table table-condensed">
+            <caption ng-show="!clickedNode">Click a node to see its rules</caption>
+            <caption ng-show="!!clickedNode">Showing {{clickedNodeRules.length}} {{clickedNodeRules.length > 1 ? 'rules' : 'rule'}} associated with <code>{{clickedNode.id}}</code></caption>
+            <thead>
+              <tr>
+                <th>Rule</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="rule in clickedNodeRules">
+                <td>{{rule}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</editor>
+<div ng-class="{'col-md-12': editorSize == 0,
+                      'viz-container': editorSize == 1}">
+  <div id='visualizer' auto-height='210' auto-height-type='offset_bottom_px'>
+    <div id='surface' class='row'>
+      <div class='toolbox panel panel-default'>
+        <div class='panel-body'>
+          <div>
+            <small><strong>Legend</strong></small>
+          </div>
+          <div>
+            <svg style="width:18px; height:18px; float:left">
+              <g transform="scale(1.5,1.5)translate(1,1)">
+                <circle cx="5" cy="5" r="5" style="stroke:none; fill:#005892;" />
+              </g>
+            </svg>
+            <p style="margin-left:22px;">&nbsp;Subject</p>
+          </div>
+          <div>
+            <svg style="width:18px; height:18px; float:left">
+              <g transform="scale(1.5,1.5)translate(1,1)">
+                <circle cx="5" cy="5" r="5" style="stroke:none; fill:#ff7f0e;" />
+              </g>
+            </svg>
+            <p style="margin-left:22px;">&nbsp;Object.Class</p>
+          </div>
+        </div>
+      </div>
+      <div id="explore-lobster-container" style="position: absolute; width: 100%; height: 100%;"></div>
+      <!--<svg xmlns="http://www.w3.org/2000/svg" class='exploreview'>
+        <g class="viewer">
+          <g style="font-size: 32px; fill: #999;">
+            <text>Explore</text>
+          </g>
+        </g>
+      </svg>-->
+    </div>
+  </div>
+</div>

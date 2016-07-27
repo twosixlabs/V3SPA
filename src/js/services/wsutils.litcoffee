@@ -11,6 +11,39 @@ policies. Responsible for uncompressing jsonh objects, making queries.
 
           # Probably don't need to maintain any state
 
+Send a request to the server to fetch the lobster policy and return the JSON parsed
+version of the policy.
+
+        fetch_lobster_graph: (id) =>
+          deferred = @$q.defer()
+
+          req =
+            domain: 'lobster'
+            request: 'fetch_graph'
+            payload:
+              policy: id
+
+          @SockJSService.send req, (result)=>
+            if result.error  # Service error
+
+              $.growl(
+                title: "Error"
+                message: result.payload
+              ,
+                type: 'danger'
+              )
+
+              deferred.reject result.payload
+
+            else  # valid response. Must parse
+              json = JSON.parse result.payload
+
+              @uncompress_lobster(json.parameterized.condensed_lobster, id)
+
+              deferred.resolve json
+
+          return deferred.promise
+
 Send a request to the server to fetch the raw policy and return the JSON parsed
 version of the policy.
 
@@ -131,6 +164,31 @@ Expand the raw policy nodes and links from succinct to verbose style.
             
             json.nodes = json.nodes.map (n) ->
               'name': n.n
+              'selected': true
+
+            json.links = json.links.map (l) ->
+              'target': json.nodes[l.t]
+              'source': json.nodes[l.s]
+              'perm': l.p
+
+          return json
+
+Expand the Lobster policy nodes and links from succinct to verbose style.
+
+        uncompress_lobster: (json) =>
+          # Parse the jsonh format into regular JSON objects
+          json.nodes = jsonh.parse json.nodes
+          json.links = jsonh.parse json.links
+
+          # Confirm existence of abbreviated object keys, then expand them
+          if json.nodes?[0]?.hasOwnProperty('n') and
+          json.nodes?[0]?.hasOwnProperty('m') and
+          json?.links?[0]?.hasOwnProperty('t') and
+          json?.links?[0]?.hasOwnProperty('s')
+            
+            json.nodes = json.nodes.map (n) ->
+              'name': n.n
+              'module': json.modules[n.m]
               'selected': true
 
             json.links = json.links.map (l) ->
