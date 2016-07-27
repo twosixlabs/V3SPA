@@ -11,7 +11,6 @@ import restful
 import api.handlers.ws_domains as ws_domains
 import api
 
-import pprint
 import subprocess
 from subprocess import CalledProcessError
 
@@ -246,16 +245,34 @@ class RefPolicy(restful.ResourceDomain):
                 if not supported_docs['dsl'] and not supported_docs['raw']:
                     raise api.DisplayError("Cannot find binary policy or reference policy source in the zip file")
 
+                if supported_docs['dsl'] is True:
+                    # Import the policy into Lobster
+                    lobster_import = { 'refpolicy': metadata.id, 'modules': [] }
+
+                    lobster_json = ws_domains.call(
+                        'lobster',
+                        'translate_selinux',
+                        lobster_import
+                    )
+
+                    # TODO check the results['error'] array to see if problems
+
+                    metadata['documents'] = {
+                        'dsl': {
+                            'text': lobster_json,
+                            'mode': 'dsl',
+                            'digest': hashlib.md5(lobster_json).hexdigest() #hashlib.md5(api.db.json.dumps(lobster_json['result'])).hexdigest()
+                        }
+                    }
+
                 metadata['supported_docs'] = supported_docs
 
                 metadata['modules'] = module_info['data']
 
-                metadata['documents'] = {
-                    'raw': {
-                        'text': sesearch_result['data'],
-                        'mode': 'raw',
-                        'digest': hashlib.md5(sesearch_result['data']).hexdigest()
-                    }
+                metadata['documents']['raw'] = {
+                    'text': sesearch_result['data'],
+                    'mode': 'raw',
+                    'digest': hashlib.md5(sesearch_result['data']).hexdigest()
                 }
             except Exception:
                 metadata.Delete()
@@ -412,8 +429,6 @@ class RefPolicy(restful.ResourceDomain):
         policy_dir = os.path.abspath(os.path.join(
             api.config.get('storage', 'bulk_storage_dir'),
             'refpolicy'))
-
-        pprint.pprint(zipped_policy)
 
         if not zipfile.is_zipfile(zipped_policy):
             raise api.DisplayError("Unable to extract: file was not a ZIP archive")

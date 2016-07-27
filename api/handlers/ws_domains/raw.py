@@ -12,8 +12,6 @@ import sys
 
 import api.jsonh
 
-import pprint
-
 from subprocess import *
 
 class RawDomain(object):
@@ -315,6 +313,7 @@ class RawDomain(object):
         # Don't send the rules or raw to the client
         refpol['parsed']['parameterized'].pop('rules', None)
         refpol['parsed']['parameterized'].pop('raw', None)
+        refpol['parsed']['parameterized'].pop('condensed_lobster', None)
 
         return {
             'label': msg['response_id'],
@@ -376,6 +375,7 @@ class RawDomain(object):
         # Don't send the rules or condensed graph to the client
         refpol['parsed']['parameterized'].pop('rules', None)
         refpol['parsed']['parameterized'].pop('condensed', None)
+        refpol['parsed']['parameterized'].pop('condensed_lobster', None)
 
         return {
             'label': msg['response_id'],
@@ -461,11 +461,14 @@ class RawDomain(object):
                                 row = {"subject":s, "object":ot, "class":oc, "perm":p, "rule": line.strip()}
                                 table.append(row)
 
-            refpol['parsed'] = {
-                'version': '1.0',
-                'errors': [],
-                'parameterized': {"rules": table}
-            }
+            if 'parsed' not in refpol:
+                refpol['parsed'] = {
+                    'version': '1.0',
+                    'errors': [],
+                    'parameterized': {}
+                }
+
+            refpol['parsed']['parameterized']['rules'] = table
 
             print("=====================")
             print("Pre insert")

@@ -9,7 +9,8 @@ import urllib
 import api.support.decompose
 import api.handlers.ws_domains as ws_domains
 
-import pprint
+import api.jsonh
+
 import json
 
 __MIN_LSR_VERSION__ = 6
@@ -51,7 +52,7 @@ class LobsterDomain(object):
                 pass
 
     @staticmethod
-    def _make_request(method, path, payload, timeout=90.0):
+    def _make_request(method, path, payload=None, timeout=90.0):
         http_client = httpclient.HTTPClient()
         backend_uri = "http://{0}{1}".format(
             api.config.get('lobster_backend', 'uri'),
@@ -60,12 +61,19 @@ class LobsterDomain(object):
         logger.info("Fetching {0} from v3spa-server".format(backend_uri))
 
         try:
-            output = http_client.fetch(
-                backend_uri,
-                method=method,
-                body=payload,
-                request_timeout=timeout
-            )
+            if payload:
+                output = http_client.fetch(
+                    backend_uri,
+                    method=method,
+                    body=payload,
+                    request_timeout=timeout
+                )
+            else:
+                output = http_client.fetch(
+                    backend_uri,
+                    method=method,
+                    request_timeout=timeout
+                )
         except httpclient.HTTPError as e:
             if e.code == 599:
                 logger.warning("Request timed out")
@@ -432,12 +440,17 @@ class LobsterDomain(object):
             endpoint_uri = '/projects/{0}/import/selinux'.format(params['refpolicy'])
             payload = params if isinstance(params, basestring) else api.db.json.dumps(params)
             output = self._make_request('POST', endpoint_uri, payload)
+            if len(api.db.json.loads(output.body)['errors']) > 0:
+                raise Exception(output['errors'])
+
+            endpoint_uri = '/projects/{0}/json'.format(params['refpolicy'])
+            output = self._make_request('GET', endpoint_uri)
         except Exception as e:
             raise api.DisplayError("Unable to import policy: {0}".format(e.message))
         else:
-            return api.db.json.loads(output.body)
+            return output.body
         
-    def fetch_graph(self, params):
+    def fetch_graph(self, msg):
         """ Return the JSON graph for the given policy. Params of the form
 
             {
@@ -447,13 +460,150 @@ class LobsterDomain(object):
                 }
             }
         """
-        logger.info("Params: {0}".format(params))
+        logger.info("Params: {0}".format(msg))
+
+        # Assume we have already run translate_selinux() during policy upload
+
+        # msg.payload.policy is the id
+        refpol_id = msg['payload']['policy']
+
+        refpol_id = api.db.idtype(refpol_id)
+        refpol = ws_domains.call('refpolicy', 'Read', refpol_id)
+
+        if ('parsed' not in refpol or 'parameterized' not in refpol['parsed']
+            or 'condensed_lobster' not in refpol['parsed']['parameterized']):
+
+            lobster_json = api.db.json.loads(refpol['documents']['dsl']['text'])
+            lobster_json = lobster_json['result']
+
+            connections = lobster_json['connections']
+            ports = lobster_json['ports']
+            domains = lobster_json['domains']
+
+            node_map = {}
+            link_map = {}
+            module_map = {}
+            node_list = []
+            link_list = []
+            module_list = []
+            for key in connections.keys():
+                conn = connections[key]
+                te_file = ""
+                perm_list = []
+
+                left_dom = domains[conn['left_dom']]
+                right_dom = domains[conn['right_dom']]
+
+                left_port = ports[conn['left']]
+                right_port = ports[conn['right']]
+
+                active_dom = left_dom
+                inactive_dom = right_dom
+                if right_port['name'] == 'active':
+                    active_dom = right_dom
+                    inactive_dom = left_dom
+
+                for annot in conn['annotations']:
+                    if annot['name'] == 'Perm':
+                        perm_list.append(annot['args']) # [class, perm]
+                    elif annot['name'] == 'SourcePos':
+                        te_file = annot['args'][0]
+
+                # Skip connections that do not have any permissions
+                if len(perm_list) == 0:
+                    continue
+
+                # Skip this connection if one of the domains is not an Attribute or a Type
+                bothAreTypesOrAttrs = True
+                for dom in [left_dom, right_dom]:
+                    validAnnots = []
+                    for domAnnot in dom['domainAnnotations']:
+                        if domAnnot['name'] == 'Attribute' or domAnnot['name'] == 'Type':
+                            validAnnots.append(domAnnot)
+                    if len(validAnnots) == 0:
+                        bothAreTypesOrAttrs = bothAreTypesOrAttrs and False
+
+                if not bothAreTypesOrAttrs:
+                    continue
+
+                mod_idx = module_map.get(active_dom['module'], -1)
+                if (mod_idx == -1):
+                    mod_idx = len(module_list)
+                    module_map[active_dom['module']] = mod_idx
+                    module_list.append(active_dom['module'])
+
+                # Create/get the source node
+                source_key = active_dom['name']
+                source_idx = node_map.get(source_key, -1)
+                if source_idx == -1:
+                    source_node = { 'n': source_key, 'm': mod_idx }
+                    source_idx = len(node_list)
+                    node_map[source_key] = source_idx
+                    node_list.append(source_node)
+
+                # Loop over each class to create the object.class pairs
+                for perm in perm_list:
+                    mod_idx = module_map.get(inactive_dom['module'], -1)
+                    if (mod_idx == -1):
+                        mod_idx = len(module_list)
+                        module_map[inactive_dom['module']] = mod_idx
+                        module_list.append(inactive_dom['module'])
+
+                    target_key = inactive_dom['name'] + '.' + perm[0]
+                    target_idx = node_map.get(target_key, -1)
+                    if target_idx == -1:
+                        target_node = { 'n': target_key, 'm': mod_idx }
+                        target_idx = len(node_list)
+                        node_map[target_key] = target_idx
+                        node_list.append(target_node)
+                    link_key = source_key + '-' + target_key
+                    link = link_map.get(link_key, -1)
+                    if link == -1:
+                        link = {
+                            's': source_idx,
+                            't': target_idx,
+                            'p': [perm[1]]
+                        }
+                        link_map[link_key] = link
+                        link_list.append(link)
+                    elif perm[1] not in link['p']:
+                        link['p'].append(perm[1])
+
+            # Sparsify/compress the dicts/JSON objects
+            node_list = api.jsonh.dumps(node_list)
+            link_list = api.jsonh.dumps(link_list)
+            module_list = module_list
+
+            if 'parsed' not in refpol:
+                refpol['parsed'] = {
+                    'version': '1.0',
+                    'errors': [],
+                    'parameterized': {}
+                }
+
+            refpol['parsed']['parameterized']['condensed_lobster'] = {
+                'modules': module_list,
+                'nodes': node_list,
+                'links': link_list
+            }
+
+            refpol.Insert()
+
+        # Don't send the rules or raw to the client
+        refpol['parsed']['parameterized'].pop('rules', None)
+        refpol['parsed']['parameterized'].pop('raw', None)
+        refpol['parsed']['parameterized'].pop('condensed', None)
+
+        return {
+            'label': msg['response_id'],
+            'payload': api.db.json.dumps(refpol.parsed)
+        }
 
         # Return the cached version if available
 
         return api.db.json.loads({})
 
-    def parse(self, params):
+    def parse(self, msg):
         """ Return the JSON graph for the given policy. Params of the form
 
             {
@@ -463,9 +613,24 @@ class LobsterDomain(object):
                 }
             }
         """
-        logger.info("Params: {0}".format(params))
+        logger.info("Params: {0}".format(msg))
 
-        # NOTE: do the Lobster import in Refpolicy.do_upload_chunk()
+        # msg.payload.policy is the id
+        refpol_id = msg['payload']['policy']
+        del msg['payload']['policy']
+
+        refpol_id = api.db.idtype(refpol_id)
+        refpol = ws_domains.call('refpolicy', 'Read', refpol_id)
+
+        # If already parsed, just return the one we already translated.
+        if ('parsed' in refpol
+            and 'parameterized' in refpol['parsed']
+            and 'lobster_rules' in refpol['parsed']['parameterized']):
+            logger.info("Returning cached JSON")
+
+        else:
+
+            dsl_json = refpol['documents']['dsl']['text']
 
         # Return the cached version if available
 
@@ -481,6 +646,8 @@ class LobsterDomain(object):
             return self.validate(msg)
         elif msg['request'] == 'query_reachability':
             return self.query_reachability(msg)
+        elif msg['request'] == 'fetch_graph':
+            return self.fetch_graph(msg)
         else:
             raise Exception("Invalid message type for 'lobster' domain")
 
