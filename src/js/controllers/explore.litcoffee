@@ -15,6 +15,7 @@
         .range(["#005892", "#ff7f0e"])
 
       $scope.sigma = new sigma(
+        id: 'explore'
         renderers: [
           container: 'explore-container'
           type: 'canvas'
@@ -334,7 +335,7 @@
       $scope.applyFilters = () ->
         $scope.nodeFilter.apply()
 
-      $scope.nodeFilter = sigma.plugins.filter($scope.sigma)
+      $scope.nodeFilter = new sigma.plugins.filter($scope.sigma)
 
       $scope.controls =
         showModuleSelect: false
