@@ -14,27 +14,30 @@
         .domain(["subj", "obj.class"])
         .range(["#005892", "#ff7f0e"])
 
-      $scope.sigma = new sigma(
-        id: 'explore'
-        renderers: [
-          container: 'explore-container'
-          type: 'canvas'
-        ]
-        settings:
-          minNodeSize: 2
-          maxNodeSize: 2
-          minEdgeSize: 0.5
-          maxEdgeSize: 0.5
-          edgeColor: "default"
-          labelThreshold: 8
-          singleHover: true
-          hideEdgesOnMove: true
-          mouseZoomDuration: 0
-          doubleClickZoomDuration: 0
-          batchEdgesDrawing: true
-          canvasEdgesBatchSize: 2000
-          defaultNodeType: 'border'
-      )
+      $scope.sigma = sigma.instances('explore')
+
+      if not $scope.sigma
+        $scope.sigma = new sigma(
+          id: 'explore'
+          renderers: [
+            container: 'explore-container'
+            type: 'canvas'
+          ]
+          settings:
+            minNodeSize: 2
+            maxNodeSize: 2
+            minEdgeSize: 0.5
+            maxEdgeSize: 0.5
+            edgeColor: "default"
+            labelThreshold: 8
+            singleHover: true
+            hideEdgesOnMove: true
+            mouseZoomDuration: 0
+            doubleClickZoomDuration: 0
+            batchEdgesDrawing: true
+            canvasEdgesBatchSize: 2000
+            defaultNodeType: 'border'
+        )
 
       $scope.sigma.bind 'clickStage rightClickStage', (event) ->
         $scope.clickedNode = null
@@ -480,6 +483,7 @@
       $scope.$on "$destroy", ->
         IDEBackend.unhook "json_changed", $scope.update_view
         IDEBackend.unhook "policy_load", IDEBackend.load_condensed_graph
+        $scope.sigma.kill()
 
       $scope.policy = IDEBackend.current_policy
 
