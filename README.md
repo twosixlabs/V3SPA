@@ -9,13 +9,11 @@ V3SPA Angularized
 - mongodb
 - setools v4
 
+The V3SPA backend has been tested on Fedora 23 and 24.
+
 To set up the environment:
 
-    $ # OS X
-    $ brew install node
-
-    $ # Fedora
-    $ sudo yum install gcc nodejs npm python-tornado python-pip git python-devel mongodb-server
+    $ sudo dnf install gcc nodejs npm python-tornado python-pip git python-devel mongodb-server
     $ sudo pip install virtualenv
     $ mkdir vespa && cd vespa
     $ git init
@@ -38,8 +36,8 @@ compiling assets and putting them in the right place.
 
 ## Layout
 
-All of the client side code is now located in src/. All external
-libraries are in external.
+All of the client side code is located in src/. All external
+libraries are in external/.
 
 ## Database
 
