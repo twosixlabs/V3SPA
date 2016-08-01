@@ -4,3 +4,6 @@
 [submodule "external/angular-file-upload"]
 	path = external/angular-file-upload
 	url = https://github.com/nervgh/angular-file-upload.git
+[submodule "lobster"]
+	path = lobster
+	url = https://github.com/invincealabs/lobster
