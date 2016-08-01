@@ -9,7 +9,9 @@ V3SPA Angularized
 - mongodb
 - setools v4
 
-The V3SPA backend has been tested on Fedora 23 and 24.
+The V3SPA backend has been tested on Fedora 23 and 24. You can follow the
+instructions below on Fedora or another VM, or you can follow the Vagrant
+instructions at the end to automate the build process.
 
 To set up the environment:
 
@@ -65,3 +67,11 @@ the service open to other clients.
 
 There is a vagrant file and shell script provided to execute all the steps
 during provisioning without launching Mongo or the two binaries at the end.
+
+First install these requirements:
+
+- vagrant
+- VirtualBox
+
+    $ vagrant plugin install vagrant-vbguest
+    $ vagrant up
