@@ -1,5 +1,15 @@
-V3SPA Angularized
+V3SPA
 =================
+## About
+
+V3SPA is a tool for visualizing and analyzing SELinux and SEAndroid security policies.
+
+To address the challenges in developing and maintaining SELinux security policies, we developed V3SPA (Verification, Validation and Visualization of Security Policy Abstractions). V3SPA creates an abstraction of the underlying security policy using the Lobster domain-specific language, and then tightly integrates exploratory controls and filters with visualizations of the policy to rapidly analyze the policy rules. V3SPA includes several novel analysis modes that change the way policy authors and auditors build and analyze SELinux policies. These modes include: 
+
+1. A mode for differential policy analysis. This plugin shows analysts a visual diff of two versions of a security policy, allowing analysts to clearly see changes made. Using dynamic query filters, analysts can quickly answer questions such as, "What are the changes that affect passwd_t?" 
+
+2. A mode for analyzing information flow, identifying unexpected sets of permissions, and examining the overall design of the policy. This plugin allows users to see the entire policy at once, filter down to see only the components of interest, and execute reachability queries both from and to specified domains.
+
 ## Requirements
 
 The V3SPA backend has been tested on Fedora 24 and Chrome. V3SPA requires setools v4.
