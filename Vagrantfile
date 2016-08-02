@@ -23,7 +23,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.network :forwarded_port, guest: 8080, host: 8080
   #config.vm.provision :shell, :privileged => false, :path => "bootstrap.sh"
 #   config.vm.provision "shell", :privileged => false, inline: <<-SHELL
-#     sudo dnf install -y python git setools-devel bzip2-devel bison flex nodejs python-tornado python-devel mongodb-server swig libsepol libsepol-devel libsepol-static redhat-rpm-config
+#     sudo dnf install -y python git setools-devel setools-libs bzip2-devel bison flex nodejs python-tornado python-devel mongodb-server swig libsepol libsepol-devel libsepol-static redhat-rpm-config
 #     curl -sSL https://s3.amazonaws.com/download.fpcomplete.com/fedora/24/fpco.repo | sudo tee /etc/yum.repos.d/fpco.repo
 #     sudo dnf -y install zlib-devel stack
 #     sudo pip install virtualenv networkx setuptools
@@ -51,7 +51,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 #     cd /home/vagrant/vespa
 #     mkdir mongodb
 #     mkdir tmp
-#     mkdir tmp/bulk
 #     mkdir tmp/bulk
 #     mkdir tmp/bulk/log
 #     mkdir tmp/bulk/refpolicy
