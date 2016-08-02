@@ -2,66 +2,59 @@ V3SPA Angularized
 =================
 ## Requirements
 
-- nodejs
-- npm
-- python
-- pip
-- mongodb
-- setools v4
+The V3SPA backend has been tested on Fedora 24 and Chrome. V3SPA requires setools v4.
 
-The V3SPA backend has been tested on Fedora 23 and 24.
+To setup the backend on a Fedora box:
 
-To set up the environment:
-
-    $ sudo dnf install gcc nodejs npm python-tornado python-pip git python-devel mongodb-server
-    $ sudo pip install virtualenv
-    $ mkdir vespa && cd vespa
-    $ git init
-    $ git clone http://gitlab.labs/v3spa/ide.git
-    $ cd ide
+    $ sudo dnf install -y python git setools-devel setools-libs bzip2-devel bison flex nodejs python-tornado python-devel mongodb-server swig libsepol libsepol-devel libsepol-static redhat-rpm-config
+    $ curl -sSL https://s3.amazonaws.com/download.fpcomplete.com/fedora/24/fpco.repo | sudo tee /etc/yum.repos.d/fpco.repo
+    $ sudo dnf -y install zlib-devel stack
+    $ sudo pip install virtualenv networkx setuptools
+    $ mkdir vespa
+    $ cd vespa
+    $ git clone https://github.com/invincealabs/V3SPA.git
+    $ cd V3SPA
     $ git submodule update --init
     $ sudo npm install -g gulp
     $ sudo npm install
     $ virtualenv vespa
     $ source vespa/bin/activate
     $ pip install -r requirements.txt
+    $ gulp
 
-To run sesearch you will need SETools v4, e.g. [https://github.com/TresysTechnology/setools/releases/tag/4.0.1] and follow the [build instructions](https://github.com/TresysTechnology/setools/blob/06ee08141a23b3d88e5f6fc4f53e9654f36611d5/README.md)
+    $ cd lobster
+    $ make
 
-## Building
+    $ cd ../..
 
-All of the assets are served from static/, but they aren't
-actually stored there. The Gulp build system is responsible for
-compiling assets and putting them in the right place.
+    $ git clone https://github.com/TresysTechnology/setools.git
+    $ cd setools
+    $ git checkout 4.0.0
+    $ sudo python setup.py install
 
-## Layout
-
-All of the client side code is located in src/. All external
-libraries are in external/.
-
-## Database
-
-Mongo is installed at this point, but you need to create a location
-for database storage. Then launch Mongod.
-(Assuming you are in vespa directory.)
-
-    $ mkdir ./mongodb
-
-## Running
-
-Mongo and two more binaries need to be launched.
-(Assuming you are in the vespa dirrectory.)
+    $ mkdir mongodb
+    $ mkdir tmp
+    $ mkdir tmp/bulk
+    $ mkdir tmp/bulk/log
+    $ mkdir tmp/bulk/refpolicy
+    $ mkdir tmp/bulk/tmp
+    $ mkdir tmp/bulk/projects
 
     $ mongod --dbpath ./mongodb &
-    $ python ide/vespa.py &
-    $ (cd tmp/bulk && ../../api/bin/lobster-server) &
+    $ python V3SPA/vespa.py &
+    $ (cd tmp/bulk && ../../V3SPA/lobster/v3spa-server/dist/v3spa-server) &
 
 ## Misc
 At this point you should create the appropriate firewall rules for 
 your machine to allow external access to port 8080 if you would like
 the service open to other clients.
 
-## Automated Install
+Otherwise, open your Chrome browser and go to http://localhost:8080 to load
+V3SPA.
 
-There is a vagrant file and shell script provided to execute all the steps
-during provisioning without launching Mongo or the two binaries at the end.
+The policy-examples directory contains several example policies in the format
+required by V3SPA. If you have a policy binary, the file must be named sepolicy
+and it must be located in the policy/ directory. If you have source, it must be
+in reference policy format. Your zip file can contain only a binary, or only
+policy source, or both, as long as it follows this structure and naming
+convention.
