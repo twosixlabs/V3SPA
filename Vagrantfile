@@ -11,7 +11,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.ssh.insert_key=true
 
   config.vm.provider :virtualbox do |vb|
-      vb.memory = 4096
+      vb.memory = 8192
       vb.cpus = 2
       vb.name = "v3spa_builder24"
   end
@@ -39,6 +39,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
     cd lobster
     make
+    mkdir /home/vagrant/vespa/lobster
+    cp /vagrant/lobster/v3spa-server/dist/bin/* /home/vagrant/vespa/lobster/
 
     cd /home/vagrant/
     mkdir vespa
@@ -61,27 +63,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
     python /vagrant/vespa.py &
 
-    (cd tmp/bulk && /vagrant/lobster/v3spa-server/dist/bin/v3spa-server) &
+    (cd tmp/bulk && /home/vagrant/vespa/lobster/v3spa-server) &
 
   SHELL
-
-  # config.vm.provision "shell", :privileged => false, inline: <<-SHELL
-  #   cd /home/vagrant/vespa
-  #   sudo dnf install gcc nodejs npm python-tornado python-pip git python-devel mongodb-server -y
-  #   sudo pip install virtualenv
-  #   mkdir vespa && cd vespa
-  #   git init
-  #   cd ide
-  #   git submodule update --init
-  #   sudo npm install -g gulp
-  #   sudo npm install
-  #   virtualenv vespa
-  #   source vespa/bin/activate
-  #   pip install -r requirements.txt
-  #   gulp
-  #   cd ~/vespa/
-  #   mkdir mongodb
-
-  # SHELL
 
 end
