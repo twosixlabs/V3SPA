@@ -340,7 +340,17 @@
 
       $scope.nodeFilter = new sigma.plugins.filter($scope.sigma)
 
+      zoomInCallback = () ->
+        camera = $scope.sigma.camera
+        camera.goTo({ratio: camera.ratio / camera.settings('zoomingRatio')})
+
+      zoomOutCallback = () ->
+        camera = $scope.sigma.camera
+        camera.goTo({ratio: camera.ratio * camera.settings('zoomingRatio')})
+
       $scope.controls =
+        zoomIn: zoomInCallback
+        zoomOut: zoomOutCallback
         showModuleSelect: false
         alwaysVisible: []
         autocompleteItems: getAutocompleteItems
