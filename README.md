@@ -10,13 +10,15 @@ To address the challenges in developing and maintaining SELinux security policie
 
 2. A mode for analyzing information flow, identifying unexpected sets of permissions, and examining the overall design of the policy. This plugin allows users to see the entire policy at once, filter down to see only the components of interest, and execute reachability queries both from and to specified domains.
 
-## Requirements
+## Installation
 
-The V3SPA backend has been tested on Fedora 24 and Chrome. V3SPA requires setools v4.
+The V3SPA backend has been tested on Fedora 24, and the frontend has been tested in Chrome. V3SPA requires setools v4.
+
+### Manual Installation
 
 To setup the backend on a Fedora box:
 
-    $ sudo dnf install -y python git setools-devel setools-libs bzip2-devel bison flex nodejs python-tornado python-devel mongodb-server swig libsepol libsepol-devel libsepol-static redhat-rpm-config
+    $ sudo dnf install -y python git setools-devel setools-libs bzip2-devel bison flex nodejs python-tornado python-devel mongodb-server swig libsepol libsepol-devel libsepol-static libselinux-python libselinux-static redhat-rpm-config
     $ curl -sSL https://s3.amazonaws.com/download.fpcomplete.com/fedora/24/fpco.repo | sudo tee /etc/yum.repos.d/fpco.repo
     $ sudo dnf -y install zlib-devel stack
     $ sudo pip install virtualenv networkx setuptools
@@ -54,13 +56,45 @@ To setup the backend on a Fedora box:
     $ python V3SPA/vespa.py &
     $ (cd tmp/bulk && ../../V3SPA/lobster/v3spa-server/dist/v3spa-server) &
 
-## Misc
 At this point you should create the appropriate firewall rules for 
-your machine to allow external access to port 8080 if you would like
-the service open to other clients.
+your VM to allow external access to port 8080 if you would like
+the service open to clients outside your VM.
 
-Otherwise, open your Chrome browser and go to http://localhost:8080 to load
-V3SPA.
+### Automated (vagrant) Installation
+
+There is a vagrant file and shell script provided to execute all the steps during provisioning without launching Mongo or the two binaries at the end.
+
+First install these requirements:
+
+ - vagrant
+ - VirtualBox
+
+Then run these commands:
+
+    $ git clone https://github.com/invincealabs/V3SPA.git
+    $ cd V3SPA
+    $ vagrant plugin install vagrant-vbguest
+    $ vagrant up
+
+The username and password are both `vagrant`.
+
+The V3SPA backend should now be running and accessible from your host machine at http://localhost:8080
+
+You can run `vagrant suspend` to stop running the VM and `vagrant resume` to start it up again.
+
+If you need to restart the services for some reason (e.g. you ran `vagrant up` but you cannot access V3SPA at http://localhost:8080) then log in to the VM using `vagrant ssh` and run these commands:
+
+    $ cd /vagrant
+    $ source vespa/bin/activate
+    $ cd /home/vagrant/vespa
+    $ mongod --dbpath ./mongodb &
+    $ python /vagrant/vespa.py &
+    $ (cd tmp/bulk && /home/vagrant/vespa/lobster/v3spa-server) &
+    $ logout
+
+### Using V3SPA
+
+Open your Chrome browser and go to http://localhost:8080 to load V3SPA.
 
 The policy-examples directory contains several example policies in the format
 required by V3SPA. If you have a policy binary, the file must be named sepolicy
@@ -68,3 +102,5 @@ and it must be located in the policy/ directory. If you have source, it must be
 in reference policy format. Your zip file can contain only a binary, or only
 policy source, or both, as long as it follows this structure and naming
 convention.
+
+Click the "Load" link and drag and drop one of the policies into V3SPA. Loading a policy for the first time could take a minute or two to parse the policy. Reloading a policy again later will be faster, but can still take a few seconds.
