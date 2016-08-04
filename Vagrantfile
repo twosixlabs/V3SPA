@@ -37,12 +37,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
     cd lobster
     make
-    mkdir /home/vagrant/vespa/lobster
-    cp /vagrant/lobster/v3spa-server/dist/bin/* /home/vagrant/vespa/lobster/
 
     cd /home/vagrant/
     mkdir vespa
     cd vespa
+
+    mkdir /home/vagrant/vespa/lobster
+    cp /vagrant/lobster/v3spa-server/dist/bin/* /home/vagrant/vespa/lobster/
 
     git clone https://github.com/TresysTechnology/setools.git
     cd setools
@@ -57,11 +58,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     mkdir tmp/bulk/refpolicy
     mkdir tmp/bulk/tmp
     mkdir tmp/bulk/projects
-    mongod --dbpath ./mongodb &
 
-    python /vagrant/vespa.py &
-
-    (cd tmp/bulk && /home/vagrant/vespa/lobster/v3spa-server) &
+    cd /home/vagrant/vespa/setools
+    sudo python setup.py install
 
   SHELL
 
