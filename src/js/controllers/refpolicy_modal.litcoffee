@@ -22,7 +22,7 @@
               $modalInstance.dismiss('cancel')
 
             $scope.upload_refpolicy = (file)->
-              if file.type != 'application/zip'
+              if file.type != 'application/zip' and file.type != 'application/x-zip-compressed'
                 $scope.$apply ->
                   $scope.fileerrors = "Reference policy must be uploaded as a zipfile"
                 console.log($scope.fileerrors)
