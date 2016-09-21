@@ -21,5 +21,6 @@
 //= require sigmajs/plugins/sigma.plugins.filter.js
 //= require sigmajs/plugins/sigma.statistics.HITS.min.js
 //= require sigmajs/plugins/sigma.plugins.tooltips.js
+//= require sigmajs/plugins/sigma.plugins.dragNodes.min.js
 //= require fastforce.js
 //= require ng-tags-input/ng-tags-input.js

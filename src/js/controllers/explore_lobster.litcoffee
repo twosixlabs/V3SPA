@@ -105,6 +105,8 @@
       $scope.statistics
       $scope.tooltips = sigma.plugins.tooltips($scope.sigma, $scope.sigma.renderers[0], tooltipsConfig)
 
+      $scope.dragListener = sigma.plugins.dragNodes($scope.sigma, $scope.sigma.renderers[0])
+
       $scope.isInAlwaysVisibleList = (node) ->
         if not node? then return false
         for tag in $scope.controls.alwaysVisible
