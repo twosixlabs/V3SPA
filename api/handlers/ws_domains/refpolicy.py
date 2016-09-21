@@ -447,8 +447,13 @@ class RefPolicy(restful.ResourceDomain):
         except KeyError:
             raise api.DisplayError("File does not appear to contain "
                             "SELinux reference policy source or binary. "
-                            "Make sure the archive name is the same as "
-                            "its top-level folder.")
+                            "If your policy is named mypolicy, make sure the "
+                            "zip name is mypolicy and that it contains a "
+                            "directory named mypolicy. The mypolicy directory "
+                            "should contain either the reference policy "
+                            "source or the policy binary, or both. The policy "
+                            "binary should be named sepolicy and it should be "
+                            "in the mypolicy/policy directory.")
 
         # Delete the existing file first.
         import shutil

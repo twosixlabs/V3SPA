@@ -97,10 +97,53 @@ If you need to restart the services for some reason (e.g. you ran `vagrant up` b
 Open your Chrome browser and go to http://localhost:8080 to load V3SPA.
 
 The policy-examples directory contains several example policies in the format
-required by V3SPA. If you have a policy binary, the file must be named sepolicy
-and it must be located in the policy/ directory. If you have source, it must be
-in reference policy format. Your zip file can contain only a binary, or only
-policy source, or both, as long as it follows this structure and naming
-convention.
+required by V3SPA. If your policy is named "mypolicy", your zip file should be
+named `mypolicy.zip` and all your policy files should be inside a directory
+named `mypolicy` in the `mypolicy.zip` file. If you have a policy binary, the
+file must be named `sepolicy` and it must be located in the `mypolicy/policy/`
+directory in the zip, like this:
 
-Click the "Load" link and drag and drop one of the policies into V3SPA. Loading a policy for the first time could take a minute or two to parse the policy. Reloading a policy again later will be faster, but can still take a few seconds.
+    mypolicy.zip
+    │
+    └───mypolicy
+        │
+        └───policy
+            │   sepolicy
+
+If you have policy source, it must be in reference policy
+format, and the files and subdirectories should be in the `mypolicy` directory,
+like this:
+
+    mypolicy.zip
+    │
+    └───mypolicy
+    │   │   build.conf
+    │   │   Makefile
+    │   │   rules.modular
+    │   │   rules.monolithic
+    │   │   ...
+    │   │
+    │   └───config
+    │   │    │   ...
+    │   │
+    │   └───doc
+    │   │    │   ...
+    │   │
+    │   └───man
+    │   │    │   ...
+    │   │
+    │   └───policy
+    │       │   ...
+    │   
+    └───support
+        │   ...
+
+Your zip file can contain only a binary, or only policy source, or both, as
+long as your zip follows this structure and naming convention. If your zip file
+has both a binary policy and source policy, simply add the `sepolicy` file to
+the `mypolicy/policy/` in your policy source tree (in other words, merge the
+two examples above).
+
+Click the "Load" link and drag and drop one of the policies into V3SPA. Loading
+a policy for the first time could take a minute or two to parse the policy.
+Reloading a policy again later will be faster, but can still take a few seconds.
