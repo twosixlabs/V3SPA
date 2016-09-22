@@ -493,6 +493,7 @@
       $scope.$on "$destroy", ->
         IDEBackend.unhook "json_changed", $scope.update_view
         IDEBackend.unhook "policy_load", IDEBackend.load_lobster_graph
+        sigma.plugins.killDragNodes($scope.sigma)
         $scope.sigma.kill()
 
       $scope.policy = IDEBackend.current_policy
