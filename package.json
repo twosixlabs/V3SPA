@@ -1,18 +1,21 @@
 {
   "name": "V3SPA",
-  "version": "1.0.0",
+  "version": "2.0.0",
+  "license": "BSD-3-Clause",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/invincealabs/V3SPA"
+  },
   "dependencies": {
-    "browserify": "~3.28.2",
-    "gulp": "~3.5.2",
-    "gulp-chug": "~0.1.8",
-    "gulp-coffee": "~1.4.1",
-    "gulp-debug": "~0.2.0",
+    "browserify": "~13.1.1",
+    "gulp": "^3.5.2",
+    "gulp-chug": "^0.1.8",
+    "gulp-coffee": "^1.4.1",
+    "gulp-debug": "^0.2.0",
     "gulp-include": "cwacek/gulp-include#improved",
-    "gulp-less": "~1.2.1",
-    "gulp-rename": "~1.0.0",
-    "gulp-uglify": "~0.2.1",
-    "gulp-util": "~2.2.14",
-    "jade": "~1.1.5",
-    "jadeify": "~2.1.1"
+    "gulp-less": "^1.2.1",
+    "gulp-rename": "^1.0.0",
+    "gulp-uglify": "^0.2.1",
+    "gulp-util": "^2.2.14"
   }
 }
