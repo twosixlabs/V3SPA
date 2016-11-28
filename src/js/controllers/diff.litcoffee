@@ -11,6 +11,10 @@
       comparisonLinkMap = {}
       comparisonLinkSourceMap = {}
       comparisonLinkTargetMap = {}
+      comparison =
+        original:
+          nodes: []
+          links: []
       $scope.input = 
         refpolicy: comparisonPolicy
 
@@ -43,6 +47,8 @@ Get the raw JSON
 
         WSUtils.fetch_raw_graph(comparisonPolicy._id).then (json) =>
           comparisonRules = []
+          comparison.original.nodes = json.parameterized.raw.nodes
+          comparison.original.links = json.parameterized.raw.links
           comparisonNodes = json.parameterized.raw.nodes
           comparisonLinks = json.parameterized.raw.links
 
@@ -84,6 +90,10 @@ Enumerate the differences between the two policies
         primaryLinks = $scope.primaryLinks
         primaryNodeMap = $scope.nodeMap
         primaryLinkMap = $scope.linkMap
+
+        # Reset the "selected" flag when changing policies
+        primaryNodes.forEach (n) -> n.selected = true
+        comparisonNodes.forEach (n) -> n.selected = true
 
         # Reconcile the two lists of links
         # Loop over the primary links: if in comparison links
@@ -268,8 +278,8 @@ Enumerate the differences between the two policies
 
         if not $scope.primaryNodes?.length or
         not $scope.primaryLinks?.length or
-        not comparisonNodes?.length or
-        not comparisonLinks?.length
+        not comparison?.original?.nodes?.length or
+        not comparison?.original?.links?.length
           return
 
         nodeMapReducer = (map, currNode) ->
@@ -286,8 +296,13 @@ Enumerate the differences between the two policies
 
         nodeMapKey = (link) -> "#{link.source.type}-#{link.source.name}-#{link.target.type}-#{link.target.name}"
 
+        # Need shallow copies of the nodes and links arrays
+        $scope.primaryNodes = $scope.primaryNodes.slice()
+        $scope.primaryLinks = $scope.primaryLinks.slice()
         $scope.primaryNodes.forEach addPolicy(primaryPolicyId())
         $scope.primaryLinks.forEach addPolicy(primaryPolicyId())
+        comparisonNodes = comparison.original.nodes.slice()
+        comparisonLinks = comparison.original.links.slice()
         comparisonNodes.forEach addPolicy(comparisonPolicyId())
         comparisonLinks.forEach addPolicy(comparisonPolicyId())
 
