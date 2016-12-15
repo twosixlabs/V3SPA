@@ -64,4 +64,39 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   SHELL
 
+  config.vm.provision "shell", run: 'always', inline: <<-SHELL
+    ps cax | grep mongod > /dev/null
+    if [ $? -eq 1 ]; then
+      cd /home/vagrant/vespa
+      nohup mongod --dbpath ./mongodb & sleep 1
+    else
+      echo "Mongo is already running."
+    fi
+
+    ps cax | grep python > /dev/null
+    if [ $? -eq 1 ]; then
+      cd /vagrant
+      git submodule update --init
+      sudo npm install -g gulp
+      sudo npm install
+      virtualenv vespa
+      source vespa/bin/activate
+      pip install -r requirements.txt
+      gulp
+      cd /home/vagrant/vespa
+      nohup python /vagrant/vespa.py & sleep 1
+    else
+      echo "V3SPA is already running."
+    fi
+
+    ps cax | grep v3spa-server > /dev/null
+    if [ $? -eq 1 ]; then
+      cd /home/vagrant/vespa
+      cd tmp/bulk
+      nohup /home/vagrant/vespa/lobster/v3spa-server & sleep 1
+    else
+      echo "Lobster is already running."
+    fi
+  SHELL
+
 end
