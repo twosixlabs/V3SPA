@@ -1,5 +1,9 @@
 V3SPA
 =================
+
+[![Black Hat Arsenal](https://www.toolswatch.org/badges/arsenal/2016.svg)](https://www.blackhat.com/us-16/arsenal.html)
+[![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](./LICENSE)
+
 ## About
 
 V3SPA is a tool for visualizing and analyzing SELinux and SEAndroid security policies.
