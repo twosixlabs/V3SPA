@@ -4,6 +4,7 @@
 VAGRANTFILE_API_VERSION = "2"
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = "fedora/24-cloud-base"
+  config.vm.box_url = "http://archives.fedoraproject.org/pub/archive/fedora/linux/releases/24/CloudImages/x86_64/images/Fedora-Cloud-Base-Vagrant-24-1.2.x86_64.vagrant-virtualbox.box"
 
   config.ssh.username = 'vagrant'
   config.ssh.password = 'vagrant'
