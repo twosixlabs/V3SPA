@@ -96,6 +96,29 @@ If you need to restart the services for some reason (e.g. you ran `vagrant up` b
     $ (cd tmp/bulk && /home/vagrant/vespa/lobster/v3spa-server) &
     $ logout
 
+
+### Docker Installation
+There are Docker and docker-compose files along with some additional resources that allow you to run the application with Docker.
+
+When running, it starts mongodb instance and connects the application to it.
+
+In order to use it, you will need to install these requirements:
+
+- Docker
+- docker-compose
+
+Then to run the application use these commands:
+
+    $ docker-compose build
+    $ docker-compose up
+
+Following that, open a web browser and go to http://<docker-host>:8080/ (running on local machine, use http://localhost:8080/)
+
+By default, the application will be served on port 8080. You can change the mapping in docker-compose.yml, line 7. For example to run it on port 7079 change it to `- 7079:8080`.
+
+MongoDB is mounted on local folders in current directory. If required, you can change the mounting points in docker-compose.yml lines 21 and 26.
+
+
 ### Using V3SPA
 
 Open your Chrome browser and go to http://localhost:8080 to load V3SPA.
