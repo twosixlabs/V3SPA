@@ -102,13 +102,19 @@ There are Docker and docker-compose files along with some additional resources t
 
 When running, it starts mongodb instance and connects the application to it.
 
-In order to use it, you will need to install these requirements:
+In order to use it, you will need to install these prerequisites:
 
 - Docker
 - docker-compose
 
+Before the first time running the application, you will have to create directories for MongoDB to store data in (see note below about changing MongoDB storage):
+
+    $ cd V3SPA
+    $ mkdir -p mongo/configdb mongo/data
+
 Then to run the application use these commands:
 
+    $ cd V3SPA
     $ docker-compose build
     $ docker-compose up
 
@@ -116,7 +122,7 @@ Following that, open a web browser and go to http://<docker-host>:8080/ (running
 
 By default, the application will be served on port 8080. You can change the mapping in docker-compose.yml, line 7. For example to run it on port 7079 change it to `- 7079:8080`.
 
-MongoDB is mounted on local folders in current directory. If required, you can change the mounting points in docker-compose.yml lines 21 and 26.
+By default, MongoDB is mounted onto local (host, your machine) directories in the current (V3SPA) directory. If required, create the new directories where you want the data stored and then change the mounting points in docker-compose.yml lines 21 and 26.
 
 
 ### Using V3SPA
