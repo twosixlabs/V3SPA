@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  app:
+    build: .
+    ports: 
+    - "8080:8080"
+    depends_on:
+    - "mongo1"
+  mongo1:
+    image: mongo:latest
+    volumes:
+    - mongo_data:/data/db
+    - mongo_configdb:/data/configdb
+
+
+volumes:
+  mongo_data:
+    driver_opts:
+      type: none
+      device: $PWD/mongo/data
+      o: bind
+  mongo_configdb:
+    driver_opts:
+      type: none
+      device: $PWD/mongo/configdb
+      o: bind
