@@ -42,6 +42,8 @@ WORKDIR /vespa/V3SPA/lobster
 
 RUN sed -e 's/extra-deps: \[\]/extra-deps:\n- base-orphans-0@sha256:c1fc192cbcdcdb513ef87755cb5ee4efaea54aec0dfa715a3c681dffb4cf431b/' -i /vespa/V3SPA/lobster/v3spa-server/stack.yaml
 
+RUN make -C v3spa-server ghc dist/bin
+
 RUN make
 
 ENV PATH=/vespa/V3SPA/lobster/v3spa-server/dist/bin:$PATH
