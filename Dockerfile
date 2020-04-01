@@ -2,7 +2,7 @@ FROM centos:7
 
 RUN yum install -y make gcc
 
-RUN yum install -y python git setools-devel setools-libs bzip2-devel bison \
+RUN yum install -y python2 git setools setools-devel setools-libs bzip2-devel bison \
                flex python-devel swig \
                libsepol libsepol-devel libsepol-static libselinux-python \
                libselinux-static redhat-rpm-config zlib-devel
