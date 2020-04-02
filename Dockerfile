@@ -1,5 +1,7 @@
 FROM centos:7
 
+RUN yum install -y deltarpm
+
 RUN yum install -y make gcc
 
 RUN yum install -y python2 git setools setools-devel setools-libs bzip2-devel bison \
