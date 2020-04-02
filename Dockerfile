@@ -5,7 +5,8 @@ RUN yum install -y make gcc
 RUN yum install -y python2 git setools setools-devel setools-libs bzip2-devel bison \
                flex python-devel swig \
                libsepol libsepol-devel libsepol-static libselinux-python \
-               libselinux-static redhat-rpm-config zlib-devel
+               libselinux-static redhat-rpm-config zlib-devel \
+               perl make automake gcc gmp-devel libffi zlib xz tar git gnupg \ # needed by stack
 # removed python-tornado from yum install - will be installed as part of pip -r requirements.txt
 
 RUN yum install -y epel-release 
