@@ -55,6 +55,8 @@ WORKDIR /vespa
 RUN git clone https://github.com/TresysTechnology/setools.git
 WORKDIR /vespa/setools
 RUN git checkout 4.0.0
+RUN python setup.py build_ext
+RUN python setup.py build
 RUN python setup.py install
 
 WORKDIR /vespa
