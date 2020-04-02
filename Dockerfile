@@ -6,7 +6,9 @@ RUN yum install -y python2 git setools setools-devel setools-libs bzip2-devel bi
                flex python-devel swig \
                libsepol libsepol-devel libsepol-static libselinux-python \
                libselinux-static redhat-rpm-config zlib-devel \
-               perl make automake gcc gmp-devel libffi zlib xz tar git gnupg \ # needed by stack
+               perl make automake gcc gmp-devel libffi zlib xz tar git gnupg # needed by stack \
+               policycoreutils-python setools setools-console setroubleshoot* policycoreutils-devel # recommended for sepoliy analysis
+
 # removed python-tornado from yum install - will be installed as part of pip -r requirements.txt
 
 RUN yum install -y epel-release 
