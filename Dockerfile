@@ -16,8 +16,6 @@ RUN yum install -y python2-pip
 
 RUN pip install --upgrade pip
 
-RUN curl -sSL https://get.haskellstack.org/ | sh
-
 ENV PATH=/root/.local/bin:$PATH
 
 RUN pip install networkx setuptools
@@ -25,6 +23,11 @@ RUN pip install networkx setuptools
 RUN npm install -g gulp
 
 RUN mkdir /vespa
+
+WORKDIR /vespa
+RUN curl -sSL -o stack.tar.gz https://github.com/commercialhaskell/stack/releases/download/v1.9.3/stack-1.9.3-linux-x86_64-static.tar.gz
+RUN tar zxf stack.tar.gz
+ENV PATH=/vespa/stack-1.9.3-linux-x86_64-static:$PATH
 
 RUN git clone https://github.com/invincealabs/V3SPA.git /vespa/V3SPA
 
