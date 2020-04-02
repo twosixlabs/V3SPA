@@ -34,11 +34,8 @@ RUN curl -sSL -o stack.tar.gz https://github.com/commercialhaskell/stack/release
 RUN tar zxf stack.tar.gz
 ENV PATH=/vespa/stack-1.9.3-linux-x86_64-static:$PATH
 
-RUN git clone https://github.com/invincealabs/V3SPA.git /vespa/V3SPA
-
+COPY ./ /vespa/V3SPA
 WORKDIR /vespa/V3SPA
-
-RUN git submodule update --init
 
 RUN npm install
  
