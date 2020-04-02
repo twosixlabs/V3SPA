@@ -243,7 +243,7 @@ class RefPolicy(restful.ResourceDomain):
                     supported_docs['raw'] = True
 
                 if not supported_docs['dsl'] and not supported_docs['raw']:
-                    raise api.DisplayError("Cannot find binary policy or reference policy source in the zip file")
+                    raise api.DisplayError("Cannot find binary policy or reference policy source in the zip file: " + '\n'.join(errors))
 
                 if supported_docs['dsl'] is True:
                     # Import the policy into Lobster
