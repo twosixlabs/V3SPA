@@ -29,6 +29,9 @@
           Filter by hub statistic
           <range-slider width="500" height="40" range="filters.hubRange" range-change-end="filters.hubChange(extent)"></range-slider>
         </div>
+        <div>
+            <label><input type="checkbox" ng-model="controls.connectionsOnly" ng-change="filters.showConnectionsOnlyChanged()" />Only show objects with visible connections</label>
+        </div>
       </div>
       <div class="row node-controls" ng-show="controls.tab == 'accessVectorTab'">
         <div class="col-xs-3"><av-filter title="Subjects" items="filters.subjList" selection-change="filters.avChange()"></av-filter></div>

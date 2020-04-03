@@ -203,6 +203,10 @@
         $scope.nodeFilter.undo('node-hub')
         $scope.nodeFilter.nodesBy(nodeHub, 'node-hub').apply()
 
+      showConnectionsOnlyChangedCallback = () ->
+        $scope.applyFilters()
+        $scope.sigma.refresh()
+
       # User checked/unchecked something in the access vector filter
       avChangeCallback = () ->
         checkboxReducer = (map, currItem) ->
@@ -336,9 +340,18 @@
         addToAlwaysVisibleList: addToAlwaysVisibleList
         removeFromAlwaysVisibleList: removeFromAlwaysVisibleList
         clearAlwaysVisibleList: clearAlwaysVisibleList
+        showConnectionsOnlyChanged: showConnectionsOnlyChangedCallback
 
       $scope.applyFilters = () ->
         $scope.nodeFilter.apply()
+
+        # Filter for nodes with no visible connections after all other filters
+        # are applied.
+        if $scope.controls.connectionsOnly
+          g = $scope.sigma.graph
+          g.nodes().forEach((n) ->
+            n.hidden = n.hidden || _.every(g.adjacentEdges(n.id), (e) -> e.hidden)
+          )
 
       $scope.nodeFilter = new sigma.plugins.filter($scope.sigma)
 
@@ -364,6 +377,7 @@
           primary: true
           both: true
           comparison: true
+        connectionsOnly: false
 
       $scope.list_refpolicies = 
         query: (query)->
