@@ -11,5 +11,5 @@ pep8==1.4.6
 pyflakes==0.7.3
 pymongo==2.5
 sockjs-tornado==1.0.0
-tornado==3.1.1
+tornado==6.3.2
 wsgiref==0.1.2
